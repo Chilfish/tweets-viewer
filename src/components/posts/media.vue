@@ -8,7 +8,7 @@ const props = defineProps<{
 }>()
 
 function isVideo(url: string) {
-  return url.startsWith('https://video.twimg.com/')
+  return url.includes('https://video.twimg.com/')
 }
 
 const size = props.media.length
@@ -19,6 +19,8 @@ const height = size > 1 ? maxHeight / 2 : maxHeight
 const width = size > 1 ? maxWidth / 2 : maxWidth
 
 const modal = useModal()
+
+const replacedUrls = props.media.map(url => `https://proxy.chilfish.top/?url=${url.replace('name=orig', 'name=small')}`)
 </script>
 
 <template>
@@ -29,7 +31,7 @@ const modal = useModal()
     }"
   >
     <div
-      v-for="url in media"
+      v-for="url in replacedUrls"
       :key="url"
       class="relative"
     >

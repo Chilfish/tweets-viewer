@@ -21,7 +21,7 @@ watch(dateRange, () => {
 
 <template>
   <header
-    class="mb-2 flex items-center justify-between p-2"
+    class="flex items-center justify-between p-4"
   >
     <button
       title="Reset search"
