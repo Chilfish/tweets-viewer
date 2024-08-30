@@ -47,7 +47,7 @@ watch(dateRange, () => {
           'id': 'tweets-search',
         }"
         class="p-1"
-        @keydown="(e) => {
+        @keydown="(e: any) => {
           if (e.key === 'Enter') {
             tweetStore.search()
           }
