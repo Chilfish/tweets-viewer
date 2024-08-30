@@ -11,10 +11,29 @@ import {
   zhCN,
 } from 'naive-ui'
 import { computed } from 'vue'
+import { useHead, useSeoMeta } from '@unhead/vue'
 import { isDark } from '~/composables'
 
-const theme = computed(() => !isDark.value ? null : darkTheme)
+const title = 'Twitter Archive Explorer'
+const description = 'Explore your Twitter archive with ease'
 
+useSeoMeta({
+  title,
+  description,
+  ogTitle: title,
+  ogDescription: description,
+  twitterCard: 'summary',
+})
+
+useHead({
+  title,
+  meta: [
+    { name: 'description', content: description },
+    { name: 'theme-color', content: '#3388bb' },
+  ],
+})
+
+const theme = computed(() => !isDark.value ? null : darkTheme)
 const themes = {
   common: {
     primaryColor: '#3388bb',

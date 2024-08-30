@@ -1,5 +1,5 @@
 {
-  "name": "shadcn-vue-unocss-starter",
+  "name": "tweets-viewer",
   "type": "module",
   "version": "0.0.0",
   "private": true,
@@ -12,6 +12,7 @@
     "postinstall": "simple-git-hooks"
   },
   "dependencies": {
+    "@unhead/vue": "^1.10.0",
     "@unocss/reset": "^0.62.3",
     "@vueuse/core": "^11.0.3",
     "class-variance-authority": "^0.7.0",
