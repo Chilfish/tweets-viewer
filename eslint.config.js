@@ -9,4 +9,7 @@ export default antfu({
     'vue/no-multiple-template-root': 'off',
     'node/prefer-global/process': 'off',
   },
+  ignores: [
+    'public',
+  ],
 })

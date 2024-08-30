@@ -1,22 +1,44 @@
 import { defineComponent } from 'vue'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 import { CardHeader } from '../ui/card'
+import { useTweetStore } from '~/stores/tweets'
 
 export const PostProfile = defineComponent({
-  setup() {
+  props: {
+    time: {
+      type: String,
+      required: true,
+    },
+  },
+  setup({ time }) {
+    const user = useTweetStore().user!
+
     return () => (
       <CardHeader class="flex flex-row items-center gap-2 pb-1">
-        <Avatar>
-          <AvatarImage alt="User avatar" src="/placeholder-avatar.jpg" />
-          <AvatarFallback>J2D</AvatarFallback>
+        <Avatar size="sm">
+          <AvatarImage
+            alt={`User avatar for ${user.name}`}
+            src={user.avatar_url}
+          />
+          <AvatarFallback>{user.name}</AvatarFallback>
         </Avatar>
         <div class="flex items-center gap-2">
-          <p class="font-semibold">Jane Doe</p>
-          <p class="text-sm text-muted-foreground">@janedoe</p>
-          <time
-            class="text-sm text-muted-foreground hover:underline"
+          <p class="text-3.5 font-semibold">
+            {user.screen_name}
+          </p>
+          <a
+            class="text-3.2 text-muted-foreground hover:underline"
+            href={`https://twitter.com/${user.name}`}
+            target="_blank"
           >
-            2021-08-01 12:00
+            @
+            {user.name}
+          </a>
+          <span>·</span>
+          <time
+            class="text-muted-foreground"
+          >
+            {time}
           </time>
         </div>
       </CardHeader>

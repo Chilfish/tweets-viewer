@@ -2,6 +2,8 @@ export interface TweetAction {
   retweet_count: number
   quote_count: number
   reply_count: number
+  favorite_count: number
+  views_count: number
 }
 
 export interface Tweet extends TweetAction {
