@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { onBeforeMount } from 'vue'
+import { computed, onBeforeMount } from 'vue'
 import { Loader } from 'lucide-vue-next'
 import { Post } from '~/components/posts/post'
 import { useTweetStore } from '~/stores/tweets'
 
 const tweetStore = useTweetStore()
+
+const tweets = computed(() => tweetStore.getTweets())
 
 onBeforeMount(async () => {
   const tweetJson = await fetch('/data-test.json').then(res => res.json())
@@ -17,7 +19,7 @@ onBeforeMount(async () => {
 <template>
   <template v-if="tweetStore.tweets.length">
     <Post
-      v-for="tweet in tweetStore.tweets"
+      v-for="tweet in tweets"
       :key="tweet.id"
       :tweet="tweet"
     />

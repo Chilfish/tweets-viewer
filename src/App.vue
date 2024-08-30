@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import type {
+  GlobalThemeOverrides,
+} from 'naive-ui'
 import {
   NConfigProvider,
   NMessageProvider,
@@ -11,6 +14,12 @@ import { computed } from 'vue'
 import { isDark } from '~/composables'
 
 const theme = computed(() => !isDark.value ? null : darkTheme)
+
+const themes = {
+  common: {
+    primaryColor: '#3388bb',
+  },
+} satisfies GlobalThemeOverrides
 </script>
 
 <template>
@@ -18,6 +27,7 @@ const theme = computed(() => !isDark.value ? null : darkTheme)
     :locale="zhCN"
     :date-locale="dateZhCN"
     :theme
+    :theme-overrides="themes"
   >
     <NModalProvider>
       <NMessageProvider>
@@ -30,7 +40,7 @@ const theme = computed(() => !isDark.value ? null : darkTheme)
 <style>
 * {
   box-sizing: border-box;
-  min-width: 0;
+  /* min-width: 0; */
 }
 
 *::-webkit-scrollbar {
