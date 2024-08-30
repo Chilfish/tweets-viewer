@@ -12,7 +12,7 @@ const root = path.dirname(fileURLToPath(import.meta.url))
 export default defineConfig({
   resolve: {
     alias: {
-      '@/': `${path.join(root, 'src')}/`,
+      '~/': `${path.join(root, 'src')}/`,
     },
   },
   plugins: [
