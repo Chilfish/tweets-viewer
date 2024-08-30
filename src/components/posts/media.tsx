@@ -1,5 +1,5 @@
 import { defineComponent } from 'vue'
-import { Image } from '../Image'
+import { ImagePreviewer } from '../ImagePreviewer'
 import { cn } from '~/utils'
 
 function isVideo(url: string) {
@@ -40,7 +40,7 @@ export const PostMedia = defineComponent({
                 />
               )
             : (
-                <Image
+                <ImagePreviewer
                   height={height}
                   width={width}
                   src={url}
