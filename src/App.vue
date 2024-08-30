@@ -1,3 +1,44 @@
 <template>
   <RouterView />
 </template>
+
+<style>
+* {
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-track {
+  border-radius: 8px;
+  background-color: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  border-radius: 8px;
+  background-color: #7a797963;
+}
+
+*,
+*:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.5;
+  /* min-height: 100dvh; */
+  display: flex;
+  flex-direction: column;
+
+  @apply: bg-light-7 dark:bg-dark-8 dark:text-white text-black;
+}
+</style>

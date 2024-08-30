@@ -1,11 +1,14 @@
-<script setup lang="ts">
-// import { Avatar, AvatarImage } from '~/components/ui/avatar'
+<script setup lang="tsx">
+import { Post, QuoutedPost } from '~/components/posts/post'
 </script>
 
 <template>
-  <main class="mx-auto w-50% p-4">
-    <Avatar>
-      <AvatarImage src="https://pbs.twimg.com/profile_images/1749408673724825600/SiKCGmUR_normal.jpg" />
-    </Avatar>
+  <main class="mx-auto w-50% flex flex-col gap-0 p-4">
+    <Post />
+    <Post />
+    <Post />
+    <Post />
+
+    <QuoutedPost />
   </main>
 </template>

@@ -2,6 +2,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
 import Vue from '@vitejs/plugin-vue'
+import vueJsx from '@vitejs/plugin-vue-jsx'
 import UnoCSS from 'unocss/vite'
 import Components from 'unplugin-vue-components/vite'
 import VueDevTools from 'vite-plugin-vue-devtools'
@@ -12,7 +13,7 @@ const root = path.dirname(fileURLToPath(import.meta.url))
 export default defineConfig({
   resolve: {
     alias: {
-      '~/': `${path.join(root, 'src')}/`,
+      '~': `${path.join(root, 'src')}`,
     },
   },
   plugins: [
@@ -22,6 +23,7 @@ export default defineConfig({
         defineModel: true,
       },
     }),
+    vueJsx(),
 
     // https://github.com/antfu/vite-plugin-components
     Components({

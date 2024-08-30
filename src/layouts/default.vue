@@ -4,6 +4,7 @@
 
 <template>
   <main class="">
+    <Toaster />
     <slot />
   </main>
 </template>
