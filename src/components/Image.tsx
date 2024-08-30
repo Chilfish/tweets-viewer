@@ -41,12 +41,14 @@ export const Image = defineComponent({
         alt={props.alt}
         class="rounded-lg object-cover"
         height={props.height}
+        width={props.width}
         src={placeholderSVG}
         style={{
           aspectRatio: `${props.width}/${props.height}`,
           objectFit: 'cover',
+          height: `${props.height}px`,
+          width: `${props.width}px`,
         }}
-        width={props.width}
       />
     )
   },
