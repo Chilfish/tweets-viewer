@@ -41,4 +41,8 @@ body {
 
   @apply: bg-light-7 dark:bg-dark-8 dark:text-white text-black;
 }
+
+p {
+  white-space: pre-wrap;
+}
 </style>

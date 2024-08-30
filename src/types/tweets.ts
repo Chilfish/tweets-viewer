@@ -11,7 +11,10 @@ export interface Tweet extends TweetAction {
   created_at: string
   full_text: string
   media: string[]
-  in_reply_to: string | null
+  in_reply_to: {
+    id: string
+    name: string
+  } | null
   retweeted_status: string | null
   quoted_status: string | null
 }

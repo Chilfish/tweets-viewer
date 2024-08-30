@@ -1,15 +1,12 @@
 import { ChartColumn, ExternalLink, HeartIcon, MessageCircle, Repeat2 } from 'lucide-vue-next'
 import { defineComponent } from 'vue'
-import { Image } from '../Image'
 import { PostProfile } from './profile'
 import { PostText } from './text'
+import { PostMedia } from './media'
+import { Link } from './link'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent, CardFooter } from '~/components/ui/card'
 import type { Tweet } from '~/types/tweets'
-
-function isVideo(url: string) {
-  return url.startsWith('https://video.twimg.com/')
-}
 
 const PostContent = defineComponent({
   props: {
@@ -17,23 +14,25 @@ const PostContent = defineComponent({
       type: String,
       required: true,
     },
+    quoutId: String as () => Tweet['quoted_status'],
     media: {
       type: Array as () => string[],
       default: () => [],
     },
   },
-  setup({ text, media }) {
+  setup({ text, media, quoutId }) {
     return () => (
       <CardContent class="pb-2 space-y-2">
         <PostText text={text} />
-        <div class="grid grid-cols-2 gap-2">
-          {media.map(url => (
-            isVideo(url)
-              ? <video controls src={url} />
-              : <Image src={url} />
-
-          ))}
-        </div>
+        <PostMedia media={media} />
+        {quoutId && (
+          <p
+            class="rounded-lg bg-gray-100 p-3"
+          >
+            这是一条转发推文，查看
+            {Link(`https://x.com/i/status/${quoutId}`, '原文')}
+          </p>
+        )}
       </CardContent>
     )
   },
@@ -98,6 +97,7 @@ export const Post = defineComponent({
         <PostProfile time={tweet.created_at} />
         <PostContent
           text={tweet.full_text}
+          quoutId={tweet.quoted_status}
           media={tweet.media}
         />
         <PostActions

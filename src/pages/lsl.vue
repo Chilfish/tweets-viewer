@@ -6,7 +6,7 @@ import { useTweetStore } from '~/stores/tweets'
 const tweetStore = useTweetStore()
 
 onBeforeMount(async () => {
-  const tweetJson = await fetch('/data-lsl.json').then(res => res.json())
+  const tweetJson = await fetch('/data-test.json').then(res => res.json())
 
   tweetStore.setTweets(tweetJson.tweets.slice(0, 10))
   tweetStore.user = tweetJson.user
