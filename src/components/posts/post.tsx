@@ -1,7 +1,7 @@
 import { defineComponent } from 'vue'
 import { PostProfile } from './profile'
 import { PostText } from './text'
-import { PostMedia } from './media'
+import PostMedia from './media.vue'
 import { Link } from './link'
 import { PostActions } from './actions'
 import { Card, CardContent } from '~/components/ui/card'

@@ -1,5 +1,30 @@
+<script setup lang="ts">
+import {
+  NConfigProvider,
+  NMessageProvider,
+  NModalProvider,
+  darkTheme,
+  dateZhCN,
+  zhCN,
+} from 'naive-ui'
+import { computed } from 'vue'
+import { isDark } from '~/composables'
+
+const theme = computed(() => !isDark.value ? null : darkTheme)
+</script>
+
 <template>
-  <RouterView />
+  <NConfigProvider
+    :locale="zhCN"
+    :date-locale="dateZhCN"
+    :theme
+  >
+    <NModalProvider>
+      <NMessageProvider>
+        <RouterView />
+      </NMessageProvider>
+    </NModalProvider>
+  </NConfigProvider>
 </template>
 
 <style>
@@ -19,12 +44,6 @@
 *::-webkit-scrollbar-thumb {
   border-radius: 8px;
   background-color: #7a797963;
-}
-
-*,
-*:focus-visible {
-  outline: none;
-  box-shadow: none;
 }
 
 html {

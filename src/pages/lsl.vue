@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onBeforeMount } from 'vue'
+import { Loader } from 'lucide-vue-next'
 import { Post } from '~/components/posts/post'
 import { useTweetStore } from '~/stores/tweets'
 
@@ -14,13 +15,17 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <main
-    class="mx-auto flex flex-col gap-0 sm:w-50% sm:p-4"
-  >
+  <template v-if="tweetStore.tweets.length">
     <Post
       v-for="tweet in tweetStore.tweets"
       :key="tweet.id"
       :tweet="tweet"
     />
-  </main>
+  </template>
+  <div
+    v-else
+    class="w-full flex items-center justify-center pt-30"
+  >
+    <Loader class="animate-spin" />
+  </div>
 </template>

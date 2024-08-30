@@ -6,6 +6,7 @@ import vueJsx from '@vitejs/plugin-vue-jsx'
 import UnoCSS from 'unocss/vite'
 import Components from 'unplugin-vue-components/vite'
 import VueDevTools from 'vite-plugin-vue-devtools'
+import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
 
 const root = path.dirname(fileURLToPath(import.meta.url))
 
@@ -28,6 +29,9 @@ export default defineConfig({
     // https://github.com/antfu/vite-plugin-components
     Components({
       dts: 'src/types/auto-components.d.ts',
+      resolvers: [
+        NaiveUiResolver(),
+      ],
     }),
 
     // https://github.com/antfu/unocss

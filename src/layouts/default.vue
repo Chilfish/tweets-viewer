@@ -3,8 +3,9 @@
 </script>
 
 <template>
-  <main class="">
-    <Toaster />
+  <main
+    class="mx-auto flex flex-col gap-0 sm:w-50% sm:p-4"
+  >
     <slot />
   </main>
 </template>
