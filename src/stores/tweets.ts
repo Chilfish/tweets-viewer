@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref, shallowRef, triggerRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useDateFormat } from '@vueuse/core'
 import type { Tweet, User } from '~/types/tweets'
 import { buildSearch } from '~/utils/search'
 
@@ -23,6 +24,20 @@ export const useTweetStore = defineStore('tweets', () => {
     }
     return tweets.value
   }
+  function getTweetsById(id: string) {
+    return tweets.value.find(t => t.id === id)
+  }
+
+  function getTweetsRange() {
+    if (!tweets.value.length)
+      return { start: Date.now(), end: Date.now() }
+
+    // 新推文在前
+    const start = new Date(tweets.value[tweets.value.length - 1].created_at).getTime()
+    const end = new Date(tweets.value[0].created_at).getTime()
+    return { start, end }
+  }
+
   function setTweets(newTweets: Tweet[]) {
     tweets.value = newTweets
     triggerRef(tweets)
@@ -53,6 +68,20 @@ export const useTweetStore = defineStore('tweets', () => {
     router.push({ query: { q: keyword } })
   }
 
+  function getTweetsByDateRange(start: number, end: number) {
+    const data = tweets.value.filter((t) => {
+      const timestamp = new Date(t.created_at).getTime()
+      return timestamp >= start && timestamp <= end
+    })
+    console.log('getTweetsByDateRange', data, start, end)
+    searchTweets.value = data
+    router.push({
+      query: {
+        q: `from:${useDateFormat(start, 'YYYY-MM-DD').value} to:${useDateFormat(end, 'YYYY-MM-DD').value}`,
+      },
+    })
+  }
+
   return {
     user,
     tweets,
@@ -62,5 +91,7 @@ export const useTweetStore = defineStore('tweets', () => {
     getTweets,
     resetSearch,
     search,
+    getTweetsRange,
+    getTweetsByDateRange,
   }
 })

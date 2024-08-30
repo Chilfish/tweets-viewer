@@ -1,33 +1,24 @@
 <script setup lang="ts">
-import { computed, onBeforeMount } from 'vue'
-import { Loader } from 'lucide-vue-next'
+import { computed } from 'vue'
 import { Post } from '~/components/posts/post'
 import { useTweetStore } from '~/stores/tweets'
 
 const tweetStore = useTweetStore()
 
 const tweets = computed(() => tweetStore.getTweets())
-
-onBeforeMount(async () => {
-  const tweetJson = await fetch('/data-test.json').then(res => res.json())
-
-  tweetStore.setTweets(tweetJson.tweets.slice(0, 10))
-  tweetStore.user = tweetJson.user
-})
 </script>
 
 <template>
-  <template v-if="tweetStore.tweets.length">
-    <Post
-      v-for="tweet in tweets"
-      :key="tweet.id"
-      :tweet="tweet"
-    />
-  </template>
-  <div
-    v-else
-    class="w-full flex items-center justify-center pt-30"
-  >
-    <Loader class="animate-spin" />
-  </div>
+  <Post
+    v-for="tweet in tweets"
+    :key="tweet.id"
+    :tweet="tweet"
+  />
+
+  <n-empty
+    v-if="!tweets.length"
+    class="mt-8"
+    size="large"
+    description="没有任何推文欸"
+  />
 </template>

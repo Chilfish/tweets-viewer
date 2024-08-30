@@ -1,13 +1,27 @@
 <script setup lang="ts">
-import { Search } from 'lucide-vue-next'
+import { CalendarSearch, Search } from 'lucide-vue-next'
+import { ref, watch } from 'vue'
 import { useTweetStore } from '~/stores/tweets'
 
 const tweetStore = useTweetStore()
+const { start, end } = tweetStore.getTweetsRange()
+const day = 24 * 60 * 60 * 1000
+
+function disableDate(ts: number) {
+  return ts < start - day || ts > end
+}
+
+const dateRange = ref<[number, number]>([end, end])
+
+watch(dateRange, () => {
+  const [start, end] = dateRange.value
+  tweetStore.getTweetsByDateRange(start, end + day)
+})
 </script>
 
 <template>
   <header
-    class="flex items-center justify-between p-4"
+    class="mb-2 flex items-center justify-between p-2"
   >
     <button
       title="Reset search"
@@ -21,11 +35,12 @@ const tweetStore = useTweetStore()
     </button>
 
     <div
-      class="w-100"
+      class="w-60 flex items-center gap-4 md:w-100"
     >
       <n-input
         v-model:value="tweetStore.searchText"
         placeholder="Search"
+        class="p-1"
         clearable
         @keydown="(e) => {
           if (e.key === 'Enter') {
@@ -40,6 +55,31 @@ const tweetStore = useTweetStore()
           />
         </template>
       </n-input>
+
+      <n-popover
+        trigger="click"
+        placement="bottom"
+        :show-arrow="false"
+      >
+        <template #trigger>
+          <button>
+            <CalendarSearch class="h-6 w-6" />
+          </button>
+        </template>
+
+        <div class="w-fit p-2">
+          <p class="mb-4 text-4">
+            选择搜索的日期范围
+          </p>
+
+          <n-date-picker
+            v-model:value="dateRange"
+            type="daterange"
+            clearable
+            :is-date-disabled="disableDate"
+          />
+        </div>
+      </n-popover>
     </div>
   </header>
 </template>
