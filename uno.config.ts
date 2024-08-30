@@ -21,4 +21,9 @@ export default defineConfig({
       ],
     },
   },
+  theme: {
+    colors: {
+      primary: '#3388bb',
+    },
+  },
 })

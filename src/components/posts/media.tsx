@@ -1,6 +1,6 @@
 import { defineComponent } from 'vue'
 import { ImagePreviewer } from '../ImagePreviewer'
-import { cn } from '~/utils'
+import { Video } from '../Video'
 
 function isVideo(url: string) {
   return url.startsWith('https://video.twimg.com/')
@@ -23,20 +23,18 @@ export const PostMedia = defineComponent({
 
     return () => (
       <div
-        class={cn('grid gap-2px', `grid-cols-${cols}`)}
+        class="grid gap-2px"
+        style={{
+          gridTemplateColumns: `repeat(${cols}, 1fr)`,
+        }}
       >
         {media.map(url => (
           isVideo(url)
             ? (
-                <video
-                  controls
+                <Video
                   height={height}
                   width={width}
                   src={url}
-                  class="rounded-lg object-contain"
-                  style={{
-                    maxHeight: `${height}px`,
-                  }}
                 />
               )
             : (

@@ -2,7 +2,7 @@ export function Link(url: string, text?: string) {
   return (
     <a
       href={url}
-      class="px-1 text-blue-500 hover:underline"
+      class="px-1 text-primary hover:underline"
       target="_blank"
     >
       {text || url}

@@ -1,11 +1,10 @@
-import { ChartColumn, ExternalLink, HeartIcon, MessageCircle, Repeat2 } from 'lucide-vue-next'
 import { defineComponent } from 'vue'
 import { PostProfile } from './profile'
 import { PostText } from './text'
 import { PostMedia } from './media'
 import { Link } from './link'
-import { Button } from '~/components/ui/button'
-import { Card, CardContent, CardFooter } from '~/components/ui/card'
+import { PostActions } from './actions'
+import { Card, CardContent } from '~/components/ui/card'
 import type { Tweet } from '~/types/tweets'
 
 const PostContent = defineComponent({
@@ -38,52 +37,6 @@ const PostContent = defineComponent({
   },
 })
 
-const PostActions = defineComponent({
-  props: {
-    comment: Number,
-    retweet: Number,
-    like: Number,
-    view: Number,
-    link: String,
-  },
-  setup({ comment, retweet, like, view, link }) {
-    return () => (
-      <CardFooter class="flex justify-between pb-2">
-        <Button variant="ghost" size="sm" class="text-muted-foreground">
-          <MessageCircle class="mr-2 h-4 w-4" />
-          {comment || 0}
-        </Button>
-        <Button variant="ghost" size="sm" class="text-muted-foreground">
-          <Repeat2 class="mr-2 h-4 w-4" />
-          {retweet || 0}
-        </Button>
-        <Button variant="ghost" size="sm" class="text-muted-foreground">
-          <HeartIcon class="mr-2 h-4 w-4" />
-          {like || 0}
-        </Button>
-        <Button variant="ghost" size="sm" class="text-muted-foreground">
-          <ChartColumn class="mr-2 h-4 w-4" />
-          {view || 0}
-        </Button>
-
-        <Button
-          title="Open in new tab"
-          variant="ghost"
-          size="sm"
-          class="text-muted-foreground"
-          onClick={() => {
-            if (!link)
-              return
-            window.open(link, '_blank')
-          }}
-        >
-          <ExternalLink class="h-4 w-4" />
-        </Button>
-      </CardFooter>
-    )
-  },
-})
-
 export const Post = defineComponent({
   props: {
     tweet: {
@@ -107,30 +60,6 @@ export const Post = defineComponent({
           view={tweet.views_count}
           link={`https://twitter.com/i/status/${tweet.id}`}
         />
-      </Card>
-    )
-  },
-})
-
-export const QuoutedPost = defineComponent({
-  props: {
-    tweet: {
-      type: Object as () => Tweet,
-      required: true,
-    },
-  },
-  setup({ tweet }) {
-    return () => (
-      <Card class="mx-auto">
-        <PostProfile time={tweet.created_at} />
-
-        <CardContent class="pb-2">
-          <p class="py-2">
-            Hello!
-          </p>
-          <Post tweet={tweet} />
-        </CardContent>
-        <PostActions />
       </Card>
     )
   },
