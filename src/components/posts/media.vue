@@ -12,7 +12,7 @@ function isVideo(url: string) {
 }
 
 const size = props.media.length
-const maxWidth = 1000 // px
+const maxWidth = 900 // px
 const maxHeight = 500 // px
 const cols = size > 1 ? 2 : 1
 const height = size > 1 ? maxHeight / 2 : maxHeight
@@ -38,6 +38,7 @@ const modal = useModal()
         :src="url"
         :width="width"
         :height="height"
+        :unset-width="size === 1"
         @click="modal.create({
           style: {
             width: 'auto',

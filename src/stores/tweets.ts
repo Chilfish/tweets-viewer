@@ -25,10 +25,26 @@ export const useTweetStore = defineStore('tweets', () => {
     search()
   })
 
+  function parseDateRange() {
+    const query = route.query
+    if (query.from && query.to) {
+      return {
+        start: new Date(query.from as string).getTime(),
+        end: new Date(query.to as string).getTime(),
+      }
+    }
+    return getTweetsRange()
+  }
+
   function getTweets() {
-    if (searchQuery.value) {
-      if (!searchTweets.value.length)
-        search()
+    const query = route.query
+    if (query.q) {
+      search()
+      return searchTweets.value
+    }
+    else if (query.from && query.to) {
+      const { start, end } = parseDateRange()
+      getTweetsByDateRange(start, end)
       return searchTweets.value
     }
     return tweets.value
@@ -70,9 +86,15 @@ export const useTweetStore = defineStore('tweets', () => {
       return
     }
 
+    const { start, end } = parseDateRange()
+
     searchTweets.value = searchFn
       .search(keyword)
       .map(id => tweets.value.find(t => t.id === id)!)
+      .filter((t) => {
+        const timestamp = new Date(t.created_at).getTime()
+        return timestamp >= start && timestamp <= end
+      })
 
     router.push({
       query: {
@@ -91,7 +113,8 @@ export const useTweetStore = defineStore('tweets', () => {
     router.push({
       query: {
         ...route.query,
-        q: `from:${useDateFormat(start, 'YYYY-MM-DD').value} to:${useDateFormat(end, 'YYYY-MM-DD').value}`,
+        from: useDateFormat(start, 'YYYY-MM-DD').value,
+        to: useDateFormat(end, 'YYYY-MM-DD').value,
       },
     })
   }

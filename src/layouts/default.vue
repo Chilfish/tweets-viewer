@@ -8,7 +8,7 @@ const tweetStore = useTweetStore()
 onBeforeMount(async () => {
   const tweetJson = await fetch('/data-lsl.json').then(res => res.json())
 
-  tweetStore.setTweets(tweetJson.tweets.slice(0, 100).sort((a: any, b: any) => +b.id - +a.id))
+  tweetStore.setTweets(tweetJson.tweets.sort((a: any, b: any) => +b.id - +a.id))
   tweetStore.user = tweetJson.user
 })
 </script>

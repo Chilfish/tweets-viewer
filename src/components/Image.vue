@@ -7,6 +7,7 @@ const props = defineProps<{
   alt?: string
   width?: number
   height?: number
+  unsetWidth?: boolean
 } >()
 
 const observer = new IntersectionObserver((entries) => {
@@ -35,16 +36,13 @@ onMounted(() => {
     ref="imgRef"
     class="rounded-lg object-cover"
     :alt
-    :height
-    :width
     loading="lazy"
     referrerpolicy="no-referrer"
     :src="placeholderSVG"
     :style="{
-      aspectRatio: `${props.width}/${props.height}`,
       objectFit: 'cover',
-      height: `${props.height}px`,
-      width: `${props.width}px`,
+      height: `${height}px`,
+      width: unsetWidth ? undefined : `${width}px`,
     }"
   >
 </template>
