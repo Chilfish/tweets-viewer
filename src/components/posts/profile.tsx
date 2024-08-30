@@ -2,6 +2,7 @@ import { defineComponent } from 'vue'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 import { CardHeader } from '../ui/card'
 import { useTweetStore } from '~/stores/tweets'
+import { proxyUrl } from '~/constant'
 
 export const PostProfile = defineComponent({
   props: {
@@ -18,7 +19,7 @@ export const PostProfile = defineComponent({
         <Avatar size="sm">
           <AvatarImage
             alt={`User avatar for ${user.name}`}
-            src={user.avatar_url}
+            src={proxyUrl + user.avatar_url}
           />
           <AvatarFallback>{user.name}</AvatarFallback>
         </Avatar>

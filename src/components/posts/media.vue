@@ -2,6 +2,7 @@
 import { useModal } from 'naive-ui'
 import { h } from 'vue'
 import Image from '../Image.vue'
+import { proxyUrl } from '~/constant'
 
 const props = defineProps<{
   media: string[]
@@ -20,7 +21,7 @@ const width = size > 1 ? maxWidth / 2 : maxWidth
 
 const modal = useModal()
 
-const replacedUrls = props.media.map(url => `https://proxy.chilfish.top/?url=${url.replace('name=orig', 'name=small')}`)
+const replacedUrls = props.media.map(url => `${proxyUrl}${url.replace('name=orig', 'name=small')}`)
 </script>
 
 <template>
