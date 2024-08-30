@@ -23,7 +23,7 @@ export const PostProfile = defineComponent({
           />
           <AvatarFallback>{user.name}</AvatarFallback>
         </Avatar>
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2">
           <p class="text-3.5 font-semibold">
             {user.screen_name}
           </p>
@@ -37,7 +37,7 @@ export const PostProfile = defineComponent({
           </a>
           <span>·</span>
           <time
-            class="text-muted-foreground"
+            class="text-3.2 text-muted-foreground"
           >
             {time}
           </time>

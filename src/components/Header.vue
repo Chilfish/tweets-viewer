@@ -81,6 +81,7 @@ watch(dateRange, () => {
             v-model:value="dateRange"
             type="daterange"
             clearable
+            bind-calendar-months
             :is-date-disabled="disableDate"
           />
         </div>
@@ -88,3 +89,16 @@ watch(dateRange, () => {
     </div>
   </header>
 </template>
+
+<style>
+.n-date-panel.n-date-panel--daterange.n-date-panel--shadow {
+  display: flex;
+  flex-direction: column;
+  margin-left: 1rem;
+}
+@media (min-width: 768px) {
+  .n-date-panel.n-date-panel--daterange.n-date-panel--shadow {
+    display: grid;
+  }
+}
+</style>
