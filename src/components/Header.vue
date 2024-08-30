@@ -40,8 +40,13 @@ watch(dateRange, () => {
       <n-input
         v-model:value="tweetStore.searchText"
         placeholder="Search"
+        :input-props="{
+          'aria-label': 'Search',
+          'aria-describedby': 'tweets search',
+          'type': 'search',
+          'id': 'tweets-search',
+        }"
         class="p-1"
-        clearable
         @keydown="(e) => {
           if (e.key === 'Enter') {
             tweetStore.search()

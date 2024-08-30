@@ -1,25 +1,34 @@
 import { defineStore } from 'pinia'
-import { computed, ref, shallowRef, triggerRef } from 'vue'
+import { computed, ref, shallowRef, triggerRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useDateFormat } from '@vueuse/core'
-import type { Tweet, User } from '~/types/tweets'
 import { buildSearch } from '~/utils/search'
+import type { Tweet, User } from '~/types/tweets'
 
 export const useTweetStore = defineStore('tweets', () => {
   const user = ref<User | null>(null)
   const tweets = shallowRef<Tweet[]>([])
-  const searchTweets = shallowRef<Tweet[]>([])
+
   const router = useRouter()
   const route = useRoute()
 
+  const searchTweets = shallowRef<Tweet[]>([])
   const searchQuery = computed(() => route.query.q as string)
   const searchText = ref(searchQuery.value)
   let searchFn: ReturnType<typeof buildSearch> | null = null
 
+  watch(searchQuery, (query) => {
+    if (query === searchText.value)
+      return
+
+    searchText.value = query
+    search()
+  })
+
   function getTweets() {
-    console.log('getTweets', searchQuery.value)
     if (searchQuery.value) {
-      search()
+      if (!searchTweets.value.length)
+        search()
       return searchTweets.value
     }
     return tweets.value
@@ -65,7 +74,12 @@ export const useTweetStore = defineStore('tweets', () => {
       .search(keyword)
       .map(id => tweets.value.find(t => t.id === id)!)
 
-    router.push({ query: { q: keyword } })
+    router.push({
+      query: {
+        ...route.query,
+        q: keyword,
+      },
+    })
   }
 
   function getTweetsByDateRange(start: number, end: number) {
@@ -73,10 +87,10 @@ export const useTweetStore = defineStore('tweets', () => {
       const timestamp = new Date(t.created_at).getTime()
       return timestamp >= start && timestamp <= end
     })
-    console.log('getTweetsByDateRange', data, start, end)
     searchTweets.value = data
     router.push({
       query: {
+        ...route.query,
         q: `from:${useDateFormat(start, 'YYYY-MM-DD').value} to:${useDateFormat(end, 'YYYY-MM-DD').value}`,
       },
     })
@@ -93,5 +107,6 @@ export const useTweetStore = defineStore('tweets', () => {
     search,
     getTweetsRange,
     getTweetsByDateRange,
+    getTweetsById,
   }
 })

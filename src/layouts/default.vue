@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import { onBeforeMount } from 'vue'
 import { isDark } from '~/composables'
-
 import { useTweetStore } from '~/stores/tweets'
 
 const tweetStore = useTweetStore()
 
 onBeforeMount(async () => {
-  const tweetJson = await fetch('/data-test.json').then(res => res.json())
+  const tweetJson = await fetch('/data-lsl.json').then(res => res.json())
 
-  tweetStore.setTweets(tweetJson.tweets.slice(0, 10).sort((a: any, b: any) => +b.id - +a.id))
+  tweetStore.setTweets(tweetJson.tweets.slice(0, 100).sort((a: any, b: any) => +b.id - +a.id))
   tweetStore.user = tweetJson.user
 })
 </script>
@@ -31,9 +30,7 @@ onBeforeMount(async () => {
       v-if="tweetStore.tweets.length"
     >
       <Header />
-      <section>
-        <slot />
-      </section>
+      <slot />
     </template>
 
     <div
