@@ -40,4 +40,20 @@ export default defineConfig({
     // https://github.com/webfansplz/vite-plugin-vue-devtools
     VueDevTools(),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          const names = [
+            'naive-ui',
+          ]
+          for (const name of names) {
+            if (id.includes(`node_modules/${name}/`)) {
+              return name
+            }
+          }
+        },
+      },
+    },
+  },
 })
