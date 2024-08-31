@@ -8,7 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 export async function canGoogle() {
   try {
     const aborter = new AbortController()
-    setTimeout(() => aborter.abort('Timeout 1.5s'), 1500)
+    setTimeout(() => aborter.abort('Timeout 2s'), 2000)
 
     const urls = [
       // 居然有时能直连推特图床

@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { computed, ref, shallowRef, triggerRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useDateFormat } from '@vueuse/core'
+import { fallbackUser, notfountRetry, staticUrl } from '~/constant'
 import { buildSearch } from '~/utils/search'
 import type { Tweet, User } from '~/types/tweets'
 
@@ -25,9 +26,25 @@ export const useTweetStore = defineStore('tweets', () => {
     search()
   })
 
-  async function initTweets() {
-    const name = localStorage.getItem('user') || 'lsl'
-    const tweetJson = await fetch(`/data-${name}.json`).then(res => res.json())
+  let retry = 0
+  async function initTweets(name = route.params.name || fallbackUser) {
+    console.log('Loading data for', name)
+
+    const tweetJson = await fetch(`${staticUrl}/tweet/data-${name}.json`)
+      .then(res => res.json())
+      .catch(async () => {
+        if (retry < notfountRetry) {
+          retry++
+          router.push({
+            path: `@${fallbackUser}`,
+          })
+          await initTweets(fallbackUser)
+        }
+        else {
+          console.error('Failed to load data for', name)
+          router.push('/')
+        }
+      })
 
     setTweets(tweetJson.tweets.sort((a: any, b: any) => +b.id - +a.id))
     user.value = tweetJson.user
@@ -80,7 +97,7 @@ export const useTweetStore = defineStore('tweets', () => {
     searchText.value = ''
     router.push({
       query: {},
-      path: user.value?.name || '/',
+      path: `@${user.value?.name}` || '/',
     })
   }
 
