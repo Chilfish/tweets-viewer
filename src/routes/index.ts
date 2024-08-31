@@ -26,6 +26,14 @@ const routes: RouteRecordRaw[] = [
     path: '/lsl',
     component: useLayout('lsl'),
   },
+  {
+    path: '/ttisrn_0710',
+    component: useLayout('lsl'),
+  },
+  {
+    path: '/memo',
+    component: useLayout('memo'),
+  },
 ]
 
 const router = createRouter({

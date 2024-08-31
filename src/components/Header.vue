@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CalendarSearch, Moon, Search, Sun } from 'lucide-vue-next'
+import { CalendarSearch, History, Moon, Search, Sun } from 'lucide-vue-next'
 import { ref, watch } from 'vue'
 import { useTweetStore } from '~/stores/tweets'
 import { isDark } from '~/composables'
@@ -42,6 +42,13 @@ watch(dateRange, () => {
         <Sun v-if="!isDark" />
         <Moon v-else />
       </button>
+
+      <RouterLink
+        to="/memo"
+        title="那年今日"
+      >
+        <History class="h-6 w-6" />
+      </RouterLink>
     </div>
 
     <div

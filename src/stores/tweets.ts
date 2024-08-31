@@ -25,6 +25,14 @@ export const useTweetStore = defineStore('tweets', () => {
     search()
   })
 
+  async function initTweets() {
+    const name = localStorage.getItem('user') || 'lsl'
+    const tweetJson = await fetch(`/data-${name}.json`).then(res => res.json())
+
+    setTweets(tweetJson.tweets.sort((a: any, b: any) => +b.id - +a.id))
+    user.value = tweetJson.user
+  }
+
   function parseDateRange() {
     const query = route.query
     if (query.from && query.to) {
@@ -70,7 +78,10 @@ export const useTweetStore = defineStore('tweets', () => {
   function resetSearch() {
     searchTweets.value = []
     searchText.value = ''
-    router.push({ query: {} })
+    router.push({
+      query: {},
+      path: user.value?.name || '/',
+    })
   }
 
   function search() {
@@ -119,11 +130,23 @@ export const useTweetStore = defineStore('tweets', () => {
     })
   }
 
+  // 获取往年今日的数据
+  function getLastYearsTodayData() {
+    const today = new Date()
+    const todayStr = `${today.getMonth() + 1}-${today.getDate()}`
+    const lastYearsToday = tweets.value.filter((item) => {
+      const date = new Date(item.created_at)
+      return `${date.getMonth() + 1}-${date.getDate()}` === todayStr
+    })
+    return lastYearsToday
+  }
+
   return {
     user,
     tweets,
     searchText,
     searchTweets,
+    initTweets,
     setTweets,
     getTweets,
     resetSearch,
@@ -131,5 +154,6 @@ export const useTweetStore = defineStore('tweets', () => {
     getTweetsRange,
     getTweetsByDateRange,
     getTweetsById,
+    getLastYearsTodayData,
   }
 })
