@@ -23,6 +23,7 @@ const modal = useModal()
 
 <template>
   <div
+    v-if="media.length"
     class="grid gap-2px"
     :style="{
       gridTemplateColumns: `repeat(${cols}, 1fr)`,
