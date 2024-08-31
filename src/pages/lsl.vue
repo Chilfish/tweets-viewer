@@ -9,16 +9,18 @@ const tweets = tweetStore.getTweets()
 
 const tweetsToDisplay = ref(tweets.slice(0, 10))
 
+function loadmore() {
+  const size = tweetsToDisplay.value.length
+  tweetsToDisplay.value = [
+    ...tweetsToDisplay.value,
+    ...tweets.slice(size, size + 10),
+  ]
+}
+
 useInfiniteScroll(
   window.document,
-  () => {
-    const size = tweetsToDisplay.value.length
-    tweetsToDisplay.value = [
-      ...tweetsToDisplay.value,
-      ...tweets.slice(size, size + 10),
-    ]
-  },
-  { distance: 20 },
+  loadmore,
+  { distance: 10 },
 )
 </script>
 
@@ -31,9 +33,19 @@ useInfiniteScroll(
     />
   </section>
 
+  <Button
+    v-if="tweets.length > tweetsToDisplay.length"
+    class="m-4 p-2"
+    size="large"
+    variant="ghost"
+    @click="loadmore"
+  >
+    加载更多
+  </Button>
+
   <n-empty
     v-if="!tweets.length"
-    class="mt-8"
+    class="my-8"
     size="large"
     description="没有任何推文欸"
   />

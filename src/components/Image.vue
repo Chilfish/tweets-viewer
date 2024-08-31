@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { placeholderSVG } from '~/constant'
+import { placeholderSVG, proxyUrl } from '~/constant'
+import { isGoodNetwork } from '~/composables'
 
 const props = defineProps<{
   src: string
@@ -14,7 +15,7 @@ const observer = new IntersectionObserver((entries) => {
   entries.forEach((entry) => {
     if (entry.isIntersecting) {
       const img = entry.target as HTMLImageElement
-      img.src = props.src
+      img.src = isGoodNetwork.value ? proxyUrl + props.src : props.src
       img.onerror = () => {
         img.src = placeholderSVG
       }

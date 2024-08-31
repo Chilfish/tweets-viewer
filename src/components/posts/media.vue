@@ -2,7 +2,6 @@
 import { useModal } from 'naive-ui'
 import { h } from 'vue'
 import Image from '../Image.vue'
-import { proxyUrl } from '~/constant'
 
 const props = defineProps<{
   media: string[]
@@ -20,8 +19,6 @@ const height = size > 1 ? maxHeight / 2 : maxHeight
 const width = size > 1 ? maxWidth / 2 : maxWidth
 
 const modal = useModal()
-
-const replacedUrls = props.media.map(url => `${proxyUrl}${url.replace('name=orig', 'name=small')}`)
 </script>
 
 <template>
@@ -32,13 +29,13 @@ const replacedUrls = props.media.map(url => `${proxyUrl}${url.replace('name=orig
     }"
   >
     <div
-      v-for="url in replacedUrls"
+      v-for="url in media"
       :key="url"
       class="relative"
     >
       <Image
         v-if="!isVideo(url)"
-        :src="url"
+        :src="url.replace('name=orig', 'name=small')"
         :width="width"
         :height="height"
         :unset-width="size === 1"
@@ -57,7 +54,7 @@ const replacedUrls = props.media.map(url => `${proxyUrl}${url.replace('name=orig
           closable: false,
           preset: 'card',
           content: () => h(Image, {
-            src: url,
+            src: url.replace('name=orig', 'name=medium'),
           }),
         })"
       />

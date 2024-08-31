@@ -12,7 +12,7 @@ import {
 } from 'naive-ui'
 import { computed } from 'vue'
 import { useHead, useSeoMeta } from '@unhead/vue'
-import { isDark } from '~/composables'
+import { checkNetwork, isDark } from '~/composables'
 
 const title = 'Twitter Archive Explorer'
 const description = 'Explore your Twitter archive with ease'
@@ -32,6 +32,8 @@ useHead({
     { name: 'theme-color', content: '#3388bb' },
   ],
 })
+
+checkNetwork()
 
 const theme = computed(() => !isDark.value ? null : darkTheme)
 const themes = {

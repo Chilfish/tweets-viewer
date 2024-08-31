@@ -1,4 +1,6 @@
-import { useDark } from '@vueuse/core'
+import { useDark, useNetwork, watchImmediate } from '@vueuse/core'
+import { ref } from 'vue'
+import { canGoogle } from '~/utils'
 
 export const isDark = useDark({
   valueLight: 'light',
@@ -6,3 +8,18 @@ export const isDark = useDark({
   storageKey: 'theme',
   disableTransition: false,
 })
+
+const { isOnline } = useNetwork()
+export const isGoodNetwork = ref(true)
+export function checkNetwork() {
+  watchImmediate(isOnline, async () => {
+    if (isOnline.value) {
+      isGoodNetwork.value = await canGoogle()
+    }
+    isGoodNetwork.value = false
+  })
+
+  console.log('isGoodNetwork', isGoodNetwork.value)
+
+  return isGoodNetwork
+}
