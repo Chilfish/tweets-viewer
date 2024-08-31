@@ -10,16 +10,17 @@ export const isDark = useDark({
 })
 
 const { isOnline } = useNetwork()
-export const isGoodNetwork = ref(true)
+export const isGoodNetwork = ref(false)
 export function checkNetwork() {
   watchImmediate(isOnline, async () => {
     if (isOnline.value) {
       isGoodNetwork.value = await canGoogle()
     }
-    isGoodNetwork.value = false
+    else {
+      isGoodNetwork.value = false
+    }
+    console.log('isGoodNetwork', isGoodNetwork.value)
   })
-
-  console.log('isGoodNetwork', isGoodNetwork.value)
 
   return isGoodNetwork
 }

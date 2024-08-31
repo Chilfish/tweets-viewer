@@ -11,7 +11,7 @@ export async function canGoogle() {
     setTimeout(() => aborter.abort('Timeout 2s'), 2000)
 
     const urls = [
-      'https://x.com/',
+      'https://pbs.twimg.com/profile_images/1683899100922511378/5lY42eHs_400x400.jpg',
     ]
     console.log('Checking network... ping to', urls)
 

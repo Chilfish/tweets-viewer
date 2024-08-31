@@ -15,7 +15,7 @@ const observer = new IntersectionObserver((entries) => {
   entries.forEach((entry) => {
     if (entry.isIntersecting) {
       const img = entry.target as HTMLImageElement
-      img.src = isGoodNetwork.value ? proxyUrl + props.src : props.src
+      img.src = isGoodNetwork.value ? props.src : proxyUrl + props.src
       img.onerror = () => {
         img.src = placeholderSVG
       }

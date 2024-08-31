@@ -55,7 +55,7 @@ const modal = useModal()
           closable: false,
           preset: 'card',
           content: () => h(Image, {
-            src: url.replace('name=orig', 'name=medium'),
+            src: url.replace('name=orig', 'name=small'),
           }),
         })"
       />

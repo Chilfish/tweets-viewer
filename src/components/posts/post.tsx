@@ -26,7 +26,7 @@ const PostContent = defineComponent({
         <PostMedia media={media} />
         {quoutId && (
           <p
-            class="rounded-lg bg-gray-100 p-3 dark:bg-gray-800"
+            class="rounded-lg bg-gray-100 p-2 px-3 text-3.5 dark:bg-gray-800"
           >
             这是一条转发推文，查看
             {Link(`https://x.com/i/status/${quoutId}`, '原文')}

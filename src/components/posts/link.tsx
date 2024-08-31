@@ -10,7 +10,7 @@ export function Link(url: string, text?: string) {
   )
 }
 export function PeopleLink(name: string) {
-  return Link(`https://x.com/${name}`, name)
+  return Link(`https://x.com/${name}`, `@${name}`)
 }
 export function HashTagLink(tag: string) {
   return Link(`https://x.com/hashtag/${tag}`, `#${tag}`)
