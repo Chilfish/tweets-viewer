@@ -2,6 +2,8 @@ import { useDark, useNetwork, watchImmediate } from '@vueuse/core'
 import { ref } from 'vue'
 import { canGoogle } from '~/utils'
 
+export * from './seo'
+
 export const isDark = useDark({
   valueLight: 'light',
   valueDark: 'dark',

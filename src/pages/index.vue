@@ -1,4 +1,7 @@
 <script setup lang="tsx">
+import { useSeo } from '~/composables'
+
+useSeo()
 </script>
 
 <template>

@@ -1,21 +1,16 @@
 <script setup lang="ts">
-import { useHead } from '@unhead/vue'
 import { Post } from '~/components/posts/post'
 import { useTweetStore } from '~/stores/tweets'
+import { useSeo } from '~/composables'
 
 const tweetStore = useTweetStore()
 const tweets = tweetStore.getLastYearsTodayData()
 
 const name = tweetStore.user.screen_name
 
-useHead({
-  title: `${name}的那年今日 | Twitter Archive Explorer`,
-  meta: [
-    {
-      name: 'description',
-      content: `${name}的那年今日推文`,
-    },
-  ],
+useSeo({
+  title: `${name} 推文的那年今日`,
+  description: `${name} 在这一天的推文`,
 })
 </script>
 

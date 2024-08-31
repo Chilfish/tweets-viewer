@@ -11,27 +11,7 @@ import {
   zhCN,
 } from 'naive-ui'
 import { computed } from 'vue'
-import { useHead, useSeoMeta } from '@unhead/vue'
 import { checkNetwork, isDark } from '~/composables'
-
-const title = 'Twitter Archive Explorer'
-const description = 'Explore your Twitter archive with ease'
-
-useSeoMeta({
-  title,
-  description,
-  ogTitle: title,
-  ogDescription: description,
-  twitterCard: 'summary',
-})
-
-useHead({
-  title,
-  meta: [
-    { name: 'description', content: description },
-    { name: 'theme-color', content: '#3388bb' },
-  ],
-})
 
 checkNetwork()
 

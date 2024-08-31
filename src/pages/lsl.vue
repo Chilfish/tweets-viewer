@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { useInfiniteScroll } from '@vueuse/core'
 import { ref } from 'vue'
-import { useHead } from '@unhead/vue'
 import { Post } from '~/components/posts/post'
 import { useTweetStore } from '~/stores/tweets'
+import { useSeo } from '~/composables'
 
 const tweetStore = useTweetStore()
 const tweets = tweetStore.getTweets()
@@ -26,14 +26,9 @@ useInfiniteScroll(
 
 const name = tweetStore.user.screen_name || ''
 
-useHead({
-  title: `${name}的推文记录 | Twitter Archive Explorer`,
-  meta: [
-    {
-      name: 'description',
-      content: `${name}的推文`,
-    },
-  ],
+useSeo({
+  title: `${name} 推文记录`,
+  description: `查看${name} 的历史推文`,
 })
 </script>
 
