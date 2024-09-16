@@ -1,11 +1,11 @@
+import type { Component } from 'vue'
+
+import { defineAsyncComponent, h } from 'vue'
 import {
-  type RouteRecordRaw,
   createRouter,
   createWebHistory,
+  type RouteRecordRaw,
 } from 'vue-router'
-
-import type { Component } from 'vue'
-import { defineAsyncComponent, h } from 'vue'
 import DefaultLayout from '../layouts/default.vue'
 
 function useLayout(
@@ -33,6 +33,10 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/memo',
     component: useLayout('memo'),
+  },
+  {
+    path: '/fans',
+    component: useLayout('fans'),
   },
   {
     path: '/:pathMatch(.*)*',
