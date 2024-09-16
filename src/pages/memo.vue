@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { Post } from '~/components/posts/post'
-import { useTweetStore } from '~/stores/tweets'
 import { useSeo } from '~/composables'
+import { useTweetStore } from '~/stores/tweets'
 
 const tweetStore = useTweetStore()
 const tweets = tweetStore.getLastYearsTodayData()
 
-const name = tweetStore.user.screen_name
+const name = tweetStore.user?.screen_name || '用户'
 
 useSeo({
   title: `${name} 推文的那年今日`,

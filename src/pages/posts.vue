@@ -2,8 +2,8 @@
 import { useInfiniteScroll } from '@vueuse/core'
 import { ref } from 'vue'
 import { Post } from '~/components/posts/post'
-import { useTweetStore } from '~/stores/tweets'
 import { useSeo } from '~/composables'
+import { useTweetStore } from '~/stores/tweets'
 
 const tweetStore = useTweetStore()
 const tweets = tweetStore.getTweets()
@@ -24,7 +24,7 @@ useInfiniteScroll(
   { distance: 10 },
 )
 
-const name = tweetStore.user.screen_name || ''
+const name = tweetStore.user?.screen_name || ''
 
 useSeo({
   title: `${name} 推文记录`,
@@ -44,7 +44,7 @@ useSeo({
   <Button
     v-if="tweets.length > tweetsToDisplay.length"
     class="m-4 p-2"
-    size="large"
+    size="lg"
     variant="ghost"
     @click="loadmore"
   >
