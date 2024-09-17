@@ -1,11 +1,11 @@
 import { defineComponent } from 'vue'
-import { PostProfile } from './profile'
-import { PostText } from './text'
-import PostMedia from './media.vue'
-import { Link } from './link'
-import { PostActions } from './actions'
 import { Card, CardContent } from '~/components/ui/card'
 import type { Tweet } from '~/types/tweets'
+import { PostActions } from './actions'
+import { Link } from './link'
+import PostMedia from './media.vue'
+import { PostProfile } from './profile'
+import { PostText } from './text'
 
 const PostContent = defineComponent({
   props: {

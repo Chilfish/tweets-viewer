@@ -3,11 +3,11 @@ import type {
   GlobalThemeOverrides,
 } from 'naive-ui'
 import {
+  darkTheme,
+  dateZhCN,
   NConfigProvider,
   NMessageProvider,
   NModalProvider,
-  darkTheme,
-  dateZhCN,
   zhCN,
 } from 'naive-ui'
 import { computed } from 'vue'

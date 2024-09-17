@@ -1,10 +1,10 @@
+import { useDateFormat } from '@vueuse/core'
 import { defineStore } from 'pinia'
 import { computed, ref, shallowRef, triggerRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useDateFormat } from '@vueuse/core'
 import { fallbackUser, notfountRetry, staticUrl } from '~/constant'
-import { buildSearch } from '~/utils/search'
 import type { Tweet, User } from '~/types/tweets'
+import { buildSearch } from '~/utils/search'
 
 export const useTweetStore = defineStore('tweets', () => {
   const user = ref<User | null>(null)

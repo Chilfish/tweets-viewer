@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { placeholderSVG, proxyUrl } from '~/constant'
 import { isGoodNetwork } from '~/composables'
+import { placeholderSVG, proxyUrl } from '~/constant'
 
 const props = defineProps<{
   src: string

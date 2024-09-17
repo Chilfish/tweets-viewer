@@ -12,63 +12,58 @@ const user = reactive({
 
 const error = ref('')
 
-async function fetchFans() {
+async function fetcher(url: string) {
   const res = await fetch(
-    `${proxyUrl}https://api.bilibili.com/x/relation/stat?vmid=${uid}`,
-    {
-      // mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json',
-        'referer': 'https://space.bilibili.com/',
-      },
-    },
-  ).catch((err) => {
-    console.error(err)
+    `${proxyUrl}${url}`,
+  )
+  if (!res.ok) {
+    error.value = '获取接口失败，请稍后再试。'
     return null
-  })
-
-  if (!res) {
-    error.value = '获取粉丝数失败，请稍后再试。'
-    return 0
   }
 
   try {
     const data = await res.json()
     if (data.code !== 0) {
       error.value = data.message
-      return 0
+      return null
     }
-
-    // user.name = data.data.card.name
-    // user.avatar = data.data.card.face
-    return data.data.follower
+    return data
   }
   catch (err) {
     error.value = '由于触发哔哩哔哩安全风控策略，该次访问请求被拒绝。'
     console.error(err)
-    return 0
+    return null
   }
 }
 
-async function getInfo() {
-  const data = await fetch(
-    `${proxyUrl}
-https://api.bilibili.com/x/space/top/arc?vmid=${uid}`,
+async function fetchFans() {
+  const res = await fetcher(
+    `https://api.bilibili.com/x/relation/stat?vmid=${uid}`,
   )
-    .then(res => res.json())
-    .catch((err) => {
-      console.error(err)
-      return null
+  if (!res)
+    return 0
+
+  return res.data.follower
+}
+
+async function getInfo() {
+  const dom = await fetch(`${proxyUrl}https://space.bilibili.com/${uid}`)
+    .then(res => res.text())
+    .catch(() => {
+      error.value = '获取用户信息失败，请稍后再试。'
+      return ''
     })
 
-  if (!data) {
-    error.value = '获取用户信息失败，请稍后再试。'
+  // get from <title> tag
+  const title = dom.match(/<title>(.*?)<\/title>/)
+  if (!title)
     return
-  }
 
-  const { name, face } = data.data.owner
-  user.name = name
-  user.avatar = face
+  user.name = title[1].split('的个人空间-')[0]
+
+  const avatar = dom.match(/<link rel="apple-touch-icon" href="(.*?)">/)
+  if (avatar)
+    user.avatar = avatar[1]
 }
 
 const tweened = reactive({
@@ -84,8 +79,6 @@ onMounted(async () => {
 
   const timer = setInterval(async () => {
     const res = await fetchFans()
-
-    console.log(res)
 
     if (res === 0) {
       if (retried < 3) {
@@ -168,5 +161,12 @@ onMounted(async () => {
     >
       错误：{{ error }}
     </p>
+
+    <iframe
+      class="h-96 w-full"
+      :src="`https://space.bilibili.com/${uid}`"
+      frameborder="0"
+      allowfullscreen
+    />
   </div>
 </template>

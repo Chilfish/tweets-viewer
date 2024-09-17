@@ -1,12 +1,12 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { defineConfig } from 'vite'
 import Vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import UnoCSS from 'unocss/vite'
-import Components from 'unplugin-vue-components/vite'
-import VueDevTools from 'vite-plugin-vue-devtools'
 import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
+import Components from 'unplugin-vue-components/vite'
+import { defineConfig } from 'vite'
+import VueDevTools from 'vite-plugin-vue-devtools'
 
 const root = path.dirname(fileURLToPath(import.meta.url))
 
@@ -53,6 +53,15 @@ export default defineConfig({
             }
           }
         },
+      },
+    },
+  },
+  server: {
+    proxy: {
+      '/static': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/static/, ''),
       },
     },
   },

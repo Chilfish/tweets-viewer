@@ -6,7 +6,9 @@ export const proxyUrl = isDev
   ? 'http://localhost:8787/?url='
   : 'https://proxy.chilfish.top/?url='
 
-export const staticUrl = 'https://p.chilfish.top'
+export const staticUrl = isDev
+  ? '/static'
+  : 'https://p.chilfish.top'
 
 export const notfountRetry = 3
 

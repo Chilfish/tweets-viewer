@@ -1,5 +1,5 @@
-import { defineComponent } from 'vue'
 import type { JSX } from 'vue/jsx-runtime'
+import { defineComponent } from 'vue'
 import { HashTagLink, Link, PeopleLink } from './link'
 
 function retweetInfo(text: string) {

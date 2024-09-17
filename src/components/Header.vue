@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { CalendarSearch, History, Moon, Search, Sun } from 'lucide-vue-next'
 import { ref, watch } from 'vue'
-import { useTweetStore } from '~/stores/tweets'
 import { isDark } from '~/composables'
+import { useTweetStore } from '~/stores/tweets'
 
 const tweetStore = useTweetStore()
 const { start, end } = tweetStore.getTweetsRange()

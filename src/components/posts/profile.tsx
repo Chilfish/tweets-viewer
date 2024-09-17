@@ -1,8 +1,8 @@
 import { defineComponent } from 'vue'
+import { proxyUrl } from '~/constant'
+import { useTweetStore } from '~/stores/tweets'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 import { CardHeader } from '../ui/card'
-import { useTweetStore } from '~/stores/tweets'
-import { proxyUrl } from '~/constant'
 
 export const PostProfile = defineComponent({
   props: {
