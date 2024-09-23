@@ -23,15 +23,11 @@ const routes: RouteRecordRaw[] = [
     component: useLayout('index'),
   },
   {
-    path: '/lsl',
-    redirect: `/@ttisrn_0710`,
-  },
-  {
     path: '/@:name',
     component: useLayout('posts'),
   },
   {
-    path: '/memo',
+    path: '/@:name/memo',
     component: useLayout('memo'),
   },
   {
@@ -41,6 +37,14 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/:pathMatch(.*)*',
     component: useLayout('index'),
+  },
+  {
+    path: '/lsl',
+    redirect: `/@ttisrn_0710`,
+  },
+  {
+    path: '/memo',
+    redirect: `/@ttisrn_0710/memo`,
   },
 ]
 

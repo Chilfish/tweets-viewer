@@ -1,12 +1,7 @@
 <script setup lang="ts">
-import { onBeforeMount } from 'vue'
 import { useTweetStore } from '~/stores/tweets'
 
 const tweetStore = useTweetStore()
-
-onBeforeMount(async () => {
-  await tweetStore.initTweets()
-})
 </script>
 
 <template>

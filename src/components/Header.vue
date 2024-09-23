@@ -44,7 +44,7 @@ watch(dateRange, () => {
       </button>
 
       <RouterLink
-        to="/memo"
+        :to="`@${tweetStore.user?.name}/memo`"
         title="那年今日"
       >
         <History class="h-6 w-6" />

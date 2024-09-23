@@ -10,8 +10,9 @@ import {
   NModalProvider,
   zhCN,
 } from 'naive-ui'
-import { computed } from 'vue'
+import { computed, onBeforeMount } from 'vue'
 import { checkNetwork, isDark } from '~/composables'
+import { useTweetStore } from '~/stores/tweets'
 
 checkNetwork()
 
@@ -21,6 +22,12 @@ const themes = {
     primaryColor: '#3388bb',
   },
 } satisfies GlobalThemeOverrides
+
+const tweetStore = useTweetStore()
+
+onBeforeMount(async () => {
+  await tweetStore.initTweets()
+})
 </script>
 
 <template>

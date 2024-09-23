@@ -97,7 +97,7 @@ export const useTweetStore = defineStore('tweets', () => {
     searchText.value = ''
     router.push({
       query: {},
-      path: `@${user.value?.name}` || '/',
+      path: `/@${user.value?.name}` || '/',
     })
   }
 
