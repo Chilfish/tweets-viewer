@@ -1,26 +1,24 @@
 <script setup lang="ts">
 import { useInfiniteScroll } from '@vueuse/core'
-import { ref } from 'vue'
+import { ref, shallowRef } from 'vue'
 import { Post } from '~/components/posts/post'
 import { useSeo } from '~/composables'
 import { useTweetStore } from '~/stores/tweets'
+import type { Tweet } from '~/types/tweets'
+
+const page = ref(0)
+const offset = 10
 
 const tweetStore = useTweetStore()
-const tweets = tweetStore.getTweets()
-
-const tweetsToDisplay = ref(tweets.slice(0, 10))
-
-function loadmore() {
-  const size = tweetsToDisplay.value.length
-  tweetsToDisplay.value = [
-    ...tweetsToDisplay.value,
-    ...tweets.slice(size, size + 10),
-  ]
-}
+const tweets = shallowRef<Tweet[]>([])
 
 useInfiniteScroll(
   window.document,
-  loadmore,
+  async () => {
+    const data = await tweetStore.getTweetsPages(page.value, offset)
+    tweets.value = [...tweets.value, ...data]
+    page.value++
+  },
   { distance: 10 },
 )
 
@@ -35,18 +33,18 @@ useSeo({
 <template>
   <section>
     <Post
-      v-for="tweet in tweetsToDisplay"
+      v-for="tweet in tweets"
       :key="tweet.id"
       :tweet="tweet"
     />
   </section>
 
   <Button
-    v-if="tweets.length > tweetsToDisplay.length"
+    v-if="tweets.length > tweets.length"
     class="m-4 p-2"
     size="lg"
     variant="ghost"
-    @click="loadmore"
+    @click="() => page++"
   >
     加载更多
   </Button>

@@ -1,5 +1,4 @@
-# shadcn-vue UnoCSS Starter
+TODO:
 
-This is a starter template for [Vue.js](https://vuejs.org) projects using [UnoCSS](https://unocss.com) and [shadcn-vue](https://www.shadcn-vue.com).
-
-If you want to set up a new project manually, take a look at the [unocss-preset-shadcn](https://github.com/hyoban/unocss-preset-shadcn).
+- [ ] 暂存到 indexedDB 中，再fetch版本号来决定是否更新
+- [ ] indexedDB 的搜索加载什么的会更好些吧……毕竟推文会很多（json就4Mb）

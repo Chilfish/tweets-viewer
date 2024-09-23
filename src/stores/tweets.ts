@@ -1,18 +1,24 @@
-import { useDateFormat } from '@vueuse/core'
+import { useDateFormat, useStorage } from '@vueuse/core'
 import { defineStore } from 'pinia'
-import { computed, ref, shallowRef, triggerRef, watch } from 'vue'
+import { computed, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { fallbackUser, notfountRetry, staticUrl } from '~/constant'
-import type { Tweet, User } from '~/types/tweets'
+import { useRetryFetch } from '~/composables'
+import { fallbackUser, staticUrl } from '~/constant'
+import { db } from '~/db'
+import type { DataVersion, Tweet, User, VersionKey } from '~/types/tweets'
 import { buildSearch } from '~/utils/search'
 
 export const useTweetStore = defineStore('tweets', () => {
   const user = ref<User | null>(null)
-  const tweets = shallowRef<Tweet[]>([])
+  // const tweets = shallowRef<Tweet[]>([])
+  const isInit = ref(false)
 
   const router = useRouter()
   const route = useRoute()
 
+  const versionStore = useStorage<DataVersion>('dataVersion', {})
+
+  const tweetRange = ref({ start: Date.now(), end: Date.now() })
   const searchTweets = shallowRef<Tweet[]>([])
   const searchQuery = computed(() => route.query.q as string)
   const searchText = ref(searchQuery.value)
@@ -26,28 +32,59 @@ export const useTweetStore = defineStore('tweets', () => {
     search()
   })
 
-  let retry = 0
-  async function initTweets(name = route.params.name || fallbackUser) {
+  function checkVersion(version: DataVersion) {
+    const oldVersions = versionStore.value
+    for (const key in version) {
+      if (oldVersions[key as VersionKey] !== version[key as VersionKey]) {
+        versionStore.value = version
+        return true
+      }
+    }
+    return false
+  }
+
+  async function initTweets(name = route.params.name as string || fallbackUser) {
     console.log('Loading data for', name)
+    const fetcher = useRetryFetch((err) => {
+      console.error(err)
+      router.push('/')
+      isInit.value = true
+    })
 
-    const tweetJson = await fetch(`${staticUrl}/tweet/data-${name}.json`)
-      .then(res => res.json())
-      .catch(async () => {
-        if (retry < notfountRetry) {
-          retry++
-          router.push({
-            path: `@${fallbackUser}`,
-          })
-          await initTweets(fallbackUser)
-        }
-        else {
-          console.error('Failed to load data for', name)
-          router.push('/')
-        }
-      })
+    const versions = await fetcher<DataVersion>(`${staticUrl}/tweet/versions.json`)
+    if (!versions) {
+      return
+    }
 
-    setTweets(tweetJson.tweets.sort((a: any, b: any) => +b.id - +a.id))
-    user.value = tweetJson.user
+    if (!checkVersion(versions)) {
+      console.log('No new data')
+      isInit.value = true
+
+      const curUser = (await db.users.get(name))!
+      user.value = curUser
+
+      if (route.params.name !== curUser.name) {
+        router.push(`/@${curUser.name}`)
+      }
+
+      console.log('User', curUser)
+      return
+    }
+
+    const tweetJson = await fetcher<{
+      user: User
+      tweets: Tweet[]
+    }>(`${staticUrl}/tweet/data-${name}.json`)
+    if (!tweetJson) {
+      return
+    }
+
+    const curUser = tweetJson.user
+    await db.users.put(curUser)
+    await db.tweets.bulkPut(tweetJson.tweets.map(tweet => ({ ...tweet, uid: curUser.name })))
+
+    user.value = curUser
+    isInit.value = true
   }
 
   function parseDateRange() {
@@ -61,7 +98,7 @@ export const useTweetStore = defineStore('tweets', () => {
     return getTweetsRange()
   }
 
-  function getTweets() {
+  async function getTweets() {
     const query = route.query
     if (query.q) {
       search()
@@ -72,26 +109,30 @@ export const useTweetStore = defineStore('tweets', () => {
       getTweetsByDateRange(start, end)
       return searchTweets.value
     }
-    return tweets.value
+
+    return await db.tweets.toArray()
   }
-  function getTweetsById(id: string) {
-    return tweets.value.find(t => t.id === id)
+
+  async function getTweetsPages(page: number, pageSize: number) {
+    console.log('getTweetsPages', page, pageSize)
+    return await db.tweets.offset(page * pageSize).limit(pageSize).toArray()
+  }
+
+  async function getTweetsById(id: string) {
+    return await db.tweets.filter(t => t.id === id).toArray()
   }
 
   function getTweetsRange() {
-    if (!tweets.value.length)
-      return { start: Date.now(), end: Date.now() }
+    // if (!tweets.value.length)
+    //   return { start: Date.now(), end: Date.now() }
 
-    // 新推文在前
-    const start = new Date(tweets.value[tweets.value.length - 1].created_at).getTime()
-    const end = new Date(tweets.value[0].created_at).getTime()
-    return { start, end }
+    // // 新推文在前
+    // const start = new Date(tweets.value[tweets.value.length - 1].created_at).getTime()
+    // const end = new Date(tweets.value[0].created_at).getTime()
+    // return { start, end }
+    return tweetRange.value
   }
 
-  function setTweets(newTweets: Tweet[]) {
-    tweets.value = newTweets
-    triggerRef(tweets)
-  }
   function resetSearch() {
     searchTweets.value = []
     searchText.value = ''
@@ -159,13 +200,14 @@ export const useTweetStore = defineStore('tweets', () => {
   }
 
   return {
+    isInit,
     user,
-    tweets,
+    // tweets,
     searchText,
     searchTweets,
     initTweets,
-    setTweets,
     getTweets,
+    getTweetsPages,
     resetSearch,
     search,
     getTweetsRange,

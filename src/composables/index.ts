@@ -26,3 +26,24 @@ export function checkNetwork() {
 
   return isGoodNetwork
 }
+
+export function useRetryFetch(
+  onError: (error: Error) => void = console.error,
+) {
+  return async function retryFetch<T = any>(
+    url: string,
+    retry = 0,
+  ): Promise<T | null> {
+    return fetch(url)
+      .then(res => res.json())
+      .catch(async () => {
+        if (retry < 3) {
+          return retryFetch(url, retry + 1)
+        }
+        else {
+          onError(new Error(`Failed to fetch ${url}`))
+          return null
+        }
+      })
+  }
+}

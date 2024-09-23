@@ -39,6 +39,10 @@ const routes: RouteRecordRaw[] = [
     component: useLayout('index'),
   },
   {
+    path: '/test',
+    component: useLayout('test'),
+  },
+  {
     path: '/lsl',
     redirect: `/@ttisrn_0710`,
   },
