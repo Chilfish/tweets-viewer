@@ -5,7 +5,7 @@ import { isDark } from '~/composables'
 import { useTweetStore } from '~/stores/tweets'
 
 const tweetStore = useTweetStore()
-const { start, end } = tweetStore.getTweetsRange()
+const { start, end } = tweetStore.tweetStore.tweetRange
 const day = 24 * 60 * 60 * 1000
 
 function disableDate(ts: number) {
@@ -13,9 +13,9 @@ function disableDate(ts: number) {
 }
 
 const dateRange = ref<[number, number]>([end, end])
-watch(dateRange, () => {
+watch(dateRange, async () => {
   const [start, end] = dateRange.value
-  tweetStore.getTweetsByDateRange(start, end + day)
+  await tweetStore.getTweetsByDateRange(start, end + day)
 })
 </script>
 
@@ -44,7 +44,7 @@ watch(dateRange, () => {
       </button>
 
       <RouterLink
-        :to="`@${tweetStore.user?.name}/memo`"
+        :to="`/@${tweetStore.user?.name}/memo`"
         title="那年今日"
       >
         <History class="h-6 w-6" />
@@ -55,7 +55,7 @@ watch(dateRange, () => {
       class="w-60 flex items-center gap-4 md:w-100"
     >
       <n-input
-        v-model:value="tweetStore.searchText"
+        v-model:value="tweetStore.searchState.text"
         placeholder="Search"
         :input-props="{
           'aria-label': 'Search',

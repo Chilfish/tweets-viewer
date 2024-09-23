@@ -2,11 +2,12 @@
 import { useAsyncState } from '@vueuse/core'
 import { Post } from '~/components/posts/post'
 import { useSeo } from '~/composables'
+import { getLastYearsTodayData } from '~/db'
 import { useTweetStore } from '~/stores/tweets'
 import type { Tweet } from '~/types/tweets'
 
 const tweetStore = useTweetStore()
-const { state: tweets } = useAsyncState<Tweet[]>(tweetStore.getLastYearsTodayData(), [])
+const { state: tweets, isLoading } = useAsyncState<Tweet[]>(getLastYearsTodayData, [])
 
 const name = tweetStore.user?.screen_name || '用户'
 
@@ -25,10 +26,17 @@ useSeo({
     />
 
     <n-empty
-      v-if="!tweets.length"
+      v-if="!tweets.length && !isLoading"
       class="my-8"
       size="large"
       description="没有任何推文欸"
     />
+
+    <div
+      v-else-if="isLoading"
+      class="w-full flex items-center justify-center pt-30"
+    >
+      <Loader class="animate-spin" />
+    </div>
   </section>
 </template>

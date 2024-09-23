@@ -6,18 +6,31 @@ import { useSeo } from '~/composables'
 import { useTweetStore } from '~/stores/tweets'
 import type { Tweet } from '~/types/tweets'
 
-const page = ref(0)
-const offset = 10
-
 const tweetStore = useTweetStore()
 const tweets = shallowRef<Tweet[]>([])
+const hasMore = ref(true)
+const isLoading = ref(true)
 
 useInfiniteScroll(
   window.document,
   async () => {
-    const data = await tweetStore.getTweetsPages(page.value, offset)
+    if (!hasMore.value)
+      return
+
+    isLoading.value = true
+    const data = await tweetStore.getTweets()
+    isLoading.value = false
+
+    if (
+      data[0]?.id === tweets.value[0]?.id
+      || data.length === 0
+    ) {
+      hasMore.value = false
+      return
+    }
+
     tweets.value = [...tweets.value, ...data]
-    page.value++
+    tweetStore.nextPage()
   },
   { distance: 10 },
 )
@@ -40,17 +53,17 @@ useSeo({
   </section>
 
   <Button
-    v-if="tweets.length > tweets.length"
+    v-if="hasMore && !isLoading"
     class="m-4 p-2"
     size="lg"
     variant="ghost"
-    @click="() => page++"
+    @click="() => tweetStore.nextPage()"
   >
     加载更多
   </Button>
 
   <n-empty
-    v-if="!tweets.length"
+    v-if="!tweets.length && !isLoading"
     class="my-8"
     size="large"
     description="没有任何推文欸"

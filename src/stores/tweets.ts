@@ -1,12 +1,29 @@
 import { useDateFormat, useStorage } from '@vueuse/core'
 import { defineStore } from 'pinia'
-import { computed, ref, shallowRef, watch } from 'vue'
+import { reactive, ref, shallowRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useRetryFetch } from '~/composables'
 import { fallbackUser, staticUrl } from '~/constant'
-import { db } from '~/db'
-import type { DataVersion, Tweet, User, VersionKey } from '~/types/tweets'
-import { buildSearch } from '~/utils/search'
+import {
+  db,
+  pagedTweets,
+  searchTweets,
+  tweetsByDateRange,
+} from '~/db'
+import type {
+  DataVersion,
+  Tweet,
+  User,
+  VersionKey,
+} from '~/types/tweets'
+
+interface TweetStore {
+  versions: DataVersion
+  tweetRange: {
+    start: number
+    end: number
+  }
+}
 
 export const useTweetStore = defineStore('tweets', () => {
   const user = ref<User | null>(null)
@@ -15,27 +32,36 @@ export const useTweetStore = defineStore('tweets', () => {
   const router = useRouter()
   const route = useRoute()
 
-  const versionStore = useStorage<DataVersion>('dataVersion', {})
+  const tweetStore = useStorage<TweetStore>('tweetStore', {
+    versions: {},
+    tweetRange: {
+      start: Date.now(),
+      end: Date.now(),
+    },
+  })
 
-  const tweetRange = ref({ start: Date.now(), end: Date.now() })
-  const searchTweets = shallowRef<Tweet[]>([])
-  const searchQuery = computed(() => route.query.q as string)
-  const searchText = ref(searchQuery.value)
-  let searchFn: ReturnType<typeof buildSearch> | null = null
+  const pageState = reactive({
+    page: 0,
+    pageSize: 10,
+  })
 
-  watch(searchQuery, (query) => {
-    if (query === searchText.value)
-      return
+  const datePagination = reactive({
+    page: 0,
+    pageSize: 10,
+  })
 
-    searchText.value = query
-    search()
+  const searchResults = shallowRef<Tweet[]>([])
+  const searchState = reactive({
+    text: route.query.q as string,
+    page: 0,
+    pageSize: 10,
   })
 
   function checkVersion(version: DataVersion) {
-    const oldVersions = versionStore.value
+    const oldVersions = tweetStore.value.versions
     for (const key in version) {
       if (oldVersions[key as VersionKey] !== version[key as VersionKey]) {
-        versionStore.value = version
+        tweetStore.value.versions = version
         return true
       }
     }
@@ -79,9 +105,12 @@ export const useTweetStore = defineStore('tweets', () => {
     }
 
     const curUser = tweetJson.user
-    await db.users.put(curUser)
-    await db.tweets.bulkPut(tweetJson.tweets.map(tweet => ({ ...tweet, uid: curUser.name })))
+    const tweets = tweetJson.tweets.map(tweet => ({ ...tweet, uid: curUser.name }))
 
+    await db.users.put(curUser)
+    await db.tweets.bulkPut(tweets)
+
+    getTweetsRange(tweets)
     user.value = curUser
     isInit.value = true
   }
@@ -94,76 +123,81 @@ export const useTweetStore = defineStore('tweets', () => {
         end: new Date(query.to as string).getTime(),
       }
     }
-    return getTweetsRange()
+    return tweetStore.value.tweetRange
   }
 
   async function getTweets() {
     const query = route.query
     if (query.q) {
-      search()
-      return searchTweets.value
+      console.log('getTWeets', query.q)
+      await search()
+      return searchResults.value
     }
     else if (query.from && query.to) {
       const { start, end } = parseDateRange()
       getTweetsByDateRange(start, end)
-      return searchTweets.value
+      return searchResults.value
     }
 
-    return await db.tweets.toArray()
+    const tweets = await pagedTweets(pageState.page, pageState.pageSize).toArray()
+    pageState.page++
+
+    return tweets
   }
 
-  async function getTweetsPages(page: number, pageSize: number) {
-    console.log('getTweetsPages', page, pageSize)
-    return await db.tweets.offset(page * pageSize).limit(pageSize).toArray()
-  }
+  function getTweetsRange(tweets: Tweet[]) {
+    // 新推文在前
+    const end = new Date(tweets[tweets.length - 1].created_at)
+    const start = new Date(tweets[0].created_at)
 
-  async function getTweetsById(id: string) {
-    return await db.tweets.filter(t => t.id === id).toArray()
-  }
+    tweetStore.value.tweetRange = {
+      start: start.getTime(),
+      end: end.getTime(),
+    }
 
-  function getTweetsRange() {
-    // if (!tweets.value.length)
-    //   return { start: Date.now(), end: Date.now() }
-
-    // // 新推文在前
-    // const start = new Date(tweets.value[tweets.value.length - 1].created_at).getTime()
-    // const end = new Date(tweets.value[0].created_at).getTime()
-    // return { start, end }
-    return tweetRange.value
+    console.log('Tweets range', { start, end })
+    return tweetStore.value.tweetRange
   }
 
   function resetSearch() {
-    searchTweets.value = []
-    searchText.value = ''
+    searchResults.value = []
+    searchState.text = ''
     router.push({
       query: {},
       path: `/@${user.value?.name}` || '/',
     })
   }
 
-  function search() {
-    if (!searchFn) {
-      searchFn = buildSearch(tweets.value.map(t => ({
-        id: t.id,
-        text: t.full_text,
-      })))
+  let lastKeyword = ''
+  async function search() {
+    let keyword = searchState.text?.trim()
+    if (!keyword) {
+      keyword = route.query.q as string
+      searchState.text = keyword
     }
 
-    const keyword = searchText.value
-    if (!keyword) {
-      return
+    if (keyword !== lastKeyword) {
+      searchState.page = 0
+      lastKeyword = keyword
     }
 
     const { start, end } = parseDateRange()
+    const { page, pageSize } = searchState
 
-    searchTweets.value = searchFn
-      .search(keyword)
-      .map(id => tweets.value.find(t => t.id === id)!)
+    searchResults.value = await searchTweets(
+      keyword,
+    )
+      .offset(page * pageSize)
+      .limit(pageSize)
       .filter((t) => {
-        const timestamp = new Date(t.created_at).getTime()
-        return timestamp >= start && timestamp <= end
+        const date = new Date(t.created_at).getTime()
+        return date >= start && date <= end
       })
+      .toArray()
 
+    // console.log('searchTweets', searchState)
+
+    searchState.page++
     router.push({
       query: {
         ...route.query,
@@ -172,12 +206,20 @@ export const useTweetStore = defineStore('tweets', () => {
     })
   }
 
-  function getTweetsByDateRange(start: number, end: number) {
-    const data = tweets.value.filter((t) => {
-      const timestamp = new Date(t.created_at).getTime()
-      return timestamp >= start && timestamp <= end
-    })
-    searchTweets.value = data
+  async function getTweetsByDateRange(
+    start: number,
+    end: number,
+  ) {
+    const { page, pageSize } = datePagination
+
+    const data = await tweetsByDateRange(
+      pagedTweets(page, pageSize),
+      start,
+      end,
+    )
+
+    searchResults.value = data
+
     router.push({
       query: {
         ...route.query,
@@ -187,33 +229,22 @@ export const useTweetStore = defineStore('tweets', () => {
     })
   }
 
-  // 获取往年今日的数据
-  async function getLastYearsTodayData() {
-    const today = new Date()
-    const todayStr = `${today.getMonth() + 1}-${today.getDate()}`
+  function nextPage() {
 
-    const lastYearsToday = await db.tweets.filter((item) => {
-      const date = new Date(item.created_at)
-      return `${date.getMonth() + 1}-${date.getDate()}` === todayStr
-    }).toArray()
-
-    return lastYearsToday
   }
 
   return {
     isInit,
     user,
-    // tweets,
-    searchText,
-    searchTweets,
+    datePagination,
+    searchState,
+    searchResults,
+    tweetStore,
     initTweets,
     getTweets,
-    getTweetsPages,
     resetSearch,
     search,
-    getTweetsRange,
     getTweetsByDateRange,
-    getTweetsById,
-    getLastYearsTodayData,
+    nextPage,
   }
 })
