@@ -10,7 +10,6 @@ import { buildSearch } from '~/utils/search'
 
 export const useTweetStore = defineStore('tweets', () => {
   const user = ref<User | null>(null)
-  // const tweets = shallowRef<Tweet[]>([])
   const isInit = ref(false)
 
   const router = useRouter()
@@ -189,13 +188,15 @@ export const useTweetStore = defineStore('tweets', () => {
   }
 
   // 获取往年今日的数据
-  function getLastYearsTodayData() {
+  async function getLastYearsTodayData() {
     const today = new Date()
     const todayStr = `${today.getMonth() + 1}-${today.getDate()}`
-    const lastYearsToday = tweets.value.filter((item) => {
+
+    const lastYearsToday = await db.tweets.filter((item) => {
       const date = new Date(item.created_at)
       return `${date.getMonth() + 1}-${date.getDate()}` === todayStr
-    })
+    }).toArray()
+
     return lastYearsToday
   }
 

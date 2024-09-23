@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import { useAsyncState } from '@vueuse/core'
 import { Post } from '~/components/posts/post'
 import { useSeo } from '~/composables'
 import { useTweetStore } from '~/stores/tweets'
+import type { Tweet } from '~/types/tweets'
 
 const tweetStore = useTweetStore()
-const tweets = tweetStore.getLastYearsTodayData()
+const { state: tweets } = useAsyncState<Tweet[]>(tweetStore.getLastYearsTodayData(), [])
 
 const name = tweetStore.user?.screen_name || '用户'
 
