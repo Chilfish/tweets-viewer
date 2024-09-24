@@ -26,4 +26,13 @@ export default defineConfig({
       main: '#3388bb',
     },
   },
+  shortcuts: [
+    {
+      link: 'text-main font-bold hover:underline underline-offset-4',
+    },
+    {
+      'center': 'flex justify-center items-center',
+      'center-col': 'center flex-col',
+    },
+  ],
 })

@@ -8,16 +8,23 @@ useSeo()
   <p class="p-8">
     网站还在施工中，还是先看看远处的
     <RouterLink
-      to="/lsl"
-      class="text-main font-bold underline underline-offset-4"
+      class="link"
+      to="/@ttisrn_0710"
     >
-      立石凛
+      @立石凛
     </RouterLink>
-    吧，有事就
+    吧，要是喜欢也可以看看
+    <RouterLink
+      class="link"
+      to="/@240y_k"
+    >
+      @西尾夕香
+    </RouterLink>
+    ，有事就
     <a
       target="_blank"
       href="https://chilfish.top/bili"
-      class="text-main font-bold"
+      class="link"
     >
       @Chilfish
     </a>

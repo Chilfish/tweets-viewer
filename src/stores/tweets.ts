@@ -1,6 +1,6 @@
 import { useDateFormat, useStorage } from '@vueuse/core'
 import { defineStore } from 'pinia'
-import { reactive, ref, shallowRef } from 'vue'
+import { reactive, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useRetryFetch } from '~/composables'
 import { staticUrl } from '~/constant'
@@ -53,6 +53,18 @@ export const useTweetStore = defineStore('tweets', () => {
     text: route.query.q as string,
     page: 0,
     pageSize: 10,
+  })
+
+  watch(() => route.params, async ({ name: newName }) => {
+    if (!newName)
+      return
+    console.log('name changed', newName)
+    tweetService.setUid(newName as string)
+    user.value = await tweetService.getUser()
+
+    pageState.page = 0
+    datePagination.page = 0
+    searchState.page = 0
   })
 
   function checkVersion(version: DataVersion, name: string) {
