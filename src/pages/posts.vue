@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useInfiniteScroll } from '@vueuse/core'
-import { ref, shallowRef } from 'vue'
+import { ref, shallowRef, useTemplateRef, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { Post } from '~/components/posts/post'
 import { useSeo } from '~/composables'
 import { useTweetStore } from '~/stores/tweets'
@@ -10,33 +11,56 @@ const tweetStore = useTweetStore()
 const tweets = shallowRef<Tweet[]>([])
 const hasMore = ref(true)
 const isLoading = ref(true)
+const route = useRoute()
+
+watch(() => route.params, async ({ name: newName }) => {
+  if (!newName || newName === tweetStore.user?.name)
+    return
+
+  tweets.value = []
+  hasMore.value = true
+  tweetStore.resetPages()
+  await loadTweets()
+})
+
+watch(() => route.query, async () => {
+  tweets.value = []
+  hasMore.value = true
+  tweetStore.resetPages()
+  await loadTweets()
+})
+
+async function loadTweets() {
+  if (!hasMore.value)
+    return
+
+  isLoading.value = true
+  const data = await tweetStore.getTweets()
+  isLoading.value = false
+
+  if (
+    data[0]?.id === tweets.value[0]?.id
+    || data.length === 0
+  ) {
+    hasMore.value = false
+    return
+  }
+
+  tweets.value = [...tweets.value, ...data]
+}
+
+const postRef = useTemplateRef('postRef')
 
 useInfiniteScroll(
-  window.document,
-  async () => {
-    if (!hasMore.value)
-      return
-
-    isLoading.value = true
-    const data = await tweetStore.getTweets()
-    isLoading.value = false
-
-    if (
-      data[0]?.id === tweets.value[0]?.id
-      || data.length === 0
-    ) {
-      hasMore.value = false
-      return
-    }
-
-    tweets.value = [...tweets.value, ...data]
-    tweetStore.nextPage()
+  document,
+  loadTweets,
+  {
+    throttle: 500,
+    distance: 10,
   },
-  { distance: 10 },
 )
 
 const name = tweetStore.user?.screen_name || ''
-
 useSeo({
   title: `${name} 推文记录`,
   description: `查看${name} 的历史推文`,
@@ -44,7 +68,10 @@ useSeo({
 </script>
 
 <template>
-  <section>
+  <section
+    ref="postRef"
+    class="flex flex-col gap-4"
+  >
     <Post
       v-for="tweet in tweets"
       :key="tweet.id"
@@ -57,7 +84,7 @@ useSeo({
     class="m-4 p-2"
     size="lg"
     variant="ghost"
-    @click="() => tweetStore.nextPage()"
+    @click="loadTweets"
   >
     加载更多
   </Button>

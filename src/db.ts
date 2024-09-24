@@ -48,6 +48,10 @@ export class TweetService {
     return (await this.db.users.get(this.uid))!
   }
 
+  async getUsers() {
+    return await this.db.users.toArray()
+  }
+
   async putData(user: User, tweets: TweetWithUid[]) {
     await this.db.transaction('rw', this.db.users, this.db.tweets, async () => {
       await this.db.users.put(user)

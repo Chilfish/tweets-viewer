@@ -1,6 +1,6 @@
 import { useDateFormat, useStorage } from '@vueuse/core'
 import { defineStore } from 'pinia'
-import { reactive, ref, shallowRef, watch } from 'vue'
+import { reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useRetryFetch } from '~/composables'
 import { staticUrl } from '~/constant'
@@ -48,7 +48,6 @@ export const useTweetStore = defineStore('tweets', () => {
     pageSize: 10,
   })
 
-  const searchResults = shallowRef<Tweet[]>([])
   const searchState = reactive({
     text: route.query.q as string,
     page: 0,
@@ -56,16 +55,20 @@ export const useTweetStore = defineStore('tweets', () => {
   })
 
   watch(() => route.params, async ({ name: newName }) => {
-    if (!newName)
+    if (!newName || newName === user.value?.name)
       return
     console.log('name changed', newName)
+
+    resetPages()
     tweetService.setUid(newName as string)
     user.value = await tweetService.getUser()
+  })
 
+  function resetPages() {
     pageState.page = 0
     datePagination.page = 0
     searchState.page = 0
-  })
+  }
 
   function checkVersion(version: DataVersion, name: string) {
     const oldVersions = tweetStore.value.versions
@@ -140,14 +143,11 @@ export const useTweetStore = defineStore('tweets', () => {
   async function getTweets() {
     const query = route.query
     if (query.q) {
-      console.log('getTWeets', query.q)
-      await search()
-      return searchResults.value
+      return await search()
     }
     else if (query.from && query.to) {
       const { start, end } = parseDateRange()
-      getTweetsByDateRange(start, end)
-      return searchResults.value
+      return await getTweetsByDateRange(start, end)
     }
 
     const tweets = await tweetService
@@ -169,17 +169,8 @@ export const useTweetStore = defineStore('tweets', () => {
       end: end.getTime(),
     }
 
-    console.log('Tweets range', { start, end })
+    // console.log('Tweets range', { start, end })
     return tweetStore.value.tweetRange
-  }
-
-  function resetSearch() {
-    searchResults.value = []
-    searchState.text = ''
-    router.push({
-      query: {},
-      path: `/@${user.value?.name}` || '/',
-    })
   }
 
   let lastKeyword = ''
@@ -198,7 +189,7 @@ export const useTweetStore = defineStore('tweets', () => {
     const { start, end } = parseDateRange()
     const { page, pageSize } = searchState
 
-    searchResults.value = await tweetService.searchTweets(
+    const res = await tweetService.searchTweets(
       keyword,
     )
       .offset(page * pageSize)
@@ -209,7 +200,7 @@ export const useTweetStore = defineStore('tweets', () => {
       })
       .toArray()
 
-    // console.log('searchTweets', searchState)
+    console.log('searchTweets', searchState, res.length)
 
     searchState.page++
     router.push({
@@ -218,6 +209,8 @@ export const useTweetStore = defineStore('tweets', () => {
         q: keyword,
       },
     })
+
+    return res
   }
 
   async function getTweetsByDateRange(
@@ -231,9 +224,9 @@ export const useTweetStore = defineStore('tweets', () => {
       start,
       end,
     )
+    console.log('getTweetsByDateRange', { start, end, page, pageSize }, data.length)
 
-    searchResults.value = data
-
+    datePagination.page++
     router.push({
       query: {
         ...route.query,
@@ -241,10 +234,8 @@ export const useTweetStore = defineStore('tweets', () => {
         to: useDateFormat(end, 'YYYY-MM-DD').value,
       },
     })
-  }
 
-  function nextPage() {
-
+    return data
   }
 
   return {
@@ -252,13 +243,12 @@ export const useTweetStore = defineStore('tweets', () => {
     user,
     datePagination,
     searchState,
-    searchResults,
     tweetStore,
+    tweetService,
     initTweets,
     getTweets,
-    resetSearch,
     search,
     getTweetsByDateRange,
-    nextPage,
+    resetPages,
   }
 })
