@@ -1,5 +1,10 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import { fallbackUser } from '~/constant'
+
+export function usernameFromUrl() {
+  return document.location.pathname.split('@').at(1) || fallbackUser
+}
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))

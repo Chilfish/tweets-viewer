@@ -13,6 +13,7 @@ import {
 import { computed, onBeforeMount } from 'vue'
 import { checkNetwork, isDark } from '~/composables'
 import { useTweetStore } from '~/stores/tweets'
+import { usernameFromUrl } from './utils'
 
 checkNetwork()
 
@@ -26,7 +27,8 @@ const themes = {
 const tweetStore = useTweetStore()
 
 onBeforeMount(async () => {
-  await tweetStore.initTweets()
+  const name = usernameFromUrl()
+  await tweetStore.initTweets(name)
 })
 </script>
 

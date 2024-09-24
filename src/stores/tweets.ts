@@ -3,19 +3,15 @@ import { defineStore } from 'pinia'
 import { reactive, ref, shallowRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useRetryFetch } from '~/composables'
-import { fallbackUser, staticUrl } from '~/constant'
-import {
-  db,
-  pagedTweets,
-  searchTweets,
-  tweetsByDateRange,
-} from '~/db'
+import { staticUrl } from '~/constant'
+import { TweetService } from '~/db'
 import type {
   DataVersion,
   Tweet,
   User,
   VersionKey,
 } from '~/types/tweets'
+import { usernameFromUrl } from '~/utils'
 
 interface TweetStore {
   versions: DataVersion
@@ -31,6 +27,8 @@ export const useTweetStore = defineStore('tweets', () => {
 
   const router = useRouter()
   const route = useRoute()
+
+  const tweetService = new TweetService(usernameFromUrl())
 
   const tweetStore = useStorage<TweetStore>('tweetStore', {
     versions: {},
@@ -57,18 +55,20 @@ export const useTweetStore = defineStore('tweets', () => {
     pageSize: 10,
   })
 
-  function checkVersion(version: DataVersion) {
+  function checkVersion(version: DataVersion, name: string) {
     const oldVersions = tweetStore.value.versions
-    for (const key in version) {
-      if (oldVersions[key as VersionKey] !== version[key as VersionKey]) {
-        tweetStore.value.versions = version
-        return true
-      }
+    const key: VersionKey = `data-${name}`
+
+    if (oldVersions[key] === version[key]) {
+      return false
     }
-    return false
+
+    tweetStore.value.versions[key] = version[key]
+
+    return true
   }
 
-  async function initTweets(name = route.params.name as string || fallbackUser) {
+  async function initTweets(name: string) {
     console.log('Loading data for', name)
     const fetcher = useRetryFetch((err) => {
       console.error(err)
@@ -81,16 +81,16 @@ export const useTweetStore = defineStore('tweets', () => {
       return
     }
 
-    if (!checkVersion(versions)) {
+    if (!checkVersion(versions, name)) {
       console.log('No new data')
       isInit.value = true
 
-      const curUser = (await db.users.get(name))!
+      const curUser = await tweetService.getUser()
       user.value = curUser
 
-      if (route.params.name !== curUser.name) {
-        router.push(`/@${curUser.name}`)
-      }
+      // if (route.params.name !== curUser.name) {
+      //   router.push(`/@${curUser.name}`)
+      // }
 
       console.log('User', curUser)
       return
@@ -107,8 +107,7 @@ export const useTweetStore = defineStore('tweets', () => {
     const curUser = tweetJson.user
     const tweets = tweetJson.tweets.map(tweet => ({ ...tweet, uid: curUser.name }))
 
-    await db.users.put(curUser)
-    await db.tweets.bulkPut(tweets)
+    await tweetService.putData(curUser, tweets)
 
     getTweetsRange(tweets)
     user.value = curUser
@@ -139,7 +138,10 @@ export const useTweetStore = defineStore('tweets', () => {
       return searchResults.value
     }
 
-    const tweets = await pagedTweets(pageState.page, pageState.pageSize).toArray()
+    const tweets = await tweetService
+      .pagedTweets(pageState.page, pageState.pageSize)
+      .toArray()
+
     pageState.page++
 
     return tweets
@@ -184,7 +186,7 @@ export const useTweetStore = defineStore('tweets', () => {
     const { start, end } = parseDateRange()
     const { page, pageSize } = searchState
 
-    searchResults.value = await searchTweets(
+    searchResults.value = await tweetService.searchTweets(
       keyword,
     )
       .offset(page * pageSize)
@@ -212,8 +214,8 @@ export const useTweetStore = defineStore('tweets', () => {
   ) {
     const { page, pageSize } = datePagination
 
-    const data = await tweetsByDateRange(
-      pagedTweets(page, pageSize),
+    const data = await tweetService.tweetsByDateRange(
+      tweetService.pagedTweets(page, pageSize),
       start,
       end,
     )

@@ -12,16 +12,22 @@ function useLayout(
   page: string,
   layout: Component = DefaultLayout,
 ): Component {
-  return h(layout, null, {
-    default: () => h(defineAsyncComponent(() => import(`../pages/${page}.vue`))),
-  })
+  return h(
+    layout,
+    h(defineAsyncComponent(() => import(`../pages/${page}.vue`))),
+  )
+}
+
+function useDefaultRoute(name = '') {
+  return {
+    path: `/${name}`,
+    name: name || 'index',
+    component: useLayout(name || 'index'),
+  } as RouteRecordRaw
 }
 
 const routes: RouteRecordRaw[] = [
-  {
-    path: '/',
-    component: useLayout('index'),
-  },
+  useDefaultRoute(),
   {
     path: '/@:name',
     component: useLayout('posts'),
@@ -30,18 +36,18 @@ const routes: RouteRecordRaw[] = [
     path: '/@:name/memo',
     component: useLayout('memo'),
   },
-  {
-    path: '/fans',
-    component: useLayout('fans'),
-  },
+  // {
+  //   path: '/fans',
+  //   component: useLayout('fans'),
+  // },
   {
     path: '/:pathMatch(.*)*',
     component: useLayout('index'),
   },
-  {
-    path: '/test',
-    component: useLayout('test'),
-  },
+  // {
+  //   path: '/test',
+  //   component: useLayout('test'),
+  // },
   {
     path: '/lsl',
     redirect: `/@ttisrn_0710`,
