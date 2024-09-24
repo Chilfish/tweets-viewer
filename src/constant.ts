@@ -2,9 +2,11 @@ export const placeholderSVG = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDo
 
 export const isDev = import.meta.env.DEV
 
-export const proxyUrl = isDev
-  ? 'http://localhost:8787/?url='
-  : 'https://proxy.chilfish.top/?url='
+export const proxyUrl = 'https://proxy.chilfish.top/?url='
+
+// export const proxyUrl = isDev
+//   ? 'http://localhost:8787/?url='
+//   : 'https://proxy.chilfish.top/?url='
 
 export const staticUrl = isDev
   ? '/static'

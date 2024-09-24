@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, useTemplateRef } from 'vue'
+import { isGoodNetwork } from '~/composables'
+import { proxyUrl } from '~/constant'
 
 const props = defineProps<{
   src: string
@@ -12,7 +14,7 @@ const observer = new IntersectionObserver((entries) => {
     if (entry.isIntersecting) {
       const video = entry.target as HTMLVideoElement
 
-      video.src = props.src
+      video.src = isGoodNetwork.value ? props.src : proxyUrl + props.src
       video.onerror = (e) => {
         console.error(e)
         video.src = ''
@@ -22,8 +24,7 @@ const observer = new IntersectionObserver((entries) => {
   })
 })
 
-const videoRef = ref<HTMLVideoElement | null>(null)
-
+const videoRef = useTemplateRef<HTMLVideoElement>('videoRef')
 onMounted(() => {
   if (videoRef.value) {
     observer.observe(videoRef.value)

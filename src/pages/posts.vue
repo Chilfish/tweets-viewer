@@ -39,8 +39,8 @@ async function loadTweets() {
   isLoading.value = false
 
   if (
-    data[0]?.id === tweets.value[0]?.id
-    || data.length === 0
+    // data[0]?.id === tweets.value[0]?.id
+    data.length === 0
   ) {
     hasMore.value = false
     return

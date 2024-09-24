@@ -196,7 +196,7 @@ export const useTweetStore = defineStore('tweets', () => {
       })
       .toArray()
 
-    console.log('searchTweets', searchState, res.length)
+    // console.log('searchTweets', searchState, res.length)
 
     searchState.page++
     // router.push({

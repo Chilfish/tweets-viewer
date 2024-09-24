@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, useTemplateRef } from 'vue'
 import { isGoodNetwork } from '~/composables'
 import { placeholderSVG, proxyUrl } from '~/constant'
 
@@ -24,7 +24,7 @@ const observer = new IntersectionObserver((entries) => {
   })
 })
 
-const imgRef = ref<HTMLImageElement | null>(null)
+const imgRef = useTemplateRef<HTMLImageElement>('imgRef')
 onMounted(() => {
   if (imgRef.value) {
     observer.observe(imgRef.value)
