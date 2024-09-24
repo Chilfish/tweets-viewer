@@ -21,7 +21,7 @@ const PostContent = defineComponent({
   },
   setup({ text, media, quoutId }) {
     return () => (
-      <CardContent class="pb-2 space-y-2">
+      <CardContent class="pb-2">
         <PostText text={text} />
         <PostMedia media={media} />
         {quoutId && (

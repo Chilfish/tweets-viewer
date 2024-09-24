@@ -56,7 +56,7 @@ useInfiniteScroll(
   loadTweets,
   {
     throttle: 500,
-    distance: 10,
+    distance: 0,
   },
 )
 
@@ -70,7 +70,7 @@ useSeo({
 <template>
   <section
     ref="postRef"
-    class="flex flex-col gap-4"
+    class="flex flex-col gap-3"
   >
     <Post
       v-for="tweet in tweets"

@@ -80,6 +80,11 @@ watch(dateRange, async () => {
         class="p-1"
         @keydown="(e: any) => {
           if (e.key === 'Enter') {
+            $router.push({
+              query: {
+                q: tweetStore.searchState.text,
+              },
+            })
             tweetStore.search()
           }
         }"

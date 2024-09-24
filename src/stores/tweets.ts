@@ -175,11 +175,7 @@ export const useTweetStore = defineStore('tweets', () => {
 
   let lastKeyword = ''
   async function search() {
-    let keyword = searchState.text?.trim()
-    if (!keyword) {
-      keyword = route.query.q as string
-      searchState.text = keyword
-    }
+    const keyword = route.query.q as string
 
     if (keyword !== lastKeyword) {
       searchState.page = 0
@@ -203,12 +199,12 @@ export const useTweetStore = defineStore('tweets', () => {
     console.log('searchTweets', searchState, res.length)
 
     searchState.page++
-    router.push({
-      query: {
-        ...route.query,
-        q: keyword,
-      },
-    })
+    // router.push({
+    //   query: {
+    //     ...route.query,
+    //     q: keyword,
+    //   },
+    // })
 
     return res
   }
