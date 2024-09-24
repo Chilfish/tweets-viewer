@@ -8,6 +8,7 @@ export default antfu({
     'unused-imports/no-unused-vars': 'warn',
     'vue/no-multiple-template-root': 'off',
     'node/prefer-global/process': 'off',
+    'no-unused-vars': 'warn',
   },
   ignores: [
     'public',

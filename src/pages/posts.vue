@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useInfiniteScroll } from '@vueuse/core'
-import { ref, shallowRef, useTemplateRef, watch } from 'vue'
+import { ref, shallowRef, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { Post } from '~/components/posts/post'
 import { useSeo } from '~/composables'
@@ -49,8 +49,6 @@ async function loadTweets() {
   tweets.value = [...tweets.value, ...data]
 }
 
-const postRef = useTemplateRef('postRef')
-
 useInfiniteScroll(
   document,
   loadTweets,
@@ -69,7 +67,6 @@ useSeo({
 
 <template>
   <section
-    ref="postRef"
     class="flex flex-col gap-3"
   >
     <Post
