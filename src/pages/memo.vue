@@ -7,7 +7,7 @@ import type { Tweet } from '~/types/tweets'
 
 const tweetStore = useTweetStore()
 const { state: tweets, isLoading } = useAsyncState<Tweet[]>(
-  tweetStore.tweetService.getLastYearsTodayData,
+  () => tweetStore.tweetService.getLastYearsTodayData(),
   [],
 )
 
