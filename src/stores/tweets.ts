@@ -98,7 +98,6 @@ export const useTweetStore = defineStore('tweets', () => {
 
     if (!checkVersion(versions, name)) {
       console.log('No new data')
-      isInit.value = true
 
       const curUser = await tweetService.getUser()
       user.value = curUser
@@ -108,6 +107,7 @@ export const useTweetStore = defineStore('tweets', () => {
       // }
 
       console.log('User', curUser)
+      isInit.value = true
       return
     }
 

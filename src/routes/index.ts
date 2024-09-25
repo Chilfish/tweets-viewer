@@ -36,10 +36,10 @@ const routes: RouteRecordRaw[] = [
     path: '/@:name/memo',
     component: useLayout('memo'),
   },
-  // {
-  //   path: '/fans',
-  //   component: useLayout('fans'),
-  // },
+  {
+    path: '/fans',
+    component: useLayout('fans'),
+  },
   {
     path: '/:pathMatch(.*)*',
     component: useLayout('index'),

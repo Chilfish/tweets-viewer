@@ -3,7 +3,7 @@ import { twMerge } from 'tailwind-merge'
 import { fallbackUser } from '~/constant'
 
 export function usernameFromUrl() {
-  return document.location.pathname.split('@').at(1) || fallbackUser
+  return document.location.pathname.split('/').at(1)?.slice(1) || fallbackUser
 }
 
 export function cn(...inputs: ClassValue[]) {

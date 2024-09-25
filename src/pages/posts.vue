@@ -63,6 +63,10 @@ useSeo({
   title: `${name} 推文记录`,
   description: `查看${name} 的历史推文`,
 })
+
+function refresh() {
+  location.reload()
+}
 </script>
 
 <template>
@@ -91,5 +95,14 @@ useSeo({
     class="my-8"
     size="large"
     description="没有任何推文欸"
-  />
+  >
+    <template #extra>
+      <n-button
+        size="small"
+        @click="refresh"
+      >
+        刷新试试？
+      </n-button>
+    </template>
+  </n-empty>
 </template>

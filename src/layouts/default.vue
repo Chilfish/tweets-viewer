@@ -8,12 +8,10 @@ const tweetStore = useTweetStore()
   <main
     class="mx-auto flex flex-col gap-0 transition-all duration-300 md:w-50% md:p-4"
   >
-    <template
+    <Header />
+    <slot
       v-if="tweetStore.isInit"
-    >
-      <Header />
-      <slot />
-    </template>
+    />
 
     <div
       v-else
