@@ -15,8 +15,9 @@ const isLoading = ref(true)
 const route = useRoute()
 
 watch(() => route.params, async ({ name: newName }) => {
-  if (!newName || newName === tweetStore.user?.name)
-    return
+  // if (newName === tweetStore.user?.name)
+  //   return
+  console.log('newName', newName)
 
   await reloadTweets()
 })
@@ -34,12 +35,14 @@ async function reloadTweets() {
 }
 
 async function loadTweets() {
-  if (!hasMore.value)
+  if (!hasMore.value || !tweetStore.isInit)
     return
 
   isLoading.value = true
   const data = await tweetStore.getTweets()
   isLoading.value = false
+
+  // console.log('loadTweets', data.length)
 
   if (
     // data[0]?.id === tweets.value[0]?.id

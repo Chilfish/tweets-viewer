@@ -30,7 +30,7 @@ export const useTweetStore = defineStore('tweets', () => {
 
   const tweetService = new TweetService(usernameFromUrl())
 
-  const tweetStore = useStorage<TweetStore>('tweetStore', {
+  const tweetConfig = useStorage<TweetStore>('tweetStore', {
     versions: {},
     tweetRange: {
       start: Date.now(),
@@ -40,18 +40,15 @@ export const useTweetStore = defineStore('tweets', () => {
 
   const pageState = reactive({
     page: 0,
-    pageSize: 10,
   })
 
   const datePagination = reactive({
     page: 0,
-    pageSize: 10,
   })
 
   const searchState = reactive({
     text: route.query.q as string,
     page: 0,
-    pageSize: 10,
   })
 
   watch(() => route.params, async ({ name: newName }) => {
@@ -60,8 +57,7 @@ export const useTweetStore = defineStore('tweets', () => {
     console.log('name changed', newName)
 
     resetPages()
-    tweetService.setUid(newName as string)
-    user.value = await tweetService.getUser()
+    await initTweets(newName as string)
   })
 
   const isReverse = ref(tweetService.isReverse)
@@ -75,20 +71,25 @@ export const useTweetStore = defineStore('tweets', () => {
     searchState.page = 0
   }
 
-  function checkVersion(version: DataVersion, name: string) {
-    const oldVersions = tweetStore.value.versions
-    const key: VersionKey = `data-${name}`
+  function checkVersion(newVersions: DataVersion, name: string) {
+    const oldVersions = tweetConfig.value.versions
+    const newKey: VersionKey = `data-${name}`
+    const isSame = oldVersions[newKey] === newVersions[newKey]
+    oldVersions[newKey] = newVersions[newKey]
 
-    if (oldVersions[key] === version[key]) {
-      return false
+    // new version - old version
+    const notInNew = Object.entries(newVersions).filter(([key]) => !oldVersions[key as VersionKey])
+
+    for (const [key] of notInNew) {
+      oldVersions[key as VersionKey] = 'null'
     }
 
-    tweetStore.value.versions[key] = version[key]
-
-    return true
+    return !isSame
   }
 
   async function initTweets(name?: string) {
+    isInit.value = false
+
     if (!name)
       name = usernameFromUrl()
 
@@ -132,6 +133,7 @@ export const useTweetStore = defineStore('tweets', () => {
     const curUser = tweetJson.user
     const tweets = tweetJson.tweets.map(tweet => ({ ...tweet, uid: curUser.name }))
 
+    console.log('fetch tweets', tweets.length)
     await tweetService.putData(curUser, tweets)
 
     getTweetsRange(tweets)
@@ -147,7 +149,7 @@ export const useTweetStore = defineStore('tweets', () => {
         end: new Date(query.to as string).getTime(),
       }
     }
-    return tweetStore.value.tweetRange
+    return tweetConfig.value.tweetRange
   }
 
   async function getTweets() {
@@ -161,7 +163,7 @@ export const useTweetStore = defineStore('tweets', () => {
     }
 
     const tweets = await tweetService
-      .pagedTweets(pageState.page, pageState.pageSize)
+      .pagedTweets(pageState.page)
       .toArray()
 
     pageState.page++
@@ -174,13 +176,13 @@ export const useTweetStore = defineStore('tweets', () => {
     const end = new Date(tweets[tweets.length - 1].created_at)
     const start = new Date(tweets[0].created_at)
 
-    tweetStore.value.tweetRange = {
+    tweetConfig.value.tweetRange = {
       start: start.getTime(),
       end: end.getTime(),
     }
 
     // console.log('Tweets range', { start, end })
-    return tweetStore.value.tweetRange
+    return tweetConfig.value.tweetRange
   }
 
   let lastKeyword = ''
@@ -193,12 +195,12 @@ export const useTweetStore = defineStore('tweets', () => {
     }
 
     const { start, end } = parseDateRange()
-    const { page, pageSize } = searchState
+    const pageSize = tweetService.pageSize
 
     const res = await tweetService.searchTweets(
       keyword,
     )
-      .offset(page * pageSize)
+      .offset(searchState.page * pageSize)
       .limit(pageSize)
       .filter((t) => {
         const date = new Date(t.created_at).getTime()
@@ -223,10 +225,10 @@ export const useTweetStore = defineStore('tweets', () => {
     start: number,
     end: number,
   ) {
-    const { page, pageSize } = datePagination
+    const { page } = datePagination
 
     const data = await tweetService.tweetsByDateRange(
-      tweetService.pagedTweets(page, pageSize),
+      tweetService.pagedTweets(page),
       start,
       end,
     )
@@ -249,7 +251,7 @@ export const useTweetStore = defineStore('tweets', () => {
     user,
     datePagination,
     searchState,
-    tweetStore,
+    tweetConfig,
     tweetService,
     isReverse,
     initTweets,

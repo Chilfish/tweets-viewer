@@ -2,13 +2,34 @@
 import { onBeforeMount, ref } from 'vue'
 import { proxyUrl } from '~/constant'
 import { useTweetStore } from '~/stores/tweets'
-import type { User } from '~/types/tweets'
+
+interface UserInfo {
+  name: string
+  screen_name: string
+  avatar_url: string
+}
 
 const tweetStore = useTweetStore()
-const users = ref<User[]>([])
+const users = ref<UserInfo[]>([])
 
 onBeforeMount(async () => {
   users.value = await tweetStore.tweetService.getUsers()
+
+  const otherUsers = Object.keys(tweetStore.tweetConfig.versions)
+    .map((key) => {
+      const name = key.split('-')[1]
+      return {
+        name,
+        screen_name: name,
+        avatar_url: `https://unavatar.io/twitter/${name}`,
+      }
+    })
+
+  // unique by name
+  users.value = [
+    ...users.value,
+    ...otherUsers.filter(user => !users.value.some(u => u.name === user.name)),
+  ]
 })
 </script>
 

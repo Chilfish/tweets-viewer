@@ -18,7 +18,7 @@ import TwitterIcon from './icon/TwitterIcon'
 import UserList from './UserList.vue'
 
 const tweetStore = useTweetStore()
-const { start, end } = tweetStore.tweetStore.tweetRange
+const { start, end } = tweetStore.tweetConfig.tweetRange
 const day = 24 * 60 * 60 * 1000
 
 function disableDate(ts: number) {

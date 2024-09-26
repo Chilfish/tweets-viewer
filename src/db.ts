@@ -28,6 +28,8 @@ export class TwitterDB extends Dexie {
 export class TweetService {
   private db: TwitterDB
   private uid: string
+
+  pageSize = 10
   /**
    * 是否倒序，以最新的在前，默认为 true
    */
@@ -62,10 +64,10 @@ export class TweetService {
     })
   }
 
-  pagedTweets(page: number, pageSize: number) {
+  pagedTweets(page: number) {
     return this.tweets()
-      .offset(page * pageSize)
-      .limit(pageSize)
+      .offset(page * this.pageSize)
+      .limit(this.pageSize)
   }
 
   /**
