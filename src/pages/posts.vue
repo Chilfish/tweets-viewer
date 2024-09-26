@@ -6,6 +6,7 @@ import { Post } from '~/components/posts/post'
 import { useSeo } from '~/composables'
 import { useTweetStore } from '~/stores/tweets'
 import type { Tweet } from '~/types/tweets'
+import { usernameFromUrl } from '~/utils'
 
 const tweetStore = useTweetStore()
 const tweets = shallowRef<Tweet[]>([])
@@ -96,7 +97,7 @@ function refresh() {
     v-if="!tweets.length && !isLoading"
     class="my-8"
     size="large"
-    description="没有任何推文欸"
+    :description="`没有任何推文欸（@${usernameFromUrl()}）`"
   >
     <template #extra>
       <n-button

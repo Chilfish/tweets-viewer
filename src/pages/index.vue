@@ -1,7 +1,16 @@
 <script setup lang="tsx">
+import { onBeforeMount } from 'vue'
 import { useSeo } from '~/composables'
+import { useTweetStore } from '~/stores/tweets'
+
+const tweetStore = useTweetStore()
 
 useSeo()
+onBeforeMount(() => {
+  if (!tweetStore.isInit) {
+    tweetStore.initTweets()
+  }
+})
 </script>
 
 <template>

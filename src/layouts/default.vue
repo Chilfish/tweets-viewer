@@ -1,7 +1,17 @@
 <script setup lang="ts">
+import { Loader } from 'lucide-vue-next'
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { useTweetStore } from '~/stores/tweets'
 
 const tweetStore = useTweetStore()
+const route = useRoute()
+
+const isLoaded = computed(() => {
+  return route.name === 'index'
+    ? true
+    : tweetStore.isInit
+})
 </script>
 
 <template>
@@ -10,7 +20,7 @@ const tweetStore = useTweetStore()
   >
     <Header />
     <slot
-      v-if="tweetStore.isInit"
+      v-if="isLoaded"
     />
 
     <div

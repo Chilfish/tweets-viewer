@@ -88,8 +88,13 @@ export const useTweetStore = defineStore('tweets', () => {
     return true
   }
 
-  async function initTweets(name: string) {
+  async function initTweets(name?: string) {
+    if (!name)
+      name = usernameFromUrl()
+
     console.log('Loading data for', name)
+    tweetService.setUid(name)
+
     const fetcher = useRetryFetch((err) => {
       console.error(err)
       router.push('/')
