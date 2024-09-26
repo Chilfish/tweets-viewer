@@ -169,7 +169,7 @@ export const useTweetStore = defineStore('tweets', () => {
       end: end.getTime(),
     }
 
-    // console.log('Tweets range', { start, end })
+    console.log('Tweets range', { start, end })
     return tweetStore.value.tweetRange
   }
 

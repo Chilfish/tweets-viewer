@@ -21,7 +21,6 @@ onBeforeMount(async () => {
       <RouterLink to="/" class="link">
         首页
       </RouterLink>
-      看看
     </p>
 
     <RouterLink

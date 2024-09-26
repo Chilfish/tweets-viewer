@@ -43,7 +43,7 @@ watch(dateRange, async () => {
         </PopoverTrigger>
 
         <PopoverContent
-          class="w-60 p-3"
+          class="w-52 p-3"
         >
           <UserList />
         </PopoverContent>
