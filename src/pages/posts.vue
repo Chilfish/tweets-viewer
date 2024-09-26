@@ -17,18 +17,20 @@ watch(() => route.params, async ({ name: newName }) => {
   if (!newName || newName === tweetStore.user?.name)
     return
 
-  tweets.value = []
-  hasMore.value = true
-  tweetStore.resetPages()
-  await loadTweets()
+  await reloadTweets()
 })
 
-watch(() => route.query, async () => {
+watch([
+  () => route.query,
+  () => tweetStore.isReverse,
+], reloadTweets)
+
+async function reloadTweets() {
   tweets.value = []
   hasMore.value = true
   tweetStore.resetPages()
   await loadTweets()
-})
+}
 
 async function loadTweets() {
   if (!hasMore.value)

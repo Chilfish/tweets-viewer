@@ -14,7 +14,7 @@ onBeforeMount(async () => {
 
 <template>
   <ul
-    class="flex flex-col text-3.5"
+    class="flex flex-col"
   >
     <p class="pb-2">
       切换用户，或是回

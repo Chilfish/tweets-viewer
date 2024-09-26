@@ -43,8 +43,17 @@ watch(dateRange, async () => {
         </PopoverTrigger>
 
         <PopoverContent
-          class="w-52 p-3"
+          class="w-52 p-3 text-3.5"
         >
+          <div class="flex items-center gap-3 pb-2 pl-1">
+            <span>
+              新帖子在前
+            </span>
+            <n-switch
+              v-model:value="tweetStore.isReverse"
+              size="small"
+            />
+          </div>
           <UserList />
         </PopoverContent>
       </Popover>

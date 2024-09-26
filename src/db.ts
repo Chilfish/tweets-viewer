@@ -28,6 +28,10 @@ export class TwitterDB extends Dexie {
 export class TweetService {
   private db: TwitterDB
   private uid: string
+  /**
+   * 是否倒序，以最新的在前，默认为 true
+   */
+  isReverse = true
 
   constructor(uid: string) {
     this.db = new TwitterDB()
@@ -35,9 +39,8 @@ export class TweetService {
   }
 
   private tweets() {
-    return this.db.tweets
-      .reverse()
-      .filter(t => t.uid === this.uid)
+    const collection = this.db.tweets.filter(t => t.uid === this.uid)
+    return this.isReverse ? collection.reverse() : collection
   }
 
   setUid(uid: string) {

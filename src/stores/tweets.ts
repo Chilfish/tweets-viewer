@@ -64,6 +64,11 @@ export const useTweetStore = defineStore('tweets', () => {
     user.value = await tweetService.getUser()
   })
 
+  const isReverse = ref(tweetService.isReverse)
+  watch(isReverse, (val) => {
+    tweetService.isReverse = val
+  })
+
   function resetPages() {
     pageState.page = 0
     datePagination.page = 0
@@ -169,7 +174,7 @@ export const useTweetStore = defineStore('tweets', () => {
       end: end.getTime(),
     }
 
-    console.log('Tweets range', { start, end })
+    // console.log('Tweets range', { start, end })
     return tweetStore.value.tweetRange
   }
 
@@ -220,7 +225,7 @@ export const useTweetStore = defineStore('tweets', () => {
       start,
       end,
     )
-    console.log('getTweetsByDateRange', { start, end, page, pageSize }, data.length)
+    // console.log('getTweetsByDateRange', { start, end, page, pageSize }, data.length)
 
     datePagination.page++
     router.push({
@@ -241,6 +246,7 @@ export const useTweetStore = defineStore('tweets', () => {
     searchState,
     tweetStore,
     tweetService,
+    isReverse,
     initTweets,
     getTweets,
     search,
