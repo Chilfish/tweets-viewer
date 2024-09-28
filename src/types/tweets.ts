@@ -32,8 +32,3 @@ export interface User {
   birthday: string
   created_at: string
 }
-
-export type VersionKey = `data-${string}`
-export interface DataVersion {
-  [ket: VersionKey]: string
-}

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onBeforeMount, ref } from 'vue'
 import { proxyUrl } from '~/constant'
-import { useTweetStore } from '~/stores/tweets'
+import { newVersions, useTweetStore } from '~/stores/tweets'
 
 interface UserInfo {
   name: string
@@ -15,8 +15,8 @@ const users = ref<UserInfo[]>([])
 onBeforeMount(async () => {
   users.value = await tweetStore.tweetService.getUsers()
 
-  const otherUsers = Object.keys(tweetStore.tweetConfig.versions)
-    .map((key) => {
+  const otherUsers = newVersions.value
+    .map(({ name: key }) => {
       const name = key.split('-')[1]
       return {
         name,

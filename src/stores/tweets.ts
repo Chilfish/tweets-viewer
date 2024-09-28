@@ -1,25 +1,73 @@
 import { useDateFormat, useStorage } from '@vueuse/core'
 import { defineStore } from 'pinia'
-import { reactive, ref, watch } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useRetryFetch } from '~/composables'
 import { staticUrl } from '~/constant'
 import { TweetService } from '~/db'
 import type {
-  DataVersion,
   Tweet,
   User,
-  VersionKey,
 } from '~/types/tweets'
 import { usernameFromUrl } from '~/utils'
 
-interface TweetStore {
-  versions: DataVersion
+type TweetKey = `data-${string}`
+
+interface TweetConfig {
+  name: TweetKey
+  version: string
   tweetRange: {
     start: number
     end: number
   }
 }
+
+export const tweetConfig = useStorage<TweetConfig[]>('tweetConfig', [])
+export const newVersions = ref<TweetConfig[]>([])
+
+function isSameVersion(newVersions: TweetConfig[], name: string) {
+  const oldVersions = tweetConfig.value
+  const newKey: TweetKey = `data-${name}`
+  const newVersion = newVersions.find(c => c.name === newKey)?.version
+  const oldVersion = oldVersions.find(c => c.name === newKey)?.version
+
+  if (newVersion === oldVersion) {
+    return true
+  }
+
+  const newConfig = newVersions.find(c => c.name === newKey)
+  if (!newConfig) {
+    return false
+  }
+
+  const oldConfig = oldVersions.find(c => c.name === newKey)
+
+  if (!oldConfig) {
+    oldVersions.push(newConfig)
+    return false
+  }
+
+  oldConfig.version = newConfig.version
+  oldConfig.tweetRange = newConfig.tweetRange
+
+  return false
+}
+
+// function checkVersion(newVersions: DataVersion, name: string) {
+//   const oldVersions = tweetConfig.value.versions
+//   const newKey: VersionKey = `data-${name}`
+//   const isSame = oldVersions[newKey] === newVersions[newKey]
+//   oldVersions[newKey] = newVersions[newKey]
+
+//   // new version - old version
+//   const notInNew = Object.entries(newVersions).filter(([key]) => !oldVersions[key as VersionKey])
+
+//   for (const [key] of notInNew) {
+//     oldVersions[key as VersionKey] = 'null'
+//   }
+
+//   return !isSame
+// }
 
 export const useTweetStore = defineStore('tweets', () => {
   const user = ref<User | null>(null)
@@ -29,14 +77,6 @@ export const useTweetStore = defineStore('tweets', () => {
   const route = useRoute()
 
   const tweetService = new TweetService(usernameFromUrl())
-
-  const tweetConfig = useStorage<TweetStore>('tweetStore', {
-    versions: {},
-    tweetRange: {
-      start: Date.now(),
-      end: Date.now(),
-    },
-  })
 
   const pageState = reactive({
     page: 0,
@@ -65,26 +105,21 @@ export const useTweetStore = defineStore('tweets', () => {
     tweetService.isReverse = val
   })
 
+  const curConfig = computed(() => {
+    return tweetConfig.value.find(c => c.name === `data-${user.value?.name}`) || {
+      name: `data-${user.value?.name}`,
+      version: '0',
+      tweetRange: {
+        start: 0,
+        end: 0,
+      },
+    }
+  })
+
   function resetPages() {
     pageState.page = 0
     datePagination.page = 0
     searchState.page = 0
-  }
-
-  function checkVersion(newVersions: DataVersion, name: string) {
-    const oldVersions = tweetConfig.value.versions
-    const newKey: VersionKey = `data-${name}`
-    const isSame = oldVersions[newKey] === newVersions[newKey]
-    oldVersions[newKey] = newVersions[newKey]
-
-    // new version - old version
-    const notInNew = Object.entries(newVersions).filter(([key]) => !oldVersions[key as VersionKey])
-
-    for (const [key] of notInNew) {
-      oldVersions[key as VersionKey] = 'null'
-    }
-
-    return !isSame
   }
 
   async function initTweets(name?: string) {
@@ -102,12 +137,13 @@ export const useTweetStore = defineStore('tweets', () => {
       isInit.value = true
     })
 
-    const versions = await fetcher<DataVersion>(`${staticUrl}/tweet/versions.json`)
-    if (!versions) {
+    const versions = await fetcher<TweetConfig[]>(`${staticUrl}/tweet/versions.json`)
+    if (!versions?.length) {
       return
     }
 
-    if (!checkVersion(versions, name)) {
+    newVersions.value = versions
+    if (isSameVersion(versions, name)) {
       console.log('No new data')
 
       const curUser = await tweetService.getUser()
@@ -136,7 +172,6 @@ export const useTweetStore = defineStore('tweets', () => {
     console.log('fetch tweets', tweets.length)
     await tweetService.putData(curUser, tweets)
 
-    getTweetsRange(tweets)
     user.value = curUser
     isInit.value = true
   }
@@ -149,7 +184,7 @@ export const useTweetStore = defineStore('tweets', () => {
         end: new Date(query.to as string).getTime(),
       }
     }
-    return tweetConfig.value.tweetRange
+    return curConfig.value.tweetRange
   }
 
   async function getTweets() {
@@ -169,20 +204,6 @@ export const useTweetStore = defineStore('tweets', () => {
     pageState.page++
 
     return tweets
-  }
-
-  function getTweetsRange(tweets: Tweet[]) {
-    // 新推文在前
-    const end = new Date(tweets[tweets.length - 1].created_at)
-    const start = new Date(tweets[0].created_at)
-
-    tweetConfig.value.tweetRange = {
-      start: start.getTime(),
-      end: end.getTime(),
-    }
-
-    // console.log('Tweets range', { start, end })
-    return tweetConfig.value.tweetRange
   }
 
   let lastKeyword = ''
@@ -251,9 +272,9 @@ export const useTweetStore = defineStore('tweets', () => {
     user,
     datePagination,
     searchState,
-    tweetConfig,
     tweetService,
     isReverse,
+    curConfig,
     initTweets,
     getTweets,
     search,
