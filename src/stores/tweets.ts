@@ -25,17 +25,17 @@ interface TweetConfig {
 export const tweetConfig = useStorage<TweetConfig[]>('tweetConfig', [])
 export const newVersions = ref<TweetConfig[]>([])
 
-function isSameVersion(newVersions: TweetConfig[], name: string) {
+function isSameVersion(name: string) {
   const oldVersions = tweetConfig.value
   const newKey: TweetKey = `data-${name}`
-  const newVersion = newVersions.find(c => c.name === newKey)?.version
+  const newVersion = newVersions.value.find(c => c.name === newKey)?.version
   const oldVersion = oldVersions.find(c => c.name === newKey)?.version
 
   if (newVersion === oldVersion) {
     return true
   }
 
-  const newConfig = newVersions.find(c => c.name === newKey)
+  const newConfig = newVersions.value.find(c => c.name === newKey)
   if (!newConfig) {
     return false
   }
@@ -52,22 +52,6 @@ function isSameVersion(newVersions: TweetConfig[], name: string) {
 
   return false
 }
-
-// function checkVersion(newVersions: DataVersion, name: string) {
-//   const oldVersions = tweetConfig.value.versions
-//   const newKey: VersionKey = `data-${name}`
-//   const isSame = oldVersions[newKey] === newVersions[newKey]
-//   oldVersions[newKey] = newVersions[newKey]
-
-//   // new version - old version
-//   const notInNew = Object.entries(newVersions).filter(([key]) => !oldVersions[key as VersionKey])
-
-//   for (const [key] of notInNew) {
-//     oldVersions[key as VersionKey] = 'null'
-//   }
-
-//   return !isSame
-// }
 
 export const useTweetStore = defineStore('tweets', () => {
   const user = ref<User | null>(null)
@@ -94,9 +78,7 @@ export const useTweetStore = defineStore('tweets', () => {
   watch(() => route.params, async ({ name: newName }) => {
     if (!newName || newName === user.value?.name)
       return
-    console.log('name changed', newName)
 
-    resetPages()
     await initTweets(newName as string)
   })
 
@@ -124,6 +106,7 @@ export const useTweetStore = defineStore('tweets', () => {
 
   async function initTweets(name?: string) {
     isInit.value = false
+    resetPages()
 
     if (!name)
       name = usernameFromUrl()
@@ -137,23 +120,19 @@ export const useTweetStore = defineStore('tweets', () => {
       isInit.value = true
     })
 
-    const versions = await fetcher<TweetConfig[]>(`${staticUrl}/tweet/versions.json`)
-    if (!versions?.length) {
-      return
+    if (newVersions.value.length === 0) {
+      const versions = await fetcher<TweetConfig[]>(`${staticUrl}/tweet/versions.json`)
+      if (!versions?.length) {
+        return
+      }
+      newVersions.value = versions
     }
 
-    newVersions.value = versions
-    if (isSameVersion(versions, name)) {
+    if (isSameVersion(name)) {
       console.log('No new data')
 
       const curUser = await tweetService.getUser()
       user.value = curUser
-
-      // if (route.params.name !== curUser.name) {
-      //   router.push(`/@${curUser.name}`)
-      // }
-
-      console.log('User', curUser)
       isInit.value = true
       return
     }
