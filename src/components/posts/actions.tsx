@@ -29,7 +29,8 @@ export const PostActions = defineComponent({
     view: Number,
     link: String,
   },
-  setup({ comment, retweet, like, view, link }) {
+  setup(props) {
+    const { comment, retweet, like, view } = props
     return () => (
       <CardFooter class="flex justify-between pb-2">
         <ActionButton
@@ -61,15 +62,15 @@ export const PostActions = defineComponent({
         </ActionButton>
 
         <Button
+          as="a"
+          // @ts-expect-error as is fine
+          href={props.link}
+          target="_blank"
+          rel="noopener noreferrer"
           title="Open in new tab"
           variant="ghost"
           size="sm"
           class="text-muted-foreground"
-          onClick={() => {
-            if (!link)
-              return
-            window.open(link, '_blank')
-          }}
         >
           <ExternalLink class="h-4 w-4" />
         </Button>

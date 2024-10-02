@@ -51,6 +51,13 @@ console.log(mergedData.length, data.length)
 await writeJson(`${folder}/data-merged.json`, mergedData)
 
 data = data.map((el) => {
+  // 一些错误的数据
+  const isOther = el.screen_name && el.screen_name !== name && !el.full_text.startsWith('RT @')
+  if (isOther) {
+    console.log('Other:', el.screen_name, el.full_text)
+    return null
+  }
+
   if (el.full_text.startsWith('RT @') && !includeRT) {
     return null
   }
@@ -90,10 +97,12 @@ data = data.map((el) => {
   .filter(Boolean)
   .sort((a, b) => a.created_at.localeCompare(b.created_at))
 
+const userTweet = data.find(el => el.screen_name === name)
+
 const user = {
-  name: data[0].screen_name,
-  screen_name: data[0].name,
-  avatar_url: data[0].profile_image_url,
+  name: userTweet.screen_name,
+  screen_name: userTweet.name,
+  avatar_url: userTweet.profile_image_url,
 } as User
 
 data.forEach((el) => {

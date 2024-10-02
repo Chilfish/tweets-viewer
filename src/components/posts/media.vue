@@ -7,7 +7,13 @@ const props = defineProps<{
   media: string[]
 }>()
 
+defineEmits<{
+  error: []
+}>()
+
 function isVideo(url: string) {
+  if (!url)
+    return false
   return url.includes('https://video.twimg.com/')
 }
 
@@ -24,7 +30,7 @@ const modal = useModal()
 <template>
   <div
     v-if="media.length"
-    class="grid gap-2px pb-2"
+    class="grid gap-2px py-2"
     :style="{
       gridTemplateColumns: `repeat(${cols}, 1fr)`,
     }"
@@ -36,7 +42,7 @@ const modal = useModal()
     >
       <Image
         v-if="!isVideo(url)"
-        :src="url.replace('name=orig', 'name=small')"
+        :src="url?.replace('name=orig', 'name=small')"
         :width="width"
         :height="height"
         :unset-width="size === 1"
@@ -55,9 +61,10 @@ const modal = useModal()
           closable: false,
           preset: 'card',
           content: () => h(Image, {
-            src: url.replace('name=orig', 'name=small'),
+            src: url?.replace('name=orig', 'name=small'),
           }),
         })"
+        @error="() => $emit('error')"
       />
       <Video
         v-else

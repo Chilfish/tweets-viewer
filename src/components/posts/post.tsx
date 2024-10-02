@@ -1,5 +1,6 @@
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
 import { Card, CardContent } from '~/components/ui/card'
+import { useTweetStore } from '~/stores/tweets'
 import type { Tweet } from '~/types/tweets'
 import { PostActions } from './actions'
 import { Link } from './link'
@@ -19,11 +20,15 @@ const PostContent = defineComponent({
       default: () => [],
     },
   },
-  setup({ text, media, quoutId }) {
+  emits: ['imgError'],
+  setup({ text, media, quoutId }, { emit }) {
     return () => (
       <CardContent class="pb-2">
         <PostText text={text} />
-        <PostMedia media={media} />
+        <PostMedia
+          onError={() => emit('imgError')}
+          media={media.filter(Boolean)}
+        />
         {quoutId && (
           <p
             class="rounded-lg bg-gray-100 p-2 px-3 text-3.5 dark:bg-gray-800"
@@ -45,6 +50,11 @@ export const Post = defineComponent({
     },
   },
   setup({ tweet }) {
+    const tweetStore = useTweetStore()
+    const curUser = tweetStore.user?.name || 'i/web'
+    const url = `https://twitter.com/${curUser}/status/${tweet.id}`
+    const link = ref(url)
+
     return () => (
       <Card class="mx-auto min-w-full">
         <PostProfile time={tweet.created_at} />
@@ -52,13 +62,16 @@ export const Post = defineComponent({
           text={tweet.full_text}
           quoutId={tweet.quoted_status}
           media={tweet.media}
+          onImgError={() => {
+            link.value = `https://web.archive.org/web/${url}`
+          }}
         />
         <PostActions
           comment={tweet.reply_count}
           retweet={tweet.retweet_count + tweet.quote_count}
           like={tweet.favorite_count}
           view={tweet.views_count}
-          link={`https://twitter.com/i/status/${tweet.id}`}
+          link={link.value}
         />
       </Card>
     )
