@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useAsyncState } from '@vueuse/core'
+import { Loader } from 'lucide-vue-next'
 import { Post } from '~/components/posts/post'
 import { useSeo } from '~/composables'
 import { useTweetStore } from '~/stores/tweets'

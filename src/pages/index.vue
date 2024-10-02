@@ -23,14 +23,7 @@ onBeforeMount(() => {
       >
         @立石凛
       </RouterLink>
-      吧，要是喜欢也可以看看
-      <RouterLink
-        class="link"
-        to="/@240y_k"
-      >
-        @西尾夕香
-      </RouterLink>
-      ，有事就
+      吧，小蓝鸟按钮可查看已有数据的列表，有事就找
       <a
         target="_blank"
         href="https://chilfish.top/bili"
@@ -40,7 +33,21 @@ onBeforeMount(() => {
       </a>
     </p>
     <p>
-      其他人的就随缘放上来吧……在做适配中，有些推文不一定有转推；会根据网络情况来是否代理图片；数据不一定会最新同步，在爬取前就删除的就找不回了（也可以手动在互联网档案馆翻）
+      其他人的就随缘放上来吧，在做适配中……
+      <ul>
+        <li>
+          可能会漏掉一些转推；
+        </li>
+        <li>
+          会根据网络情况来是否代理图片；
+        </li>
+        <li>
+          数据不一定会最新同步，在爬取前就删除的就找不回了
+        </li>
+        <li>
+          显示已删除的推文，可以点击推文右下角按钮转到互联网档案馆查看备份
+        </li>
+      </ul>
     </p>
     <p>
       不过是完全出于考古自用的目的来搭建的，会有一些已知的、自己能忍受的小 bug）
@@ -55,5 +62,12 @@ onBeforeMount(() => {
 p {
   text-indent: 1rem;
   text-align: justify;
+}
+
+ul {
+  list-style-type: disc;
+}
+li {
+  margin-left: 3rem;
 }
 </style>
