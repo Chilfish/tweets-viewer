@@ -78,6 +78,9 @@ importers:
       naive-ui:
         specifier: ^2.39.0
         version: 2.39.0(vue@3.5.8(typescript@5.6.2))
+      ohash:
+        specifier: ^1.1.4
+        version: 1.1.4
       simple-git-hooks:
         specifier: ^2.11.1
         version: 2.11.1
@@ -2557,6 +2560,9 @@ packages:
 
   ofetch@1.3.4:
     resolution: {integrity: sha512-KLIET85ik3vhEfS+3fDlc/BAZiAp+43QEC/yCo5zkNoY2YaKvNkOaFr/6wCFgFH1kuYQM5pMNi0Tg8koiIemtw==}
+
+  ohash@1.1.4:
+    resolution: {integrity: sha512-FlDryZAahJmEF3VR3w1KogSEdWX3WhA5GPakFx4J81kEAiHyLMpdLLElS8n8dfNadMgAne/MywcvmogzscVt4g==}
 
   onetime@6.0.0:
     resolution: {integrity: sha512-1FlR+gjXK7X+AsAHso35MnyN5KqGwJRi/31ft6x0M194ht7S+rWAvd7PHss9xSKMzE0asv1pyIHaJYq+BbacAQ==}
@@ -6119,6 +6125,8 @@ snapshots:
       destr: 2.0.3
       node-fetch-native: 1.6.4
       ufo: 1.5.3
+
+  ohash@1.1.4: {}
 
   onetime@6.0.0:
     dependencies:
