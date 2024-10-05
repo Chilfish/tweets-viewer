@@ -16,5 +16,4 @@ async function run(name: string) {
 }
 
 await run('filterData')
-
 await run('hash')

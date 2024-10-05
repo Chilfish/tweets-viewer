@@ -80,9 +80,21 @@ export async function writeJson(
   return file
 }
 
-export async function readJson<T = any>(file: string) {
+export async function readJson<T = any>(
+  file: string,
+  fallback?: T,
+) {
   file = dir(file)
 
   const data = await readFile(file, 'utf-8')
-  return JSON.parse(data) as T
+
+  try {
+    return JSON.parse(data) as T
+  }
+  catch {
+    if (fallback)
+      return fallback
+
+    throw new Error('Invalid JSON data.')
+  }
 }
