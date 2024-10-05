@@ -1,5 +1,5 @@
 import type { Collection } from 'dexie'
-import type { Tweet, User } from './types/tweets'
+import type { Tweet } from './types/tweets'
 import Dexie from 'dexie'
 
 interface TweetWithUid extends Tweet {
@@ -10,7 +10,6 @@ export type TweetCollection = Collection<TweetWithUid, string, TweetWithUid>
 
 export class TwitterDB extends Dexie {
   tweets: Dexie.Table<TweetWithUid, string>
-  users: Dexie.Table<User, string>
 
   constructor() {
     super('TwitterDB')
@@ -21,7 +20,6 @@ export class TwitterDB extends Dexie {
     })
 
     this.tweets = this.table('tweets')
-    this.users = this.table('users')
   }
 }
 
@@ -49,17 +47,8 @@ export class TweetService {
     this.uid = uid
   }
 
-  async getUser() {
-    return (await this.db.users.get(this.uid))!
-  }
-
-  async getUsers() {
-    return await this.db.users.toArray()
-  }
-
-  async putData(user: User, tweets: TweetWithUid[]) {
-    await this.db.transaction('rw', this.db.users, this.db.tweets, async () => {
-      await this.db.users.put(user)
+  async putData(tweets: TweetWithUid[]) {
+    await this.db.transaction('rw', this.db.tweets, async () => {
       await this.db.tweets.bulkPut(tweets)
     })
   }

@@ -11,11 +11,10 @@ for (const file of files) {
   console.log(`Hashing ${file}`)
   const filename = file.split('/').pop()?.split('.').shift()
 
-  const data = await readJson(file)
-  const version = hash(data)
+  const tweets = await readJson(file)
+  const version = hash(tweets)
 
   const key = `${filename}` as TweetKey
-  const tweets = data.tweets
   const start = new Date(tweets[0].created_at).getTime()
   const end = new Date(tweets[tweets.length - 1].created_at).getTime()
 

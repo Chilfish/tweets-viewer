@@ -9,18 +9,21 @@ export function useSeo(
     description: string
   } = { title: '', description: '' },
 ) {
+  title = title ? `${title} | ` : ''
+  description = description ? `${description} | ` : ''
+
   useSeoMeta({
-    title: `${title} | ${baseTitle}`,
-    description: `${description} | ${baseDes}`,
-    ogTitle: `${title} | ${baseTitle}`,
-    ogDescription: `${description} | ${baseDes}`,
+    title: `${title}${baseTitle}`,
+    description: `${description}${baseDes}`,
+    ogTitle: `${title}${baseTitle}`,
+    ogDescription: `${description}${baseDes}`,
     twitterCard: 'summary',
   })
 
   useHead({
-    title: `${title} | ${baseTitle}`,
+    title: `${title} ${baseTitle}`,
     meta: [
-      { name: 'description', content: `${description} | ${baseDes}` },
+      { name: 'description', content: `${description}${baseDes}` },
       { name: 'theme-color', content: '#3388bb' },
     ],
   })

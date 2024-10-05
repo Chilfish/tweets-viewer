@@ -5,10 +5,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useRetryFetch } from '~/composables'
 import { staticUrl } from '~/constant'
 import { TweetService } from '~/db'
-import type {
-  Tweet,
-  User,
-} from '~/types/tweets'
+import type { Tweet } from '~/types/tweets'
 import { usernameFromUrl } from '~/utils'
 
 type TweetKey = `data-${string}`
@@ -16,6 +13,7 @@ type TweetKey = `data-${string}`
 interface TweetConfig {
   name: TweetKey
   version: string
+  screen_name: string
   tweetRange: {
     start: number
     end: number
@@ -54,7 +52,12 @@ function isSameVersion(name: string) {
 }
 
 export const useTweetStore = defineStore('tweets', () => {
-  const user = ref<User | null>(null)
+  const user = ref('')
+
+  const curUser = computed(() => {
+    const config = tweetConfig.value.find(c => c.name === `data-${user.value}`)
+    return config?.screen_name || user.value
+  })
   const isInit = ref(false)
 
   const router = useRouter()
@@ -76,7 +79,7 @@ export const useTweetStore = defineStore('tweets', () => {
   })
 
   watch(() => route.params, async ({ name: newName }) => {
-    if (!newName || newName === user.value?.name)
+    if (!newName || newName === user.value)
       return
 
     await initTweets(newName as string)
@@ -88,8 +91,8 @@ export const useTweetStore = defineStore('tweets', () => {
   })
 
   const curConfig = computed(() => {
-    return tweetConfig.value.find(c => c.name === `data-${user.value?.name}`) || {
-      name: `data-${user.value?.name}`,
+    return tweetConfig.value.find(c => c.name === `data-${user.value}`) || {
+      name: `data-${user.value}`,
       version: '0',
       tweetRange: {
         start: 0,
@@ -113,6 +116,7 @@ export const useTweetStore = defineStore('tweets', () => {
 
     console.log('Loading data for', name)
     tweetService.setUid(name)
+    user.value = name
 
     const fetcher = useRetryFetch((err) => {
       console.error(err)
@@ -130,28 +134,20 @@ export const useTweetStore = defineStore('tweets', () => {
 
     if (isSameVersion(name)) {
       console.log('No new data')
-
-      const curUser = await tweetService.getUser()
-      user.value = curUser
+      user.value = name
       isInit.value = true
       return
     }
 
-    const tweetJson = await fetcher<{
-      user: User
-      tweets: Tweet[]
-    }>(`${staticUrl}/tweet/data-${name}.json`)
+    const tweetJson = await fetcher<Tweet[]>(`${staticUrl}/tweet/data-${name}.json`)
     if (!tweetJson) {
       return
     }
 
-    const curUser = tweetJson.user
-    const tweets = tweetJson.tweets.map(tweet => ({ ...tweet, uid: curUser.name }))
+    const tweets = tweetJson.map(tweet => ({ ...tweet, uid: name }))
 
     console.log('fetch tweets', tweets.length)
-    await tweetService.putData(curUser, tweets)
-
-    user.value = curUser
+    await tweetService.putData(tweets)
     isInit.value = true
   }
 
@@ -249,6 +245,7 @@ export const useTweetStore = defineStore('tweets', () => {
   return {
     isInit,
     user,
+    curUser,
     datePagination,
     searchState,
     tweetService,

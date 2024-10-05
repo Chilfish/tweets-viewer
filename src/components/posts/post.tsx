@@ -51,7 +51,7 @@ export const Post = defineComponent({
   },
   setup({ tweet }) {
     const tweetStore = useTweetStore()
-    const curUser = tweetStore.user?.name || 'i/web'
+    const curUser = tweetStore.user || 'i/web'
     const url = `https://twitter.com/${curUser}/status/${tweet.id}`
     const link = ref(url)
 

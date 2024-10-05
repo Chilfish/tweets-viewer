@@ -33,3 +33,7 @@ export async function canGoogle() {
     return false
   }
 }
+
+export function avatarUrl(name: string) {
+  return `https://unavatar.io/twitter/${name}`
+}

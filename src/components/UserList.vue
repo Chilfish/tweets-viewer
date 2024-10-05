@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { onBeforeMount, ref } from 'vue'
-import { proxyUrl } from '~/constant'
-import { newVersions, useTweetStore } from '~/stores/tweets'
+import { newVersions } from '~/stores/tweets'
+import { avatarUrl } from '~/utils'
 
 interface UserInfo {
   name: string
@@ -9,28 +8,15 @@ interface UserInfo {
   avatar_url: string
 }
 
-const tweetStore = useTweetStore()
-const users = ref<UserInfo[]>([])
-
-onBeforeMount(async () => {
-  users.value = await tweetStore.tweetService.getUsers()
-
-  const otherUsers = newVersions.value
-    .map(({ name: key }) => {
-      const name = key.split('-')[1]
-      return {
-        name,
-        screen_name: name,
-        avatar_url: `https://unavatar.io/twitter/${name}`,
-      }
-    })
-
-  // unique by name
-  users.value = [
-    ...users.value,
-    ...otherUsers.filter(user => !users.value.some(u => u.name === user.name)),
-  ]
-})
+const users = newVersions.value
+  .map(({ name: key, screen_name }) => {
+    const name = key.split('-')[1]
+    return {
+      name,
+      screen_name,
+      avatar_url: avatarUrl(name),
+    } as UserInfo
+  })
 </script>
 
 <template>
@@ -53,7 +39,7 @@ onBeforeMount(async () => {
       <Avatar size="sm">
         <AvatarImage
           :alt="`User avatar for ${user.name}}`"
-          :src="`${proxyUrl}${user.avatar_url}`"
+          :src="avatarUrl(user.name)"
         />
         <AvatarFallback>{{ user.name }}</AvatarFallback>
       </Avatar>
