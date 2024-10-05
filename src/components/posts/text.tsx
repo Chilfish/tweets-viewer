@@ -105,12 +105,9 @@ export const PostText = defineComponent({
     }
 
     return () => (
-      <>
-        <p class="py-2">
-          {parseText(text)}
-        </p>
-
-      </>
+      <p class="py-2">
+        {parseText(text)}
+      </p>
     )
   },
 })

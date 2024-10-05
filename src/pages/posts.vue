@@ -15,9 +15,8 @@ const isLoading = ref(true)
 const route = useRoute()
 
 watch(() => route.params, async ({ name: newName }) => {
-  // if (newName === tweetStore.user?.name)
-  //   return
-  console.log('newName', newName)
+  if (newName === tweetStore.user?.name)
+    return
 
   await reloadTweets()
 })
@@ -52,7 +51,9 @@ async function loadTweets() {
     return
   }
 
-  tweets.value = [...tweets.value, ...data]
+  // console.log('loadTweets', data[0], tweets.value[0])
+  if (tweets.value[0]?.id !== data[0]?.id)
+    tweets.value = [...tweets.value, ...data]
 }
 
 useInfiniteScroll(

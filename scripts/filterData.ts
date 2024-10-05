@@ -65,12 +65,13 @@ data = data.map((el) => {
   removed.forEach((key) => {
     delete el[key]
   })
+
   el.media = el.media.map((media: any) => {
     let url = media.original
     if (media.type === 'video')
       url = media.original
 
-    return url
+    return url || media
   })
 
   el.full_text = el.full_text

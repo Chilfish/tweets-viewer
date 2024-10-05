@@ -116,7 +116,7 @@ export const useTweetStore = defineStore('tweets', () => {
 
     const fetcher = useRetryFetch((err) => {
       console.error(err)
-      router.push('/')
+      // router.push('/')
       isInit.value = true
     })
 

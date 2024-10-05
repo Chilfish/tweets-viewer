@@ -27,7 +27,7 @@ function disableDate(ts: number) {
 
 const dateRange = ref<[number, number]>([range.value.end, range.value.end])
 watch(dateRange, async () => {
-  const [start, end] = dateRange.value
+  const [start, end] = dateRange.value || []
   await tweetStore.getTweetsByDateRange(start, end + day)
 })
 </script>

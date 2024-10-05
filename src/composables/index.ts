@@ -28,7 +28,7 @@ export function checkNetwork() {
 }
 
 export function useRetryFetch(
-  onError: (error: Error) => void = console.error,
+  onError: (error: Error, url: string) => void = console.error,
 ) {
   return async function retryFetch<T = any>(
     url: string,
@@ -41,7 +41,7 @@ export function useRetryFetch(
           return retryFetch(url, retry + 1)
         }
         else {
-          onError(new Error(`Failed to fetch ${url}`))
+          onError(new Error(`Failed to fetch ${url}`), url)
           return null
         }
       })
