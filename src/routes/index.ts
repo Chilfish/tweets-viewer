@@ -69,6 +69,10 @@ const routes: RouteRecordRaw[] = [
     path: '/memo',
     redirect: `/@ttisrn_0710/memo`,
   },
+  {
+    path: '/likes',
+    redirect: '/remote?url=https://p.chilfish.top/tweet/likes.json',
+  },
 ]
 
 const router = createRouter({
