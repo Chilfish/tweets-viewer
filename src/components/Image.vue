@@ -44,9 +44,9 @@ onMounted(() => {
   <img
     ref="imgRef"
     class="rounded-lg object-cover"
-    :alt
     loading="lazy"
     referrerpolicy="no-referrer"
+    :alt
     :src="placeholderSVG"
     :style="{
       objectFit: 'cover',

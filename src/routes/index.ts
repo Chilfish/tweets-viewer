@@ -54,13 +54,18 @@ const routes: RouteRecordRaw[] = [
     },
   },
   {
-    path: '/:pathMatch(.*)*',
-    component: useLayout('index'),
+    path: '/@:name/pic',
+    name: 'daily-pic',
+    component: h(
+      defineAsyncComponent(() => import('../layouts/pic.vue')),
+      h(defineAsyncComponent(() => import('../pages/pic.vue'))),
+    ),
   },
-  // {
-  //   path: '/test',
-  //   component: useLayout('test'),
-  // },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'not-found',
+    redirect: '/',
+  },
   {
     path: '/lsl',
     redirect: `/@ttisrn_0710`,

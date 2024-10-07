@@ -54,6 +54,9 @@ importers:
       '@antfu/eslint-config':
         specifier: ^3.7.3
         version: 3.7.3(@typescript-eslint/utils@8.8.0(eslint@9.12.0(jiti@2.3.2))(typescript@5.6.2))(@unocss/eslint-plugin@0.63.3(eslint@9.12.0(jiti@2.3.2))(typescript@5.6.2))(@vue/compiler-sfc@3.5.11)(eslint-plugin-format@0.1.2(eslint@9.12.0(jiti@2.3.2)))(eslint@9.12.0(jiti@2.3.2))(typescript@5.6.2)(vitest@2.1.2(@types/node@22.7.4))
+      '@hono/node-server':
+        specifier: ^1.13.1
+        version: 1.13.1(hono@4.6.3)
       '@types/node':
         specifier: ^22.7.4
         version: 22.7.4
@@ -72,6 +75,9 @@ importers:
       eslint-plugin-format:
         specifier: ^0.1.2
         version: 0.1.2(eslint@9.12.0(jiti@2.3.2))
+      hono:
+        specifier: ^4.6.3
+        version: 4.6.3
       lint-staged:
         specifier: ^15.2.10
         version: 15.2.10
@@ -691,6 +697,12 @@ packages:
 
   '@floating-ui/vue@1.1.5':
     resolution: {integrity: sha512-ynL1p5Z+woPVSwgMGqeDrx6HrJfGIDzFyESFkyqJKilGW1+h/8yVY29Khn0LaU6wHBRwZ13ntG6reiHWK6jyzw==}
+
+  '@hono/node-server@1.13.1':
+    resolution: {integrity: sha512-TSxE6cT5RHnawbjnveexVN7H2Dpn1YaLxQrCOLCUwD+hFbqbFsnJBgdWcYtASqtWVjA+Qgi8uqFug39GsHjo5A==}
+    engines: {node: '>=18.14.1'}
+    peerDependencies:
+      hono: ^4
 
   '@humanfs/core@0.19.0':
     resolution: {integrity: sha512-2cbWIHbZVEweE853g8jymffCA+NCMiuqeECeBBLm8dg2oFdjuGJhgN4UAbI+6v0CKbbhvtXA4qV8YR5Ji86nmw==}
@@ -1934,6 +1946,10 @@ packages:
   highlight.js@11.10.0:
     resolution: {integrity: sha512-SYVnVFswQER+zu1laSya563s+F8VDGt7o35d4utbamowvUNLLMovFqwCLSocpZTz3MgaSRA1IbqRWZv97dtErQ==}
     engines: {node: '>=12.0.0'}
+
+  hono@4.6.3:
+    resolution: {integrity: sha512-0LeEuBNFeSHGqZ9sNVVgZjB1V5fmhkBSB0hZrpqStSMLOWgfLy0dHOvrjbJh0H2khsjet6rbHfWTHY0kpYThKQ==}
+    engines: {node: '>=16.9.0'}
 
   hookable@5.5.3:
     resolution: {integrity: sha512-Yc+BQe8SvoXH1643Qez1zqLRmbA5rCL+sSmk6TVos0LWVfNIB7PGncdlId77WzLGSIB5KaWgTaNTs2lNVEI6VQ==}
@@ -3642,6 +3658,10 @@ snapshots:
       - '@vue/composition-api'
       - vue
 
+  '@hono/node-server@1.13.1(hono@4.6.3)':
+    dependencies:
+      hono: 4.6.3
+
   '@humanfs/core@0.19.0': {}
 
   '@humanfs/node@0.16.5':
@@ -5108,6 +5128,8 @@ snapshots:
   he@1.2.0: {}
 
   highlight.js@11.10.0: {}
+
+  hono@4.6.3: {}
 
   hookable@5.5.3: {}
 

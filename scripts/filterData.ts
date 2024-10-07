@@ -1,6 +1,12 @@
 import { existsSync } from 'node:fs'
 import glob from 'fast-glob'
-import { dir, isNotInImport, readJson, uniqueObj, writeJson } from './utils'
+import {
+  dir,
+  isNotInImport,
+  readJson,
+  uniqueObj,
+  writeJson,
+} from './utils'
 
 export async function readFiles(folder: string) {
   const jsons = await glob(`${folder.replace(/\\/g, '/')}/*.json`)
@@ -82,15 +88,57 @@ export function filterData(
     // .sort((a, b) => a.created_at.localeCompare(b.created_at))
 }
 
+export interface ImgData {
+  urls: string[]
+  statusId: string
+  createdAt: string
+  text: string
+  [key: string]: any
+}
+
+function filterImgs(
+  data: any[],
+  name: string | null = null,
+) {
+  const imgs = new Set<ImgData>()
+
+  data.forEach((el) => {
+    if (
+      el.full_text.startsWith('RT @')
+      || (name && el.screen_name && el.screen_name !== name)
+    ) {
+      return
+    }
+
+    if (!el.media.length)
+      return
+
+    imgs.add({
+      statusId: el.id,
+      createdAt: el.created_at,
+      text: el.full_text.replace(/ https:\/\/t\.co\/\w+/, ''),
+      urls: el.media.map((media: any) => media.original || media),
+    })
+  })
+
+  return Array.from(imgs)
+}
+
 if (isNotInImport(import.meta.filename)) {
-  const path = process.argv[2]
+  const path = dir(process.argv[2])
   if (!existsSync(path)) {
     console.error('No data found.')
     process.exit(1)
   }
 
+  const screenName = path.replace(/\\/g, '/').split('/').filter(Boolean).pop()
+
+  console.log(screenName, path)
+
   const data = await readFiles(dir(path))
   const filteredData = filterData(data)
+  const imgs = filterImgs(filteredData, screenName)
 
   await writeJson(`${path}/data-filtered.json`, filteredData, 'write', 0)
+  await writeJson(`${path}/data-imgs.json`, imgs)
 }

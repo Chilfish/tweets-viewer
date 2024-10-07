@@ -1,10 +1,21 @@
-import { defineConfig, presetUno } from 'unocss'
+import {
+  defineConfig,
+  presetAttributify,
+  presetIcons,
+  presetTypography,
+  presetUno,
+} from 'unocss'
 import presetAnimations from 'unocss-preset-animations'
 import { presetShadcn } from 'unocss-preset-shadcn'
 
 export default defineConfig({
   presets: [
     presetUno(),
+    presetAttributify(),
+    presetIcons({
+      scale: 1.2,
+    }),
+    presetTypography(),
     presetAnimations(),
     presetShadcn(),
   ],
