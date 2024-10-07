@@ -9,6 +9,7 @@ export default antfu({
     'vue/no-multiple-template-root': 'off',
     'node/prefer-global/process': 'off',
     'no-unused-vars': 'warn',
+    'antfu/no-top-level-await': 'off',
   },
   ignores: [
     'public',

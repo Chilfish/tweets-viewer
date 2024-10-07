@@ -4,7 +4,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "vite --host --port 3000",
+    "dev": "vite --host --port 3000 --mode development",
+    "dev:server": "wrangler dev server/index.ts",
+    "deploy:server": "wrangler deploy --minify server/index.ts",
     "build": "vite build",
     "lint": "eslint .",
     "typecheck": "vue-tsc --noEmit",
@@ -18,11 +20,10 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "dexie": "^4.0.8",
-    "fuse.js": "^7.0.0",
     "gsap": "^3.12.5",
     "lucide-vue-next": "^0.447.0",
     "pinia": "^2.2.4",
-    "radix-vue": "^1.9.6",
+    "radix-vue": "^1.9.7",
     "tailwind-merge": "^2.5.3",
     "vue": "^3.5.11",
     "vue-router": "^4.4.5"
@@ -48,7 +49,8 @@
     "unplugin-vue-components": "^0.27.4",
     "vite": "^5.4.8",
     "vite-plugin-vue-devtools": "7.4.6",
-    "vue-tsc": "^2.1.6"
+    "vue-tsc": "^2.1.6",
+    "wrangler": "^3.80.1"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm lint-staged",
