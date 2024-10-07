@@ -12,7 +12,7 @@ const { state: tweets, isLoading } = useAsyncState<Tweet[]>(
   [],
 )
 
-const name = tweetStore.curUser
+const name = tweetStore.curConfig.username
 
 useSeo({
   title: `@${name} 推文的那年今日`,

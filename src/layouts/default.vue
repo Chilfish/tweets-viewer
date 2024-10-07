@@ -1,16 +1,22 @@
 <script setup lang="ts">
-import { Loader } from 'lucide-vue-next'
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import Loading from '~/components/icon/Loading'
 import { useTweetStore } from '~/stores/tweets'
 
 const tweetStore = useTweetStore()
 const route = useRoute()
 
+const skipRoutes = ['remote', 'index']
+
 const isLoaded = computed(() => {
-  return route.name === 'index'
+  return skipRoutes.includes(route.name as string)
     ? true
     : tweetStore.isInit
+})
+
+onMounted(async () => {
+  await tweetStore.fetchVersion()
 })
 </script>
 
@@ -23,12 +29,7 @@ const isLoaded = computed(() => {
       v-if="isLoaded"
     />
 
-    <div
-      v-else
-      class="w-full flex items-center justify-center pt-30"
-    >
-      <Loader class="animate-spin" />
-    </div>
+    <Loading :loading="!isLoaded" />
 
     <n-back-top :right="20" />
   </main>

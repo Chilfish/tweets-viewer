@@ -86,15 +86,32 @@ export async function readJson<T = any>(
 ) {
   file = dir(file)
 
-  const data = await readFile(file, 'utf-8')
-
   try {
+    const data = await readFile(file, 'utf-8')
     return JSON.parse(data) as T
   }
   catch {
-    if (fallback)
+    if (fallback) {
+      console.warn(`${file} is invalid, using fallback.`)
+      await writeJson(file, fallback)
       return fallback
+    }
 
     throw new Error('Invalid JSON data.')
   }
+}
+
+/**
+ * Check if the script is not imported
+ *
+ * @example
+ * ```ts
+ * isInCli(import.meta.filename)
+ * ```
+ */
+export function isNotInImport(importMetaFilename: string) {
+  // eslint-disable-next-line no-unused-vars
+  const [_tsx, argFile] = process.argv
+
+  return path.resolve(importMetaFilename) === path.resolve(argFile)
 }

@@ -22,10 +22,14 @@ export interface User {
 export const dataFolder = dir(`D:/Downloads/tweet-data`)
 export const staticFolder = dir('D:/Codes/static/tweet')
 
+const exclude = ['chilfish_', 'mika_d_dr']
 export const dataFolders = await glob(
   `${dataFolder}/*`,
-  { onlyDirectories: true },
+  {
+    onlyDirectories: true,
+  },
 )
+  .then(folders => folders.filter(folder => !exclude.some(el => folder.includes(el))))
 
 export const config = {
   versions: [] as TweetConfig[],

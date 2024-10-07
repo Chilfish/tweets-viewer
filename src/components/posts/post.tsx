@@ -48,16 +48,28 @@ export const Post = defineComponent({
       type: Object as () => Tweet,
       required: true,
     },
+    user: {
+      type: Object as () => {
+        name: string
+        screen_name: string
+      },
+    },
   },
-  setup({ tweet }) {
-    const tweetStore = useTweetStore()
-    const curUser = tweetStore.user || 'i/web'
-    const url = `https://twitter.com/${curUser}/status/${tweet.id}`
+  setup({ tweet, user }) {
+    const curUser = useTweetStore().curConfig
+    const username = user?.name || curUser.username || 'username'
+    const screenName = user?.screen_name || curUser.name.replace('data-', '') || 'i/web'
+
+    const url = `https://twitter.com/${screenName}/status/${tweet.id}`
     const link = ref(url)
 
     return () => (
       <Card class="mx-auto min-w-full">
-        <PostProfile time={tweet.created_at} />
+        <PostProfile
+          time={tweet.created_at}
+          name={username}
+          screen_name={screenName}
+        />
         <PostContent
           text={tweet.full_text}
           quoutId={tweet.quoted_status}

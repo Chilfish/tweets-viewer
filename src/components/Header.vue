@@ -67,7 +67,7 @@ watch(dateRange, async () => {
       </button>
 
       <RouterLink
-        :to="`/@${tweetStore.user}/memo`"
+        :to="`/@${tweetStore.curUser()}/memo`"
         title="那年今日"
       >
         <History class="h-6 w-6" />

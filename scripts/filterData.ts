@@ -1,44 +1,47 @@
-import type { User } from '.'
+import { existsSync } from 'node:fs'
 import glob from 'fast-glob'
-import { config, dataFolders, staticFolder } from '.'
-import { readJson, uniqueObj, writeJson } from './utils'
+import { dir, isNotInImport, readJson, uniqueObj, writeJson } from './utils'
 
-const removedKeys = [
-  'bookmark_count',
-  'bookmarked',
-  'favorited',
-  'retweeted',
-  'url',
-  'profile_image_url',
-  'screen_name',
-  'name',
-]
-
-async function readFiles(folder: string) {
-  const jsons = await glob(`${folder}/*.json`)
+export async function readFiles(folder: string) {
+  const jsons = await glob(`${folder.replace(/\\/g, '/')}/*.json`)
     .then(files => files.filter(name => !name.includes('data-')))
 
-  const data: any[] = []
   if (!jsons.length) {
-    console.error('No data found.')
+    console.error(`No data found in ${folder}`)
     return []
   }
 
+  const data: any[] = []
   for (const json of jsons) {
     const _data = await readJson(json)
     data.push(..._data)
   }
 
-  const mergedData = uniqueObj(data, 'id').sort((a, b) => b.id.localeCompare(a.id))
+  const mergedData = uniqueObj(data, 'id')
+  // .sort((a, b) => b.id.localeCompare(a.id))
   await writeJson(`${folder}/data-merged.json`, mergedData)
 
-  return data
+  return mergedData
 }
 
-function filterData(data: any[], name: string) {
+export function filterData(
+  data: any[],
+  name: string | null = null,
+) {
+  const removedKeys = [
+    'bookmark_count',
+    'bookmarked',
+    'favorited',
+    'retweeted',
+    'url',
+    'profile_image_url',
+  ]
+  if (name)
+    removedKeys.push(...['screen_name', 'name'])
+
   return data.map((el) => {
-    // 一些错误的数据
-    const isOther = el.screen_name && el.screen_name !== name && !el.full_text.startsWith('RT @')
+  // 一些错误的数据
+    const isOther = name && el.screen_name && el.screen_name !== name && !el.full_text.startsWith('RT @')
     if (isOther) {
       // console.log('Other:', el.screen_name, el.full_text)
       return null
@@ -76,42 +79,18 @@ function filterData(data: any[], name: string) {
     return el
   })
     .filter(Boolean)
-    .sort((a, b) => a.created_at.localeCompare(b.created_at))
+    // .sort((a, b) => a.created_at.localeCompare(b.created_at))
 }
 
-function getUserInfo(data: any[], name: string) {
-  const userTweet = data.find(el => el.screen_name === name)
-
-  const user = {
-    name: userTweet.screen_name,
-    screen_name: userTweet.name,
-    avatar_url: userTweet.profile_image_url,
-  } as User
-
-  return user
-}
-
-await config.init()
-
-for await (const folder of dataFolders) {
-  const data = await readFiles(folder)
-  console.log(folder, data.length)
-
-  const name = folder.split('/').pop()
-  if (!name) {
-    console.warn('No name found.')
-    continue
+if (isNotInImport(import.meta.filename)) {
+  const path = process.argv[2]
+  if (!existsSync(path)) {
+    console.error('No data found.')
+    process.exit(1)
   }
 
-  const user = getUserInfo(data, name)
-  const filteredData = filterData(data, name)
+  const data = await readFiles(dir(path))
+  const filteredData = filterData(data)
 
-  await writeJson(`${staticFolder}/data-${user.name}.json`, filteredData, 'write', 0)
-
-  await config.set({
-    name: `data-${user.name}`,
-    screen_name: user.screen_name,
-  })
+  await writeJson(`${path}/data-filtered.json`, filteredData, 'write', 0)
 }
-
-console.log('Done.')

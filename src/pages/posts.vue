@@ -15,7 +15,7 @@ const isLoading = ref(true)
 const route = useRoute()
 
 watch(() => route.params, async ({ name: newName }) => {
-  if (newName === tweetStore.user)
+  if (newName === tweetStore.curUser())
     return
 
   await reloadTweets()
@@ -65,7 +65,7 @@ useInfiniteScroll(
   },
 )
 
-const name = tweetStore.curUser
+const name = tweetStore.curConfig.username
 useSeo({
   title: `@${name} 推文记录`,
   description: `查看@${name} 的历史推文`,

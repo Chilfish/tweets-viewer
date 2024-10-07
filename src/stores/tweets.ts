@@ -1,4 +1,4 @@
-import { useDateFormat, useStorage } from '@vueuse/core'
+import { useDateFormat } from '@vueuse/core'
 import { defineStore } from 'pinia'
 import { computed, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -7,57 +7,10 @@ import { staticUrl } from '~/constant'
 import { TweetService } from '~/db'
 import type { Tweet } from '~/types/tweets'
 import { usernameFromUrl } from '~/utils'
-
-type TweetKey = `data-${string}`
-
-interface TweetConfig {
-  name: TweetKey
-  version: string
-  screen_name: string
-  tweetRange: {
-    start: number
-    end: number
-  }
-}
-
-export const tweetConfig = useStorage<TweetConfig[]>('tweetConfig', [])
-export const newVersions = ref<TweetConfig[]>([])
-
-function isSameVersion(name: string) {
-  const oldVersions = tweetConfig.value
-  const newKey: TweetKey = `data-${name}`
-  const newVersion = newVersions.value.find(c => c.name === newKey)?.version
-  const oldVersion = oldVersions.find(c => c.name === newKey)?.version
-
-  if (newVersion === oldVersion) {
-    return true
-  }
-
-  const newConfig = newVersions.value.find(c => c.name === newKey)
-  if (!newConfig) {
-    return false
-  }
-
-  const oldConfig = oldVersions.find(c => c.name === newKey)
-
-  if (!oldConfig) {
-    oldVersions.push(newConfig)
-    return false
-  }
-
-  oldConfig.version = newConfig.version
-  oldConfig.tweetRange = newConfig.tweetRange
-
-  return false
-}
+import { fetchVersion, isSameVersion, tweetConfig } from './version'
 
 export const useTweetStore = defineStore('tweets', () => {
-  const user = ref('')
-
-  const curUser = computed(() => {
-    const config = tweetConfig.value.find(c => c.name === `data-${user.value}`)
-    return config?.screen_name || user.value
-  })
+  const screenName = ref('')
   const isInit = ref(false)
 
   const router = useRouter()
@@ -79,7 +32,7 @@ export const useTweetStore = defineStore('tweets', () => {
   })
 
   watch(() => route.params, async ({ name: newName }) => {
-    if (!newName || newName === user.value)
+    if (!newName || newName === screenName.value)
       return
 
     await initTweets(newName as string)
@@ -90,16 +43,17 @@ export const useTweetStore = defineStore('tweets', () => {
     tweetService.isReverse = val
   })
 
-  const curConfig = computed(() => {
-    return tweetConfig.value.find(c => c.name === `data-${user.value}`) || {
-      name: `data-${user.value}`,
+  const curConfig = computed(() => tweetConfig.value.find(c => c.name === `data-${screenName.value}`)
+    || {
+      name: `data-${screenName.value}`,
       version: '0',
+      username: screenName.value,
       tweetRange: {
         start: 0,
         end: 0,
       },
-    }
-  })
+    },
+  )
 
   function resetPages() {
     pageState.page = 0
@@ -116,28 +70,22 @@ export const useTweetStore = defineStore('tweets', () => {
 
     console.log('Loading data for', name)
     tweetService.setUid(name)
-    user.value = name
+    screenName.value = name
+
+    await fetchVersion()
+
+    if (isSameVersion(name)) {
+      console.log('No new data')
+      screenName.value = name
+      isInit.value = true
+      return
+    }
 
     const fetcher = useRetryFetch((err) => {
       console.error(err)
       // router.push('/')
       isInit.value = true
     })
-
-    if (newVersions.value.length === 0) {
-      const versions = await fetcher<TweetConfig[]>(`${staticUrl}/tweet/versions.json`)
-      if (!versions?.length) {
-        return
-      }
-      newVersions.value = versions
-    }
-
-    if (isSameVersion(name)) {
-      console.log('No new data')
-      user.value = name
-      isInit.value = true
-      return
-    }
 
     const tweetJson = await fetcher<Tweet[]>(`${staticUrl}/tweet/data-${name}.json`)
     if (!tweetJson) {
@@ -242,19 +190,23 @@ export const useTweetStore = defineStore('tweets', () => {
     return data
   }
 
+  function curUser() {
+    return curConfig.value.name.replace('data-', '')
+  }
+
   return {
     isInit,
-    user,
-    curUser,
     datePagination,
     searchState,
     tweetService,
     isReverse,
     curConfig,
+    fetchVersion,
     initTweets,
     getTweets,
     search,
     getTweetsByDateRange,
     resetPages,
+    curUser,
   }
 })
