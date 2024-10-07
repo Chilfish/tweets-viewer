@@ -7,7 +7,6 @@ import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
 import Components from 'unplugin-vue-components/vite'
 import { defineConfig } from 'vite'
 import VueDevTools from 'vite-plugin-vue-devtools'
-import { apiUrl } from './src/constant'
 
 const root = path.dirname(fileURLToPath(import.meta.url))
 
@@ -65,7 +64,7 @@ export default defineConfig({
         rewrite: path => path.replace(/^\/static/, ''),
       },
       '/api': {
-        target: apiUrl,
+        target: 'http://localhost:8787',
         changeOrigin: true,
         rewrite: path => path.replace(/^\/api/, ''),
       },

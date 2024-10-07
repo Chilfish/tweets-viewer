@@ -5,6 +5,7 @@ import { PostText } from '~/components/posts/text'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent, CardFooter } from '~/components/ui/card'
 import { Skeleton } from '~/components/ui/skeleton'
+import { apiUrl } from '~/constant'
 import { formatDate } from '~/utils'
 
 interface ImgData {
@@ -21,7 +22,7 @@ async function fetchImgData() {
   isLoading.value = true
   imgData.value = null
 
-  imgData.value = await fetch('/api/img').then(res => res.json())
+  imgData.value = await fetch(`${apiUrl}/img`).then(res => res.json())
   isLoading.value = false
 }
 

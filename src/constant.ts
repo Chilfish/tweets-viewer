@@ -9,7 +9,7 @@ export const proxyUrl = 'https://proxy.chilfish.top/?url='
 //   : 'https://proxy.chilfish.top/?url='
 
 export const apiUrl = isDev
-  ? 'http://localhost:8787'
+  ? '/api'
   : 'https://tweet-api.chilfish.top'
 
 export const staticUrl = isDev
