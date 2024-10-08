@@ -5,7 +5,7 @@ import { PostText } from '~/components/posts/text'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent, CardFooter } from '~/components/ui/card'
 import { Skeleton } from '~/components/ui/skeleton'
-import { apiUrl } from '~/constant'
+import { apiUrl, fallbackUser } from '~/constant'
 import { formatDate } from '~/utils'
 
 interface ImgData {
@@ -17,12 +17,13 @@ interface ImgData {
 
 const imgData = ref<ImgData | null>(null)
 const isLoading = ref(false)
+const name = location.pathname.split('/')[1]?.replace('@', '') || fallbackUser
 
 async function fetchImgData() {
   isLoading.value = true
   imgData.value = null
 
-  imgData.value = await fetch(`${apiUrl}/img`).then(res => res.json())
+  imgData.value = await fetch(`${apiUrl}/image/get?name=${name}`).then(res => res.json())
   isLoading.value = false
 }
 
