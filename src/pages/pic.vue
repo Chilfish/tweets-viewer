@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { useQuery } from '@tanstack/vue-query'
+import { computed } from 'vue'
 import Image from '~/components/Image.vue'
 import { PostText } from '~/components/posts/text'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent, CardFooter } from '~/components/ui/card'
 import { Skeleton } from '~/components/ui/skeleton'
-import { apiUrl, fallbackUser } from '~/constant'
+import Video from '~/components/Video.vue'
+import { fallbackUser } from '~/constant'
 import { formatDate } from '~/utils'
+import { request } from '~/utils/fetch'
 
 interface ImgData {
   url: string
@@ -15,42 +18,39 @@ interface ImgData {
   text: string
 }
 
-const imgData = ref<ImgData | null>(null)
-const isLoading = ref(false)
 const name = location.pathname.split('/')[1]?.replace('@', '') || fallbackUser
 
-async function fetchImgData() {
-  isLoading.value = true
-  imgData.value = null
-
-  imgData.value = await fetch(`${apiUrl}/image/get?name=${name}`).then(res => res.json())
-  isLoading.value = false
-}
-
-onMounted(async () => {
-  await fetchImgData()
+const { data: imgData, refetch, isFetching } = useQuery({
+  queryKey: ['tweets-search'],
+  queryFn: () => request.get<ImgData>(`/image/get?name=${name}`).then(res => res.data),
+  initialData: null,
+  refetchOnWindowFocus: false,
 })
+
+const isVideo = computed(() => imgData.value?.url.includes('video.twimg.com'))
 </script>
 
 <template>
   <div
     class="mx-auto min-h-50vh w-90vw transition-all space-y-3"
-    md="max-w-2xl"
+    md="max-w-36rem"
   >
-    <Card
-      v-if="imgData"
-    >
+    <Card v-if="imgData">
       <CardContent class="p-0">
         <Image
-          class="h-auto w-full"
+          v-if="!isVideo"
+          class="h-auto w-full rounded-lg object-cover"
           :src="imgData.url"
           :alt="imgData.text.slice(0, 20)"
-          @error="fetchImgData"
+        />
+        <Video
+          v-else
+          :src="imgData.url"
+          :alt="imgData.text.slice(0, 20)"
         />
       </CardContent>
 
       <CardFooter
-        v-if="imgData.statusId"
         class="flex flex-col items-start p-4"
       >
         <PostText
@@ -78,16 +78,25 @@ onMounted(async () => {
       </div>
     </div>
 
-    <Button
-      v-if="!isLoading"
-      :style="{
-        letterSpacing: '0.05rem',
-      }"
-      class="mx-auto mt-4 w-full"
-      variant="ghost"
-      @click="fetchImgData"
-    >
-      看看别的
-    </Button>
+    <div class="center gap-4 pt-4">
+      <Button
+        v-if="!isFetching"
+        :style="{
+          letterSpacing: '0.05rem',
+        }"
+        variant="outline"
+        @click="() => refetch()"
+      >
+        看看别的
+      </Button>
+
+      <RouterLink
+        to="/"
+        class="px-4 py-2 radix-btn"
+        hover="bg-accent text-accent-foreground text-blue"
+      >
+        返回首页
+      </RouterLink>
+    </div>
   </div>
 </template>

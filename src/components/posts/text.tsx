@@ -71,8 +71,8 @@ export const PostText = defineComponent({
       required: true,
     },
   },
-  setup({ text }) {
-    const retweetTo = retweetInfo(text)
+  setup(props) {
+    const retweetTo = retweetInfo(props.text)
     if (retweetTo.name) {
       return () => (
         <>
@@ -88,7 +88,7 @@ export const PostText = defineComponent({
       )
     }
 
-    const replyTo = replyInfo(text)
+    const replyTo = replyInfo(props.text)
     if (replyTo.name) {
       return () => (
         <>
@@ -106,7 +106,7 @@ export const PostText = defineComponent({
 
     return () => (
       <p class="py-2">
-        {parseText(text)}
+        {parseText(props.text)}
       </p>
     )
   },

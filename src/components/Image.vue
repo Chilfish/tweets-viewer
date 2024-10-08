@@ -1,25 +1,37 @@
 <script setup lang="ts">
-import { onMounted, useTemplateRef } from 'vue'
+import { onMounted, onUnmounted, useTemplateRef, watch } from 'vue'
 import { isGoodNetwork } from '~/composables'
 import { placeholderSVG, proxyUrl } from '~/constant'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   src: string
   alt?: string
   width?: number
   height?: number
   unsetWidth?: boolean
-} >()
+  lazy?: boolean
+}>(), {
+  lazy: true,
+})
 
 const emits = defineEmits<{
   error: []
 }>()
 
+function setSrc(url: string) {
+  if (isGoodNetwork.value) {
+    return url
+  }
+  return proxyUrl + url
+}
+
 const observer = new IntersectionObserver((entries) => {
   entries.forEach((entry) => {
     if (entry.isIntersecting) {
       const img = entry.target as HTMLImageElement
-      img.src = isGoodNetwork.value ? props.src : proxyUrl + props.src
+      const src = setSrc(props.src)
+      img.src = src
+
       img.onerror = () => {
         console.warn('Image load failed:', img.src)
 
@@ -35,6 +47,18 @@ const observer = new IntersectionObserver((entries) => {
 const imgRef = useTemplateRef<HTMLImageElement>('imgRef')
 onMounted(() => {
   if (imgRef.value) {
+    if (props.lazy)
+      observer.observe(imgRef.value)
+    else
+      imgRef.value.src = setSrc(props.src)
+  }
+})
+onUnmounted(() => {
+  observer.disconnect()
+})
+
+watch(() => props.src, () => {
+  if (imgRef.value) {
     observer.observe(imgRef.value)
   }
 })
@@ -44,7 +68,7 @@ onMounted(() => {
   <img
     ref="imgRef"
     class="rounded-lg object-cover"
-    loading="lazy"
+    :loading="lazy ? 'lazy' : 'eager'"
     referrerpolicy="no-referrer"
     :alt
     :src="placeholderSVG"

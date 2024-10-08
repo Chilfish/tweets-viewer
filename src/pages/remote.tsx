@@ -72,7 +72,7 @@ export default defineComponent({
           ))}
         </section>
 
-        <Loading loading={isFetching} />
+        <Loading loading={isFetching.value} />
 
         {!noMore.value && (
           <Button
