@@ -28,13 +28,13 @@ function disableDate(ts: number) {
 const dateRange = ref<[number, number]>([range.value.end, range.value.end])
 watch(dateRange, async () => {
   const [start, end] = dateRange.value || []
-  await tweetStore.getTweetsByDateRange(start, end + day)
+  tweetStore.getTweetsByDateRange(start, end + day)
 })
 </script>
 
 <template>
   <header
-    class="flex items-center justify-between p-4"
+    class="flex items-center justify-between px-4 py-2"
   >
     <div class="center gap-4">
       <Popover>
@@ -78,7 +78,7 @@ watch(dateRange, async () => {
       class="w-60 flex items-center gap-4 md:w-100"
     >
       <n-input
-        v-model:value="tweetStore.searchState.text"
+        v-model:value="tweetStore.searchText"
         placeholder="Search"
         :input-props="{
           'aria-label': 'Search',
@@ -91,10 +91,9 @@ watch(dateRange, async () => {
           if (e.key === 'Enter') {
             $router.push({
               query: {
-                q: tweetStore.searchState.text,
+                q: tweetStore.searchText,
               },
             })
-            tweetStore.search()
           }
         }"
       >

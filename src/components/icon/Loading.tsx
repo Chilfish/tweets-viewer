@@ -1,19 +1,18 @@
-import type { PropType, Ref } from 'vue'
 import { Loader } from 'lucide-vue-next'
-import { defineComponent, toValue } from 'vue'
+import { defineComponent } from 'vue'
 
 export default defineComponent({
-  name: 'Loging',
+  name: 'Loading',
   props: {
     loading: {
-      type: Object as PropType<Ref<boolean> | boolean>,
-      required: true,
+      type: Boolean,
+      default: true,
     },
   },
   setup({ loading }) {
-    return () => toValue(loading) && (
+    return () => loading && (
       <div
-        class="w-full flex items-center justify-center pt-30"
+        class="w-full flex items-center justify-center pt-10"
       >
         <Loader class="animate-spin" />
       </div>

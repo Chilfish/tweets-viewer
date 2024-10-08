@@ -6,7 +6,6 @@ import {
   createWebHistory,
   type RouteRecordRaw,
 } from 'vue-router'
-import { useTweetStore } from '~/stores/tweets'
 import DefaultLayout from '../layouts/default.vue'
 
 function useLayout(
@@ -34,24 +33,10 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/@:name',
     component: useLayout('posts'),
-    beforeEnter: (to, _from, next) => {
-      const tweetStore = useTweetStore()
-      const name = to.params.name as string
-      tweetStore.initTweets(name).then(() => {
-        next()
-      })
-    },
   },
   {
     path: '/@:name/memo',
     component: useLayout('memo'),
-    beforeEnter: (to, _from, next) => {
-      const tweetStore = useTweetStore()
-      const name = to.params.name as string
-      tweetStore.initTweets(name).then(() => {
-        next()
-      })
-    },
   },
   {
     path: '/@:name/pic',

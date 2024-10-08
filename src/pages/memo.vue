@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import { useAsyncState } from '@vueuse/core'
-import { Loader } from 'lucide-vue-next'
+import { useQuery } from '@tanstack/vue-query'
+import { computed } from 'vue'
+import Loading from '~/components/icon/Loading'
 import { Post } from '~/components/posts/post'
 import { useSeo } from '~/composables'
 import { useTweetStore } from '~/stores/tweets'
-import type { Tweet } from '~/types/tweets'
 
 const tweetStore = useTweetStore()
-const { state: tweets, isLoading } = useAsyncState<Tweet[]>(
-  () => tweetStore.tweetService.getLastYearsTodayData(),
-  [],
-)
+const { data: tweets, isFetching } = useQuery({
+  queryKey: ['memo', computed(() => tweetStore.isReverse)],
+  queryFn: () => tweetStore.tweetService.getLastYearsTodayData(),
+  refetchOnWindowFocus: false,
+  initialData: [],
+})
 
 const name = tweetStore.curConfig.username
 
@@ -29,17 +31,12 @@ useSeo({
     />
 
     <n-empty
-      v-if="!tweets.length && !isLoading"
+      v-if="!tweets.length && !isFetching"
       class="my-8"
       size="large"
       description="没有任何推文欸"
     />
 
-    <div
-      v-else-if="isLoading"
-      class="w-full flex items-center justify-center pt-30"
-    >
-      <Loader class="animate-spin" />
-    </div>
+    <Loading v-if="isFetching" />
   </section>
 </template>

@@ -6,6 +6,10 @@ export function usernameFromUrl() {
   return document.location.pathname.split('/').at(1)?.slice(1) || fallbackUser
 }
 
+export function getSearch(key: string) {
+  return new URLSearchParams(window.location.search).get(key) || ''
+}
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }

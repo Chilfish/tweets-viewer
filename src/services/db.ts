@@ -1,5 +1,6 @@
 import type { Collection } from 'dexie'
-import type { Tweet } from './types/tweets'
+import type { TweetService } from '.'
+import type { Tweet } from '../types/tweets'
 import Dexie from 'dexie'
 
 interface TweetWithUid extends Tweet {
@@ -16,35 +17,36 @@ export class TwitterDB extends Dexie {
 
     this.version(1).stores({
       tweets: 'id, uid',
-      users: 'name',
     })
 
     this.tweets = this.table('tweets')
   }
 }
 
-export class TweetService {
+export class TweetDBService implements TweetService {
   private db: TwitterDB
-  private uid: string
-
+  name: string
   pageSize = 10
-  /**
-   * 是否倒序，以最新的在前，默认为 true
-   */
   isReverse = true
 
-  constructor(uid: string) {
+  constructor(name: string) {
     this.db = new TwitterDB()
-    this.uid = uid
+    this.name = name
   }
 
   private tweets() {
-    const collection = this.db.tweets.filter(t => t.uid === this.uid)
+    const collection = this.db.tweets.filter(t => t.uid === this.name)
     return this.isReverse ? collection.reverse() : collection
   }
 
-  setUid(uid: string) {
-    this.uid = uid
+  private pagedTweets(page: number) {
+    return this.tweets()
+      .offset(page * this.pageSize)
+      .limit(this.pageSize)
+  }
+
+  changeName(name: string) {
+    this.name = name
   }
 
   async putData(tweets: TweetWithUid[]) {
@@ -53,10 +55,8 @@ export class TweetService {
     })
   }
 
-  pagedTweets(page: number) {
-    return this.tweets()
-      .offset(page * this.pageSize)
-      .limit(this.pageSize)
+  async getTweets(page: number) {
+    return this.pagedTweets(page).toArray()
   }
 
   /**
@@ -69,32 +69,44 @@ export class TweetService {
     const lastYearsToday = await this.tweets()
       .filter((item) => {
         const date = new Date(item.created_at)
-        return `${date.getMonth() + 1}-${date.getDate()}` === todayStr && item.uid === this.uid
+        return `${date.getMonth() + 1}-${date.getDate()}` === todayStr && item.uid === this.name
       })
       .toArray()
 
     return lastYearsToday
   }
 
-  async tweetsByDateRange(
-    tweets: TweetCollection,
+  async getByDateRange(
     start: number,
     end: number,
+    page: number,
   ) {
-    return await tweets
+    return await this.pagedTweets(page)
       .filter((t) => {
         const date = new Date(t.created_at).getTime()
-        return date >= start && date <= end && t.uid === this.uid
+        return date >= start && date <= end && t.uid === this.name
       })
       .toArray()
   }
 
-  searchTweets(keyword: string) {
-    return this.tweets()
+  async searchTweets(
+    keyword: string,
+    page: number,
+    start: number,
+    end: number,
+  ) {
+    return await this.tweets()
       .filter((t) => {
         const regex = new RegExp(keyword, 'i')
         const isMatch = regex.test(t.full_text)
-        return isMatch && t.uid === this.uid
+        return isMatch && t.uid === this.name
       })
+      .offset(page * this.pageSize)
+      .limit(this.pageSize)
+      .filter((t) => {
+        const date = new Date(t.created_at).getTime()
+        return date >= start && date <= end
+      })
+      .toArray()
   }
 }

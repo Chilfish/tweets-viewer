@@ -14,9 +14,11 @@
     "postinstall": "simple-git-hooks"
   },
   "dependencies": {
+    "@tanstack/vue-query": "^5.59.1",
     "@unhead/vue": "^1.11.7",
     "@unocss/reset": "^0.63.3",
     "@vueuse/core": "^11.1.0",
+    "axios": "^1.7.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "dexie": "^4.0.8",

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { newVersions } from '~/stores/version'
+import { tweetConfig } from '~/stores/version'
 import { avatarUrl } from '~/utils'
 
 interface UserInfo {
@@ -8,7 +8,7 @@ interface UserInfo {
   avatar_url: string
 }
 
-const users = newVersions.value
+const users = tweetConfig.value
   .map(({ name: key, username: screen_name }) => {
     const name = key.split('-')[1]
     return {

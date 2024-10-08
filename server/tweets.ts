@@ -1,4 +1,4 @@
-import type { Tweet } from '../src/types/tweets'
+import type { Tweet } from '@/types/tweets'
 import { Hono } from 'hono'
 import { staticUrl } from './common'
 
@@ -37,13 +37,16 @@ async function searchTweets(
   reverse: boolean,
   page: number,
 ) {
-  const tweets = await pagedTweets(name, page, reverse)
+  const tweets = await fetchTweets(name, reverse)
 
-  return tweets.filter((t) => {
+  const filteredTweets = tweets.filter((t) => {
     const regex = new RegExp(keyword, 'i')
     const isMatch = regex.test(t.full_text)
     return isMatch
   })
+
+  const pagedTweets = filteredTweets.slice(page * pageSize, (page + 1) * pageSize)
+  return pagedTweets
 }
 
 async function getTweetsByDateRange(
@@ -53,11 +56,13 @@ async function getTweetsByDateRange(
   reverse: boolean,
   page: number,
 ) {
-  const tweets = await pagedTweets(name, page, reverse)
-  return tweets.filter((t) => {
-    const date = new Date(t.created_at).getTime()
-    return date >= start && date <= end
-  })
+  const tweets = await fetchTweets(name, reverse)
+  return tweets
+    .filter((t) => {
+      const date = new Date(t.created_at).getTime()
+      return date >= start && date <= end
+    })
+    .slice(page * pageSize, (page + 1) * pageSize)
 }
 
 async function getLastYearsTodayData(name: string, reverse: boolean) {
@@ -129,7 +134,7 @@ app.get('/search/:name', async (c) => {
   return c.json(tweets)
 })
 
-app.get('/last-years-today/:name', async (c) => {
+app.get('/get/:name/last-years-today', async (c) => {
   const name = c.req.param('name')
   const reverse = c.req.query('reverse') === 'true'
 
@@ -152,6 +157,20 @@ app.get('/reset/:name', async (c) => {
   return c.json({
     success: true,
     size: tweetsMap.size,
+  })
+})
+
+app.get('/status', (c) => {
+  const keys = Array.from(tweetsMap.keys())
+  const sizes = keys.map(key => tweetsMap.get(key)?.length)
+
+  const status = keys.map((key, index) => ({
+    name: key,
+    size: sizes[index],
+  }))
+
+  return c.json({
+    status,
   })
 })
 

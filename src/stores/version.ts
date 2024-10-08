@@ -1,4 +1,3 @@
-import { useStorage } from '@vueuse/core'
 import { ref } from 'vue'
 import { staticUrl } from '~/constant'
 
@@ -20,43 +19,14 @@ export interface TweetConfig {
   }
 }
 
-export const tweetConfig = useStorage<TweetConfig[]>('tweetConfig', [])
-export const newVersions = ref<TweetConfig[]>([])
-
-export function isSameVersion(name: string) {
-  const oldVersions = tweetConfig.value
-  const newKey: TweetKey = `data-${name}`
-  const newVersion = newVersions.value.find(c => c.name === newKey)?.version
-  const oldVersion = oldVersions.find(c => c.name === newKey)?.version
-
-  if (newVersion === oldVersion) {
-    return true
-  }
-
-  const newConfig = newVersions.value.find(c => c.name === newKey)
-  if (!newConfig) {
-    return false
-  }
-
-  const oldConfig = oldVersions.find(c => c.name === newKey)
-
-  if (!oldConfig) {
-    oldVersions.push(newConfig)
-    return false
-  }
-
-  oldConfig.version = newConfig.version
-  oldConfig.tweetRange = newConfig.tweetRange
-
-  return false
-}
+export const tweetConfig = ref<TweetConfig[]>([])
 
 export async function fetchVersion() {
-  if (newVersions.value.length) {
-    return newVersions.value
+  if (tweetConfig.value.length) {
+    return tweetConfig.value
   }
 
   const versions = await fetch(`${staticUrl}/tweet/versions.json`).then(res => res.json())
-  newVersions.value = versions
+  tweetConfig.value = versions
   return versions
 }

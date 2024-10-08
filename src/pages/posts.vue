@@ -1,79 +1,98 @@
 <script setup lang="ts">
-import { useInfiniteScroll } from '@vueuse/core'
-import { ref, shallowRef, watch } from 'vue'
+import { useQuery } from '@tanstack/vue-query'
+import { useEventListener, useThrottleFn } from '@vueuse/core'
+import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import Loading from '~/components/icon/Loading'
 import { Post } from '~/components/posts/post'
 import { useSeo } from '~/composables'
 import { useTweetStore } from '~/stores/tweets'
+import type { TweetsReturn } from '~/stores/tweets'
 import type { Tweet } from '~/types/tweets'
-import { usernameFromUrl } from '~/utils'
 
 const tweetStore = useTweetStore()
-const tweets = shallowRef<Tweet[]>([])
-const hasMore = ref(true)
-const isLoading = ref(true)
+const tweets = ref<Tweet[]>([])
+const noMore = ref(false)
 const route = useRoute()
+const queryType = ref<'search' | 'dateRange' | 'all'>('all')
 
-watch(() => route.params, async ({ name: newName }) => {
-  if (newName === tweetStore.curUser())
-    return
-
-  await reloadTweets()
+const queryInfo = ref<TweetsReturn>({
+  queryKey: [],
+  queryFn: () => Promise.resolve([]),
 })
+watch(() => route.query, (query, oldQuery) => {
+  const hasOtherQueryChanged = Object.keys(query).some(key =>
+    key !== 'page' && query[key] !== oldQuery?.[key],
+  )
 
-watch([
-  () => route.query,
-  () => tweetStore.isReverse,
-], reloadTweets)
-
-async function reloadTweets() {
-  tweets.value = []
-  hasMore.value = true
-  tweetStore.resetPages()
-  await loadTweets()
-}
-
-async function loadTweets() {
-  if (!hasMore.value || !tweetStore.isInit)
-    return
-
-  isLoading.value = true
-  const data = await tweetStore.getTweets()
-  isLoading.value = false
-
-  // console.log('loadTweets', data.length)
-
-  if (
-    // data[0]?.id === tweets.value[0]?.id
-    data.length === 0
-  ) {
-    hasMore.value = false
-    return
+  if (hasOtherQueryChanged) {
+    reset()
   }
 
-  // console.log('loadTweets', data[0], tweets.value[0])
-  if (tweets.value[0]?.id !== data[0]?.id)
-    tweets.value = [...tweets.value, ...data]
+  if (route.query.q) {
+    queryType.value = 'search'
+    queryInfo.value = tweetStore.search()
+  }
+  else if (route.query.from && route.query.to) {
+    queryType.value = 'dateRange'
+    queryInfo.value = tweetStore.getTweetsByDateRange()
+  }
+  else {
+    queryType.value = 'all'
+    queryInfo.value = tweetStore.getTweets()
+  }
+}, { immediate: true })
+
+const { data: queryData, isFetching } = useQuery({
+  queryKey: computed(() => queryInfo.value.queryKey),
+  queryFn: computed(() => queryInfo.value.queryFn),
+  initialData: [],
+  refetchOnWindowFocus: false,
+})
+
+watch(queryData, () => {
+  if (queryData.value.length < 10)
+    noMore.value = true
+  else
+    noMore.value = false
+
+  tweets.value = [...tweets.value, ...queryData.value]
+}, { immediate: true })
+
+function refresh() {
+  location.reload()
 }
 
-useInfiniteScroll(
-  document,
-  loadTweets,
-  {
-    throttle: 500,
-    distance: 0,
-  },
-)
+const loadMore = useThrottleFn(() => {
+  if (noMore.value)
+    return
+  tweetStore.nextPage()
+}, 1000)
+useEventListener(window, 'scroll', () => {
+  const offset = 100
+  const scrollHeight = document.documentElement.scrollHeight
+  const isDown = window.scrollY + window.innerHeight >= scrollHeight - offset
+
+  if (isDown)
+    loadMore()
+})
+
+// 更换用户、查看顺序时重置
+watch([
+  () => route.params.name,
+  () => tweetStore.isReverse,
+], reset)
+
+function reset() {
+  tweets.value = []
+  tweetStore.resetPages()
+}
 
 const name = tweetStore.curConfig.username
 useSeo({
   title: `@${name} 推文记录`,
   description: `查看@${name} 的历史推文`,
 })
-
-function refresh() {
-  location.reload()
-}
 </script>
 
 <template>
@@ -88,20 +107,25 @@ function refresh() {
   </section>
 
   <Button
-    v-if="hasMore && !isLoading"
+    v-if="!isFetching && tweets.length && !noMore"
     class="m-4 p-2"
     size="lg"
     variant="ghost"
-    @click="loadTweets"
+    @click="loadMore"
   >
     加载更多
   </Button>
 
+  <Loading
+    v-if="!noMore"
+    :loading="isFetching"
+  />
+
   <n-empty
-    v-if="!tweets.length && !isLoading"
+    v-if="!tweets.length && !isFetching"
     class="my-8"
     size="large"
-    :description="`没有任何推文欸（@${usernameFromUrl()}）`"
+    :description="`没有任何推文欸（@${name}）`"
   >
     <template #extra>
       <n-button

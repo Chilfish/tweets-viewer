@@ -16,7 +16,7 @@ const isLoaded = computed(() => {
 })
 
 onMounted(async () => {
-  await tweetStore.fetchVersion()
+  await tweetStore.initTweets()
 })
 </script>
 
@@ -25,11 +25,9 @@ onMounted(async () => {
     class="mx-auto flex flex-col gap-0 transition-all duration-300 md:w-50% md:p-4"
   >
     <Header />
-    <slot
-      v-if="isLoaded"
-    />
+    <slot />
 
-    <Loading :loading="!isLoaded" />
+    <Loading v-if="!isLoaded" />
 
     <n-back-top :right="20" />
   </main>
