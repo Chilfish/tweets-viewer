@@ -26,7 +26,10 @@ export async function fetchVersion() {
     return tweetConfig.value
   }
 
-  const versions = await fetch(`${staticUrl}/tweet/versions.json`).then(res => res.json())
+  const versions = await fetch(`${staticUrl}/tweet/versions.json`)
+    .then(res => res.json())
+    .catch(() => [])
+
   tweetConfig.value = versions
   return versions
 }

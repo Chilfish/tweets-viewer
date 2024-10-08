@@ -52,7 +52,7 @@ export const useTweetStore = defineStore('tweets', () => {
       username: screenName.value,
       tweetRange: {
         start: 0,
-        end: 0,
+        end: Date.now(),
       },
     },
   )
