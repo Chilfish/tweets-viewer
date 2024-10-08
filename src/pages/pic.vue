@@ -34,7 +34,7 @@ onMounted(async () => {
 
 <template>
   <div
-    class="mx-auto min-h-50vh flex flex-col justify-center transition-all container space-y-3"
+    class="mx-auto min-h-50vh w-90vw transition-all space-y-3"
     md="max-w-2xl"
   >
     <Card
