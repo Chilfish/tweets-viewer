@@ -1,9 +1,9 @@
 import { Hono } from 'hono'
-import { staticUrl } from './common'
+import { staticUrl } from '../common'
 
 const app = new Hono()
 
-let config = []
+let config = [] as any[]
 async function getConfig() {
   if (config.length) {
     return config

@@ -1,17 +1,22 @@
+import { now } from '@/utils/date'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { isNode } from './common'
 
-import configApp from './config'
-import imageApp from './image'
-import tweetsApp from './tweets'
+import configApp from './routes/config'
+import imageApp from './routes/image'
+import tweetsApp from './routes/tweets'
 
 const app = new Hono()
 
 app.use(cors())
 
 app
-  .get('/', c => c.text('Hello World'))
+  .get('/', c => c.json({
+    tokyoTime: now(),
+    serverTime: new Date(),
+    message: 'Hello, World!',
+  }))
   .route('/image', imageApp)
   .route('/tweets', tweetsApp)
   .route('/config', configApp)
