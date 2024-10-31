@@ -1,4 +1,5 @@
 import type { Tweet } from '@/types/tweets'
+import { getDate, now } from '@/utils/date'
 import { Hono } from 'hono'
 import { staticUrl } from './common'
 
@@ -59,20 +60,20 @@ async function getTweetsByDateRange(
   const tweets = await fetchTweets(name, reverse)
   return tweets
     .filter((t) => {
-      const date = new Date(t.created_at).getTime()
+      const date = getDate(t.created_at).getTime()
       return date >= start && date <= end
     })
     .slice(page * pageSize, (page + 1) * pageSize)
 }
 
 async function getLastYearsTodayData(name: string, reverse: boolean) {
-  const today = new Date()
+  const today = now('beijing')
   const todayStr = `${today.getMonth() + 1}-${today.getDate()}`
 
   const lastYearsToday = await fetchTweets(name, reverse)
 
   return lastYearsToday.filter((item) => {
-    const date = new Date(item.created_at)
+    const date = getDate(item.created_at)
     return `${date.getMonth() + 1}-${date.getDate()}` === todayStr
   })
 }
@@ -142,17 +143,8 @@ app.get('/get/:name/last-years-today', async (c) => {
   return c.json(tweets)
 })
 
-app.get('/reset/:name', async (c) => {
-  const name = c.req.param('name')
-  if (!name) {
-    tweetsMap.clear()
-  }
-  else {
-    if (!tweetsMap.has(name))
-      return c.json({ error: 'name not found' }, 400)
-
-    tweetsMap.set(name, [])
-  }
+app.get('/reset', async (c) => {
+  tweetsMap.clear()
 
   return c.json({
     success: true,

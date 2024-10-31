@@ -1,5 +1,6 @@
 import { defineComponent } from 'vue'
 import { avatarUrl } from '~/utils'
+import { formatDate } from '~/utils/date'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 import { CardHeader } from '../ui/card'
 
@@ -43,8 +44,9 @@ export const PostProfile = defineComponent({
           <span>·</span>
           <time
             class="text-3.2 text-muted-foreground"
+            title="东京时间"
           >
-            {time}
+            {formatDate(time)}
           </time>
         </div>
       </CardHeader>

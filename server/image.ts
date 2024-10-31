@@ -8,7 +8,7 @@ let imgData = [] as any[]
 async function fetchImgData() {
   if (imgData.length)
     return
-  imgData = await fetch(`${staticUrl}/tweet/data-imgs.json`)
+  imgData = await fetch(`${staticUrl}/tweet/imgs.json`)
     .then(r => r.json())
     .catch(() => [])
 }

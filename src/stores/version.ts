@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { staticUrl } from '~/constant'
+import { request } from '~/utils/fetch'
 
 type TweetKey = `data-${string}`
 
@@ -8,7 +8,6 @@ export interface TweetConfig {
    * `data-${userId}`
    */
   name: TweetKey
-  version: string
   /**
    * name to be displayed
    */
@@ -26,10 +25,9 @@ export async function fetchVersion() {
     return tweetConfig.value
   }
 
-  const versions = await fetch(`${staticUrl}/tweet/versions.json`)
-    .then(res => res.json())
-    .catch(() => [])
+  const { data: config } = await request.get<TweetConfig[]>(`/config`)
+    .catch(() => ({ data: [] }))
 
-  tweetConfig.value = versions
-  return versions
+  tweetConfig.value = config
+  return config
 }

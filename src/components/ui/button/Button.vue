@@ -8,6 +8,7 @@ type Props = PrimitiveProps & /* @vue-ignore */ ButtonHTMLAttributes & {
   variant?: ButtonVariants['variant']
   size?: ButtonVariants['size']
   class?: HTMLAttributes['class']
+  onClick?: () => void
 }
 
 const props = withDefaults(defineProps<Props>(), {

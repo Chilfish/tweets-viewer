@@ -85,7 +85,7 @@ export function filterData(
     return el
   })
     .filter(Boolean)
-    // .sort((a, b) => a.created_at.localeCompare(b.created_at))
+    .sort((a, b) => a.created_at.localeCompare(b.created_at))
 }
 
 export interface ImgData {
