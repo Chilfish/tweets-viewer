@@ -1,4 +1,4 @@
-import { formatDate, now } from '@/utils/date'
+import { formatDate, getDate, now } from '@/utils/date'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 
@@ -12,8 +12,18 @@ app.use(cors())
 
 app
   .get('/', (c) => {
+    const today = now()
+
+    const date = getDate('2022-01-01 23:30:01:00')
+    date.setHours(date.getHours() + 1)
+
+    const dateStr = `${date.getMonth() + 1}-${date.getDate()}`
+
     return c.json({
-      tokyoTime: formatDate(now()),
+      date: dateStr,
+      today,
+      tokyoTime: formatDate(now('tokyo')),
+      beijingTime: formatDate(now('beijing')),
       serverTime: new Date().toLocaleString(),
       message: 'Hello, World!',
     })

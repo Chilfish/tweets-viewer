@@ -46,7 +46,7 @@ export const PostProfile = defineComponent({
             class="text-3.2 text-muted-foreground"
             title="东京时间"
           >
-            {formatDate(time)}
+            {formatDate(time, { timezone: 'tokyo' })}
           </time>
         </div>
       </CardHeader>

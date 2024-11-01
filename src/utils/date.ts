@@ -1,4 +1,3 @@
-import { TZDate } from '@date-fns/tz'
 import { format } from 'date-fns'
 import { zhCN } from 'date-fns/locale'
 
@@ -12,13 +11,18 @@ type TZ = keyof typeof tzs
 
 export function formatDate(
   time: Time,
-  fmt = 'yyyy-MM-dd HH:mm:ss',
-  tz: TZ = 'tokyo',
+  options: {
+    timezone?: TZ
+    fmt?: string
+  } = {},
 ) {
-  const date = getDate(time, tz)
+  const {
+    timezone,
+    fmt = 'yyyy-MM-dd HH:mm:ss',
+  } = options
 
   return format(
-    date,
+    getDate(time, timezone),
     fmt,
     { locale: zhCN },
   )
@@ -26,18 +30,17 @@ export function formatDate(
 
 export function getDate(
   time: Time,
-  tz: TZ = 'tokyo',
+  timezone?: TZ,
 ) {
-  if (typeof time === 'number' && time < 1e12)
-    time *= 1000
-
-  let date = new Date(time)
-  if (Number.isNaN(date.getTime()))
-    date = new Date()
-
-  return new TZDate(date.toUTCString(), tzs[tz])
+  return new Date(
+    new Date(time).toLocaleString(zhCN.code, {
+      timeZone: timezone ? tzs[timezone] : undefined,
+    }),
+  )
 }
 
-export function now(tz: TZ = 'tokyo') {
-  return TZDate.tz(tzs[tz])
+export function now(
+  timezone: TZ = 'beijing',
+) {
+  return getDate(new Date(), timezone)
 }

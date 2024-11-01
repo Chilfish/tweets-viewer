@@ -16,10 +16,16 @@ async function fetchTweets(
   const url = `${staticUrl}/tweet/data-${name}.json`
   const tweets = await fetch(url)
     .then(r => r.json())
+    .then(data => data.sort((a: any, b: any) => {
+      const dateA = new Date(a.created_at).getTime()
+      const dateB = new Date(b.created_at).getTime()
+      return dateA - dateB
+    }))
     .catch((e) => {
       console.error(`Failed to fetch tweets for ${url}:`, e)
       return []
     }) as Tweet[]
+
   tweetsMap.set(name, tweets)
 
   return reverse ? tweets.toReversed() : tweets
@@ -71,13 +77,15 @@ async function getTweetsByDateRange(
 }
 
 async function getLastYearsTodayData(name: string, reverse: boolean) {
-  const today = now()
+  const today = now('beijing')
   const todayStr = `${today.getMonth() + 1}-${today.getDate()}`
 
   const tweets = await fetchTweets(name, reverse)
 
   return tweets.filter((item) => {
     const date = getDate(item.created_at)
+    date.setHours(date.getHours() + 1)
+
     const dateStr = `${date.getMonth() + 1}-${date.getDate()}`
     return dateStr === todayStr
   })
