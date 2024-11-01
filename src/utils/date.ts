@@ -35,9 +35,9 @@ export function getDate(
   if (Number.isNaN(date.getTime()))
     date = new Date()
 
-  return new TZDate(date, tzs[tz])
+  return new TZDate(date.toUTCString(), tzs[tz])
 }
 
 export function now(tz: TZ = 'tokyo') {
-  return getDate(Date.now(), tz)
+  return TZDate.tz(tzs[tz])
 }

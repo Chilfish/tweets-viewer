@@ -10,12 +10,16 @@ async function fetchTweets(
   name: string,
   reverse: boolean = false,
 ) {
-  if (tweetsMap.has(name))
+  if (tweetsMap.get(name)?.length)
     return reverse ? tweetsMap.get(name)!.toReversed() : tweetsMap.get(name)!
 
-  const tweets = await fetch(`${staticUrl}/tweet/data-${name}.json`)
+  const url = `${staticUrl}/tweet/data-${name}.json`
+  const tweets = await fetch(url)
     .then(r => r.json())
-    .catch(() => []) as Tweet[]
+    .catch((e) => {
+      console.error(`Failed to fetch tweets for ${url}:`, e)
+      return []
+    }) as Tweet[]
   tweetsMap.set(name, tweets)
 
   return reverse ? tweets.toReversed() : tweets
@@ -67,14 +71,15 @@ async function getTweetsByDateRange(
 }
 
 async function getLastYearsTodayData(name: string, reverse: boolean) {
-  const today = now('beijing')
+  const today = now()
   const todayStr = `${today.getMonth() + 1}-${today.getDate()}`
 
-  const lastYearsToday = await fetchTweets(name, reverse)
+  const tweets = await fetchTweets(name, reverse)
 
-  return lastYearsToday.filter((item) => {
+  return tweets.filter((item) => {
     const date = getDate(item.created_at)
-    return `${date.getMonth() + 1}-${date.getDate()}` === todayStr
+    const dateStr = `${date.getMonth() + 1}-${date.getDate()}`
+    return dateStr === todayStr
   })
 }
 
