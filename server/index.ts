@@ -3,9 +3,9 @@ import { cloudflareRateLimiter } from '@hono-rate-limiter/cloudflare'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 
-import configApp from './routes/config'
-import imageApp from './routes/image'
 import tweetsApp from './routes/tweets'
+import usersApp from './routes/users'
+import imageApp from './routes/v1/image'
 
 interface AppType {
   Variables: {
@@ -45,7 +45,12 @@ app
   })
   .route('/image', imageApp)
   .route('/tweets', tweetsApp)
-  .route('/config', configApp)
+  .route('/users', usersApp)
+
+app.onError((err, c) => {
+  console.error(`${err}`)
+  return c.json(err, 500)
+})
 
 export default {
   fetch: app.fetch,

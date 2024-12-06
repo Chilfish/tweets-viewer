@@ -54,13 +54,13 @@ export async function getTweetsByDateRange({
   end,
   reverse,
   page,
-}: GetTweet & { start: Date, end: Date }) {
+}: GetTweet & { start: number, end: number }) {
   return db
     .select()
     .from(tweetsTable)
     .where(and(
       eq(tweetsTable.userId, uid),
-      sql`CAST(${tweetsTable.createdAt} AS DATE) BETWEEN ${start} AND ${end}`,
+      sql`CAST(${tweetsTable.createdAt} AS DATE) BETWEEN ${new Date(start)} AND ${new Date(end)}`,
     ))
     .orderBy(_order(reverse))
     .limit(pageSize)
