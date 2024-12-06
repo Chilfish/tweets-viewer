@@ -24,3 +24,4 @@ dist-ssr
 .wrangler
 
 auto-*.d.ts
+.env

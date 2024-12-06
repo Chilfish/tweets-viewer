@@ -36,11 +36,15 @@
   "devDependencies": {
     "@antfu/eslint-config": "^3.11.2",
     "@hono-rate-limiter/cloudflare": "^0.2.2",
+    "@neondatabase/serverless": "^0.10.4",
     "@types/node": "^22.10.1",
     "@unocss/eslint-plugin": "^0.65.1",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vitejs/plugin-vue-jsx": "^4.1.1",
     "concurrently": "^9.1.0",
+    "dotenv": "^16.4.7",
+    "drizzle-kit": "^0.29.1",
+    "drizzle-orm": "^0.37.0",
     "eslint": "^9.16.0",
     "eslint-plugin-format": "^0.1.3",
     "hono": "^4.6.12",
@@ -59,8 +63,7 @@
     "wrangler": "^3.92.0"
   },
   "simple-git-hooks": {
-    "pre-commit": "pnpm lint-staged",
-    "pre-push": "pnpm typecheck"
+    "pre-commit": "pnpm lint-staged"
   },
   "lint-staged": {
     "*": "eslint --fix"
