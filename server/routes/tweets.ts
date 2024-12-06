@@ -1,3 +1,4 @@
+import type { AppType } from 'common'
 import {
   getLastYearsTodayTweets,
   getTweets,
@@ -5,20 +6,22 @@ import {
   getTweetsByKeyword,
 } from '@db/index'
 import { Hono } from 'hono'
+import { getContext } from 'hono/context-storage'
 
 const app = new Hono()
 
-app.get('/get/:uid', async (c) => {
-  const uid = Number(c.req.param('uid'))
+app.get('/get/:name', async (c) => {
+  const name = c.req.param('name')
   const page = Number(c.req.query('page') || 0)
   const reverse = c.req.query('reverse') === 'true'
+  const { db } = getContext<AppType>().var
 
-  const tweets = await getTweets({ uid, page, reverse })
+  const tweets = await getTweets({ db, name, page, reverse })
   return c.json(tweets)
 })
 
-app.get('/get/:uid/range', async (c) => {
-  const uid = Number(c.req.param('uid'))
+app.get('/get/:name/range', async (c) => {
+  const name = c.req.param('name')
   const start = Number(c.req.query('start'))
   const end = Number(c.req.query('end'))
   const reverse = c.req.query('reverse') === 'true'
@@ -31,12 +34,13 @@ app.get('/get/:uid/range', async (c) => {
   if (start < 0 || end < 0)
     return c.json({ error: 'start and end must be positive' }, 400)
 
-  const tweets = await getTweetsByDateRange({ uid, start, end, reverse, page })
+  const { db } = getContext<AppType>().var
+  const tweets = await getTweetsByDateRange({ db, name, start, end, reverse, page })
   return c.json(tweets)
 })
 
-app.get('/search/:uid', async (c) => {
-  const uid = Number(c.req.param('uid'))
+app.get('/search/:name', async (c) => {
+  const name = c.req.param('name')
   const keyword = c.req.query('q')
   const reverse = c.req.query('reverse') === 'true'
   const page = Number(c.req.query('page') || 0)
@@ -44,15 +48,17 @@ app.get('/search/:uid', async (c) => {
   if (!keyword)
     return c.json({ error: 'keyword is required' }, 400)
 
-  const tweets = await getTweetsByKeyword({ uid, keyword, reverse, page })
+  const { db } = getContext<AppType>().var
+  const tweets = await getTweetsByKeyword({ db, name, keyword, reverse, page })
   return c.json(tweets)
 })
 
-app.get('/get/:uid/last-years-today', async (c) => {
-  const uid = Number(c.req.param('uid'))
+app.get('/get/:name/last-years-today', async (c) => {
+  const name = c.req.param('name')
   const reverse = c.req.query('reverse') === 'true'
 
-  const tweets = await getLastYearsTodayTweets({ uid, reverse, page: 0 })
+  const { db } = getContext<AppType>().var
+  const tweets = await getLastYearsTodayTweets({ db, name, reverse, page: 0 })
   return c.json(tweets)
 })
 

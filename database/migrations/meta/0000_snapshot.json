@@ -1,5 +1,5 @@
 {
-  "id": "5f07c83e-551e-4b90-b91e-027165adb77e",
+  "id": "35aa6650-9f93-4994-baea-81647c65fb72",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -20,9 +20,9 @@
           "primaryKey": false,
           "notNull": true
         },
-        "user_id": {
-          "name": "user_id",
-          "type": "integer",
+        "user_name": {
+          "name": "user_name",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -147,15 +147,15 @@
         }
       },
       "foreignKeys": {
-        "tweets_user_id_users_id_fk": {
-          "name": "tweets_user_id_users_id_fk",
+        "tweets_user_name_users_screen_name_fk": {
+          "name": "tweets_user_name_users_screen_name_fk",
           "tableFrom": "tweets",
           "tableTo": "users",
           "columnsFrom": [
-            "user_id"
+            "user_name"
           ],
           "columnsTo": [
-            "id"
+            "screen_name"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"

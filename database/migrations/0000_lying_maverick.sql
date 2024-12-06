@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS "tweets" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"tweet_id" text NOT NULL,
-	"user_id" integer NOT NULL,
+	"user_name" text NOT NULL,
 	"created_at" timestamp NOT NULL,
 	"full_text" text NOT NULL,
 	"media" json DEFAULT '[]'::json NOT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS "users" (
 );
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "tweets" ADD CONSTRAINT "tweets_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
+ ALTER TABLE "tweets" ADD CONSTRAINT "tweets_user_name_users_screen_name_fk" FOREIGN KEY ("user_name") REFERENCES "public"."users"("screen_name") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

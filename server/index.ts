@@ -1,29 +1,31 @@
+import type { AppType } from './common'
 import { formatDate, getDate, now } from '@/utils/date'
 import { cloudflareRateLimiter } from '@hono-rate-limiter/cloudflare'
+import { neon } from '@neondatabase/serverless'
+import { drizzle } from 'drizzle-orm/neon-http'
 import { Hono } from 'hono'
+import { contextStorage } from 'hono/context-storage'
 import { cors } from 'hono/cors'
-
 import tweetsApp from './routes/tweets'
 import usersApp from './routes/users'
 import imageApp from './routes/v1/image'
 
-interface AppType {
-  Variables: {
-    rateLimit: boolean
-  }
-  Bindings: {
-    RATE_LIMITER: RateLimit
-  }
-}
-
 const app = new Hono<AppType>()
 
 app
+  .use(contextStorage())
   .use(cors())
   .use(cloudflareRateLimiter<AppType>({
     rateLimitBinding: c => c.env.RATE_LIMITER,
     keyGenerator: c => c.req.header('cf-connecting-ip') ?? c.req.header('x-forwarded-for') ?? 'unknown',
   }))
+  .use(async (c, next) => {
+    const { DATABASE_URL } = c.env
+    const sql = neon(DATABASE_URL)
+    const db = drizzle({ client: sql })
+    c.set('db', db)
+    return next()
+  })
 
 app
   .get('/', (c) => {

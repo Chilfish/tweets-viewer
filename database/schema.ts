@@ -26,9 +26,9 @@ export const usersTable = pgTable('users', {
 export const tweetsTable = pgTable('tweets', {
   id: serial('id').primaryKey(),
   tweetId: text('tweet_id').notNull(),
-  userId: integer('user_id')
+  userId: text('user_name')
     .notNull()
-    .references(() => usersTable.id, { onDelete: 'cascade' }),
+    .references(() => usersTable.screenName, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at').notNull(),
   fullText: text('full_text').notNull(),
   media: json('media').notNull().default([]),
