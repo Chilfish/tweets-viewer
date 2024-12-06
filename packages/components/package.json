@@ -1,0 +1,17 @@
+{
+  "name": "@tweets-viewer/components",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+  },
+  "dependencies": {
+    "cva": "npm:class-variance-authority@^0.7.1",
+    "lucide-vue-next": "^0.468.0",
+    "radix-vue": "^1.9.10"
+  },
+  "devDependencies": {
+    "@tweets-viewer/core": "workspace:*",
+    "naive-ui": "^2.40.3"
+  }
+}

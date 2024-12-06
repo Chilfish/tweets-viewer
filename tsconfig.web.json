@@ -1,0 +1,29 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "jsx": "preserve",
+    "jsxImportSource": "vue",
+    "lib": [
+      "ESNext",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "types": [
+      "vite/client"
+    ]
+  },
+  "include": [
+    "packages/**/*.ts",
+    "packages/**/*.vue",
+    "packages/**/*.tsx",
+    "apps/**/*.ts",
+    "apps/**/*.vue",
+    "apps/**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "*.config.ts"
+  ]
+}
