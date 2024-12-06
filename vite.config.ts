@@ -1,7 +1,7 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import Vue from '@vitejs/plugin-vue'
-import vueJsx from '@vitejs/plugin-vue-jsx'
+import VueJsx from '@vitejs/plugin-vue-jsx'
 import UnoCSS from 'unocss/vite'
 import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
 import Components from 'unplugin-vue-components/vite'
@@ -24,7 +24,7 @@ export default defineConfig({
         defineModel: true,
       },
     }),
-    vueJsx(),
+    VueJsx(),
 
     // https://github.com/antfu/vite-plugin-components
     Components({
@@ -40,22 +40,6 @@ export default defineConfig({
     // https://github.com/webfansplz/vite-plugin-vue-devtools
     VueDevTools(),
   ],
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          const names = [
-            'naive-ui',
-          ]
-          for (const name of names) {
-            if (id.includes(`node_modules/${name}/`)) {
-              return name
-            }
-          }
-        },
-      },
-    },
-  },
   server: {
     proxy: {
       '/static': {

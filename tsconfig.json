@@ -5,10 +5,8 @@
     "jsxImportSource": "vue",
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "useDefineForClassFields": true,
-
     "baseUrl": ".",
     "module": "ESNext",
-
     "moduleResolution": "bundler",
     "paths": {
       "~/*": ["./src/*"]
