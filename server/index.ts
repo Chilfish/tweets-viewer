@@ -1,4 +1,5 @@
 import { formatDate, getDate, now } from '@/utils/date'
+import { cloudflareRateLimiter } from '@hono-rate-limiter/cloudflare'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 
@@ -6,9 +7,23 @@ import configApp from './routes/config'
 import imageApp from './routes/image'
 import tweetsApp from './routes/tweets'
 
-const app = new Hono()
+interface AppType {
+  Variables: {
+    rateLimit: boolean
+  }
+  Bindings: {
+    RATE_LIMITER: RateLimit
+  }
+}
 
-app.use(cors())
+const app = new Hono<AppType>()
+
+app
+  .use(cors())
+  .use(cloudflareRateLimiter<AppType>({
+    rateLimitBinding: c => c.env.RATE_LIMITER,
+    keyGenerator: c => c.req.header('cf-connecting-ip') ?? c.req.header('x-forwarded-for') ?? 'unknown',
+  }))
 
 app
   .get('/', (c) => {

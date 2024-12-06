@@ -2,17 +2,21 @@ name = "tweet-api"
 compatibility_flags = [ "nodejs_compat" ]
 compatibility_date = "2024-09-23"
 
-# [vars]
-# MY_VAR = "my-variable"
+[[kv_namespaces]]
+binding = "tweet-hono-rate-limiter"
+id = "c0fc65ecc29040d989349622f611c072"
 
-# [[r2_buckets]]
-# binding = "MY_BUCKET"
-# bucket_name = "my-bucket"
+[vars]
+rateLimit = true
 
-# [[d1_databases]]
-# binding = "DB"
-# database_name = "my-database"
-# database_id = ""
+[[unsafe.bindings]]
+name = "RATE_LIMITER"
+type = "ratelimit"
+# An identifier you define, that is unique to your Cloudflare account.
+# Must be an integer.
+namespace_id = "1001"
 
-# [ai]
-# binding = "AI"
+# Limit: the number of tokens allowed within a given period in a single
+# Cloudflare location
+# Period: the duration of the period, in seconds. Must be either 10 or 60
+simple = { limit = 200, period = 60 }
