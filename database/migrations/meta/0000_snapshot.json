@@ -1,5 +1,5 @@
 {
-  "id": "6378949b-8e2a-45d4-af63-8e05fb642f45",
+  "id": "5f07c83e-551e-4b90-b91e-027165adb77e",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -129,6 +129,21 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
+        },
+        "text_idx": {
+          "name": "text_idx",
+          "columns": [
+            {
+              "expression": "full_text",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
       "foreignKeys": {
@@ -232,7 +247,15 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "users_screen_name_unique": {
+          "name": "users_screen_name_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "screen_name"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false

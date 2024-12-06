@@ -27,7 +27,8 @@ CREATE TABLE IF NOT EXISTS "users" (
 	"created_at" timestamp NOT NULL,
 	"location" text,
 	"website" text,
-	"birthday" timestamp
+	"birthday" timestamp,
+	CONSTRAINT "users_screen_name_unique" UNIQUE("screen_name")
 );
 --> statement-breakpoint
 DO $$ BEGIN
@@ -37,4 +38,5 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "tweet_id_idx" ON "tweets" USING btree ("tweet_id");--> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "created_at_idx" ON "tweets" USING btree ("created_at");
+CREATE INDEX IF NOT EXISTS "created_at_idx" ON "tweets" USING btree ("created_at");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "text_idx" ON "tweets" USING btree ("full_text");

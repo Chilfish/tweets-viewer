@@ -11,7 +11,7 @@ import {
 export const usersTable = pgTable('users', {
   id: serial('id').primaryKey(),
   name: text('name').notNull(),
-  screenName: text('screen_name').notNull(),
+  screenName: text('screen_name').notNull().unique(),
   avatarUrl: text('avatar_url').notNull(),
   profileBannerUrl: text('profile_banner_url').notNull(),
   followersCount: integer('followers_count').notNull(),
@@ -40,9 +40,10 @@ export const tweetsTable = pgTable('tweets', {
   replyCount: integer('reply_count').notNull().default(0),
   favoriteCount: integer('favorite_count').notNull().default(0),
   viewsCount: integer('views_count').notNull().default(0),
-}, tabel => ({
-  tweetIdIdx: index('tweet_id_idx').on(tabel.tweetId),
-  createdAtIdx: index('created_at_idx').on(tabel.createdAt),
+}, table => ({
+  tweetIdIdx: index('tweet_id_idx').on(table.tweetId),
+  createdAtIdx: index('created_at_idx').on(table.createdAt),
+  textIdx: index('text_idx').on(table.fullText),
 }))
 
 export type InsertUser = typeof usersTable.$inferInsert
