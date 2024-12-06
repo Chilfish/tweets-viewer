@@ -1,5 +1,5 @@
 {
-  "id": "27b152b8-8205-4bc8-bea4-0ac8cc30999a",
+  "id": "6378949b-8e2a-45d4-af63-8e05fb642f45",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -10,8 +10,14 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "integer",
+          "type": "serial",
           "primaryKey": true,
+          "notNull": true
+        },
+        "tweet_id": {
+          "name": "tweet_id",
+          "type": "text",
+          "primaryKey": false,
           "notNull": true
         },
         "user_id": {
@@ -93,7 +99,38 @@
           "default": 0
         }
       },
-      "indexes": {},
+      "indexes": {
+        "tweet_id_idx": {
+          "name": "tweet_id_idx",
+          "columns": [
+            {
+              "expression": "tweet_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "created_at_idx": {
+          "name": "created_at_idx",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "tweets_user_id_users_id_fk": {
           "name": "tweets_user_id_users_id_fk",

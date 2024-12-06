@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS "tweets" (
-	"id" integer PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
+	"tweet_id" text NOT NULL,
 	"user_id" integer NOT NULL,
 	"created_at" timestamp NOT NULL,
 	"full_text" text NOT NULL,
@@ -34,3 +35,6 @@ DO $$ BEGIN
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
+--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "tweet_id_idx" ON "tweets" USING btree ("tweet_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "created_at_idx" ON "tweets" USING btree ("created_at");

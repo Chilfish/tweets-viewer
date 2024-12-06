@@ -1,4 +1,12 @@
-import { integer, json, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core'
+import {
+  index,
+  integer,
+  json,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+} from 'drizzle-orm/pg-core'
 
 export const usersTable = pgTable('users', {
   id: serial('id').primaryKey(),
@@ -16,7 +24,8 @@ export const usersTable = pgTable('users', {
 })
 
 export const tweetsTable = pgTable('tweets', {
-  id: integer('id').primaryKey(),
+  id: serial('id').primaryKey(),
+  tweetId: text('tweet_id').notNull(),
   userId: integer('user_id')
     .notNull()
     .references(() => usersTable.id, { onDelete: 'cascade' }),
@@ -31,7 +40,10 @@ export const tweetsTable = pgTable('tweets', {
   replyCount: integer('reply_count').notNull().default(0),
   favoriteCount: integer('favorite_count').notNull().default(0),
   viewsCount: integer('views_count').notNull().default(0),
-})
+}, tabel => ({
+  tweetIdIdx: index('tweet_id_idx').on(tabel.tweetId),
+  createdAtIdx: index('created_at_idx').on(tabel.createdAt),
+}))
 
 export type InsertUser = typeof usersTable.$inferInsert
 export type SelectUser = typeof usersTable.$inferSelect
