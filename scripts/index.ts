@@ -1,61 +1,54 @@
+import type { TweetData } from './filter'
 import glob from 'fast-glob'
-import { dir, readJson, writeJson } from './utils'
+import pMap from 'p-map'
+import { filterTweet, filterUser } from './filter'
+import { readJson, uniqueObj, writeJson } from './utils'
 
-export type TweetKey = `data-${string}`
+const dataFolder = `D:/Downloads/tweet-data`
 
-export interface TweetConfig {
-  name: TweetKey
-  version: string
-  tweetRange: {
-    start: number
-    end: number
-  }
-  [key: string]: any
-}
-
-export interface User {
-  name: string // as id
-  screen_name: string
-  avatar_url: string
-}
-
-export const dataFolder = dir(`D:/Downloads/tweet-data`)
-export const staticFolder = dir('D:/Codes/static/tweet')
-
-const exclude = ['chilfish_', 'mika_d_dr']
-export const dataFolders = await glob(
+const dataFolders = await glob(
   `${dataFolder}/*`,
   {
     onlyDirectories: true,
   },
 )
-  .then(folders => folders.filter(folder => !exclude.some(el => folder.includes(el))))
 
-export const config = {
-  versions: [] as TweetConfig[],
-  async set(config: Partial<TweetConfig>) {
-    const index = this.versions.findIndex(v => v.name === config.name)
-    if (index !== -1) {
-      this.versions[index] = { ...this.versions[index], ...config }
-    }
-    else {
-      this.versions.push(config as TweetConfig)
-    }
+async function readData(folder: string) {
+  const files = await glob(`${folder}/*.json`)
+    .then(files => files.filter(name => !name.includes('/data-')))
 
-    await writeJson(`${staticFolder}/versions.json`, this.versions, 'write', 0)
-  },
-  async get() {
-    if (!this.versions.length)
-      await this.init()
+  if (!files.length) {
+    console.error(`No data found in ${folder}`)
+    return []
+  }
 
-    return this.versions
-  },
-  async init() {
-    this.versions = await readJson<TweetConfig[]>(
-      `${staticFolder}/versions.json`,
-      [],
-    )
+  const data = (await pMap(files, file => readJson<TweetData[]>(file))).flatMap(d => d)
 
-    return this.versions
-  },
+  const mergedData = uniqueObj(data, 'id')
+    .sort((a, b) => {
+      const idA = 'id' in a ? a.id : a.rest_id
+      const idB = 'id' in b ? b.id : b.rest_id
+      return idB.localeCompare(idA)
+    })
+  await writeJson(`${folder}/data-merged.json`, mergedData)
+
+  return mergedData
+}
+
+for await (const folder of dataFolders) {
+  const data = await readData(folder)
+
+  const birthday = await glob(`${folder}/birthday_*`)
+    .then(name => name[0]?.split('_').pop())
+
+  console.log(folder, data.length, birthday)
+
+  if (!data.length) {
+    continue
+  }
+  const user = filterUser(data[0], new Date(birthday || ''))
+  const tweet = data.map(filterTweet)
+
+  await writeJson(`${folder}/data-user.json`, user)
+  await writeJson(`${folder}/data-tweet.json`, tweet)
 }

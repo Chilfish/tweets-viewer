@@ -1,0 +1,1283 @@
+{
+  "id": "1864488451191787581",
+  "created_at": "2024-12-05 09:54:21",
+  "full_text": "こちら本日12:30から販売開始です🎫",
+  "media": [],
+  "screen_name": "ttisrn_0710",
+  "name": "立石凛",
+  "profile_image_url": "https://pbs.twimg.com/profile_images/1749408673724825600/SiKCGmUR_normal.jpg",
+  "in_reply_to": null,
+  "retweeted_status": null,
+  "quoted_status": "1863870599711658056",
+  "favorite_count": 359,
+  "retweet_count": 40,
+  "bookmark_count": 8,
+  "quote_count": 2,
+  "reply_count": 9,
+  "views_count": 21221,
+  "favorited": false,
+  "retweeted": false,
+  "bookmarked": false,
+  "url": "https://twitter.com/ttisrn_0710/status/1864488451191787581",
+  "metadata": {
+    "__typename": "Tweet",
+    "rest_id": "1864488451191787581",
+    "core": {
+      "user_results": {
+        "result": {
+          "__typename": "User",
+          "id": "VXNlcjoxMzUzNTQzNTA1NDMyMzAxNTY5",
+          "rest_id": "1353543505432301569",
+          "affiliates_highlighted_label": {},
+          "has_graduated_access": true,
+          "is_blue_verified": false,
+          "profile_image_shape": "Circle",
+          "legacy": {
+            "notifications": true,
+            "following": true,
+            "can_dm": false,
+            "can_media_tag": true,
+            "created_at": "Mon Jan 25 03:24:31 +0000 2021",
+            "default_profile": true,
+            "default_profile_image": false,
+            "description": "響 声優 https://t.co/XTzqpKHxDR┊https://t.co/BzqoGzEpoN",
+            "entities": {
+              "description": {
+                "urls": [
+                  {
+                    "display_url": "instagram.com/rin_.t710",
+                    "expanded_url": "https://www.instagram.com/rin_.t710",
+                    "url": "https://t.co/XTzqpKHxDR",
+                    "indices": [5, 28]
+                  },
+                  {
+                    "display_url": "youtube.com/@Tateishi_rin",
+                    "expanded_url": "https://www.youtube.com/@Tateishi_rin",
+                    "url": "https://t.co/BzqoGzEpoN",
+                    "indices": [29, 52]
+                  }
+                ]
+              },
+              "url": {
+                "urls": [
+                  {
+                    "display_url": "freecalend.com/open/mem231613…",
+                    "expanded_url": "https://freecalend.com/open/mem231613_date202407_modefull",
+                    "url": "https://t.co/kdP8UCdeZg",
+                    "indices": [0, 23]
+                  }
+                ]
+              }
+            },
+            "fast_followers_count": 0,
+            "favourites_count": 34,
+            "followers_count": 66798,
+            "friends_count": 141,
+            "has_custom_timelines": false,
+            "is_translator": false,
+            "listed_count": 634,
+            "location": "#ぺこりんちゅ",
+            "media_count": 420,
+            "name": "立石凛",
+            "normal_followers_count": 66798,
+            "pinned_tweet_ids_str": ["1863931764433199293"],
+            "possibly_sensitive": false,
+            "profile_banner_url": "https://pbs.twimg.com/profile_banners/1353543505432301569/1615705581",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/1749408673724825600/SiKCGmUR_normal.jpg",
+            "profile_interstitial_type": "",
+            "screen_name": "ttisrn_0710",
+            "statuses_count": 1205,
+            "translator_type": "none",
+            "url": "https://t.co/kdP8UCdeZg",
+            "verified": false,
+            "want_retweets": true,
+            "withheld_in_countries": []
+          },
+          "tipjar_settings": {}
+        }
+      }
+    },
+    "unmention_data": {},
+    "edit_control": {
+      "edit_tweet_ids": ["1864488451191787581"],
+      "editable_until_msecs": "1733367261000",
+      "is_edit_eligible": true,
+      "edits_remaining": "5"
+    },
+    "is_translatable": true,
+    "views": {
+      "count": "21221",
+      "state": "EnabledWithCount"
+    },
+    "source": "<a href=\"http://twitter.com/download/iphone\" rel=\"nofollow\">Twitter for iPhone</a>",
+    "quoted_status_result": {
+      "result": {
+        "__typename": "Tweet",
+        "rest_id": "1863870599711658056",
+        "core": {
+          "user_results": {
+            "result": {
+              "__typename": "User",
+              "id": "VXNlcjoyNTk0Njk2NTk=",
+              "rest_id": "259469659",
+              "affiliates_highlighted_label": {},
+              "has_graduated_access": true,
+              "is_blue_verified": true,
+              "profile_image_shape": "Circle",
+              "legacy": {
+                "following": false,
+                "can_dm": true,
+                "can_media_tag": true,
+                "created_at": "Wed Mar 02 00:02:04 +0000 2011",
+                "default_profile": false,
+                "default_profile_image": false,
+                "description": "『いつもココロにワクワクを。』UNISEX JAPAN BRAND Original/コラボアイテム/USED/セレクト【営業時間】平日12:00-20:00 土日祝 11:00-20:00 原宿本店☎︎03-3423-3323 通販.WEB☎︎043-225-7711 キングリーマスク",
+                "entities": {
+                  "description": {
+                    "urls": []
+                  },
+                  "url": {
+                    "urls": [
+                      {
+                        "display_url": "kinglymask.jp",
+                        "expanded_url": "http://kinglymask.jp/",
+                        "url": "https://t.co/pLWqtzIuES",
+                        "indices": [0, 23]
+                      }
+                    ]
+                  }
+                },
+                "fast_followers_count": 0,
+                "favourites_count": 71967,
+                "followers_count": 27453,
+                "friends_count": 1465,
+                "has_custom_timelines": true,
+                "is_translator": false,
+                "listed_count": 332,
+                "location": "東京都渋谷区神宮前3-21-22 フィールドビル1F",
+                "media_count": 67882,
+                "name": "KINGLYMASK®︎公式&原宿本店",
+                "normal_followers_count": 27453,
+                "pinned_tweet_ids_str": ["1734150830859997504"],
+                "possibly_sensitive": false,
+                "profile_banner_url": "https://pbs.twimg.com/profile_banners/259469659/1700456625",
+                "profile_image_url_https": "https://pbs.twimg.com/profile_images/690355128415752192/5PAH-1-j_normal.png",
+                "profile_interstitial_type": "",
+                "screen_name": "KINGLY_MASK",
+                "statuses_count": 146372,
+                "translator_type": "none",
+                "url": "https://t.co/pLWqtzIuES",
+                "verified": false,
+                "want_retweets": false,
+                "withheld_in_countries": []
+              },
+              "tipjar_settings": {}
+            }
+          }
+        },
+        "unmention_data": {},
+        "edit_control": {
+          "edit_tweet_ids": ["1863870599711658056"],
+          "editable_until_msecs": "1733219954000",
+          "is_edit_eligible": false,
+          "edits_remaining": "5"
+        },
+        "is_translatable": true,
+        "views": {
+          "count": "116000",
+          "state": "EnabledWithCount"
+        },
+        "source": "<a href=\"http://twitter.com/download/iphone\" rel=\"nofollow\">Twitter for iPhone</a>",
+        "note_tweet": {
+          "is_expandable": true,
+          "note_tweet_results": {
+            "result": {
+              "id": "Tm90ZVR3ZWV0OjE4NjM4NzA1OTk1ODE2MDU4ODg=",
+              "text": "【情報解禁】\n\n３月１日（土）\n立石凛 × KINGLYMASK\n１日店長イベント開催決定📣\n\n↓参加条件やルールや特典がございますので画像の詳細をお確かめください♪\n\nご応募対象期間\n１２月５日お昼１２時３０分〜１月１３日２３時５９分まで\n\n１日店長イベントは先着２００名様限定です✨（条件を満たしてのご注文完了順）\n\n１日店長イベントに参加しない場合でも条件を満たしていればブロマイドゲット可能です🎄\n\nさらに♪\n今回の期間に合わせてコラボアイテムの一部再販＆新しくロンTバージョンの発売決定🎵\n（コラボアイテムも対象です）\n\nイベント対象特設ページはコチラ\n→\nオフィシャルサイト\nhttps://t.co/IvVHdFxBh8",
+              "entity_set": {
+                "hashtags": [],
+                "symbols": [],
+                "urls": [
+                  {
+                    "display_url": "gigaplus.makeshop.jp/kinglymask/Cat…",
+                    "expanded_url": "https://gigaplus.makeshop.jp/kinglymask/Category/tateishirin_tentou/sp.html",
+                    "url": "https://t.co/IvVHdFxBh8",
+                    "indices": [294, 317]
+                  }
+                ],
+                "user_mentions": []
+              }
+            }
+          }
+        },
+        "legacy": {
+          "bookmark_count": 33,
+          "bookmarked": false,
+          "created_at": "Tue Dec 03 08:59:14 +0000 2024",
+          "conversation_id_str": "1863870599711658056",
+          "display_text_range": [0, 120],
+          "entities": {
+            "hashtags": [],
+            "media": [
+              {
+                "display_url": "pic.x.com/IIKhaTyikV",
+                "expanded_url": "https://x.com/KINGLY_MASK/status/1863870599711658056/photo/1",
+                "id_str": "1863870593793490944",
+                "indices": [121, 144],
+                "media_key": "3_1863870593793490944",
+                "media_url_https": "https://pbs.twimg.com/media/Gd3MbgpbgAAR7H7.jpg",
+                "type": "photo",
+                "url": "https://t.co/IIKhaTyikV",
+                "ext_media_availability": {
+                  "status": "Available"
+                },
+                "features": {
+                  "all": {
+                    "tags": [
+                      {
+                        "user_id": "1353543505432301569",
+                        "name": "立石凛",
+                        "screen_name": "ttisrn_0710",
+                        "type": "user"
+                      },
+                      {
+                        "user_id": "1353543505432301569",
+                        "name": "立石凛",
+                        "screen_name": "ttisrn_0710",
+                        "type": "user"
+                      },
+                      {
+                        "user_id": "1353543505432301569",
+                        "name": "立石凛",
+                        "screen_name": "ttisrn_0710",
+                        "type": "user"
+                      },
+                      {
+                        "user_id": "1353543505432301569",
+                        "name": "立石凛",
+                        "screen_name": "ttisrn_0710",
+                        "type": "user"
+                      }
+                    ]
+                  },
+                  "large": {
+                    "faces": []
+                  },
+                  "medium": {
+                    "faces": []
+                  },
+                  "small": {
+                    "faces": []
+                  },
+                  "orig": {
+                    "faces": []
+                  }
+                },
+                "sizes": {
+                  "large": {
+                    "h": 2048,
+                    "w": 978,
+                    "resize": "fit"
+                  },
+                  "medium": {
+                    "h": 1200,
+                    "w": 573,
+                    "resize": "fit"
+                  },
+                  "small": {
+                    "h": 680,
+                    "w": 325,
+                    "resize": "fit"
+                  },
+                  "thumb": {
+                    "h": 150,
+                    "w": 150,
+                    "resize": "crop"
+                  }
+                },
+                "original_info": {
+                  "height": 2095,
+                  "width": 1000,
+                  "focus_rects": [
+                    {
+                      "x": 0,
+                      "y": 608,
+                      "w": 1000,
+                      "h": 560
+                    },
+                    {
+                      "x": 0,
+                      "y": 388,
+                      "w": 1000,
+                      "h": 1000
+                    },
+                    {
+                      "x": 0,
+                      "y": 318,
+                      "w": 1000,
+                      "h": 1140
+                    },
+                    {
+                      "x": 0,
+                      "y": 0,
+                      "w": 1000,
+                      "h": 2000
+                    },
+                    {
+                      "x": 0,
+                      "y": 0,
+                      "w": 1000,
+                      "h": 2095
+                    }
+                  ]
+                },
+                "media_results": {
+                  "result": {
+                    "media_key": "3_1863870593793490944"
+                  }
+                }
+              },
+              {
+                "display_url": "pic.x.com/IIKhaTyikV",
+                "expanded_url": "https://x.com/KINGLY_MASK/status/1863870599711658056/photo/1",
+                "id_str": "1863870593793409024",
+                "indices": [121, 144],
+                "media_key": "3_1863870593793409024",
+                "media_url_https": "https://pbs.twimg.com/media/Gd3MbgpaQAAc1Xj.jpg",
+                "type": "photo",
+                "url": "https://t.co/IIKhaTyikV",
+                "ext_media_availability": {
+                  "status": "Available"
+                },
+                "features": {
+                  "all": {
+                    "tags": [
+                      {
+                        "user_id": "1353543505432301569",
+                        "name": "立石凛",
+                        "screen_name": "ttisrn_0710",
+                        "type": "user"
+                      },
+                      {
+                        "user_id": "1353543505432301569",
+                        "name": "立石凛",
+                        "screen_name": "ttisrn_0710",
+                        "type": "user"
+                      },
+                      {
+                        "user_id": "1353543505432301569",
+                        "name": "立石凛",
+                        "screen_name": "ttisrn_0710",
+                        "type": "user"
+                      },
+                      {
+                        "user_id": "1353543505432301569",
+                        "name": "立石凛",
+                        "screen_name": "ttisrn_0710",
+                        "type": "user"
+                      }
+                    ]
+                  },
+                  "large": {
+                    "faces": []
+                  },
+                  "medium": {
+                    "faces": []
+                  },
+                  "small": {
+                    "faces": []
+                  },
+                  "orig": {
+                    "faces": []
+                  }
+                },
+                "sizes": {
+                  "large": {
+                    "h": 1345,
+                    "w": 1000,
+                    "resize": "fit"
+                  },
+                  "medium": {
+                    "h": 1200,
+                    "w": 892,
+                    "resize": "fit"
+                  },
+                  "small": {
+                    "h": 680,
+                    "w": 506,
+                    "resize": "fit"
+                  },
+                  "thumb": {
+                    "h": 150,
+                    "w": 150,
+                    "resize": "crop"
+                  }
+                },
+                "original_info": {
+                  "height": 1345,
+                  "width": 1000,
+                  "focus_rects": [
+                    {
+                      "x": 0,
+                      "y": 291,
+                      "w": 1000,
+                      "h": 560
+                    },
+                    {
+                      "x": 0,
+                      "y": 71,
+                      "w": 1000,
+                      "h": 1000
+                    },
+                    {
+                      "x": 0,
+                      "y": 1,
+                      "w": 1000,
+                      "h": 1140
+                    },
+                    {
+                      "x": 235,
+                      "y": 0,
+                      "w": 673,
+                      "h": 1345
+                    },
+                    {
+                      "x": 0,
+                      "y": 0,
+                      "w": 1000,
+                      "h": 1345
+                    }
+                  ]
+                },
+                "media_results": {
+                  "result": {
+                    "media_key": "3_1863870593793409024"
+                  }
+                }
+              },
+              {
+                "display_url": "pic.x.com/IIKhaTyikV",
+                "expanded_url": "https://x.com/KINGLY_MASK/status/1863870599711658056/photo/1",
+                "id_str": "1863870593797623808",
+                "indices": [121, 144],
+                "media_key": "3_1863870593797623808",
+                "media_url_https": "https://pbs.twimg.com/media/Gd3MbgqakAA0RuX.jpg",
+                "type": "photo",
+                "url": "https://t.co/IIKhaTyikV",
+                "ext_media_availability": {
+                  "status": "Available"
+                },
+                "features": {
+                  "all": {
+                    "tags": [
+                      {
+                        "user_id": "1353543505432301569",
+                        "name": "立石凛",
+                        "screen_name": "ttisrn_0710",
+                        "type": "user"
+                      },
+                      {
+                        "user_id": "1353543505432301569",
+                        "name": "立石凛",
+                        "screen_name": "ttisrn_0710",
+                        "type": "user"
+                      },
+                      {
+                        "user_id": "1353543505432301569",
+                        "name": "立石凛",
+                        "screen_name": "ttisrn_0710",
+                        "type": "user"
+                      },
+                      {
+                        "user_id": "1353543505432301569",
+                        "name": "立石凛",
+                        "screen_name": "ttisrn_0710",
+                        "type": "user"
+                      }
+                    ]
+                  },
+                  "large": {
+                    "faces": [
+                      {
+                        "x": 35,
+                        "y": 1147,
+                        "h": 358,
+                        "w": 358
+                      }
+                    ]
+                  },
+                  "medium": {
+                    "faces": [
+                      {
+                        "x": 26,
+                        "y": 878,
+                        "h": 274,
+                        "w": 274
+                      }
+                    ]
+                  },
+                  "small": {
+                    "faces": [
+                      {
+                        "x": 15,
+                        "y": 497,
+                        "h": 155,
+                        "w": 155
+                      }
+                    ]
+                  },
+                  "orig": {
+                    "faces": [
+                      {
+                        "x": 35,
+                        "y": 1147,
+                        "h": 358,
+                        "w": 358
+                      }
+                    ]
+                  }
+                },
+                "sizes": {
+                  "large": {
+                    "h": 1567,
+                    "w": 1000,
+                    "resize": "fit"
+                  },
+                  "medium": {
+                    "h": 1200,
+                    "w": 766,
+                    "resize": "fit"
+                  },
+                  "small": {
+                    "h": 680,
+                    "w": 434,
+                    "resize": "fit"
+                  },
+                  "thumb": {
+                    "h": 150,
+                    "w": 150,
+                    "resize": "crop"
+                  }
+                },
+                "original_info": {
+                  "height": 1567,
+                  "width": 1000,
+                  "focus_rects": [
+                    {
+                      "x": 0,
+                      "y": 1007,
+                      "w": 1000,
+                      "h": 560
+                    },
+                    {
+                      "x": 0,
+                      "y": 567,
+                      "w": 1000,
+                      "h": 1000
+                    },
+                    {
+                      "x": 0,
+                      "y": 427,
+                      "w": 1000,
+                      "h": 1140
+                    },
+                    {
+                      "x": 0,
+                      "y": 0,
+                      "w": 784,
+                      "h": 1567
+                    },
+                    {
+                      "x": 0,
+                      "y": 0,
+                      "w": 1000,
+                      "h": 1567
+                    }
+                  ]
+                },
+                "media_results": {
+                  "result": {
+                    "media_key": "3_1863870593797623808"
+                  }
+                }
+              },
+              {
+                "display_url": "pic.x.com/IIKhaTyikV",
+                "expanded_url": "https://x.com/KINGLY_MASK/status/1863870599711658056/photo/1",
+                "id_str": "1863870593797652480",
+                "indices": [121, 144],
+                "media_key": "3_1863870593797652480",
+                "media_url_https": "https://pbs.twimg.com/media/Gd3MbgqbAAAUk-o.jpg",
+                "type": "photo",
+                "url": "https://t.co/IIKhaTyikV",
+                "ext_media_availability": {
+                  "status": "Available"
+                },
+                "features": {
+                  "all": {
+                    "tags": [
+                      {
+                        "user_id": "1353543505432301569",
+                        "name": "立石凛",
+                        "screen_name": "ttisrn_0710",
+                        "type": "user"
+                      },
+                      {
+                        "user_id": "1353543505432301569",
+                        "name": "立石凛",
+                        "screen_name": "ttisrn_0710",
+                        "type": "user"
+                      },
+                      {
+                        "user_id": "1353543505432301569",
+                        "name": "立石凛",
+                        "screen_name": "ttisrn_0710",
+                        "type": "user"
+                      },
+                      {
+                        "user_id": "1353543505432301569",
+                        "name": "立石凛",
+                        "screen_name": "ttisrn_0710",
+                        "type": "user"
+                      }
+                    ]
+                  },
+                  "large": {
+                    "faces": []
+                  },
+                  "medium": {
+                    "faces": []
+                  },
+                  "small": {
+                    "faces": []
+                  },
+                  "orig": {
+                    "faces": []
+                  }
+                },
+                "sizes": {
+                  "large": {
+                    "h": 1430,
+                    "w": 1125,
+                    "resize": "fit"
+                  },
+                  "medium": {
+                    "h": 1200,
+                    "w": 944,
+                    "resize": "fit"
+                  },
+                  "small": {
+                    "h": 680,
+                    "w": 535,
+                    "resize": "fit"
+                  },
+                  "thumb": {
+                    "h": 150,
+                    "w": 150,
+                    "resize": "crop"
+                  }
+                },
+                "original_info": {
+                  "height": 1430,
+                  "width": 1125,
+                  "focus_rects": [
+                    {
+                      "x": 0,
+                      "y": 0,
+                      "w": 1125,
+                      "h": 630
+                    },
+                    {
+                      "x": 0,
+                      "y": 0,
+                      "w": 1125,
+                      "h": 1125
+                    },
+                    {
+                      "x": 0,
+                      "y": 0,
+                      "w": 1125,
+                      "h": 1283
+                    },
+                    {
+                      "x": 178,
+                      "y": 0,
+                      "w": 715,
+                      "h": 1430
+                    },
+                    {
+                      "x": 0,
+                      "y": 0,
+                      "w": 1125,
+                      "h": 1430
+                    }
+                  ]
+                },
+                "media_results": {
+                  "result": {
+                    "media_key": "3_1863870593797652480"
+                  }
+                }
+              }
+            ],
+            "symbols": [],
+            "timestamps": [],
+            "urls": [],
+            "user_mentions": []
+          },
+          "extended_entities": {
+            "media": [
+              {
+                "display_url": "pic.x.com/IIKhaTyikV",
+                "expanded_url": "https://x.com/KINGLY_MASK/status/1863870599711658056/photo/1",
+                "id_str": "1863870593793490944",
+                "indices": [121, 144],
+                "media_key": "3_1863870593793490944",
+                "media_url_https": "https://pbs.twimg.com/media/Gd3MbgpbgAAR7H7.jpg",
+                "type": "photo",
+                "url": "https://t.co/IIKhaTyikV",
+                "ext_media_availability": {
+                  "status": "Available"
+                },
+                "features": {
+                  "all": {
+                    "tags": [
+                      {
+                        "user_id": "1353543505432301569",
+                        "name": "立石凛",
+                        "screen_name": "ttisrn_0710",
+                        "type": "user"
+                      },
+                      {
+                        "user_id": "1353543505432301569",
+                        "name": "立石凛",
+                        "screen_name": "ttisrn_0710",
+                        "type": "user"
+                      },
+                      {
+                        "user_id": "1353543505432301569",
+                        "name": "立石凛",
+                        "screen_name": "ttisrn_0710",
+                        "type": "user"
+                      },
+                      {
+                        "user_id": "1353543505432301569",
+                        "name": "立石凛",
+                        "screen_name": "ttisrn_0710",
+                        "type": "user"
+                      }
+                    ]
+                  },
+                  "large": {
+                    "faces": []
+                  },
+                  "medium": {
+                    "faces": []
+                  },
+                  "small": {
+                    "faces": []
+                  },
+                  "orig": {
+                    "faces": []
+                  }
+                },
+                "sizes": {
+                  "large": {
+                    "h": 2048,
+                    "w": 978,
+                    "resize": "fit"
+                  },
+                  "medium": {
+                    "h": 1200,
+                    "w": 573,
+                    "resize": "fit"
+                  },
+                  "small": {
+                    "h": 680,
+                    "w": 325,
+                    "resize": "fit"
+                  },
+                  "thumb": {
+                    "h": 150,
+                    "w": 150,
+                    "resize": "crop"
+                  }
+                },
+                "original_info": {
+                  "height": 2095,
+                  "width": 1000,
+                  "focus_rects": [
+                    {
+                      "x": 0,
+                      "y": 608,
+                      "w": 1000,
+                      "h": 560
+                    },
+                    {
+                      "x": 0,
+                      "y": 388,
+                      "w": 1000,
+                      "h": 1000
+                    },
+                    {
+                      "x": 0,
+                      "y": 318,
+                      "w": 1000,
+                      "h": 1140
+                    },
+                    {
+                      "x": 0,
+                      "y": 0,
+                      "w": 1000,
+                      "h": 2000
+                    },
+                    {
+                      "x": 0,
+                      "y": 0,
+                      "w": 1000,
+                      "h": 2095
+                    }
+                  ]
+                },
+                "media_results": {
+                  "result": {
+                    "media_key": "3_1863870593793490944"
+                  }
+                }
+              },
+              {
+                "display_url": "pic.x.com/IIKhaTyikV",
+                "expanded_url": "https://x.com/KINGLY_MASK/status/1863870599711658056/photo/1",
+                "id_str": "1863870593793409024",
+                "indices": [121, 144],
+                "media_key": "3_1863870593793409024",
+                "media_url_https": "https://pbs.twimg.com/media/Gd3MbgpaQAAc1Xj.jpg",
+                "type": "photo",
+                "url": "https://t.co/IIKhaTyikV",
+                "ext_media_availability": {
+                  "status": "Available"
+                },
+                "features": {
+                  "all": {
+                    "tags": [
+                      {
+                        "user_id": "1353543505432301569",
+                        "name": "立石凛",
+                        "screen_name": "ttisrn_0710",
+                        "type": "user"
+                      },
+                      {
+                        "user_id": "1353543505432301569",
+                        "name": "立石凛",
+                        "screen_name": "ttisrn_0710",
+                        "type": "user"
+                      },
+                      {
+                        "user_id": "1353543505432301569",
+                        "name": "立石凛",
+                        "screen_name": "ttisrn_0710",
+                        "type": "user"
+                      },
+                      {
+                        "user_id": "1353543505432301569",
+                        "name": "立石凛",
+                        "screen_name": "ttisrn_0710",
+                        "type": "user"
+                      }
+                    ]
+                  },
+                  "large": {
+                    "faces": []
+                  },
+                  "medium": {
+                    "faces": []
+                  },
+                  "small": {
+                    "faces": []
+                  },
+                  "orig": {
+                    "faces": []
+                  }
+                },
+                "sizes": {
+                  "large": {
+                    "h": 1345,
+                    "w": 1000,
+                    "resize": "fit"
+                  },
+                  "medium": {
+                    "h": 1200,
+                    "w": 892,
+                    "resize": "fit"
+                  },
+                  "small": {
+                    "h": 680,
+                    "w": 506,
+                    "resize": "fit"
+                  },
+                  "thumb": {
+                    "h": 150,
+                    "w": 150,
+                    "resize": "crop"
+                  }
+                },
+                "original_info": {
+                  "height": 1345,
+                  "width": 1000,
+                  "focus_rects": [
+                    {
+                      "x": 0,
+                      "y": 291,
+                      "w": 1000,
+                      "h": 560
+                    },
+                    {
+                      "x": 0,
+                      "y": 71,
+                      "w": 1000,
+                      "h": 1000
+                    },
+                    {
+                      "x": 0,
+                      "y": 1,
+                      "w": 1000,
+                      "h": 1140
+                    },
+                    {
+                      "x": 235,
+                      "y": 0,
+                      "w": 673,
+                      "h": 1345
+                    },
+                    {
+                      "x": 0,
+                      "y": 0,
+                      "w": 1000,
+                      "h": 1345
+                    }
+                  ]
+                },
+                "media_results": {
+                  "result": {
+                    "media_key": "3_1863870593793409024"
+                  }
+                }
+              },
+              {
+                "display_url": "pic.x.com/IIKhaTyikV",
+                "expanded_url": "https://x.com/KINGLY_MASK/status/1863870599711658056/photo/1",
+                "id_str": "1863870593797623808",
+                "indices": [121, 144],
+                "media_key": "3_1863870593797623808",
+                "media_url_https": "https://pbs.twimg.com/media/Gd3MbgqakAA0RuX.jpg",
+                "type": "photo",
+                "url": "https://t.co/IIKhaTyikV",
+                "ext_media_availability": {
+                  "status": "Available"
+                },
+                "features": {
+                  "all": {
+                    "tags": [
+                      {
+                        "user_id": "1353543505432301569",
+                        "name": "立石凛",
+                        "screen_name": "ttisrn_0710",
+                        "type": "user"
+                      },
+                      {
+                        "user_id": "1353543505432301569",
+                        "name": "立石凛",
+                        "screen_name": "ttisrn_0710",
+                        "type": "user"
+                      },
+                      {
+                        "user_id": "1353543505432301569",
+                        "name": "立石凛",
+                        "screen_name": "ttisrn_0710",
+                        "type": "user"
+                      },
+                      {
+                        "user_id": "1353543505432301569",
+                        "name": "立石凛",
+                        "screen_name": "ttisrn_0710",
+                        "type": "user"
+                      }
+                    ]
+                  },
+                  "large": {
+                    "faces": [
+                      {
+                        "x": 35,
+                        "y": 1147,
+                        "h": 358,
+                        "w": 358
+                      }
+                    ]
+                  },
+                  "medium": {
+                    "faces": [
+                      {
+                        "x": 26,
+                        "y": 878,
+                        "h": 274,
+                        "w": 274
+                      }
+                    ]
+                  },
+                  "small": {
+                    "faces": [
+                      {
+                        "x": 15,
+                        "y": 497,
+                        "h": 155,
+                        "w": 155
+                      }
+                    ]
+                  },
+                  "orig": {
+                    "faces": [
+                      {
+                        "x": 35,
+                        "y": 1147,
+                        "h": 358,
+                        "w": 358
+                      }
+                    ]
+                  }
+                },
+                "sizes": {
+                  "large": {
+                    "h": 1567,
+                    "w": 1000,
+                    "resize": "fit"
+                  },
+                  "medium": {
+                    "h": 1200,
+                    "w": 766,
+                    "resize": "fit"
+                  },
+                  "small": {
+                    "h": 680,
+                    "w": 434,
+                    "resize": "fit"
+                  },
+                  "thumb": {
+                    "h": 150,
+                    "w": 150,
+                    "resize": "crop"
+                  }
+                },
+                "original_info": {
+                  "height": 1567,
+                  "width": 1000,
+                  "focus_rects": [
+                    {
+                      "x": 0,
+                      "y": 1007,
+                      "w": 1000,
+                      "h": 560
+                    },
+                    {
+                      "x": 0,
+                      "y": 567,
+                      "w": 1000,
+                      "h": 1000
+                    },
+                    {
+                      "x": 0,
+                      "y": 427,
+                      "w": 1000,
+                      "h": 1140
+                    },
+                    {
+                      "x": 0,
+                      "y": 0,
+                      "w": 784,
+                      "h": 1567
+                    },
+                    {
+                      "x": 0,
+                      "y": 0,
+                      "w": 1000,
+                      "h": 1567
+                    }
+                  ]
+                },
+                "media_results": {
+                  "result": {
+                    "media_key": "3_1863870593797623808"
+                  }
+                }
+              },
+              {
+                "display_url": "pic.x.com/IIKhaTyikV",
+                "expanded_url": "https://x.com/KINGLY_MASK/status/1863870599711658056/photo/1",
+                "id_str": "1863870593797652480",
+                "indices": [121, 144],
+                "media_key": "3_1863870593797652480",
+                "media_url_https": "https://pbs.twimg.com/media/Gd3MbgqbAAAUk-o.jpg",
+                "type": "photo",
+                "url": "https://t.co/IIKhaTyikV",
+                "ext_media_availability": {
+                  "status": "Available"
+                },
+                "features": {
+                  "all": {
+                    "tags": [
+                      {
+                        "user_id": "1353543505432301569",
+                        "name": "立石凛",
+                        "screen_name": "ttisrn_0710",
+                        "type": "user"
+                      },
+                      {
+                        "user_id": "1353543505432301569",
+                        "name": "立石凛",
+                        "screen_name": "ttisrn_0710",
+                        "type": "user"
+                      },
+                      {
+                        "user_id": "1353543505432301569",
+                        "name": "立石凛",
+                        "screen_name": "ttisrn_0710",
+                        "type": "user"
+                      },
+                      {
+                        "user_id": "1353543505432301569",
+                        "name": "立石凛",
+                        "screen_name": "ttisrn_0710",
+                        "type": "user"
+                      }
+                    ]
+                  },
+                  "large": {
+                    "faces": []
+                  },
+                  "medium": {
+                    "faces": []
+                  },
+                  "small": {
+                    "faces": []
+                  },
+                  "orig": {
+                    "faces": []
+                  }
+                },
+                "sizes": {
+                  "large": {
+                    "h": 1430,
+                    "w": 1125,
+                    "resize": "fit"
+                  },
+                  "medium": {
+                    "h": 1200,
+                    "w": 944,
+                    "resize": "fit"
+                  },
+                  "small": {
+                    "h": 680,
+                    "w": 535,
+                    "resize": "fit"
+                  },
+                  "thumb": {
+                    "h": 150,
+                    "w": 150,
+                    "resize": "crop"
+                  }
+                },
+                "original_info": {
+                  "height": 1430,
+                  "width": 1125,
+                  "focus_rects": [
+                    {
+                      "x": 0,
+                      "y": 0,
+                      "w": 1125,
+                      "h": 630
+                    },
+                    {
+                      "x": 0,
+                      "y": 0,
+                      "w": 1125,
+                      "h": 1125
+                    },
+                    {
+                      "x": 0,
+                      "y": 0,
+                      "w": 1125,
+                      "h": 1283
+                    },
+                    {
+                      "x": 178,
+                      "y": 0,
+                      "w": 715,
+                      "h": 1430
+                    },
+                    {
+                      "x": 0,
+                      "y": 0,
+                      "w": 1125,
+                      "h": 1430
+                    }
+                  ]
+                },
+                "media_results": {
+                  "result": {
+                    "media_key": "3_1863870593797652480"
+                  }
+                }
+              }
+            ]
+          },
+          "favorite_count": 195,
+          "favorited": false,
+          "full_text": "【情報解禁】\n\n３月１日（土）\n立石凛 × KINGLYMASK\n１日店長イベント開催決定📣\n\n↓参加条件やルールや特典がございますので画像の詳細をお確かめください♪\n\nご応募対象期間\n１２月５日お昼１２時３０分〜１月１３日２３時５９分まで https://t.co/IIKhaTyikV",
+          "is_quote_status": false,
+          "lang": "ja",
+          "possibly_sensitive": false,
+          "possibly_sensitive_editable": true,
+          "quote_count": 8,
+          "reply_count": 1,
+          "retweet_count": 77,
+          "retweeted": false,
+          "user_id_str": "259469659",
+          "id_str": "1863870599711658056"
+        }
+      }
+    },
+    "legacy": {
+      "bookmark_count": 8,
+      "bookmarked": false,
+      "created_at": "Thu Dec 05 01:54:21 +0000 2024",
+      "conversation_id_str": "1864488451191787581",
+      "display_text_range": [0, 19],
+      "entities": {
+        "hashtags": [],
+        "symbols": [],
+        "timestamps": [],
+        "urls": [],
+        "user_mentions": []
+      },
+      "favorite_count": 359,
+      "favorited": false,
+      "full_text": "こちら本日12:30から販売開始です🎫",
+      "is_quote_status": true,
+      "lang": "ja",
+      "quote_count": 2,
+      "quoted_status_id_str": "1863870599711658056",
+      "quoted_status_permalink": {
+        "url": "https://t.co/m8TqWCYuJV",
+        "expanded": "https://twitter.com/kingly_mask/status/1863870599711658056",
+        "display": "x.com/kingly_mask/st…"
+      },
+      "reply_count": 9,
+      "retweet_count": 40,
+      "retweeted": false,
+      "user_id_str": "1353543505432301569",
+      "id_str": "1864488451191787581"
+    },
+    "quick_promote_eligibility": {
+      "eligibility": "IneligibleUserUnauthorized"
+    }
+  }
+}

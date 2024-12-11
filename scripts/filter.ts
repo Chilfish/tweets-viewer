@@ -1,0 +1,144 @@
+import type quoteData from './data/quote.json'
+import type replyData from './data/reply.json'
+import type retweetData from './data/retweet.json'
+import type textData from './data/text_img.json'
+
+import type {
+  QuotedTweet,
+  ReTweet,
+  Tweet,
+  User,
+  UserInfo,
+} from './types'
+
+type TextData = typeof textData
+type RetweetData = typeof retweetData
+type QuoteData = typeof quoteData
+type ReplyData = typeof replyData
+
+export type TweetData = TextData | RetweetData | QuoteData | ReplyData
+
+function _getUser(data: TweetData) {
+  const _data = {
+    ...data,
+    metadata: 'metadata' in data ? data.metadata : data,
+  }
+  const user = _data.metadata?.core.user_results.result
+
+  if (!user || user.__typename !== 'User') {
+    throw new Error('User not found')
+  }
+  return user
+}
+
+export function filterUserInfo(data: TweetData): UserInfo {
+  const user = _getUser(data)
+  const { legacy } = user
+
+  return {
+    name: legacy.name,
+    screen_name: legacy.screen_name,
+    avatar_url: legacy.profile_image_url_https,
+  }
+}
+
+export function filterUser(data: TweetData, birthday = new Date()): User {
+  const user = _getUser(data)
+  const { legacy } = user
+
+  const website = legacy.entities.url.urls[0].expanded_url
+
+  const bio = legacy.entities.description.urls
+    .reduce(
+      (acc, url) => acc.replace(url.url, url.expanded_url),
+      legacy.description,
+    )
+
+  return {
+    ...filterUserInfo(data),
+    profile_banner_url: legacy.profile_banner_url,
+    followers_count: legacy.followers_count,
+    following_count: legacy.friends_count,
+    location: legacy.location,
+    created_at: new Date(legacy.created_at),
+    bio,
+    birthday,
+    website,
+  }
+}
+
+function _filterTweet(data: TextData): Tweet {
+  const tweet = data.metadata?.legacy
+
+  if (!tweet) {
+    throw new Error('Tweet not found')
+  }
+
+  const media = tweet.extended_entities?.media.map(m => ({
+    url: m.media_url_https,
+    type: m.type,
+    height: m.original_info.height,
+    width: m.original_info.width,
+  })) || []
+
+  const isRetweet = 'retweeted_status_result' in (data.metadata?.legacy || {})
+  const isQuote = 'quoted_status_result' in (data.metadata || {})
+
+  return {
+    id: tweet.id_str,
+    created_at: new Date(tweet.created_at),
+    full_text: isRetweet ? '' : tweet.full_text,
+    media,
+    retweet_count: tweet.retweet_count,
+    quote_count: tweet.quote_count,
+    reply_count: tweet.reply_count,
+    favorite_count: tweet.favorite_count,
+    views_count: data.views_count || 0,
+
+    retweeted_status: isRetweet ? filterRetweet(data as any) : null,
+    quoted_status: isQuote ? filterQuotedTweet(data as any) : null,
+  }
+}
+
+export function filterTweet(data: TweetData): Tweet {
+  if ('metadata' in data && 'legacy' in data.metadata) {
+    return _filterTweet(data as TextData)
+  }
+  else {
+    // @ts-expect-error it's a tweet
+    data.metadata = { legacy: data.legacy }
+    return _filterTweet(data as TextData)
+  }
+}
+
+export function filterRetweet(data: RetweetData): ReTweet | null {
+  const retweet = data.metadata?.legacy.retweeted_status_result?.result
+
+  if (!retweet || retweet.__typename !== 'Tweet') {
+    return null
+  }
+
+  // @ts-expect-error it's a tweet
+  const retweetedUser = filterUserInfo({ metadata: retweet })
+
+  return {
+    user: retweetedUser,
+    tweet: filterTweet(retweet as any),
+  }
+}
+
+export function filterQuotedTweet(data: QuoteData): QuotedTweet | null {
+  const quotedTweet = data.metadata?.quoted_status_result?.result
+
+  if (!quotedTweet || quotedTweet.__typename !== 'Tweet') {
+    return null
+  }
+
+  // @ts-expect-error it's a tweet
+  const quoteUser = filterUserInfo({ metadata: quotedTweet })
+
+  return {
+    user: quoteUser,
+    tweet: filterTweet(quotedTweet as any),
+  }
+}

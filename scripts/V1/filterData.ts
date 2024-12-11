@@ -6,7 +6,7 @@ import {
   readJson,
   uniqueObj,
   writeJson,
-} from './utils'
+} from '../utils'
 
 export async function readFiles(folder: string) {
   const jsons = await glob(`${folder.replace(/\\/g, '/')}/*.json`)

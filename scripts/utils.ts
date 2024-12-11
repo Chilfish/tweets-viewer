@@ -101,21 +101,6 @@ export async function readJson<T = any>(
   }
 }
 
-/**
- * Check if the script is not imported
- *
- * @example
- * ```ts
- * isInCli(import.meta.filename)
- * ```
- */
-export function isNotInImport(importMetaFilename: string) {
-  // eslint-disable-next-line no-unused-vars
-  const [_tsx, argFile] = process.argv
-
-  return path.resolve(importMetaFilename) === path.resolve(argFile)
-}
-
 export function tweetUrl(id: string, name = 'i') {
   return `https://twitter.com/${name}/status/${id}`
 }
