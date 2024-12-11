@@ -1,5 +1,6 @@
 import type quoteData from './data/quote.json'
 import type replyData from './data/reply.json'
+import type cardData from './data/retweet-card.json'
 import type retweetData from './data/retweet.json'
 import type textData from './data/text_img.json'
 
@@ -15,8 +16,9 @@ type TextData = typeof textData
 type RetweetData = typeof retweetData
 type QuoteData = typeof quoteData
 type ReplyData = typeof replyData
+type CardData = typeof cardData
 
-export type TweetData = TextData | RetweetData | QuoteData | ReplyData
+export type TweetData = TextData | RetweetData | QuoteData | ReplyData | CardData
 
 function _getUser(data: TweetData) {
   const _data = {
@@ -54,9 +56,11 @@ export function filterUser(data: TweetData, birthday = new Date()): User {
       legacy.description,
     )
 
+  const profile_banner_url = 'profile_banner_url' in legacy ? legacy.profile_banner_url : ''
+
   return {
     ...filterUserInfo(data),
-    profile_banner_url: legacy.profile_banner_url,
+    profile_banner_url,
     followers_count: legacy.followers_count,
     following_count: legacy.friends_count,
     location: legacy.location,
@@ -68,18 +72,42 @@ export function filterUser(data: TweetData, birthday = new Date()): User {
 }
 
 function _filterTweet(data: TextData): Tweet {
-  const tweet = data.metadata?.legacy
+  const tweet = data.metadata.legacy
 
-  if (!tweet) {
+  if (!tweet?.id_str) {
     throw new Error('Tweet not found')
   }
 
-  const media = tweet.extended_entities?.media.map(m => ({
-    url: m.media_url_https,
-    type: m.type,
-    height: m.original_info.height,
-    width: m.original_info.width,
-  })) || []
+  const mediaLinks = tweet.extended_entities?.media || []
+
+  const media = mediaLinks.map((m) => {
+    const isVideo = m.type === 'video'
+    let url = m.media_url_https
+    if (isVideo) {
+      // @ts-expect-error it's a video
+      url = m.video_info.variants
+        .filter((v: any) => v.content_type === 'video/mp4')
+        .sort((a: any, b: any) => b.bitrate - a.bitrate)[0]
+        .url
+    }
+
+    return {
+      url,
+      type: m.type,
+      height: m.original_info.height,
+      width: m.original_info.width,
+    }
+  })
+
+  let text = mediaLinks.reduce(
+    (acc, m) => acc.replace(` ${m.url}`, ''),
+    tweet.full_text,
+  )
+
+  text = tweet.entities.urls.reduce(
+    (acc, url) => acc.replace(url.url, url.expanded_url),
+    text,
+  )
 
   const isRetweet = 'retweeted_status_result' in (data.metadata?.legacy || {})
   const isQuote = 'quoted_status_result' in (data.metadata || {})
@@ -87,7 +115,7 @@ function _filterTweet(data: TextData): Tweet {
   return {
     id: tweet.id_str,
     created_at: new Date(tweet.created_at),
-    full_text: isRetweet ? '' : tweet.full_text,
+    full_text: isRetweet ? 'RT' : text,
     media,
     retweet_count: tweet.retweet_count,
     quote_count: tweet.quote_count,
@@ -101,14 +129,20 @@ function _filterTweet(data: TextData): Tweet {
 }
 
 export function filterTweet(data: TweetData): Tweet {
-  if ('metadata' in data && 'legacy' in data.metadata) {
-    return _filterTweet(data as TextData)
+  let _data = data as any
+  if ('legacy' in data) {
+    _data = {
+      ...data,
+      metadata: data,
+    }
   }
-  else {
-    // @ts-expect-error it's a tweet
-    data.metadata = { legacy: data.legacy }
-    return _filterTweet(data as TextData)
+  else if (!('metadata' in data && 'legacy' in data.metadata)) {
+    _data = {
+      ...data,
+      metadata: { legacy: data },
+    }
   }
+  return _filterTweet(_data)
 }
 
 export function filterRetweet(data: RetweetData): ReTweet | null {

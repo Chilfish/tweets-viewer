@@ -1,0 +1,520 @@
+{
+  "__typename": "Tweet",
+  "rest_id": "1356153638314409988",
+  "has_birdwatch_notes": false,
+  "core": {
+    "user_results": {
+      "result": {
+        "__typename": "User",
+        "id": "VXNlcjo5MjMwNTQ3NDY5Nzc1MTc1Njg=",
+        "rest_id": "923054746977517568",
+        "affiliates_highlighted_label": {},
+        "has_graduated_access": true,
+        "is_blue_verified": false,
+        "profile_image_shape": "Circle",
+        "legacy": {
+          "following": true,
+          "can_dm": false,
+          "can_media_tag": true,
+          "created_at": "Wed Oct 25 05:12:56 +0000 2017",
+          "default_profile": true,
+          "default_profile_image": false,
+          "description": "声優事務所 響のスタッフが運用する公式アカウントです。 響所属声優の情報発信をしていきます！ 男性声優情報アカウント→ @hibiki_mens \nFCサイトはこちら→https://t.co/L2swTimOOz\n※Twitterでの個別返信は行っておりませんのでご了承ください。",
+          "entities": {
+            "description": {
+              "urls": [
+                {
+                  "display_url": "hibikifan.com",
+                  "expanded_url": "https://hibikifan.com/",
+                  "url": "https://t.co/L2swTimOOz",
+                  "indices": [
+                    84,
+                    107
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "urls": [
+                {
+                  "display_url": "hibiki-cast.jp",
+                  "expanded_url": "https://hibiki-cast.jp/",
+                  "url": "https://t.co/ZjKKmBhpCL",
+                  "indices": [
+                    0,
+                    23
+                  ]
+                }
+              ]
+            }
+          },
+          "fast_followers_count": 0,
+          "favourites_count": 99,
+          "followers_count": 59376,
+          "friends_count": 71,
+          "has_custom_timelines": true,
+          "is_translator": false,
+          "listed_count": 441,
+          "location": "",
+          "media_count": 1849,
+          "name": "響スタッフアカウント",
+          "normal_followers_count": 59376,
+          "pinned_tweet_ids_str": [
+            "1864474772471488701"
+          ],
+          "possibly_sensitive": false,
+          "profile_image_url_https": "https://pbs.twimg.com/profile_images/923058997170601986/uXpVp2rb_normal.jpg",
+          "profile_interstitial_type": "",
+          "screen_name": "official_hibiki",
+          "statuses_count": 6411,
+          "translator_type": "none",
+          "url": "https://t.co/ZjKKmBhpCL",
+          "verified": false,
+          "want_retweets": true,
+          "withheld_in_countries": []
+        },
+        "professional": {
+          "rest_id": "1580524566480584711",
+          "professional_type": "Business",
+          "category": []
+        },
+        "tipjar_settings": {}
+      }
+    }
+  },
+  "card": {
+    "rest_id": "https://t.co/RwCYhptnRA",
+    "legacy": {
+      "binding_values": [
+        {
+          "key": "photo_image_full_size_large",
+          "value": {
+            "image_value": {
+              "height": 419,
+              "width": 800,
+              "url": "https://pbs.twimg.com/card_img/1864583748446007296/c1-aJffx?format=jpg&name=800x419"
+            },
+            "type": "IMAGE"
+          }
+        },
+        {
+          "key": "thumbnail_image",
+          "value": {
+            "image_value": {
+              "height": 147,
+              "width": 280,
+              "url": "https://pbs.twimg.com/card_img/1864583748446007296/c1-aJffx?format=jpg&name=280x150"
+            },
+            "type": "IMAGE"
+          }
+        },
+        {
+          "key": "description",
+          "value": {
+            "string_value": "声優事務所 響のサイトです。所属声優の公式プロフィールをはじめ、ニュースなどを掲載しています。",
+            "type": "STRING"
+          }
+        },
+        {
+          "key": "domain",
+          "value": {
+            "string_value": "hibiki-cast.jp",
+            "type": "STRING"
+          }
+        },
+        {
+          "key": "thumbnail_image_large",
+          "value": {
+            "image_value": {
+              "height": 315,
+              "width": 600,
+              "url": "https://pbs.twimg.com/card_img/1864583748446007296/c1-aJffx?format=jpg&name=600x600"
+            },
+            "type": "IMAGE"
+          }
+        },
+        {
+          "key": "summary_photo_image_small",
+          "value": {
+            "image_value": {
+              "height": 202,
+              "width": 386,
+              "url": "https://pbs.twimg.com/card_img/1864583748446007296/c1-aJffx?format=jpg&name=386x202"
+            },
+            "type": "IMAGE"
+          }
+        },
+        {
+          "key": "thumbnail_image_original",
+          "value": {
+            "image_value": {
+              "height": 630,
+              "width": 1200,
+              "url": "https://pbs.twimg.com/card_img/1864583748446007296/c1-aJffx?format=jpg&name=orig"
+            },
+            "type": "IMAGE"
+          }
+        },
+        {
+          "key": "photo_image_full_size_small",
+          "value": {
+            "image_value": {
+              "height": 202,
+              "width": 386,
+              "url": "https://pbs.twimg.com/card_img/1864583748446007296/c1-aJffx?format=jpg&name=386x202"
+            },
+            "type": "IMAGE"
+          }
+        },
+        {
+          "key": "summary_photo_image_large",
+          "value": {
+            "image_value": {
+              "height": 419,
+              "width": 800,
+              "url": "https://pbs.twimg.com/card_img/1864583748446007296/c1-aJffx?format=jpg&name=800x419"
+            },
+            "type": "IMAGE"
+          }
+        },
+        {
+          "key": "thumbnail_image_small",
+          "value": {
+            "image_value": {
+              "height": 76,
+              "width": 144,
+              "url": "https://pbs.twimg.com/card_img/1864583748446007296/c1-aJffx?format=jpg&name=144x144"
+            },
+            "type": "IMAGE"
+          }
+        },
+        {
+          "key": "thumbnail_image_x_large",
+          "value": {
+            "image_value": {
+              "height": 630,
+              "width": 1200,
+              "url": "https://pbs.twimg.com/card_img/1864583748446007296/c1-aJffx?format=png&name=2048x2048_2_exp"
+            },
+            "type": "IMAGE"
+          }
+        },
+        {
+          "key": "photo_image_full_size_original",
+          "value": {
+            "image_value": {
+              "height": 630,
+              "width": 1200,
+              "url": "https://pbs.twimg.com/card_img/1864583748446007296/c1-aJffx?format=jpg&name=orig"
+            },
+            "type": "IMAGE"
+          }
+        },
+        {
+          "key": "vanity_url",
+          "value": {
+            "scribe_key": "vanity_url",
+            "string_value": "hibiki-cast.jp",
+            "type": "STRING"
+          }
+        },
+        {
+          "key": "photo_image_full_size",
+          "value": {
+            "image_value": {
+              "height": 314,
+              "width": 600,
+              "url": "https://pbs.twimg.com/card_img/1864583748446007296/c1-aJffx?format=jpg&name=600x314"
+            },
+            "type": "IMAGE"
+          }
+        },
+        {
+          "key": "thumbnail_image_color",
+          "value": {
+            "image_color_value": {
+              "palette": [
+                {
+                  "rgb": {
+                    "blue": 255,
+                    "green": 255,
+                    "red": 255
+                  },
+                  "percentage": 91.85
+                },
+                {
+                  "rgb": {
+                    "blue": 21,
+                    "green": 21,
+                    "red": 21
+                  },
+                  "percentage": 3.52
+                },
+                {
+                  "rgb": {
+                    "blue": 31,
+                    "green": 68,
+                    "red": 219
+                  },
+                  "percentage": 1.9
+                },
+                {
+                  "rgb": {
+                    "blue": 107,
+                    "green": 132,
+                    "red": 232
+                  },
+                  "percentage": 0.92
+                },
+                {
+                  "rgb": {
+                    "blue": 152,
+                    "green": 168,
+                    "red": 239
+                  },
+                  "percentage": 0.12
+                }
+              ]
+            },
+            "type": "IMAGE_COLOR"
+          }
+        },
+        {
+          "key": "title",
+          "value": {
+            "string_value": "新所属のお知らせ（青木陽菜・立石凛） | お知らせ | 声優事務所 響",
+            "type": "STRING"
+          }
+        },
+        {
+          "key": "summary_photo_image_color",
+          "value": {
+            "image_color_value": {
+              "palette": [
+                {
+                  "rgb": {
+                    "blue": 255,
+                    "green": 255,
+                    "red": 255
+                  },
+                  "percentage": 91.85
+                },
+                {
+                  "rgb": {
+                    "blue": 21,
+                    "green": 21,
+                    "red": 21
+                  },
+                  "percentage": 3.52
+                },
+                {
+                  "rgb": {
+                    "blue": 31,
+                    "green": 68,
+                    "red": 219
+                  },
+                  "percentage": 1.9
+                },
+                {
+                  "rgb": {
+                    "blue": 107,
+                    "green": 132,
+                    "red": 232
+                  },
+                  "percentage": 0.92
+                },
+                {
+                  "rgb": {
+                    "blue": 152,
+                    "green": 168,
+                    "red": 239
+                  },
+                  "percentage": 0.12
+                }
+              ]
+            },
+            "type": "IMAGE_COLOR"
+          }
+        },
+        {
+          "key": "summary_photo_image_x_large",
+          "value": {
+            "image_value": {
+              "height": 630,
+              "width": 1200,
+              "url": "https://pbs.twimg.com/card_img/1864583748446007296/c1-aJffx?format=png&name=2048x2048_2_exp"
+            },
+            "type": "IMAGE"
+          }
+        },
+        {
+          "key": "summary_photo_image",
+          "value": {
+            "image_value": {
+              "height": 314,
+              "width": 600,
+              "url": "https://pbs.twimg.com/card_img/1864583748446007296/c1-aJffx?format=jpg&name=600x314"
+            },
+            "type": "IMAGE"
+          }
+        },
+        {
+          "key": "photo_image_full_size_color",
+          "value": {
+            "image_color_value": {
+              "palette": [
+                {
+                  "rgb": {
+                    "blue": 255,
+                    "green": 255,
+                    "red": 255
+                  },
+                  "percentage": 91.85
+                },
+                {
+                  "rgb": {
+                    "blue": 21,
+                    "green": 21,
+                    "red": 21
+                  },
+                  "percentage": 3.52
+                },
+                {
+                  "rgb": {
+                    "blue": 31,
+                    "green": 68,
+                    "red": 219
+                  },
+                  "percentage": 1.9
+                },
+                {
+                  "rgb": {
+                    "blue": 107,
+                    "green": 132,
+                    "red": 232
+                  },
+                  "percentage": 0.92
+                },
+                {
+                  "rgb": {
+                    "blue": 152,
+                    "green": 168,
+                    "red": 239
+                  },
+                  "percentage": 0.12
+                }
+              ]
+            },
+            "type": "IMAGE_COLOR"
+          }
+        },
+        {
+          "key": "photo_image_full_size_x_large",
+          "value": {
+            "image_value": {
+              "height": 630,
+              "width": 1200,
+              "url": "https://pbs.twimg.com/card_img/1864583748446007296/c1-aJffx?format=png&name=2048x2048_2_exp"
+            },
+            "type": "IMAGE"
+          }
+        },
+        {
+          "key": "card_url",
+          "value": {
+            "scribe_key": "card_url",
+            "string_value": "https://t.co/RwCYhptnRA",
+            "type": "STRING"
+          }
+        },
+        {
+          "key": "summary_photo_image_original",
+          "value": {
+            "image_value": {
+              "height": 630,
+              "width": 1200,
+              "url": "https://pbs.twimg.com/card_img/1864583748446007296/c1-aJffx?format=jpg&name=orig"
+            },
+            "type": "IMAGE"
+          }
+        }
+      ],
+      "card_platform": {
+        "platform": {
+          "audience": {
+            "name": "production"
+          },
+          "device": {
+            "name": "Swift",
+            "version": "12"
+          }
+        }
+      },
+      "name": "summary_large_image",
+      "url": "https://t.co/RwCYhptnRA",
+      "user_refs_results": []
+    }
+  },
+  "unmention_data": {},
+  "edit_control": {
+    "edit_tweet_ids": [
+      "1356153638314409988"
+    ],
+    "editable_until_msecs": "1612168998147",
+    "is_edit_eligible": true,
+    "edits_remaining": "5"
+  },
+  "is_translatable": true,
+  "views": {
+    "state": "Enabled"
+  },
+  "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+  "legacy": {
+    "bookmark_count": 6,
+    "bookmarked": false,
+    "created_at": "Mon Feb 01 08:13:18 +0000 2021",
+    "conversation_id_str": "1356153638314409988",
+    "display_text_range": [
+      0,
+      100
+    ],
+    "entities": {
+      "hashtags": [],
+      "symbols": [],
+      "timestamps": [],
+      "urls": [
+        {
+          "display_url": "hibiki-cast.jp/20210201/01-12/",
+          "expanded_url": "https://hibiki-cast.jp/20210201/01-12/",
+          "url": "https://t.co/RwCYhptnRA",
+          "indices": [
+            77,
+            100
+          ]
+        }
+      ],
+      "user_mentions": []
+    },
+    "favorite_count": 1630,
+    "favorited": false,
+    "full_text": "【新所属のお知らせ】\n2021年2月1日より「青木陽菜（あおきひな）」「立石凛（たていしりん）」が所属となりました。\n今後とも宜しくお願い申し上げます。\nhttps://t.co/RwCYhptnRA",
+    "is_quote_status": false,
+    "lang": "ja",
+    "possibly_sensitive": false,
+    "possibly_sensitive_editable": true,
+    "quote_count": 78,
+    "reply_count": 8,
+    "retweet_count": 636,
+    "retweeted": false,
+    "user_id_str": "923054746977517568",
+    "id_str": "1356153638314409988"
+  },
+  "quick_promote_eligibility": {
+    "eligibility": "IneligibleNotProfessional"
+  },
+  "twe_private_fields": {
+    "created_at": 1612167198000,
+    "updated_at": 1733935462373,
+    "media_count": 0
+  }
+}
