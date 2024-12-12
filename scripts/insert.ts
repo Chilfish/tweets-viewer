@@ -20,43 +20,23 @@ if (!DATABASE_URL) {
 const client = neon(DATABASE_URL)
 const db = drizzle({ client })
 
-function toInsertUser(user: User): InsertUser {
-  return {
-    name: user.name,
-    screenName: user.screen_name,
-    avatarUrl: user.avatar_url,
-    profileBannerUrl: user.profile_banner_url,
-    followersCount: user.followers_count,
-    followingCount: user.following_count,
-    bio: user.bio,
-    location: user.location,
-    website: user.website,
-    createdAt: new Date(user.created_at),
-    birthday: new Date(user.birthday),
-    tweetStart: new Date(user.tweetStart),
-    tweetEnd: new Date(user.tweetEnd),
-  }
-}
+function convertDate(obj: Record<string, any>) {
+  Object.entries(obj).forEach(([key, value]) => {
+    if (value === null) {
+      return
+    }
+    if (typeof value === 'object') {
+      return convertDate(value)
+    }
+    if (typeof value !== 'string') {
+      return
+    }
 
-function toInsertTweet(tweet: Tweet, uid: string): InsertTweet {
-  return {
-    userId: uid,
-    tweetId: tweet.id,
-    createdAt: new Date(tweet.created_at),
-    fullText: tweet.full_text,
-    media: tweet.media,
-    retweetCount: tweet.retweet_count,
-    quoteCount: tweet.quote_count,
-    replyCount: tweet.reply_count,
-    favoriteCount: tweet.favorite_count,
-    viewsCount: tweet.views_count,
-    retweetedStatus: tweet.retweeted_status,
-    quotedStatus: tweet.quoted_status,
-  }
-}
-
-function errorHandler(folder: string, err: any) {
-  console.error(`Error inserting data from ${folder}:\n${err.message}, ${err.detail}`)
+    const date = new Date(value)
+    if (!Number.isNaN(date.getTime())) {
+      obj[key] = date
+    }
+  })
 }
 
 async function insertUser(user: InsertUser) {
@@ -65,28 +45,32 @@ async function insertUser(user: InsertUser) {
 }
 
 async function insertTweets(folder: string, uid: string) {
-  console.log(`Inserting data from ${folder}`)
-
   const tweets = await readJson<Tweet[]>(`${folder}/data-tweet.json`)
-    .then(tweets => tweets.map(tweet => toInsertTweet(tweet, uid)))
+  const insertTweets: InsertTweet[] = tweets.map(tweet => ({
+    ...tweet,
+    id: undefined,
+    tweetId: tweet.id,
+    userId: uid,
+  }))
+  insertTweets.forEach(convertDate)
 
   console.log(`Inserting ${tweets.length} tweets to ${uid}`)
-  await createTweets(db, tweets)
+  await createTweets(db, insertTweets)
     .then(({ rowCount }) => console.log(`Inserted ${rowCount} tweets`))
 }
 
 async function main() {
   const isInsertUser = !process.argv.includes('--no-user')
   for (const folder of dataFolders) {
-    const user = await readJson<User>(`${folder}/data-user.json`).then(toInsertUser)
+    const user = await readJson<User>(`${folder}/data-user.json`)
+    convertDate(user)
 
+    console.log(`Inserting data from ${folder}`)
     if (isInsertUser) {
       await insertUser(user)
-        .catch(err => errorHandler(folder, err))
     }
 
     await insertTweets(folder, user.screenName)
-      .catch(err => errorHandler(folder, err))
   }
 }
 

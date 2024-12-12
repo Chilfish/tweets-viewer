@@ -48,6 +48,7 @@ export async function getLastYearsTodayTweets({ db, name, reverse }: GetTweet) {
     .where(and(
       eq(tweetsTable.userId, name),
       sql`EXTRACT(DAY FROM ${tweetsTable.createdAt}) = ${today.getDate()}`,
+      sql`EXTRACT(MONTH FROM ${tweetsTable.createdAt}) = ${today.getMonth() + 1}`,
     ))
     .orderBy(_order(reverse))
 }

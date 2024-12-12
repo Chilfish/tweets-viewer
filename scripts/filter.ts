@@ -39,8 +39,8 @@ export function filterUserInfo(data: TweetData): UserInfo {
 
   return {
     name: legacy.name,
-    screen_name: legacy.screen_name,
-    avatar_url: legacy.profile_image_url_https,
+    screenName: legacy.screen_name,
+    avatarUrl: legacy.profile_image_url_https,
   }
 }
 
@@ -56,17 +56,17 @@ export function filterUser(data: TweetData, birthday = new Date()): User {
       legacy.description,
     )
 
-  const profile_banner_url = 'profile_banner_url' in legacy ? legacy.profile_banner_url : ''
+  const profileBannerUrl = 'profile_banner_url' in legacy ? legacy.profile_banner_url : ''
 
   return {
     ...filterUserInfo(data),
-    profile_banner_url,
-    followers_count: legacy.followers_count,
-    following_count: legacy.friends_count,
+    profileBannerUrl,
+    followersCount: legacy.followers_count,
+    followingCount: legacy.friends_count,
     location: legacy.location,
     bio,
     website,
-    created_at: new Date(legacy.created_at),
+    createdAt: new Date(legacy.created_at),
     birthday,
     tweetStart: new Date(),
     tweetEnd: new Date(),
@@ -116,17 +116,17 @@ function _filterTweet(data: TextData): Tweet {
 
   return {
     id: tweet.id_str,
-    created_at: new Date(tweet.created_at),
-    full_text: isRetweet ? 'RT' : text,
+    createdAt: new Date(tweet.created_at),
+    fullText: isRetweet ? 'RT' : text,
     media,
-    retweet_count: tweet.retweet_count,
-    quote_count: tweet.quote_count,
-    reply_count: tweet.reply_count,
-    favorite_count: tweet.favorite_count,
-    views_count: data.views_count || 0,
+    retweetCount: tweet.retweet_count,
+    quoteCount: tweet.quote_count,
+    replyCount: tweet.reply_count,
+    favoriteCount: tweet.favorite_count,
+    viewsCount: data.views_count || 0,
 
-    retweeted_status: isRetweet ? filterRetweet(data as any) : null,
-    quoted_status: isQuote ? filterQuotedTweet(data as any) : null,
+    retweetedStatus: isRetweet ? filterRetweet(data as any) : null,
+    quotedStatus: isQuote ? filterQuotedTweet(data as any) : null,
   }
 }
 
