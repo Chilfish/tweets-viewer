@@ -40,6 +40,8 @@ export interface Tweet {
    *  Tweet ID
    */
   id: string
+
+  tweetId: string
   /**
    *  Tweet creation date.
    */

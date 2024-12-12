@@ -116,6 +116,7 @@ function _filterTweet(data: TextData): Tweet {
 
   return {
     id: tweet.id_str,
+    tweetId: tweet.id_str,
     createdAt: new Date(tweet.created_at),
     fullText: isRetweet ? 'RT' : text,
     media,

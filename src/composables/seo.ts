@@ -4,10 +4,7 @@ const baseTitle = 'Twitter Archive Explorer'
 const baseDes = 'Explore your Twitter archive with ease'
 
 export function useSeo(
-  { title, description }: {
-    title: string
-    description: string
-  } = { title: '', description: '' },
+  { title, description } = { title: '', description: '' },
 ) {
   title = title ? `${title} | ` : ''
   description = description ? `${description} | ` : ''

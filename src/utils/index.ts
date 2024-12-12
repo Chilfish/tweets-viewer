@@ -1,13 +1,8 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
-import { fallbackUser } from '~/constant'
 
-export function usernameFromUrl() {
-  return document.location.pathname.split('/').at(1)?.slice(1) || fallbackUser
-}
-
-export function getSearch(key: string) {
-  return new URLSearchParams(window.location.search).get(key) || ''
+export function tweetUrl(name: string, id: string) {
+  return `https://twitter.com/${name}/status/${id}`
 }
 
 export function cn(...inputs: ClassValue[]) {
