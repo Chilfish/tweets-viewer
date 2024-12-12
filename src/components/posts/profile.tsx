@@ -21,7 +21,7 @@ export const PostProfile = defineComponent({
   },
   setup({ time, name, screenName }) {
     return () => (
-      <CardHeader class="flex flex-row items-center gap-2 pb-1">
+      <CardHeader class="flex flex-row items-center gap-2 py-2">
         <Avatar size="sm">
           <AvatarImage
             alt={`User avatar for ${screenName}`}
@@ -34,7 +34,7 @@ export const PostProfile = defineComponent({
             {name}
           </p>
           <a
-            class="text-3.2 text-muted-foreground hover:underline"
+            class="text-3.2 text-muted-foreground hover:text-main hover:underline"
             href={`https://twitter.com/${screenName}`}
             target="_blank"
           >

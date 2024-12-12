@@ -1,8 +1,16 @@
 <script setup lang="ts">
+import { onBeforeMount } from 'vue'
 import Loading from '~/components/icon/Loading'
+
 import { useTweetStore } from '~/stores/tweets'
+import { useUsersStore } from '~/stores/users'
 
 const tweetStore = useTweetStore()
+const usersStore = useUsersStore()
+
+onBeforeMount(async () => {
+  await usersStore.fetchUsers()
+})
 </script>
 
 <template>

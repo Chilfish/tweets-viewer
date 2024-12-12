@@ -2,6 +2,7 @@ import type { Tweet, TweetMedia, UserInfo } from '~/types'
 import { Repeat2 } from 'lucide-vue-next'
 import { defineComponent, ref } from 'vue'
 import { Card, CardContent } from '~/components/ui/card'
+import { formatDate } from '~/utils/date'
 import { PostActions } from './actions'
 import { Link } from './link'
 import PostMedia from './media.vue'
@@ -52,13 +53,30 @@ const PostCard = defineComponent({
       type: Object as () => UserInfo,
       required: true,
     },
+    retweet: {
+      type: Object as () => {
+        name: string
+        createdAt: Date
+      },
+    },
   },
-  setup({ tweet, user }) {
+  setup({ tweet, user, retweet }) {
     const url = `https://twitter.com/${user.screenName}/status/${tweet.id}`
     const link = ref(url)
 
     return () => (
-      <Card class="mx-auto min-w-full">
+      <Card class="mx-auto min-w-full pt-4">
+        {retweet && (
+          <div
+            class="flex cursor-pointer items-center px-6 text-gray-600 space-x-1.5 dark:text-gray-400 hover:text-main"
+          >
+            <Repeat2 />
+            <span class="text-sm">
+              {`@${retweet.name} 在 ${formatDate(retweet.createdAt, { timezone: 'tokyo' })} 转推了`}
+            </span>
+          </div>
+        )}
+
         <PostProfile
           time={new Date(tweet.createdAt)}
           name={user.name}
@@ -98,33 +116,16 @@ export const Post = defineComponent({
   setup({ tweet, user }) {
     const isRetweet = tweet.retweetedStatus !== null
     return () => (
-      <div class="w-full">
-        {isRetweet
-          ? (
-              <>
-                <div
-                  class="flex items-center text-gray-600 space-x-1.5 dark:text-gray-400"
-                >
-                  <Repeat2 />
-                  <span class="text-sm">
-                    {user.name}
-                    {' '}
-                    转推了
-                  </span>
-                </div>
-                <PostCard
-                  tweet={tweet.retweetedStatus!.tweet}
-                  user={tweet.retweetedStatus!.user}
-                />
-              </>
-            )
-          : (
-              <PostCard
-                tweet={tweet}
-                user={user}
-              />
-            )}
-      </div>
+      <PostCard
+        tweet={isRetweet ? tweet.retweetedStatus!.tweet : tweet}
+        user={isRetweet ? tweet.retweetedStatus!.user : user}
+        retweet={isRetweet
+          ? {
+              name: user.name,
+              createdAt: tweet.createdAt,
+            }
+          : undefined}
+      />
     )
   },
 })

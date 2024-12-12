@@ -10,6 +10,7 @@ export const useUsersStore = defineStore('users', () => {
   const name = useRouteParams<string>('name', fallbackUser)
 
   const curUser = computed<User>(() => {
+    console.log(users.value)
     return users.value.find(user => user.screenName === name.value) || {
       screenName: fallbackUser,
       name: fallbackUser,
@@ -24,7 +25,7 @@ export const useUsersStore = defineStore('users', () => {
       website: '',
       location: '',
       followingCount: 0,
-      tweetStart: new Date(0),
+      tweetStart: new Date(),
       birthday: new Date(),
       tweetEnd: new Date(),
       createdAt: new Date(),

@@ -28,8 +28,8 @@ export const useTweetStore = defineStore('tweets', () => {
   const curUser = computed(() => usersStore.curUser)
   const screenName = computed(() => curUser.value.screenName)
   const tweetRange = computed(() => ({
-    start: curUser.value.tweetStart.getTime(),
-    end: curUser.value.tweetEnd.getTime(),
+    start: new Date(curUser.value.tweetStart).getTime(),
+    end: new Date(curUser.value.tweetEnd).getTime(),
   }))
 
   const tweetService = new ServerTweetService(screenName.value)
