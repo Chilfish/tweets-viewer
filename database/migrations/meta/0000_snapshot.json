@@ -1,5 +1,5 @@
 {
-  "id": "35aa6650-9f93-4994-baea-81647c65fb72",
+  "id": "2ab87bf0-2e5e-407b-b453-d66b1b9c6069",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -45,24 +45,6 @@
           "notNull": true,
           "default": "'[]'::json"
         },
-        "in_reply_to": {
-          "name": "in_reply_to",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "retweeted_status": {
-          "name": "retweeted_status",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "quoted_status": {
-          "name": "quoted_status",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
         "retweet_count": {
           "name": "retweet_count",
           "type": "integer",
@@ -97,6 +79,18 @@
           "primaryKey": false,
           "notNull": true,
           "default": 0
+        },
+        "retweeted_status": {
+          "name": "retweeted_status",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "quoted_status": {
+          "name": "quoted_status",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {
@@ -242,6 +236,20 @@
           "type": "timestamp",
           "primaryKey": false,
           "notNull": false
+        },
+        "tweet_start": {
+          "name": "tweet_start",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "tweet_end": {
+          "name": "tweet_end",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},

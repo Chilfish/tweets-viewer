@@ -1,3 +1,5 @@
+import type { QuotedTweet, ReTweet, TweetMedia } from '../scripts/types'
+
 import {
   index,
   integer,
@@ -21,6 +23,8 @@ export const usersTable = pgTable('users', {
   location: text('location'),
   website: text('website'),
   birthday: timestamp('birthday'),
+  tweetStart: timestamp('tweet_start').notNull().defaultNow(),
+  tweetEnd: timestamp('tweet_end').notNull().defaultNow(),
 })
 
 export const tweetsTable = pgTable('tweets', {
@@ -29,17 +33,21 @@ export const tweetsTable = pgTable('tweets', {
   userId: text('user_name')
     .notNull()
     .references(() => usersTable.screenName, { onDelete: 'cascade' }),
+
   createdAt: timestamp('created_at').notNull(),
   fullText: text('full_text').notNull(),
-  media: json('media').notNull().default([]),
-  inReplyTo: text('in_reply_to'),
-  retweetedStatus: text('retweeted_status'),
-  quotedStatus: text('quoted_status'),
+
+  media: json('media').notNull().default([]).$type<TweetMedia[]>(),
+
+  // Tweet metrics
   retweetCount: integer('retweet_count').notNull().default(0),
   quoteCount: integer('quote_count').notNull().default(0),
   replyCount: integer('reply_count').notNull().default(0),
   favoriteCount: integer('favorite_count').notNull().default(0),
   viewsCount: integer('views_count').notNull().default(0),
+
+  retweetedStatus: json('retweeted_status').$type<ReTweet>(),
+  quotedStatus: json('quoted_status').$type<QuotedTweet>(),
 }, table => ({
   tweetIdIdx: index('tweet_id_idx').on(table.tweetId),
   createdAtIdx: index('created_at_idx').on(table.createdAt),

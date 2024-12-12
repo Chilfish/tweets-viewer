@@ -46,9 +46,15 @@ for await (const folder of dataFolders) {
   if (!data.length) {
     continue
   }
+
   const user = filterUser(data[0], new Date(birthday || ''))
   const tweet = data.map(filterTweet)
 
-  await writeJson(`${folder}/data-user.json`, user)
+  await writeJson(`${folder}/data-user.json`, {
+    ...user,
+    tweetStart: tweet[0].created_at,
+    tweetEnd: tweet[tweet.length - 1].created_at,
+    tweetCount: tweet.length,
+  })
   await writeJson(`${folder}/data-tweet.json`, tweet)
 }

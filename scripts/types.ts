@@ -22,6 +22,16 @@ export interface User extends UserInfo {
   created_at: Date
 }
 
+export interface TweetMedia {
+  /**
+   * media_url_https, ?name=large
+   */
+  url: string
+  type: string
+  height: number
+  width: number
+}
+
 export interface Tweet {
   /**
    *  Tweet ID
@@ -38,15 +48,7 @@ export interface Tweet {
   /**
    *  URLs of the media attached to the tweet.
    */
-  media: {
-    /**
-     * media_url_https, ?name=large
-     */
-    url: string
-    type: string
-    height: number
-    width: number
-  }[]
+  media: TweetMedia[]
 
   // Tweet metrics
   retweet_count: number

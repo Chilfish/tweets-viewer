@@ -5,14 +5,13 @@ CREATE TABLE IF NOT EXISTS "tweets" (
 	"created_at" timestamp NOT NULL,
 	"full_text" text NOT NULL,
 	"media" json DEFAULT '[]'::json NOT NULL,
-	"in_reply_to" text,
-	"retweeted_status" text,
-	"quoted_status" text,
 	"retweet_count" integer DEFAULT 0 NOT NULL,
 	"quote_count" integer DEFAULT 0 NOT NULL,
 	"reply_count" integer DEFAULT 0 NOT NULL,
 	"favorite_count" integer DEFAULT 0 NOT NULL,
-	"views_count" integer DEFAULT 0 NOT NULL
+	"views_count" integer DEFAULT 0 NOT NULL,
+	"retweeted_status" json,
+	"quoted_status" json
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "users" (
@@ -28,6 +27,8 @@ CREATE TABLE IF NOT EXISTS "users" (
 	"location" text,
 	"website" text,
 	"birthday" timestamp,
+	"tweet_start" timestamp DEFAULT now() NOT NULL,
+	"tweet_end" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "users_screen_name_unique" UNIQUE("screen_name")
 );
 --> statement-breakpoint

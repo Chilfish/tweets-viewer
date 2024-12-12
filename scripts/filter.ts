@@ -64,10 +64,10 @@ export function filterUser(data: TweetData, birthday = new Date()): User {
     followers_count: legacy.followers_count,
     following_count: legacy.friends_count,
     location: legacy.location,
-    created_at: new Date(legacy.created_at),
     bio,
-    birthday,
     website,
+    created_at: new Date(legacy.created_at),
+    birthday,
   }
 }
 
