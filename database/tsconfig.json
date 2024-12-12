@@ -21,9 +21,8 @@
   },
   "include": [
     "**/*.ts",
-    "../src/types/**/*.ts",
+    "../src/types/index.ts",
     "../src/utils/**/*.ts",
-    "../server/**/*.ts",
-    "../scripts/types.ts"
+    "../server/**/*.ts"
   ]
 }

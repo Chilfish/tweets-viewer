@@ -1,16 +1,16 @@
-import type quoteData from './data/quote.json'
-import type replyData from './data/reply.json'
-import type cardData from './data/retweet-card.json'
-import type retweetData from './data/retweet.json'
-import type textData from './data/text_img.json'
-
 import type {
   QuotedTweet,
   ReTweet,
   Tweet,
   User,
   UserInfo,
-} from './types'
+} from '@/types'
+
+import type quoteData from './data/quote.json'
+import type replyData from './data/reply.json'
+import type cardData from './data/retweet-card.json'
+import type retweetData from './data/retweet.json'
+import type textData from './data/text_img.json'
 
 type TextData = typeof textData
 type RetweetData = typeof retweetData
@@ -68,6 +68,8 @@ export function filterUser(data: TweetData, birthday = new Date()): User {
     website,
     created_at: new Date(legacy.created_at),
     birthday,
+    tweetStart: new Date(),
+    tweetEnd: new Date(),
   }
 }
 

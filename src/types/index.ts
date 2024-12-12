@@ -7,19 +7,19 @@ export interface UserInfo {
   /**
    * ID of the user.
    */
-  screen_name: string
-  avatar_url: string
+  screenName: string
+  avatarUrl: string
 }
 
 export interface User extends UserInfo {
-  profile_banner_url: string
-  followers_count: number
-  following_count: number
+  profileBannerUrl: string
+  followersCount: number
+  followingCount: number
   bio: string
   location: string
   website: string
   birthday: Date
-  created_at: Date
+  createdAt: Date
 
   tweetStart: Date
   tweetEnd: Date
@@ -43,32 +43,32 @@ export interface Tweet {
   /**
    *  Tweet creation date.
    */
-  created_at: Date
+  createdAt: Date
   /**
    *  Tweet text content.
    */
-  full_text: string
+  fullText: string
   /**
    *  URLs of the media attached to the tweet.
    */
   media: TweetMedia[]
 
   // Tweet metrics
-  retweet_count: number
-  quote_count: number
-  reply_count: number
-  favorite_count: number
-  views_count: number
+  retweetCount: number
+  quoteCount: number
+  replyCount: number
+  favoriteCount: number
+  viewsCount: number
 
   /**
    * retweeted_status_result.result
    */
-  retweeted_status: ReTweet | null
+  retweetedStatus: ReTweet | null
 
   /**
    * quoted_status_result.result
    */
-  quoted_status: QuotedTweet | null
+  quotedStatus: QuotedTweet | null
 }
 
 export interface ReTweet {

@@ -7,27 +7,27 @@ import { CardHeader } from '../ui/card'
 export const PostProfile = defineComponent({
   props: {
     time: {
-      type: String,
+      type: Date,
       required: true,
     },
     name: {
       type: String,
       required: true,
     },
-    screen_name: {
+    screenName: {
       type: String,
       required: true,
     },
   },
-  setup({ time, name, screen_name }) {
+  setup({ time, name, screenName }) {
     return () => (
       <CardHeader class="flex flex-row items-center gap-2 pb-1">
         <Avatar size="sm">
           <AvatarImage
-            alt={`User avatar for ${screen_name}`}
-            src={avatarUrl(screen_name)}
+            alt={`User avatar for ${screenName}`}
+            src={avatarUrl(screenName)}
           />
-          <AvatarFallback>{screen_name}</AvatarFallback>
+          <AvatarFallback>{screenName}</AvatarFallback>
         </Avatar>
         <div class="flex flex-wrap items-center gap-2">
           <p class="text-3.5 font-semibold">
@@ -35,11 +35,11 @@ export const PostProfile = defineComponent({
           </p>
           <a
             class="text-3.2 text-muted-foreground hover:underline"
-            href={`https://twitter.com/${screen_name}`}
+            href={`https://twitter.com/${screenName}`}
             target="_blank"
           >
             @
-            {screen_name}
+            {screenName}
           </a>
           <span>·</span>
           <time

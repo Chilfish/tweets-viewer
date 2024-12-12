@@ -1,14 +1,14 @@
+import type { Tweet } from '~/types'
 import { useEventListener, useFetch } from '@vueuse/core'
 import { defineComponent, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import Loading from '~/components/icon/Loading'
 import { Post } from '~/components/posts/post'
 import { Button } from '~/components/ui/button'
-import type { Tweet } from '~/types/tweets'
 
 interface TweetWithUser extends Tweet {
   name: string
-  screen_name: string
+  screenName: string
 }
 
 export default defineComponent({
@@ -66,7 +66,7 @@ export default defineComponent({
               tweet={tweet}
               user={{
                 name: tweet.name,
-                screen_name: tweet.screen_name,
+                screenName: tweet.screenName,
               }}
             />
           ))}

@@ -1,5 +1,5 @@
+import type { Tweet, User } from '@/types'
 import type { InsertTweet, InsertUser } from '../database'
-import type { Tweet, User } from './types'
 import { neon } from '@neondatabase/serverless'
 import { config } from 'dotenv'
 import { drizzle } from 'drizzle-orm/neon-http'

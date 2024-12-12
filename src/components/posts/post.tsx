@@ -1,7 +1,7 @@
+import type { Tweet, TweetMedia } from '~/types'
 import { defineComponent, ref } from 'vue'
 import { Card, CardContent } from '~/components/ui/card'
 import { useTweetStore } from '~/stores/tweets'
-import type { Tweet } from '~/types/tweets'
 import { PostActions } from './actions'
 import { Link } from './link'
 import PostMedia from './media.vue'
@@ -14,9 +14,9 @@ const PostContent = defineComponent({
       type: String,
       required: true,
     },
-    quoutId: String as () => Tweet['quoted_status'],
+    quoutId: String,
     media: {
-      type: Array as () => string[],
+      type: Array as () => TweetMedia[],
       default: () => [],
     },
   },
@@ -51,14 +51,14 @@ export const Post = defineComponent({
     user: {
       type: Object as () => {
         name: string
-        screen_name: string
+        screenName: string
       },
     },
   },
   setup({ tweet, user }) {
     const curUser = useTweetStore().curConfig
     const username = user?.name || curUser.username || 'username'
-    const screenName = user?.screen_name || curUser.name.replace('data-', '') || 'i/web'
+    const screenName = user?.screenName || curUser.name.replace('data-', '') || 'i/web'
 
     const url = `https://twitter.com/${screenName}/status/${tweet.id}`
     const link = ref(url)
@@ -66,23 +66,23 @@ export const Post = defineComponent({
     return () => (
       <Card class="mx-auto min-w-full">
         <PostProfile
-          time={tweet.created_at}
+          time={new Date(tweet.createdAt)}
           name={username}
-          screen_name={screenName}
+          screenName={screenName}
         />
         <PostContent
-          text={tweet.full_text}
-          quoutId={tweet.quoted_status}
+          text={tweet.fullText}
+          quoutId={tweet.quotedStatus?.tweet.id}
           media={tweet.media}
           onImgError={() => {
             link.value = `https://web.archive.org/web/${url}`
           }}
         />
         <PostActions
-          comment={tweet.reply_count}
-          retweet={tweet.retweet_count + tweet.quote_count}
-          like={tweet.favorite_count}
-          view={tweet.views_count}
+          comment={tweet.replyCount}
+          retweet={tweet.retweetCount + tweet.quoteCount}
+          like={tweet.favoriteCount}
+          view={tweet.viewsCount}
           link={link.value}
         />
       </Card>

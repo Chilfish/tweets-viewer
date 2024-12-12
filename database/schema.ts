@@ -1,4 +1,4 @@
-import type { QuotedTweet, ReTweet, TweetMedia } from '../scripts/types'
+import type { QuotedTweet, ReTweet, TweetMedia } from '@/types'
 
 import {
   index,

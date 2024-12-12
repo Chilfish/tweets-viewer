@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { TweetsReturn } from '~/stores/tweets'
+import type { Tweet } from '~/types'
 import { useQuery } from '@tanstack/vue-query'
 import { useEventListener, useThrottleFn } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
@@ -7,8 +9,6 @@ import Loading from '~/components/icon/Loading'
 import { Post } from '~/components/posts/post'
 import { useSeo } from '~/composables'
 import { useTweetStore } from '~/stores/tweets'
-import type { TweetsReturn } from '~/stores/tweets'
-import type { Tweet } from '~/types/tweets'
 
 const tweetStore = useTweetStore()
 const tweets = ref<Tweet[]>([])

@@ -4,17 +4,17 @@ import { avatarUrl } from '~/utils'
 
 interface UserInfo {
   name: string
-  screen_name: string
-  avatar_url: string
+  screenName: string
+  avatarUrl: string
 }
 
 const users = tweetConfig.value
-  .map(({ name: key, username: screen_name }) => {
+  .map(({ name: key, username: screenName }) => {
     const name = key.split('-')[1]
     return {
       name,
-      screen_name,
-      avatar_url: avatarUrl(name),
+      screenName,
+      avatarUrl: avatarUrl(name),
     } as UserInfo
   })
 </script>
@@ -43,7 +43,7 @@ const users = tweetConfig.value
         />
         <AvatarFallback>{{ user.name }}</AvatarFallback>
       </Avatar>
-      @{{ user.screen_name }}
+      @{{ user.screenName }}
     </RouterLink>
   </ul>
 </template>

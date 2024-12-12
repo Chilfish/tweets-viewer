@@ -1,4 +1,4 @@
-import type { Tweet } from '~/types/tweets'
+import type { Tweet } from '~/types'
 
 export abstract class TweetService {
   pageSize = 10
