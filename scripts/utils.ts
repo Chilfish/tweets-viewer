@@ -112,3 +112,18 @@ export function snowId2millis(id: string) {
 export function pubTime(id: string) {
   return new Date(Number(snowId2millis(id)))
 }
+
+/**
+ * Check if the script is not imported
+ * like if __name__ == '__main__' in Python
+ *
+ * @example
+ * ```ts
+ * isNotInImport(import.meta.filename)
+ * ```
+ */
+export function isNotInImport(importMetaFilename: string) {
+  const [_tsx, argFile] = process.argv
+
+  return path.resolve(importMetaFilename) === path.resolve(argFile)
+}

@@ -21,7 +21,10 @@ interface GetTweet {
 const pageSize = 10
 
 export async function createTweets(db: DB, tweets: InsertTweet[]) {
-  return db.insert(tweetsTable).values(tweets)
+  return db
+    .insert(tweetsTable)
+    .values(tweets)
+    .onConflictDoNothing()
 }
 
 const _order = (reverse: boolean) => reverse ? desc(tweetsTable.createdAt) : asc(tweetsTable.createdAt)

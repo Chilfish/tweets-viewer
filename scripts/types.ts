@@ -20,6 +20,9 @@ export interface User extends UserInfo {
   website: string
   birthday: Date
   created_at: Date
+
+  tweetStart: Date
+  tweetEnd: Date
 }
 
 export interface TweetMedia {

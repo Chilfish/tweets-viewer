@@ -2,11 +2,11 @@ import type { TweetData } from './filter'
 import glob from 'fast-glob'
 import pMap from 'p-map'
 import { filterTweet, filterUser } from './filter'
-import { readJson, uniqueObj, writeJson } from './utils'
+import { isNotInImport, readJson, uniqueObj, writeJson } from './utils'
 
 const dataFolder = `D:/Downloads/tweet-data`
 
-const dataFolders = await glob(
+export const dataFolders = await glob(
   `${dataFolder}/*`,
   {
     onlyDirectories: true,
@@ -35,7 +35,7 @@ async function readData(folder: string) {
   return mergedData
 }
 
-for await (const folder of dataFolders) {
+async function main(folder: string) {
   const data = await readData(folder)
 
   const birthday = await glob(`${folder}/birthday_*`)
@@ -44,7 +44,7 @@ for await (const folder of dataFolders) {
   console.log(folder, data.length, birthday)
 
   if (!data.length) {
-    continue
+    return
   }
 
   const user = filterUser(data[0], new Date(birthday || ''))
@@ -57,4 +57,8 @@ for await (const folder of dataFolders) {
     tweetCount: tweet.length,
   })
   await writeJson(`${folder}/data-tweet.json`, tweet)
+}
+
+if (isNotInImport(import.meta.filename)) {
+  await pMap(dataFolders, main, { concurrency: 1 })
 }

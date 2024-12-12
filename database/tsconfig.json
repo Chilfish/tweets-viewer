@@ -22,6 +22,8 @@
   "include": [
     "**/*.ts",
     "../src/types/**/*.ts",
-    "../database/**/*.ts"
+    "../src/utils/**/*.ts",
+    "../server/**/*.ts",
+    "../scripts/types.ts"
   ]
 }
