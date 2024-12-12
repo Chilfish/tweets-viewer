@@ -7,8 +7,7 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "paths": {
-      "@/*": ["../src/*"],
-      "@db/*": ["../database/*"]
+      "@/*": ["../src/*"]
     },
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
@@ -22,8 +21,8 @@
   },
   "include": [
     "**/*.ts",
-    "../src/types/**/*.ts",
+    "../src/types/index.ts",
     "../src/utils/**/*.ts",
-    "../database/**/*.ts"
+    "../server/**/*.ts"
   ]
 }

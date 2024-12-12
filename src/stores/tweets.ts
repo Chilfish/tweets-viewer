@@ -1,10 +1,10 @@
 import type { QueryKey } from '@tanstack/vue-query'
+import type { Tweet } from '~/types'
 import { useDateFormat } from '@vueuse/core'
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ServerTweetService } from '~/services/server'
-import type { Tweet } from '~/types/tweets'
 import { getSearch, usernameFromUrl } from '~/utils'
 import { fetchVersion, tweetConfig } from './version'
 

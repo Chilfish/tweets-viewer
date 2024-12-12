@@ -1,5 +1,5 @@
 import type { TweetService } from '.'
-import type { Tweet } from '~/types/tweets'
+import type { Tweet } from '~/types'
 import { request } from '~/utils/fetch'
 
 export class ServerTweetService implements TweetService {

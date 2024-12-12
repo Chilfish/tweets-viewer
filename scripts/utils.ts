@@ -101,21 +101,6 @@ export async function readJson<T = any>(
   }
 }
 
-/**
- * Check if the script is not imported
- *
- * @example
- * ```ts
- * isInCli(import.meta.filename)
- * ```
- */
-export function isNotInImport(importMetaFilename: string) {
-  // eslint-disable-next-line no-unused-vars
-  const [_tsx, argFile] = process.argv
-
-  return path.resolve(importMetaFilename) === path.resolve(argFile)
-}
-
 export function tweetUrl(id: string, name = 'i') {
   return `https://twitter.com/${name}/status/${id}`
 }
@@ -126,4 +111,19 @@ export function snowId2millis(id: string) {
 
 export function pubTime(id: string) {
   return new Date(Number(snowId2millis(id)))
+}
+
+/**
+ * Check if the script is not imported
+ * like if __name__ == '__main__' in Python
+ *
+ * @example
+ * ```ts
+ * isNotInImport(import.meta.filename)
+ * ```
+ */
+export function isNotInImport(importMetaFilename: string) {
+  const [_tsx, argFile] = process.argv
+
+  return path.resolve(importMetaFilename) === path.resolve(argFile)
 }
