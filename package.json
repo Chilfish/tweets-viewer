@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "concurrently -n \"web,server\" \"pnpm dev:web\" \"pnpm dev:server\"",
     "dev:web": "vite --host --port 3000 --mode development",
-    "dev:server": "wrangler dev server/index.ts",
-    "deploy:server": "wrangler deploy --minify server/index.ts",
+    "dev:server": "wrangler dev",
+    "deploy:server": "wrangler deploy --minify",
     "build": "vite build",
     "lint": "eslint .",
     "typecheck": "vue-tsc --noEmit",
