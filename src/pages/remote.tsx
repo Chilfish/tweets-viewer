@@ -5,6 +5,7 @@ import { useRoute } from 'vue-router'
 import Loading from '~/components/icon/Loading'
 import { Post } from '~/components/posts/post'
 import { Button } from '~/components/ui/button'
+import { useUsersStore } from '~/stores/users'
 
 interface TweetWithUser extends Tweet {
   name: string
@@ -14,6 +15,7 @@ interface TweetWithUser extends Tweet {
 export default defineComponent({
   name: 'Remote',
   setup() {
+    const usersStore = useUsersStore()
     const { url, reverse } = useRoute().query as { url: string, reverse: string }
     const { data, isFinished, isFetching } = useFetch(url, {
       mode: 'cors',
@@ -64,10 +66,7 @@ export default defineComponent({
             <Post
               key={tweet.id}
               tweet={tweet}
-              user={{
-                name: tweet.name,
-                screenName: tweet.screenName,
-              }}
+              user={usersStore.curUser}
             />
           ))}
         </section>

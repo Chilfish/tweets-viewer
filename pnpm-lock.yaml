@@ -23,6 +23,9 @@ importers:
       '@vueuse/core':
         specifier: ^12.0.0
         version: 12.0.0(typescript@5.7.2)
+      '@vueuse/router':
+        specifier: ^12.0.0
+        version: 12.0.0(typescript@5.7.2)(vue-router@4.5.0(vue@3.5.13(typescript@5.7.2)))
       axios:
         specifier: ^1.7.9
         version: 1.7.9
@@ -2088,6 +2091,11 @@ packages:
 
   '@vueuse/metadata@12.0.0':
     resolution: {integrity: sha512-Yzimd1D3sjxTDOlF05HekU5aSGdKjxhuhRFHA7gDWLn57PRbBIh+SF5NmjhJ0WRgF3my7T8LBucyxdFJjIfRJQ==}
+
+  '@vueuse/router@12.0.0':
+    resolution: {integrity: sha512-7Wu1rvxsTMgn8Rw8Jh13XMqxBowZMBKNuzyOXKc3XUsA7zX8mcTBdUBrwAYNoYZAGjy8AR7Z6Q1+43A65ww3eA==}
+    peerDependencies:
+      vue-router: '>=4.0.0-rc.1'
 
   '@vueuse/shared@10.11.1':
     resolution: {integrity: sha512-LHpC8711VFZlDaYUXEBbFBCQ7GS3dVU9mjOhhMhXP6txTV4EhYQg/KGnQuvt/sPAtoUKq7VVUnL6mVtFoL42sA==}
@@ -6341,6 +6349,14 @@ snapshots:
   '@vueuse/metadata@10.11.1': {}
 
   '@vueuse/metadata@12.0.0': {}
+
+  '@vueuse/router@12.0.0(typescript@5.7.2)(vue-router@4.5.0(vue@3.5.13(typescript@5.7.2)))':
+    dependencies:
+      '@vueuse/shared': 12.0.0(typescript@5.7.2)
+      vue: 3.5.13(typescript@5.7.2)
+      vue-router: 4.5.0(vue@3.5.13(typescript@5.7.2))
+    transitivePeerDependencies:
+      - typescript
 
   '@vueuse/shared@10.11.1(vue@3.5.13(typescript@5.7.2))':
     dependencies:

@@ -72,21 +72,21 @@ export const PostText = defineComponent({
     },
   },
   setup(props) {
-    const retweetTo = retweetInfo(props.text)
-    if (retweetTo.name) {
-      return () => (
-        <>
-          <p class="py-2">
-            从
-            {PeopleLink(retweetTo.name!)}
-            转推:
-          </p>
-          <p>
-            {parseText(retweetTo.text)}
-          </p>
-        </>
-      )
-    }
+    // const retweetTo = retweetInfo(props.text)
+    // if (retweetTo.name) {
+    //   return () => (
+    //     <>
+    //       <p class="py-2">
+    //         从
+    //         {PeopleLink(retweetTo.name!)}
+    //         转推:
+    //       </p>
+    //       <p>
+    //         {parseText(retweetTo.text)}
+    //       </p>
+    //     </>
+    //   )
+    // }
 
     const replyTo = replyInfo(props.text)
     if (replyTo.name) {

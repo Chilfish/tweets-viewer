@@ -6,7 +6,7 @@ import {
   Search,
   Sun,
 } from 'lucide-vue-next'
-import { computed, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import {
   Popover,
   PopoverContent,
@@ -18,14 +18,13 @@ import TwitterIcon from './icon/TwitterIcon'
 import UserList from './UserList.vue'
 
 const tweetStore = useTweetStore()
-const range = computed(() => tweetStore.curConfig.tweetRange)
 const day = 24 * 60 * 60 * 1000
 
 function disableDate(ts: number) {
-  return ts < range.value.start - day || ts > range.value.end
+  return ts < tweetStore.tweetRange.start - day || ts > tweetStore.tweetRange.end
 }
 
-const dateRange = ref<[number, number]>([range.value.end, range.value.end])
+const dateRange = ref<[number, number]>([tweetStore.tweetRange.end, tweetStore.tweetRange.end])
 watch(dateRange, async () => {
   const [start, end] = dateRange.value || []
   tweetStore.getTweetsByDateRange(start, end + day)
@@ -67,7 +66,7 @@ watch(dateRange, async () => {
       </button>
 
       <RouterLink
-        :to="`/@${tweetStore.curUser()}/memo`"
+        :to="`/@${tweetStore.screenName}/memo`"
         title="那年今日"
       >
         <History class="h-6 w-6" />

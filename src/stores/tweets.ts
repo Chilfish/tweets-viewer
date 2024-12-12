@@ -1,12 +1,12 @@
 import type { QueryKey } from '@tanstack/vue-query'
 import type { Tweet } from '~/types'
 import { useDateFormat } from '@vueuse/core'
+import { useRouteQuery } from '@vueuse/router'
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ServerTweetService } from '~/services/server'
-import { getSearch, usernameFromUrl } from '~/utils'
-import { fetchVersion, tweetConfig } from './version'
+import { useUsersStore } from './users'
 
 export interface TweetsReturn {
   queryFn: () => Promise<Tweet[]>
@@ -14,14 +14,26 @@ export interface TweetsReturn {
 }
 
 export const useTweetStore = defineStore('tweets', () => {
-  const screenName = ref('')
-  const isInit = ref(false)
+  const usersStore = useUsersStore()
 
   const router = useRouter()
   const route = useRoute()
 
-  const tweetService = new ServerTweetService(usernameFromUrl())
-  const page = ref(Number.parseInt(getSearch('page')) || 0)
+  const page = useRouteQuery<number>('page', 0)
+  const searchText = useRouteQuery<string>('q')
+
+  const isLoading = ref(false)
+  const isReverse = ref(true)
+
+  const curUser = computed(() => usersStore.curUser)
+  const screenName = computed(() => curUser.value.screenName)
+  const tweetRange = computed(() => ({
+    start: curUser.value.tweetStart.getTime(),
+    end: curUser.value.tweetEnd.getTime(),
+  }))
+
+  const tweetService = new ServerTweetService(screenName.value)
+
   watch(page, (val) => {
     router.push({
       query: {
@@ -30,47 +42,21 @@ export const useTweetStore = defineStore('tweets', () => {
       },
     })
   })
-  const searchText = ref(route.query.q as string)
 
   watch(() => route.params, async ({ name: newName }) => {
-    if (!newName || newName === screenName.value)
+    if (!newName || newName === usersStore.curUser?.screenName)
       return
 
-    await initTweets(newName as string)
+    tweetService.changeName(newName as string)
     resetPages()
   })
 
-  const isReverse = ref(tweetService.isReverse)
   watch(isReverse, (val) => {
     tweetService.isReverse = val
   })
 
-  const curConfig = computed(() => tweetConfig.value.find(c => c.name === `data-${screenName.value}`)
-    || {
-      name: `data-${screenName.value}`,
-      version: '0',
-      username: screenName.value,
-      tweetRange: {
-        start: 0,
-        end: Date.now(),
-      },
-    },
-  )
-
   function resetPages() {
     page.value = 0
-  }
-
-  async function initTweets(name?: string) {
-    isInit.value = false
-
-    if (!name)
-      name = usernameFromUrl()
-    tweetService.changeName(name)
-    screenName.value = name
-
-    await fetchVersion()
-    isInit.value = true
   }
 
   function parseDateRange() {
@@ -81,7 +67,10 @@ export const useTweetStore = defineStore('tweets', () => {
         end: new Date(query.to as string).getTime(),
       }
     }
-    return curConfig.value.tweetRange
+    return {
+      start: new Date().getTime(),
+      end: new Date().getTime(),
+    }
   }
 
   function search(): TweetsReturn {
@@ -131,10 +120,6 @@ export const useTweetStore = defineStore('tweets', () => {
     }
   }
 
-  function curUser() {
-    return curConfig.value.name.replace('data-', '')
-  }
-
   function nextPage() {
     page.value++
 
@@ -148,18 +133,16 @@ export const useTweetStore = defineStore('tweets', () => {
 
   return {
     page,
-    isInit,
     searchText,
     tweetService,
+    tweetRange,
     isReverse,
-    curConfig,
-    fetchVersion,
-    initTweets,
+    isLoading,
+    screenName,
     getTweets,
     search,
     getTweetsByDateRange,
     resetPages,
-    curUser,
     parseDateRange,
     nextPage,
   }

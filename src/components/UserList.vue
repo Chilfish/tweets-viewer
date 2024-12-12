@@ -1,22 +1,14 @@
 <script setup lang="ts">
-import { tweetConfig } from '~/stores/version'
+import { onBeforeMount } from 'vue'
+import Loading from '~/components/icon/Loading'
+import { useUsersStore } from '~/stores/users'
 import { avatarUrl } from '~/utils'
 
-interface UserInfo {
-  name: string
-  screenName: string
-  avatarUrl: string
-}
+const usersStore = useUsersStore()
 
-const users = tweetConfig.value
-  .map(({ name: key, username: screenName }) => {
-    const name = key.split('-')[1]
-    return {
-      name,
-      screenName,
-      avatarUrl: avatarUrl(name),
-    } as UserInfo
-  })
+onBeforeMount(async () => {
+  await usersStore.fetchUsers()
+})
 </script>
 
 <template>
@@ -30,20 +22,27 @@ const users = tweetConfig.value
       </RouterLink>
     </p>
 
-    <RouterLink
-      v-for="user in users"
-      :key="user.name"
-      :to="`/@${user.name}`"
-      class="flex items-center gap-2 rounded-2 p-2 transition-colors duration-200 hover:bg-gray-1 hover:dark:bg-gray-9"
-    >
-      <Avatar size="sm">
-        <AvatarImage
-          :alt="`User avatar for ${user.name}}`"
-          :src="avatarUrl(user.name)"
-        />
-        <AvatarFallback>{{ user.name }}</AvatarFallback>
-      </Avatar>
-      @{{ user.screenName }}
-    </RouterLink>
+    <Loading
+      v-if="usersStore.users.length === 0"
+      class="pt-2"
+    />
+
+    <template v-else>
+      <RouterLink
+        v-for="user in usersStore.users"
+        :key="user.screenName"
+        :to="`/@${user.screenName}`"
+        class="flex items-center gap-2 rounded-2 p-2 transition-colors duration-200 hover:bg-gray-1 hover:dark:bg-gray-9"
+      >
+        <Avatar size="sm">
+          <AvatarImage
+            :alt="`User avatar for ${user.name}}`"
+            :src="avatarUrl(user.screenName)"
+          />
+          <AvatarFallback>{{ user.name }}</AvatarFallback>
+        </Avatar>
+        @{{ user.name }}
+      </RouterLink>
+    </template>
   </ul>
 </template>

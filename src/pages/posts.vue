@@ -9,7 +9,9 @@ import Loading from '~/components/icon/Loading'
 import { Post } from '~/components/posts/post'
 import { useSeo } from '~/composables'
 import { useTweetStore } from '~/stores/tweets'
+import { useUsersStore } from '~/stores/users'
 
+const usersStore = useUsersStore()
 const tweetStore = useTweetStore()
 const tweets = ref<Tweet[]>([])
 const noMore = ref(false)
@@ -68,6 +70,7 @@ const loadMore = useThrottleFn(() => {
     return
   tweetStore.nextPage()
 }, 1000)
+
 useEventListener(window, 'scroll', () => {
   const offset = 100
   const scrollHeight = document.documentElement.scrollHeight
@@ -88,10 +91,9 @@ function reset() {
   tweetStore.resetPages()
 }
 
-const name = tweetStore.curConfig.username
 useSeo({
-  title: `@${name} 推文记录`,
-  description: `查看@${name} 的历史推文`,
+  title: `@${usersStore.curUser.name} 推文记录`,
+  description: `查看@${usersStore.curUser.name} 的历史推文`,
 })
 </script>
 
@@ -103,6 +105,7 @@ useSeo({
       v-for="tweet in tweets"
       :key="tweet.id"
       :tweet="tweet"
+      :user="usersStore.curUser"
     />
   </section>
 
@@ -117,15 +120,14 @@ useSeo({
   </Button>
 
   <Loading
-    v-if="!noMore"
-    :loading="isFetching"
+    v-if="!noMore && isFetching"
   />
 
   <n-empty
     v-if="!tweets.length && !isFetching"
     class="my-8"
     size="large"
-    :description="`没有任何推文欸（@${name}）`"
+    description="没有任何推文欸"
   >
     <template #extra>
       <n-button

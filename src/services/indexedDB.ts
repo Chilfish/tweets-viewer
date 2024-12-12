@@ -9,7 +9,7 @@ interface TweetWithUid extends Tweet {
 
 export type TweetCollection = Collection<TweetWithUid, string, TweetWithUid>
 
-export class TwitterDB extends Dexie {
+export class TwitterIndexedDB extends Dexie {
   tweets: Dexie.Table<TweetWithUid, string>
 
   constructor() {
@@ -24,13 +24,13 @@ export class TwitterDB extends Dexie {
 }
 
 export class TweetDBService implements TweetService {
-  private db: TwitterDB
+  private db: TwitterIndexedDB
   name: string
   pageSize = 10
   isReverse = true
 
   constructor(name: string) {
-    this.db = new TwitterDB()
+    this.db = new TwitterIndexedDB()
     this.name = name
   }
 
