@@ -1,5 +1,5 @@
 {
-  "id": "2ab87bf0-2e5e-407b-b453-d66b1b9c6069",
+  "id": "95b22560-ce77-4c3a-a404-ddcf2e03f834",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -156,7 +156,15 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "tweets_tweet_id_unique": {
+          "name": "tweets_tweet_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "tweet_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false

@@ -6,7 +6,7 @@ import {
   Search,
   Sun,
 } from 'lucide-vue-next'
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import {
   Popover,
   PopoverContent,
@@ -14,17 +14,25 @@ import {
 } from '~/components/ui/popover'
 import { isDark } from '~/composables'
 import { useTweetStore } from '~/stores/tweets'
+import { useUsersStore } from '~/stores/users'
 import TwitterIcon from './icon/TwitterIcon'
 import UserList from './UserList.vue'
 
 const tweetStore = useTweetStore()
+const usersStore = useUsersStore()
+
 const day = 24 * 60 * 60 * 1000
 
+const tweetRange = computed(() => ({
+  start: usersStore.curUser.tweetStart.getTime(),
+  end: usersStore.curUser.tweetEnd.getTime(),
+}))
+
 function disableDate(ts: number) {
-  return ts < tweetStore.tweetRange.start - day || ts > tweetStore.tweetRange.end
+  return ts < tweetRange.value.start - day || ts > tweetRange.value.end
 }
 
-const dateRange = ref<[number, number]>([tweetStore.tweetRange.end, tweetStore.tweetRange.end])
+const dateRange = ref<[number, number]>([Date.now(), Date.now()])
 watch(dateRange, async () => {
   const [start, end] = dateRange.value || []
   tweetStore.getTweetsByDateRange(start, end + day)

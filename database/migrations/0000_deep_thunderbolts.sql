@@ -11,7 +11,8 @@ CREATE TABLE IF NOT EXISTS "tweets" (
 	"favorite_count" integer DEFAULT 0 NOT NULL,
 	"views_count" integer DEFAULT 0 NOT NULL,
 	"retweeted_status" json,
-	"quoted_status" json
+	"quoted_status" json,
+	CONSTRAINT "tweets_tweet_id_unique" UNIQUE("tweet_id")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "users" (

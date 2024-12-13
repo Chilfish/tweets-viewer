@@ -52,8 +52,8 @@ async function main(folder: string) {
 
   await writeJson(`${folder}/data-user.json`, {
     ...user,
-    tweetStart: tweet[0].created_at,
-    tweetEnd: tweet[tweet.length - 1].created_at,
+    tweetStart: tweet[tweet.length - 1].createdAt,
+    tweetEnd: tweet[0].createdAt,
     tweetCount: tweet.length,
   })
   await writeJson(`${folder}/data-tweet.json`, tweet)

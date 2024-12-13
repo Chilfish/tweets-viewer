@@ -10,10 +10,10 @@ export const proxyUrl = 'https://proxy.chilfish.top/?url='
 //   : 'https://proxy.chilfish.top/?url='
 
 // export const apiUrl = 'https://tweet-api.chilfish.top'
-export const apiUrl = isDev
-  ? '/api'
-  : isPreview
-    ? 'https://tweet-api-dev.chill4fish.workers.dev/'
+export const apiUrl = isPreview
+  ? 'https://tweet-api-dev.chill4fish.workers.dev/'
+  : isDev
+    ? '/api'
     : 'https://tweet-api.chilfish.top'
 
 export const staticUrl = isDev

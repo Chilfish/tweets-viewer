@@ -1,5 +1,6 @@
 import type { Tweet, User } from '@/types'
 import type { InsertTweet, InsertUser } from '../database'
+import { convertDate } from '@/utils/date'
 import { neon } from '@neondatabase/serverless'
 import { config } from 'dotenv'
 import { drizzle } from 'drizzle-orm/neon-http'
@@ -19,25 +20,6 @@ if (!DATABASE_URL) {
 
 const client = neon(DATABASE_URL)
 const db = drizzle({ client })
-
-function convertDate(obj: Record<string, any>) {
-  Object.entries(obj).forEach(([key, value]) => {
-    if (value === null) {
-      return
-    }
-    if (typeof value === 'object') {
-      return convertDate(value)
-    }
-    if (typeof value !== 'string') {
-      return
-    }
-
-    const date = new Date(value)
-    if (!Number.isNaN(date.getTime())) {
-      obj[key] = date
-    }
-  })
-}
 
 async function insertUser(user: InsertUser) {
   await createUser({ db, user })

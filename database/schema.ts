@@ -29,7 +29,7 @@ export const usersTable = pgTable('users', {
 
 export const tweetsTable = pgTable('tweets', {
   id: serial('id').primaryKey(),
-  tweetId: text('tweet_id').notNull(),
+  tweetId: text('tweet_id').notNull().unique(),
   userId: text('user_name')
     .notNull()
     .references(() => usersTable.screenName, { onDelete: 'cascade' }),
