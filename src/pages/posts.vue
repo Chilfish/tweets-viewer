@@ -3,9 +3,8 @@ import type { TweetsReturn } from '~/stores/tweets'
 import type { Tweet } from '~/types'
 import { useQuery } from '@tanstack/vue-query'
 import { useEventListener, useThrottleFn } from '@vueuse/core'
-import { computed, ref, watch } from 'vue'
+import { computed, ref, shallowRef, triggerRef, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import Loading from '~/components/icon/Loading'
 import { Post } from '~/components/posts/post'
 import { useSeo } from '~/composables'
 import { useTweetStore } from '~/stores/tweets'
@@ -13,8 +12,10 @@ import { useUsersStore } from '~/stores/users'
 
 const usersStore = useUsersStore()
 const tweetStore = useTweetStore()
-const tweets = ref<Tweet[]>([])
+const tweets = shallowRef<Tweet[]>([])
 const noMore = ref(false)
+const isFetching = ref(false)
+const isFirstLoad = ref(true)
 const route = useRoute()
 const queryType = ref<'search' | 'dateRange' | 'all'>('all')
 
@@ -45,7 +46,7 @@ watch(() => route.query, (query, oldQuery) => {
   }
 }, { immediate: true })
 
-const { data: queryData, isFetching } = useQuery({
+const { data: queryData } = useQuery({
   queryKey: computed(() => queryInfo.value.queryKey),
   queryFn: computed(() => queryInfo.value.queryFn),
   initialData: [],
@@ -53,13 +54,22 @@ const { data: queryData, isFetching } = useQuery({
 })
 
 watch(queryData, () => {
+  if (!isFirstLoad.value && tweets.value.length > 0) {
+    return
+  }
+
+  isFetching.value = queryData.value.length === 0
+  tweetStore.isLoading = isFetching.value
+
   if (queryData.value.length < 10)
     noMore.value = true
   else
     noMore.value = false
 
-  tweets.value = [...tweets.value, ...queryData.value]
-}, { immediate: true })
+  tweets.value.push(...queryData.value)
+  triggerRef(tweets)
+  isFirstLoad.value = false
+})
 
 function refresh() {
   location.reload()
@@ -88,7 +98,9 @@ watch([
 
 function reset() {
   tweets.value = []
-  tweetStore.resetPages()
+  noMore.value = false
+  isFirstLoad.value = true
+  triggerRef(tweets)
 }
 
 useSeo({
@@ -118,13 +130,9 @@ useSeo({
   >
     加载更多
   </Button>
-
-  <Loading
-    v-if="isFetching"
-  />
-
+<!--
   <n-empty
-    v-if="!tweets.length && !isFetching"
+    v-if="queryData.length === 0 && tweets.length === 0 && !isFetching"
     class="my-8"
     size="large"
     description="没有任何推文欸"
@@ -137,5 +145,5 @@ useSeo({
         刷新试试？
       </n-button>
     </template>
-  </n-empty>
+  </n-empty> -->
 </template>

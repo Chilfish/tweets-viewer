@@ -9,7 +9,9 @@ const tweetStore = useTweetStore()
 const usersStore = useUsersStore()
 
 onBeforeMount(async () => {
+  tweetStore.isLoading = true
   await usersStore.fetchUsers()
+  tweetStore.isLoading = false
 })
 </script>
 

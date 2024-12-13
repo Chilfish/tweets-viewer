@@ -2,18 +2,17 @@ import type { User } from '~/types'
 import { useRouteParams } from '@vueuse/router'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { fallbackUser } from '~/constant'
 import { request } from '~/utils/fetch'
 
 export const useUsersStore = defineStore('users', () => {
   const users = ref<User[]>([])
-  const name = useRouteParams<string>('name', fallbackUser)
+  const name = useRouteParams<string>('name', '')
 
   const curUser = computed<User>(() => {
     return users.value.find(user => user.screenName === name.value) || {
-      screenName: fallbackUser,
-      name: fallbackUser,
-      avatarUrl: fallbackUser,
+      screenName: '',
+      name: '',
+      avatarUrl: '',
       description: '',
       followersCount: 0,
       profileBannerUrl: '',

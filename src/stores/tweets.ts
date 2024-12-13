@@ -39,11 +39,10 @@ export const useTweetStore = defineStore('tweets', () => {
     })
   })
 
-  watch(() => route.params, async ({ name: newName }) => {
-    if (!newName || newName === usersStore.curUser?.screenName)
+  watch(screenName, async (newName) => {
+    if (!newName)
       return
-
-    tweetService.changeName(newName as string)
+    tweetService.changeName(newName)
     resetPages()
   })
 

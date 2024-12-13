@@ -16,6 +16,9 @@ export class ServerTweetService implements TweetService {
   }
 
   async getTweets(page: number) {
+    if (!this.name)
+      return []
+
     const res = await request.get<Tweet[]>(`/tweets/get/${this.name}`, {
       params: {
         page,
@@ -30,6 +33,8 @@ export class ServerTweetService implements TweetService {
     end: number,
     page: number,
   ) {
+    if (!this.name)
+      return []
     const res = await request.get<Tweet[]>(`/tweets/get/${this.name}/range`, {
       params: {
         start,
@@ -42,6 +47,8 @@ export class ServerTweetService implements TweetService {
   }
 
   async getLastYearsTodayData() {
+    if (!this.name)
+      return []
     const res = await request.get<Tweet[]>(`/tweets/get/${this.name}/last-years-today`, {
       params: {
         reverse: this.isReverse,
@@ -56,6 +63,8 @@ export class ServerTweetService implements TweetService {
     start?: number,
     end?: number,
   ) {
+    if (!this.name)
+      return []
     const res = await request.get<Tweet[]>(`/tweets/search/${this.name}`, {
       params: {
         q: keyword,
