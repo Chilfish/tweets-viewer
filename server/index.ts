@@ -8,7 +8,9 @@ import { contextStorage } from 'hono/context-storage'
 import { cors } from 'hono/cors'
 import tweetsApp from './routes/tweets'
 import usersApp from './routes/users'
+import configAppV1 from './routes/v1/config'
 import imageApp from './routes/v1/image'
+import tweetsAppV1 from './routes/v1/tweets'
 
 const app = new Hono<AppType>()
 
@@ -45,9 +47,12 @@ app
       message: 'Hello, World!',
     })
   })
+  .route('/tweets', tweetsAppV1)
+  .route('/config', configAppV1)
   .route('/image', imageApp)
-  .route('/tweets', tweetsApp)
-  .route('/users', usersApp)
+  .route('/v2/tweets', tweetsApp)
+  .route('/v2/users', usersApp)
+  .route('/v2/image', imageApp)
 
 app.onError((err, c) => {
   console.error(`${err}`)

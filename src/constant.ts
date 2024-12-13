@@ -14,7 +14,7 @@ export const apiUrl = isPreview
   ? 'https://tweet-api-dev.chill4fish.workers.dev/'
   : isDev
     ? '/api'
-    : 'https://tweet-api.chilfish.top'
+    : 'https://tweet-api.chilfish.top/v2'
 
 export const staticUrl = isDev
   ? '/static'

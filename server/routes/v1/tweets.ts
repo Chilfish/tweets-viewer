@@ -1,7 +1,7 @@
-import type { Tweet } from '@/types/tweets'
+import type { Tweet } from '@/types'
 import { getDate, now } from '@/utils/date'
 import { Hono } from 'hono'
-import { staticUrl } from '../common'
+import { staticUrl } from '../../common'
 
 const tweetsMap = new Map<string, Tweet[]>()
 const pageSize = 10
