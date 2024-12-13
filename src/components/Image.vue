@@ -6,8 +6,8 @@ import { placeholderSVG, proxyUrl } from '~/constant'
 const props = withDefaults(defineProps<{
   src: string
   alt?: string
-  width?: number
-  height?: number
+  width?: stirng
+  height?: string
   unsetWidth?: boolean
   lazy?: boolean
   fit?: 'fill' | 'contain' | 'cover' | 'none' | 'scale-down'
@@ -76,8 +76,8 @@ watch(() => props.src, () => {
     :src="placeholderSVG"
     :style="{
       objectFit: fit,
-      height: height ? `${height}px` : '100%',
-      width: width && `${width}px`,
+      height: height ? height : '100%',
+      width: width && width !== 'full' ? width : '100%',
     }"
   >
 </template>

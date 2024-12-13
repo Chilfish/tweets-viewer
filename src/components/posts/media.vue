@@ -39,7 +39,7 @@ const modal = useModal()
           'max-w-80': height > width && size === 1,
         })"
         :src="url?.replace('name=orig', 'name=small')"
-        :width="width"
+        :width="width ? `${width}px` : '100%'"
         :fit="size === 1 ? 'contain' : 'cover'"
         @click="modal.create({
           style: {
