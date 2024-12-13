@@ -3,7 +3,14 @@ import type { TweetsReturn } from '~/stores/tweets'
 import type { Tweet } from '~/types'
 import { useQuery } from '@tanstack/vue-query'
 import { useEventListener, useThrottleFn } from '@vueuse/core'
-import { computed, ref, shallowRef, triggerRef, watch } from 'vue'
+import {
+  computed,
+  onMounted,
+  ref,
+  shallowRef,
+  triggerRef,
+  watch,
+} from 'vue'
 import { useRoute } from 'vue-router'
 import { Post } from '~/components/posts/post'
 import { useSeo } from '~/composables'
@@ -15,7 +22,6 @@ const tweetStore = useTweetStore()
 const tweets = shallowRef<Tweet[]>([])
 const noMore = ref(false)
 const isFetching = ref(false)
-const isFirstLoad = ref(true)
 const route = useRoute()
 const queryType = ref<'search' | 'dateRange' | 'all'>('all')
 
@@ -46,18 +52,15 @@ watch(() => route.query, (query, oldQuery) => {
   }
 }, { immediate: true })
 
-const { data: queryData } = useQuery({
+const { data: queryData, refetch } = useQuery({
   queryKey: computed(() => queryInfo.value.queryKey),
   queryFn: computed(() => queryInfo.value.queryFn),
   initialData: [],
   refetchOnWindowFocus: false,
+  gcTime: 0,
 })
 
 watch(queryData, () => {
-  if (!isFirstLoad.value && tweets.value.length > 0) {
-    return
-  }
-
   isFetching.value = queryData.value.length === 0
   tweetStore.isLoading = isFetching.value
 
@@ -66,9 +69,12 @@ watch(queryData, () => {
   else
     noMore.value = false
 
+  const isSame = queryData.value[0]?.id === tweets.value[0]?.id
+  if (isSame)
+    return
+
   tweets.value.push(...queryData.value)
   triggerRef(tweets)
-  isFirstLoad.value = false
 })
 
 function refresh() {
@@ -99,13 +105,19 @@ watch([
 function reset() {
   tweets.value = []
   noMore.value = false
-  isFirstLoad.value = true
+  tweetStore.resetPages()
   triggerRef(tweets)
 }
 
 useSeo({
   title: `@${usersStore.curUser.name} 推文记录`,
   description: `查看@${usersStore.curUser.name} 的历史推文`,
+})
+
+onMounted(() => {
+  if (route.query.q) {
+    refetch()
+  }
 })
 </script>
 

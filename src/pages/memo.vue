@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useQuery } from '@tanstack/vue-query'
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import Loading from '~/components/icon/Loading'
 import { Post } from '~/components/posts/post'
 import { useSeo } from '~/composables'
@@ -14,6 +14,10 @@ const { data: tweets, isFetching } = useQuery({
   queryFn: () => tweetStore.tweetService.getLastYearsTodayData(),
   refetchOnWindowFocus: false,
   initialData: [],
+})
+
+watch(tweets, () => {
+  tweetStore.isLoading = isFetching.value
 })
 
 useSeo({

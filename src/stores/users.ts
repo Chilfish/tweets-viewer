@@ -33,7 +33,9 @@ export const useUsersStore = defineStore('users', () => {
   async function fetchUsers() {
     if (users.value.length > 0)
       return
-    const { data } = await request<User[]>('/users/get')
+    const { data } = await request<User[]>('/users/get', {
+      id: 'get-users',
+    })
     users.value = data
   }
 

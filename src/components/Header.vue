@@ -7,12 +7,14 @@ import {
   Sun,
 } from 'lucide-vue-next'
 import { computed, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '~/components/ui/popover'
 import { isDark } from '~/composables'
+import { fallbackUser } from '~/constant'
 import { useTweetStore } from '~/stores/tweets'
 import { useUsersStore } from '~/stores/users'
 import TwitterIcon from './icon/TwitterIcon'
@@ -20,6 +22,7 @@ import UserList from './UserList.vue'
 
 const tweetStore = useTweetStore()
 const usersStore = useUsersStore()
+const router = useRouter()
 
 const day = 24 * 60 * 60 * 1000
 
@@ -37,6 +40,15 @@ watch(dateRange, async () => {
   const [start, end] = dateRange.value || []
   tweetStore.getTweetsByDateRange(start, end + day)
 })
+
+const searchText = ref(new URLSearchParams(location.search).get('q') || '')
+function search() {
+  router.push({
+    query: {
+      q: searchText.value,
+    },
+  })
+}
 </script>
 
 <template>
@@ -74,7 +86,7 @@ watch(dateRange, async () => {
       </button>
 
       <RouterLink
-        :to="`/@${tweetStore.screenName}/memo`"
+        :to="`/@${tweetStore.screenName || fallbackUser}/memo`"
         title="那年今日"
       >
         <History class="h-6 w-6" />
@@ -85,7 +97,7 @@ watch(dateRange, async () => {
       class="w-60 flex items-center gap-4 md:w-100"
     >
       <n-input
-        v-model:value="tweetStore.searchText"
+        v-model:value="searchText"
         placeholder="Search"
         :input-props="{
           'aria-label': 'Search',
@@ -96,18 +108,14 @@ watch(dateRange, async () => {
         class="p-1"
         @keydown="(e: any) => {
           if (e.key === 'Enter') {
-            $router.push({
-              query: {
-                q: tweetStore.searchText,
-              },
-            })
+            search()
           }
         }"
       >
         <template #prefix>
           <Search
             class="h-4 w-4 cursor-pointer"
-            @click="() => tweetStore.search()"
+            @click="search"
           />
         </template>
       </n-input>

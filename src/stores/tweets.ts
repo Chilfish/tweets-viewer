@@ -1,7 +1,6 @@
 import type { QueryKey } from '@tanstack/vue-query'
 import type { Tweet } from '~/types'
 import { useDateFormat } from '@vueuse/core'
-import { useRouteQuery } from '@vueuse/router'
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -13,14 +12,17 @@ export interface TweetsReturn {
   queryKey: QueryKey
 }
 
+function curPage() {
+  return Number(new URLSearchParams(location.search).get('page') || 0)
+}
+
 export const useTweetStore = defineStore('tweets', () => {
   const usersStore = useUsersStore()
 
   const router = useRouter()
   const route = useRoute()
 
-  const page = useRouteQuery<number>('page', 0)
-  const searchText = useRouteQuery<string>('q')
+  const page = ref(curPage())
 
   const isLoading = ref(false)
   const isReverse = ref(true)
@@ -30,20 +32,14 @@ export const useTweetStore = defineStore('tweets', () => {
 
   const tweetService = new ServerTweetService(screenName.value)
 
-  watch(page, (val) => {
-    router.push({
-      query: {
-        ...route.query,
-        page: val,
-      },
-    })
-  })
-
   watch(screenName, async (newName) => {
     if (!newName)
       return
     tweetService.changeName(newName)
-    resetPages()
+  })
+
+  watch(() => route.path, () => {
+    page.value = curPage()
   })
 
   watch(isReverse, (val) => {
@@ -128,7 +124,6 @@ export const useTweetStore = defineStore('tweets', () => {
 
   return {
     page,
-    searchText,
     tweetService,
     isReverse,
     isLoading,
