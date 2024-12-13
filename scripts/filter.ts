@@ -48,7 +48,7 @@ export function filterUser(data: TweetData, birthday = new Date()): User {
   const user = _getUser(data)
   const { legacy } = user
 
-  const website = legacy.entities.url.urls[0].expanded_url
+  const website = legacy.entities.url?.urls[0].expanded_url || ''
 
   const bio = legacy.entities.description.urls
     .reduce(

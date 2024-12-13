@@ -1,10 +1,10 @@
 import type { Tweet, User } from '@/types'
 import type { InsertTweet, InsertUser } from '../database'
-import { convertDate } from '@/utils/date'
 import { neon } from '@neondatabase/serverless'
 import { config } from 'dotenv'
 import { drizzle } from 'drizzle-orm/neon-http'
 import { createTweets, createUser } from '../database'
+import { convertDate } from '../src/utils/date'
 import { dataFolders } from './index'
 import { readJson } from './utils'
 
@@ -37,8 +37,17 @@ async function insertTweets(folder: string, uid: string) {
   insertTweets.forEach(convertDate)
 
   console.log(`Inserting ${tweets.length} tweets to ${uid}`)
-  await createTweets(db, insertTweets)
-    .then(({ rowCount }) => console.log(`Inserted ${rowCount} tweets`))
+
+  const chunkSize = 1000
+  let insertedCount = 0
+
+  for (let i = 0; i < insertTweets.length; i += chunkSize) {
+    const chunk = insertTweets.slice(i, i + chunkSize)
+    await createTweets(db, chunk)
+      .then(({ rowCount }) => insertedCount += rowCount)
+  }
+
+  console.log(`Inserted ${insertedCount} Tweets`)
 }
 
 async function main() {
