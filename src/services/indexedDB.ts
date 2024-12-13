@@ -1,6 +1,6 @@
 import type { Collection } from 'dexie'
 import type { TweetService } from '.'
-import type { Tweet } from '../types/tweets'
+import type { Tweet } from '~/types'
 import Dexie from 'dexie'
 
 interface TweetWithUid extends Tweet {
@@ -9,7 +9,7 @@ interface TweetWithUid extends Tweet {
 
 export type TweetCollection = Collection<TweetWithUid, string, TweetWithUid>
 
-export class TwitterDB extends Dexie {
+export class TwitterIndexedDB extends Dexie {
   tweets: Dexie.Table<TweetWithUid, string>
 
   constructor() {
@@ -24,13 +24,13 @@ export class TwitterDB extends Dexie {
 }
 
 export class TweetDBService implements TweetService {
-  private db: TwitterDB
+  private db: TwitterIndexedDB
   name: string
   pageSize = 10
   isReverse = true
 
   constructor(name: string) {
-    this.db = new TwitterDB()
+    this.db = new TwitterIndexedDB()
     this.name = name
   }
 
@@ -68,7 +68,7 @@ export class TweetDBService implements TweetService {
 
     const lastYearsToday = await this.tweets()
       .filter((item) => {
-        const date = new Date(item.created_at)
+        const date = new Date(item.createdAt)
         return `${date.getMonth() + 1}-${date.getDate()}` === todayStr && item.uid === this.name
       })
       .toArray()
@@ -83,7 +83,7 @@ export class TweetDBService implements TweetService {
   ) {
     return await this.pagedTweets(page)
       .filter((t) => {
-        const date = new Date(t.created_at).getTime()
+        const date = new Date(t.createdAt).getTime()
         return date >= start && date <= end && t.uid === this.name
       })
       .toArray()
@@ -98,13 +98,13 @@ export class TweetDBService implements TweetService {
     return await this.tweets()
       .filter((t) => {
         const regex = new RegExp(keyword, 'i')
-        const isMatch = regex.test(t.full_text)
+        const isMatch = regex.test(t.fullText)
         return isMatch && t.uid === this.name
       })
       .offset(page * this.pageSize)
       .limit(this.pageSize)
       .filter((t) => {
-        const date = new Date(t.created_at).getTime()
+        const date = new Date(t.createdAt).getTime()
         return date >= start && date <= end
       })
       .toArray()

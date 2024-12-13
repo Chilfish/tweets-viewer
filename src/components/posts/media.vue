@@ -1,28 +1,20 @@
 <script setup lang="tsx">
+import type { TweetMedia } from '~/types'
 import { useModal } from 'naive-ui'
 import { h } from 'vue'
+import { cn } from '~/utils'
 import Image from '../Image.vue'
 
 const props = defineProps<{
-  media: string[]
+  media: TweetMedia[]
 }>()
 
 defineEmits<{
   error: []
 }>()
 
-function isVideo(url: string) {
-  if (!url)
-    return false
-  return url.includes('https://video.twimg.com/')
-}
-
 const size = props.media.length
-const maxWidth = 900 // px
-const maxHeight = 500 // px
 const cols = size > 1 ? 2 : 1
-const height = size > 1 ? maxHeight / 2 : maxHeight
-const width = size > 1 ? maxWidth / 2 : maxWidth
 
 const modal = useModal()
 </script>
@@ -36,16 +28,19 @@ const modal = useModal()
     }"
   >
     <div
-      v-for="url in media"
+      v-for="({ url, type, width, height }) in media"
       :key="url"
       class="relative"
     >
       <Image
-        v-if="!isVideo(url)"
+        v-if="type !== 'video'"
+        :class="cn({
+          'max-h-80': size > 1,
+          'max-w-80': height > width && size === 1,
+        })"
         :src="url?.replace('name=orig', 'name=small')"
         :width="width"
-        :height="height"
-        :unset-width="size === 1"
+        :fit="size === 1 ? 'contain' : 'cover'"
         @click="modal.create({
           style: {
             width: 'auto',

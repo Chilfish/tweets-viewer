@@ -1,0 +1,46 @@
+import type { Tweet } from '@/types'
+import path from 'node:path'
+import glob from 'fast-glob'
+import { dataFolder } from './index'
+import { readJson, writeJson } from './utils'
+
+function toTweet(data: any): Tweet | null {
+  if (data.retweeted_status) {
+    return null
+  }
+
+  return {
+    id: data.id,
+    tweetId: data.id,
+    fullText: data.full_text,
+    createdAt: new Date(data.created_at),
+    media: data.media.map((url: string) => ({
+      url,
+      type: url.includes('video') ? 'video' : 'photo',
+      width: 0,
+      height: 0,
+    })),
+    quoteCount: data.quote_count,
+    replyCount: data.reply_count,
+    viewsCount: data.views_count,
+    retweetCount: data.retweet_count,
+    favoriteCount: data.favorite_count,
+
+    retweetedStatus: null,
+    quotedStatus: null,
+  }
+}
+
+const files = await glob('D:/Codes/static/tweet/data-*.json')
+
+for (const file of files) {
+  const data = await readJson(file, [])
+  const tweets = data.map(toTweet).filter(Boolean) as Tweet[]
+  const filename = path.basename(file)
+  const screenName = filename.replace('data-', '').replace('.json', '')
+
+  await writeJson(
+    `${dataFolder}/${screenName}/${filename.replace('data-', 'data-old-')}`,
+    tweets,
+  )
+}

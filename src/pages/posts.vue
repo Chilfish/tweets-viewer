@@ -1,18 +1,27 @@
 <script setup lang="ts">
+import type { TweetsReturn } from '~/stores/tweets'
+import type { Tweet } from '~/types'
 import { useQuery } from '@tanstack/vue-query'
 import { useEventListener, useThrottleFn } from '@vueuse/core'
-import { computed, ref, watch } from 'vue'
+import {
+  computed,
+  onMounted,
+  ref,
+  shallowRef,
+  triggerRef,
+  watch,
+} from 'vue'
 import { useRoute } from 'vue-router'
-import Loading from '~/components/icon/Loading'
 import { Post } from '~/components/posts/post'
 import { useSeo } from '~/composables'
 import { useTweetStore } from '~/stores/tweets'
-import type { TweetsReturn } from '~/stores/tweets'
-import type { Tweet } from '~/types/tweets'
+import { useUsersStore } from '~/stores/users'
 
+const usersStore = useUsersStore()
 const tweetStore = useTweetStore()
-const tweets = ref<Tweet[]>([])
+const tweets = shallowRef<Tweet[]>([])
 const noMore = ref(false)
+const isFetching = ref(false)
 const route = useRoute()
 const queryType = ref<'search' | 'dateRange' | 'all'>('all')
 
@@ -43,21 +52,30 @@ watch(() => route.query, (query, oldQuery) => {
   }
 }, { immediate: true })
 
-const { data: queryData, isFetching } = useQuery({
+const { data: queryData, refetch } = useQuery({
   queryKey: computed(() => queryInfo.value.queryKey),
   queryFn: computed(() => queryInfo.value.queryFn),
   initialData: [],
   refetchOnWindowFocus: false,
+  gcTime: 0,
 })
 
 watch(queryData, () => {
+  isFetching.value = queryData.value.length === 0
+  tweetStore.isLoading = isFetching.value
+
   if (queryData.value.length < 10)
     noMore.value = true
   else
     noMore.value = false
 
-  tweets.value = [...tweets.value, ...queryData.value]
-}, { immediate: true })
+  const isSame = queryData.value[0]?.id === tweets.value[0]?.id
+  if (isSame)
+    return
+
+  tweets.value.push(...queryData.value)
+  triggerRef(tweets)
+})
 
 function refresh() {
   location.reload()
@@ -68,6 +86,7 @@ const loadMore = useThrottleFn(() => {
     return
   tweetStore.nextPage()
 }, 1000)
+
 useEventListener(window, 'scroll', () => {
   const offset = 100
   const scrollHeight = document.documentElement.scrollHeight
@@ -85,13 +104,20 @@ watch([
 
 function reset() {
   tweets.value = []
+  noMore.value = false
   tweetStore.resetPages()
+  triggerRef(tweets)
 }
 
-const name = tweetStore.curConfig.username
 useSeo({
-  title: `@${name} 推文记录`,
-  description: `查看@${name} 的历史推文`,
+  title: `@${usersStore.curUser.name} 推文记录`,
+  description: `查看@${usersStore.curUser.name} 的历史推文`,
+})
+
+onMounted(() => {
+  if (route.query.q) {
+    refetch()
+  }
 })
 </script>
 
@@ -103,6 +129,7 @@ useSeo({
       v-for="tweet in tweets"
       :key="tweet.id"
       :tweet="tweet"
+      :user="usersStore.curUser"
     />
   </section>
 
@@ -115,17 +142,12 @@ useSeo({
   >
     加载更多
   </Button>
-
-  <Loading
-    v-if="!noMore"
-    :loading="isFetching"
-  />
-
+<!--
   <n-empty
-    v-if="!tweets.length && !isFetching"
+    v-if="queryData.length === 0 && tweets.length === 0 && !isFetching"
     class="my-8"
     size="large"
-    :description="`没有任何推文欸（@${name}）`"
+    description="没有任何推文欸"
   >
     <template #extra>
       <n-button
@@ -135,5 +157,5 @@ useSeo({
         刷新试试？
       </n-button>
     </template>
-  </n-empty>
+  </n-empty> -->
 </template>

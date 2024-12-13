@@ -1,29 +1,33 @@
+import type { AppType } from './common'
 import { formatDate, getDate, now } from '@/utils/date'
 import { cloudflareRateLimiter } from '@hono-rate-limiter/cloudflare'
+import { neon } from '@neondatabase/serverless'
+import { drizzle } from 'drizzle-orm/neon-http'
 import { Hono } from 'hono'
+import { contextStorage } from 'hono/context-storage'
 import { cors } from 'hono/cors'
-
-import configApp from './routes/config'
-import imageApp from './routes/image'
 import tweetsApp from './routes/tweets'
-
-interface AppType {
-  Variables: {
-    rateLimit: boolean
-  }
-  Bindings: {
-    RATE_LIMITER: RateLimit
-  }
-}
+import usersApp from './routes/users'
+import configAppV1 from './routes/v1/config'
+import imageApp from './routes/v1/image'
+import tweetsAppV1 from './routes/v1/tweets'
 
 const app = new Hono<AppType>()
 
 app
+  .use(contextStorage())
   .use(cors())
   .use(cloudflareRateLimiter<AppType>({
     rateLimitBinding: c => c.env.RATE_LIMITER,
     keyGenerator: c => c.req.header('cf-connecting-ip') ?? c.req.header('x-forwarded-for') ?? 'unknown',
   }))
+  .use(async (c, next) => {
+    const { DATABASE_URL } = c.env
+    const sql = neon(DATABASE_URL)
+    const db = drizzle({ client: sql })
+    c.set('db', db)
+    return next()
+  })
 
 app
   .get('/', (c) => {
@@ -43,9 +47,17 @@ app
       message: 'Hello, World!',
     })
   })
+  .route('/tweets', tweetsAppV1)
+  .route('/config', configAppV1)
   .route('/image', imageApp)
-  .route('/tweets', tweetsApp)
-  .route('/config', configApp)
+  .route('/v2/tweets', tweetsApp)
+  .route('/v2/users', usersApp)
+  .route('/v2/image', imageApp)
+
+app.onError((err, c) => {
+  console.error(`${err}`)
+  return c.json(err, 500)
+})
 
 export default {
   fetch: app.fetch,

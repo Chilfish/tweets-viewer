@@ -44,3 +44,22 @@ export function now(
 ) {
   return getDate(new Date(), timezone)
 }
+
+export function convertDate(obj: Record<string, any>) {
+  Object.entries(obj).forEach(([key, value]) => {
+    if (value === null) {
+      return
+    }
+    if (typeof value === 'object') {
+      return convertDate(value)
+    }
+    if (typeof value !== 'string') {
+      return
+    }
+
+    const date = new Date(value)
+    if (!Number.isNaN(date.getTime())) {
+      obj[key] = date
+    }
+  })
+}

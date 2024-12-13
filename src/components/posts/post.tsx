@@ -1,9 +1,12 @@
-import { defineComponent, ref } from 'vue'
+import type { Tweet, TweetMedia, UserInfo } from '~/types'
+import { useRouteParams } from '@vueuse/router'
+import { Repeat2 } from 'lucide-vue-next'
+import { computed, defineComponent, ref } from 'vue'
 import { Card, CardContent } from '~/components/ui/card'
-import { useTweetStore } from '~/stores/tweets'
-import type { Tweet } from '~/types/tweets'
+import { fallbackUser } from '~/constant'
+import { tweetUrl } from '~/utils'
+import { formatDate } from '~/utils/date'
 import { PostActions } from './actions'
-import { Link } from './link'
 import PostMedia from './media.vue'
 import { PostProfile } from './profile'
 import { PostText } from './text'
@@ -14,14 +17,13 @@ const PostContent = defineComponent({
       type: String,
       required: true,
     },
-    quoutId: String as () => Tweet['quoted_status'],
     media: {
-      type: Array as () => string[],
+      type: Array as () => TweetMedia[],
       default: () => [],
     },
   },
   emits: ['imgError'],
-  setup({ text, media, quoutId }, { emit }) {
+  setup({ text, media }, { emit }) {
     return () => (
       <CardContent class="pb-2">
         <PostText text={text} />
@@ -29,15 +31,87 @@ const PostContent = defineComponent({
           onError={() => emit('imgError')}
           media={media.filter(Boolean)}
         />
-        {quoutId && (
-          <p
-            class="rounded-lg bg-gray-100 p-2 px-3 text-3.5 dark:bg-gray-800"
-          >
-            这是一条转发推文，查看
-            {Link(`https://x.com/i/status/${quoutId}`, '原文')}
-          </p>
-        )}
       </CardContent>
+    )
+  },
+})
+
+const PostCard = defineComponent({
+  props: {
+    tweet: {
+      type: Object as () => Tweet,
+      required: true,
+    },
+    user: {
+      type: Object as () => UserInfo,
+      required: true,
+    },
+    retweet: {
+      type: Object as () => {
+        name: string
+        createdAt: Date
+        id: string
+      },
+    },
+  },
+  setup({ tweet, user, retweet }) {
+    const curUserName = useRouteParams<string>('name', fallbackUser)
+    const url = tweetUrl(user.screenName, tweet.tweetId)
+    const link = ref(url)
+    const isQuote = tweet.quotedStatus !== null
+    const isMainTweet = computed(() => curUserName.value === user.screenName || !!retweet)
+
+    return () => (
+      <Card
+        class="mx-auto w-full pt-4"
+      >
+        {retweet && (
+          <div
+            class="flex cursor-pointer items-center px-6 text-gray-600 space-x-1.5 dark:text-gray-400 hover:text-main"
+          >
+            <Repeat2 />
+            <a
+              class="text-sm"
+              href={tweetUrl('i/web', retweet.id)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {`@${retweet.name} 在 ${formatDate(retweet.createdAt, { timezone: 'tokyo' })} 转推了`}
+            </a>
+          </div>
+        )}
+
+        <PostProfile
+          time={new Date(tweet.createdAt)}
+          name={user.name}
+          screenName={user.screenName}
+        />
+        <PostContent
+          text={tweet.fullText}
+          media={tweet.media}
+          onImgError={() => {
+            link.value = `https://web.archive.org/web/${url}`
+          }}
+        />
+
+        {isQuote && (
+          <PostCard
+            tweet={tweet.quotedStatus!.tweet}
+            user={tweet.quotedStatus!.user}
+            class="mx-6 mb-2 shadow-none w-90%!"
+          />
+        )}
+
+        { isMainTweet.value && (
+          <PostActions
+            comment={tweet.replyCount}
+            retweet={tweet.retweetCount + tweet.quoteCount}
+            like={tweet.favoriteCount}
+            view={tweet.viewsCount}
+            link={link.value}
+          />
+        )}
+      </Card>
     )
   },
 })
@@ -49,43 +123,25 @@ export const Post = defineComponent({
       required: true,
     },
     user: {
-      type: Object as () => {
-        name: string
-        screen_name: string
-      },
+      type: Object as () => UserInfo,
+      required: true,
     },
   },
   setup({ tweet, user }) {
-    const curUser = useTweetStore().curConfig
-    const username = user?.name || curUser.username || 'username'
-    const screenName = user?.screen_name || curUser.name.replace('data-', '') || 'i/web'
-
-    const url = `https://twitter.com/${screenName}/status/${tweet.id}`
-    const link = ref(url)
+    const isRetweet = tweet.retweetedStatus !== null
 
     return () => (
-      <Card class="mx-auto min-w-full">
-        <PostProfile
-          time={tweet.created_at}
-          name={username}
-          screen_name={screenName}
-        />
-        <PostContent
-          text={tweet.full_text}
-          quoutId={tweet.quoted_status}
-          media={tweet.media}
-          onImgError={() => {
-            link.value = `https://web.archive.org/web/${url}`
-          }}
-        />
-        <PostActions
-          comment={tweet.reply_count}
-          retweet={tweet.retweet_count + tweet.quote_count}
-          like={tweet.favorite_count}
-          view={tweet.views_count}
-          link={link.value}
-        />
-      </Card>
+      <PostCard
+        tweet={isRetweet ? tweet.retweetedStatus!.tweet : tweet}
+        user={isRetweet ? tweet.retweetedStatus!.user : user}
+        retweet={isRetweet
+          ? {
+              name: user.name,
+              createdAt: tweet.createdAt,
+              id: tweet.tweetId,
+            }
+          : undefined}
+      />
     )
   },
 })

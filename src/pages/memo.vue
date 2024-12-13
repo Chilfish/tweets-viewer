@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { useQuery } from '@tanstack/vue-query'
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import Loading from '~/components/icon/Loading'
 import { Post } from '~/components/posts/post'
 import { useSeo } from '~/composables'
 import { useTweetStore } from '~/stores/tweets'
+import { useUsersStore } from '~/stores/users'
 
 const tweetStore = useTweetStore()
+const usersStore = useUsersStore()
 const { data: tweets, isFetching } = useQuery({
   queryKey: ['memo', computed(() => tweetStore.isReverse)],
   queryFn: () => tweetStore.tweetService.getLastYearsTodayData(),
@@ -14,11 +16,13 @@ const { data: tweets, isFetching } = useQuery({
   initialData: [],
 })
 
-const name = tweetStore.curConfig.username
+watch(tweets, () => {
+  tweetStore.isLoading = isFetching.value
+})
 
 useSeo({
-  title: `@${name} 推文的那年今日`,
-  description: `@${name} 在这一天的推文`,
+  title: `@${usersStore.curUser.name} 推文的那年今日`,
+  description: `@${usersStore.curUser.name} 在这一天的推文`,
 })
 </script>
 
@@ -28,6 +32,7 @@ useSeo({
       v-for="tweet in tweets"
       :key="tweet.id"
       :tweet="tweet"
+      :user="usersStore.curUser"
     />
 
     <n-empty

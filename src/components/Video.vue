@@ -17,7 +17,7 @@ const observer = new IntersectionObserver((entries) => {
       video.src = isGoodNetwork.value ? props.src : proxyUrl + props.src
       video.onerror = (e) => {
         console.error(e)
-        video.src = ''
+        video.remove()
       }
       observer.unobserve(entry.target)
     }

@@ -10,8 +10,10 @@ const props = withDefaults(defineProps<{
   height?: number
   unsetWidth?: boolean
   lazy?: boolean
+  fit?: 'fill' | 'contain' | 'cover' | 'none' | 'scale-down'
 }>(), {
   lazy: true,
+  fit: 'contain',
 })
 
 const emits = defineEmits<{
@@ -73,9 +75,9 @@ watch(() => props.src, () => {
     :alt
     :src="placeholderSVG"
     :style="{
-      objectFit: 'cover',
-      height: `${height}px`,
-      width: unsetWidth ? undefined : `${width}px`,
+      objectFit: fit,
+      height: height ? `${height}px` : '100%',
+      width: width && `${width}px`,
     }"
   >
 </template>

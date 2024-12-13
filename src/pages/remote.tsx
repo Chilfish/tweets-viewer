@@ -1,19 +1,21 @@
+import type { Tweet } from '~/types'
 import { useEventListener, useFetch } from '@vueuse/core'
 import { defineComponent, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import Loading from '~/components/icon/Loading'
 import { Post } from '~/components/posts/post'
 import { Button } from '~/components/ui/button'
-import type { Tweet } from '~/types/tweets'
+import { useUsersStore } from '~/stores/users'
 
 interface TweetWithUser extends Tweet {
   name: string
-  screen_name: string
+  screenName: string
 }
 
 export default defineComponent({
   name: 'Remote',
   setup() {
+    const usersStore = useUsersStore()
     const { url, reverse } = useRoute().query as { url: string, reverse: string }
     const { data, isFinished, isFetching } = useFetch(url, {
       mode: 'cors',
@@ -64,10 +66,7 @@ export default defineComponent({
             <Post
               key={tweet.id}
               tweet={tweet}
-              user={{
-                name: tweet.name,
-                screen_name: tweet.screen_name,
-              }}
+              user={usersStore.curUser}
             />
           ))}
         </section>

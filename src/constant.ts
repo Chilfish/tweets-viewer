@@ -2,15 +2,19 @@ export const placeholderSVG = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDo
 
 export const isDev = import.meta.env?.DEV || process.env.NODE_ENV === 'development'
 
+const isPreview = process.env.NODE_ENV === 'preview'
+
 export const proxyUrl = 'https://proxy.chilfish.top/?url='
 // export const proxyUrl = isDev
 //   ? 'http://localhost:8787/?url='
 //   : 'https://proxy.chilfish.top/?url='
 
 // export const apiUrl = 'https://tweet-api.chilfish.top'
-export const apiUrl = isDev
-  ? '/api'
-  : 'https://tweet-api.chilfish.top'
+export const apiUrl = isPreview
+  ? 'https://tweet-api-dev.chill4fish.workers.dev/'
+  : isDev
+    ? '/api'
+    : 'https://tweet-api.chilfish.top/v2'
 
 export const staticUrl = isDev
   ? '/static'

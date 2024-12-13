@@ -24,3 +24,7 @@ dist-ssr
 .wrangler
 
 auto-*.d.ts
+.env
+wrangler.toml
+
+.vercel

@@ -1,5 +1,5 @@
 import type { TweetService } from '.'
-import type { Tweet } from '~/types/tweets'
+import type { Tweet } from '~/types'
 import { request } from '~/utils/fetch'
 
 export class ServerTweetService implements TweetService {
@@ -15,12 +15,20 @@ export class ServerTweetService implements TweetService {
     this.name = name
   }
 
+  private queryKey(keys: Record<string, any>, domain: string): string {
+    return `${domain}-${this.name}-${JSON.stringify(keys)}-${this.isReverse ? 'reverse' : 'normal'}`
+  }
+
   async getTweets(page: number) {
+    if (!this.name)
+      return []
+
     const res = await request.get<Tweet[]>(`/tweets/get/${this.name}`, {
       params: {
         page,
         reverse: this.isReverse,
       },
+      id: this.queryKey({ page }, 'get'),
     })
     return res.data
   }
@@ -30,6 +38,8 @@ export class ServerTweetService implements TweetService {
     end: number,
     page: number,
   ) {
+    if (!this.name)
+      return []
     const res = await request.get<Tweet[]>(`/tweets/get/${this.name}/range`, {
       params: {
         start,
@@ -37,15 +47,19 @@ export class ServerTweetService implements TweetService {
         page,
         reverse: this.isReverse,
       },
+      id: this.queryKey({ start, end, page }, 'range'),
     })
     return res.data
   }
 
   async getLastYearsTodayData() {
+    if (!this.name)
+      return []
     const res = await request.get<Tweet[]>(`/tweets/get/${this.name}/last-years-today`, {
       params: {
         reverse: this.isReverse,
       },
+      id: this.queryKey({}, 'last-years-today'),
     })
     return res.data
   }
@@ -56,6 +70,8 @@ export class ServerTweetService implements TweetService {
     start?: number,
     end?: number,
   ) {
+    if (!this.name)
+      return []
     const res = await request.get<Tweet[]>(`/tweets/search/${this.name}`, {
       params: {
         q: keyword,
@@ -64,6 +80,7 @@ export class ServerTweetService implements TweetService {
         end: end || undefined,
         reverse: this.isReverse,
       },
+      id: this.queryKey({ keyword, page, start, end }, 'search'),
     })
     return res.data
   }
