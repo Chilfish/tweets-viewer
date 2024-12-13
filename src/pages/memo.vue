@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useQuery } from '@tanstack/vue-query'
-import { computed, watch } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import Loading from '~/components/icon/Loading'
 import { Post } from '~/components/posts/post'
 import { useSeo } from '~/composables'
@@ -9,11 +9,12 @@ import { useUsersStore } from '~/stores/users'
 
 const tweetStore = useTweetStore()
 const usersStore = useUsersStore()
-const { data: tweets, isFetching } = useQuery({
+const { data: tweets, isFetching, refetch } = useQuery({
   queryKey: ['memo', computed(() => tweetStore.isReverse)],
   queryFn: () => tweetStore.tweetService.getLastYearsTodayData(),
-  refetchOnWindowFocus: false,
   initialData: [],
+  refetchOnWindowFocus: false,
+  gcTime: 0,
 })
 
 watch(tweets, () => {
@@ -23,6 +24,10 @@ watch(tweets, () => {
 useSeo({
   title: `@${usersStore.curUser.name} 推文的那年今日`,
   description: `@${usersStore.curUser.name} 在这一天的推文`,
+})
+
+onMounted(() => {
+  refetch()
 })
 </script>
 
