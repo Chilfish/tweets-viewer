@@ -46,7 +46,7 @@ function links(text: ParsedText) {
     return text
   }
 
-  const regex = /(https:\/\/t.co\/\w+)/g
+  const regex = /(https?:\/\/\S+)/g
   const parts = text.split(regex)
 
   return parts.map((part) => {

@@ -3,7 +3,6 @@ import { useRouteParams } from '@vueuse/router'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { fallbackUser } from '~/constant'
-import { convertDate } from '~/utils/date'
 import { request } from '~/utils/fetch'
 
 export const useUsersStore = defineStore('users', () => {
@@ -36,7 +35,6 @@ export const useUsersStore = defineStore('users', () => {
     if (users.value.length > 0)
       return
     const { data } = await request<User[]>('/users/get')
-    data.forEach(convertDate)
     users.value = data
   }
 

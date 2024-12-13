@@ -120,7 +120,7 @@ useSeo({
   </Button>
 
   <Loading
-    v-if="!noMore && isFetching"
+    v-if="isFetching"
   />
 
   <n-empty
