@@ -10,6 +10,7 @@ import {
   shallowRef,
   triggerRef,
   watch,
+  watchEffect,
 } from 'vue'
 import { useRoute } from 'vue-router'
 import { Post } from '~/components/posts/post'
@@ -109,9 +110,11 @@ function reset() {
   triggerRef(tweets)
 }
 
-useSeo({
-  title: `@${usersStore.curUser.name} 推文记录`,
-  description: `查看@${usersStore.curUser.name} 的历史推文`,
+watchEffect(() => {
+  useSeo({
+    title: `@${usersStore.curUser.name} 推文记录`,
+    description: `查看@${usersStore.curUser.name} 的历史推文`,
+  })
 })
 
 onMounted(() => {

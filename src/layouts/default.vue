@@ -21,9 +21,10 @@ onBeforeMount(async () => {
   >
     <Header />
 
+    <slot />
+
     <Loading v-if="tweetStore.isLoading" />
 
-    <slot />
     <n-back-top :right="20" />
   </main>
 </template>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Tweet } from '~/types'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watchEffect } from 'vue'
 import { Post } from '~/components/posts/post'
 import { useSeo } from '~/composables'
 import { useTweetStore } from '~/stores/tweets'
@@ -11,9 +11,11 @@ const usersStore = useUsersStore()
 
 const tweets = ref<Tweet[]>([])
 
-useSeo({
-  title: `@${usersStore.curUser.name} 推文的那年今日`,
-  description: `@${usersStore.curUser.name} 在这一天的推文`,
+watchEffect(() => {
+  useSeo({
+    title: `@${usersStore.curUser.name} 推文的那年今日`,
+    description: `@${usersStore.curUser.name} 在这一天的推文`,
+  })
 })
 
 onMounted(async () => {

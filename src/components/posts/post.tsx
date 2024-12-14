@@ -72,7 +72,7 @@ const PostCard = defineComponent({
             <Repeat2 />
             <a
               class="text-sm"
-              href={tweetUrl('i/web', retweet.id)}
+              href={tweetUrl(curUserName.value, retweet.id)}
               target="_blank"
               rel="noopener noreferrer"
             >
