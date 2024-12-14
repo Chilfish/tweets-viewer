@@ -117,9 +117,12 @@ function _filterTweet(data: TextData): Tweet {
   return {
     id: tweet.id_str,
     tweetId: tweet.id_str,
+    userId: filterUserInfo(data).screenName,
+
     createdAt: new Date(tweet.created_at),
     fullText: isRetweet ? 'RT' : text,
     media,
+
     retweetCount: tweet.retweet_count,
     quoteCount: tweet.quote_count,
     replyCount: tweet.reply_count,

@@ -3,7 +3,7 @@ import type { TweetData } from './filter'
 import glob from 'fast-glob'
 import pMap from 'p-map'
 import { filterTweet, filterUser } from './filter'
-import { isNotInImport, readJson, uniqueObj, writeJson } from './utils'
+import { isNotInImport, mergeData, readJson, uniqueObj, writeJson } from './utils'
 
 export const dataFolder = `D:/Downloads/tweet-data`
 
@@ -43,16 +43,16 @@ async function mergeOld(
   const oldFiles = await glob(`${folder}/data-old-*.json`)
   const oldData = (await pMap(oldFiles, file => readJson<Tweet[]>(file))).flatMap(d => d)
 
-  // only add old data that is not in new data
-  newData.push(
-    ...oldData.filter(
-      old => !newData.some(
-        newD => newD.id === old.id,
-      ),
-    ),
-  )
+  // only add old data that is not in new data,
+  // if the old data is in new data, it will be replaced
+  const mergedData = mergeData(oldData, newData, 'id')
+    .sort((a, b) => b.id.localeCompare(a.id))
+    .map(tweet => ({
+      ...tweet,
+      userId: newData[0].userId,
+    }))
 
-  return newData.sort((a, b) => b.id.localeCompare(a.id))
+  return mergedData
 }
 
 async function main(folder: string) {
@@ -61,22 +61,24 @@ async function main(folder: string) {
   const birthday = await glob(`${folder}/birthday_*`)
     .then(name => name[0]?.split('_').pop())
 
-  console.log(folder, data.length, birthday)
-
   if (!data.length) {
     return
   }
 
   const user = filterUser(data[0], new Date(birthday || ''))
-  const tweet = data.map(filterTweet)
+  const tweet = data
+    .map(filterTweet)
+    .filter(tweet => tweet.userId === user.screenName)
 
   const mergedData = await mergeOld(folder, tweet)
 
+  console.log(folder, mergedData.length, birthday)
+
   await writeJson(`${folder}/data-user.json`, {
     ...user,
-    tweetStart: tweet[tweet.length - 1].createdAt,
-    tweetEnd: tweet[0].createdAt,
-    tweetCount: tweet.length,
+    tweetStart: mergedData[mergedData.length - 1].createdAt,
+    tweetEnd: mergedData[0].createdAt,
+    tweetCount: mergedData.length,
   })
   await writeJson(`${folder}/data-tweet.json`, mergedData)
 }

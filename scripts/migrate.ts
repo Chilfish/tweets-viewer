@@ -4,7 +4,10 @@ import glob from 'fast-glob'
 import { dataFolder } from './index'
 import { readJson, writeJson } from './utils'
 
-function toTweet(data: any): Tweet | null {
+function toTweet(
+  data: any,
+  uid: string,
+): Tweet | null {
   if (data.retweeted_status) {
     return null
   }
@@ -12,6 +15,7 @@ function toTweet(data: any): Tweet | null {
   return {
     id: data.id,
     tweetId: data.id,
+    userId: uid,
     fullText: data.full_text,
     createdAt: new Date(data.created_at),
     media: data.media.map((url: string) => ({
@@ -34,10 +38,12 @@ function toTweet(data: any): Tweet | null {
 const files = await glob('D:/Codes/static/tweet/data-*.json')
 
 for (const file of files) {
-  const data = await readJson(file, [])
-  const tweets = data.map(toTweet).filter(Boolean) as Tweet[]
   const filename = path.basename(file)
   const screenName = filename.replace('data-', '').replace('.json', '')
+  const data = await readJson(file, [])
+  const tweets = data.map(
+    tweet => toTweet(tweet, screenName),
+  ).filter(Boolean) as Tweet[]
 
   await writeJson(
     `${dataFolder}/${screenName}/${filename.replace('data-', 'data-old-')}`,
