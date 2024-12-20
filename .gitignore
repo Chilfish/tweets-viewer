@@ -28,3 +28,4 @@ auto-*.d.ts
 wrangler.toml
 
 .vercel
+tmp

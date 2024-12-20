@@ -43,7 +43,6 @@ export const root = path.resolve(fileURLToPath(import.meta.url), '../../')
 
 interface DirOptions {
   path: string
-  root?: boolean
   user?: boolean
 }
 
@@ -51,12 +50,10 @@ export function dir(options: string | DirOptions): string {
   let _path = ''
 
   if (typeof options !== 'string') {
-    if (options.root)
-      _path = path.resolve(root, options.path)
-    else if (options.user)
+    if (options.user)
       _path = path.resolve(os.homedir(), options.path)
     else
-      _path = path.resolve(options.path)
+      _path = path.resolve(root, options.path)
   }
   else {
     if (path.isAbsolute(options))
@@ -65,14 +62,19 @@ export function dir(options: string | DirOptions): string {
       _path = path.resolve(root, options)
   }
 
-  const isFile = !!_path.split('/').at(-1)?.includes('.')
-  const _dir = isFile ? path.dirname(_path) : _path
+  const _dir = path.dirname(_path)
 
   if (!existsSync(_dir)) {
     mkdir(_dir, { recursive: true })
   }
 
   return _path
+}
+
+export function baseDir(options: string | DirOptions) {
+  const base = dir(options)
+
+  return (sub: string) => dir(path.join(base, sub))
 }
 
 export async function writeJson(
@@ -121,6 +123,24 @@ export async function readJson<T = any>(
 
     throw new Error('Invalid JSON data.')
   }
+}
+
+export async function cachedData<T>(
+  dest: string,
+  getter: () => Promise<T>,
+  force = false,
+) {
+  try {
+    if (!force)
+      return await readJson<T>(dest)
+  }
+  catch {
+    // ignore
+  }
+
+  const data = await getter()
+  await writeJson(dest, data)
+  return data
 }
 
 export function tweetUrl(id: string, name = 'i') {
