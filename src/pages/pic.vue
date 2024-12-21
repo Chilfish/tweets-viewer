@@ -21,8 +21,13 @@ interface ImgData {
 const name = location.pathname.split('/')[1]?.replace('@', '') || fallbackUser
 
 const { data: imgData, refetch, isFetching } = useQuery({
-  queryKey: ['tweets-search'],
-  queryFn: () => request.get<ImgData>(`/image/get?name=${name}`).then(res => res.data),
+  queryKey: ['tweets-pic'],
+  queryFn: () => request.get<ImgData>(`/image/get`, {
+    id: `tweets-pic-${name}-${Date.now()}`,
+    params: {
+      name,
+    },
+  }).then(res => res.data),
   initialData: null,
   refetchOnWindowFocus: false,
 })

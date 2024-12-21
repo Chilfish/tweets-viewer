@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Tweet } from '~/types'
 import { onMounted, ref, watchEffect } from 'vue'
+import { useRoute } from 'vue-router'
 import { Post } from '~/components/posts/post'
 import { useSeo } from '~/composables'
 import { useTweetStore } from '~/stores/tweets'
@@ -8,6 +9,7 @@ import { useUsersStore } from '~/stores/users'
 
 const tweetStore = useTweetStore()
 const usersStore = useUsersStore()
+const route = useRoute()
 
 const tweets = ref<Tweet[]>([])
 
@@ -19,6 +21,9 @@ watchEffect(() => {
 })
 
 onMounted(async () => {
+  const name = route.params.name as string
+  tweetStore.tweetService.changeName(name)
+
   tweetStore.isLoading = true
   tweets.value = await tweetStore.tweetService.getLastYearsTodayData()
   tweetStore.isLoading = false

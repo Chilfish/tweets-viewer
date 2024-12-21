@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onBeforeMount } from 'vue'
+import { useRoute } from 'vue-router'
 import Loading from '~/components/icon/Loading'
 
 import { useTweetStore } from '~/stores/tweets'
@@ -7,9 +8,11 @@ import { useUsersStore } from '~/stores/users'
 
 const tweetStore = useTweetStore()
 const usersStore = useUsersStore()
+const route = useRoute()
 
 onBeforeMount(async () => {
-  tweetStore.isLoading = true
+  tweetStore.isLoading = route.name !== 'index'
+
   await usersStore.fetchUsers()
   tweetStore.isLoading = false
 })

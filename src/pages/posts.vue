@@ -78,10 +78,6 @@ watch(queryData, () => {
   triggerRef(tweets)
 })
 
-function refresh() {
-  location.reload()
-}
-
 const loadMore = useThrottleFn(() => {
   if (noMore.value)
     return

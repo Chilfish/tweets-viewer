@@ -33,10 +33,8 @@ export const useTweetStore = defineStore('tweets', () => {
   const tweetService = new ServerTweetService(screenName.value)
 
   watch(screenName, async (newName) => {
-    if (!newName)
-      return
     tweetService.changeName(newName)
-  })
+  }, { immediate: true })
 
   watch(() => route.path, () => {
     page.value = curPage()

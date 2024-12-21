@@ -12,6 +12,7 @@ export const useUsersStore = defineStore('users', () => {
     return users.value.find(user => user.screenName === name.value) || {
       screenName: '',
       name: '',
+      restId: '',
       avatarUrl: '',
       description: '',
       followersCount: 0,

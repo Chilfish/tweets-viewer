@@ -53,8 +53,10 @@ export class ServerTweetService implements TweetService {
   }
 
   async getLastYearsTodayData() {
-    if (!this.name)
+    if (!this.name) {
+      console.warn('[ServerTweetService] name is not set')
       return []
+    }
     const res = await request.get<Tweet[]>(`/tweets/get/${this.name}/last-years-today`, {
       params: {
         reverse: this.isReverse,
