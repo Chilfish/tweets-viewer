@@ -120,3 +120,29 @@ export async function getLatestTweets(db: DB) {
     createdAt: new Date(row.created_at as string),
   }))
 }
+
+export async function updateUserTweets({
+  db,
+  user,
+  tweets,
+}: {
+  db: DB
+  user: {
+    screenName: string
+    tweetEnd: Date
+  }
+  tweets: InsertTweet[]
+}) {
+  // Error: No transactions support in neon-http driver
+  let insertedCount = 0
+  const res1 = await createTweets(db, tweets)
+
+  const res2 = await db
+    .update(usersTable)
+    .set({ tweetEnd: user.tweetEnd })
+    .where(eq(usersTable.screenName, user.screenName))
+
+  insertedCount += res1.rowCount + res2.rowCount
+
+  return { rowCount: insertedCount }
+}

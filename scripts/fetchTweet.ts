@@ -54,7 +54,8 @@ async function _fetchTweet(fetchArgs: FetchArgs) {
     .filter((res: any) => res.type === 'TimelineAddEntries')
     .at(0)
     .entries
-    .map((entry: any) => entry.content.itemContent) as ITeetsItemContent[]
+    .map((entry: any) => entry.content.itemContent)
+    .filter(Boolean) as ITeetsItemContent[]
 
   return {
     tweets,
@@ -66,41 +67,52 @@ async function fetchTweet(fetchArgs: FetchArgs & { endAt: Date }) {
   const tweets: Tweet[] = []
   const user = {} as User
   let cursor: string | undefined
+  let lastTweetId = ''
 
   while (true) {
     fetchArgs.cursor = cursor
+
     const { tweets: fetchedTweets, cursor: nextCursor } = await _fetchTweet(fetchArgs)
       .catch((err) => {
-        console.error('[fetch-tweets]', err.message, err.stack)
+        console.dir(err, { depth: 3 })
         return { tweets: [] as ITeetsItemContent[], cursor: '' }
       })
 
-    if (!fetchedTweets.length) {
+    const filteredTweets = fetchedTweets.map(filterTweet)
+
+    if (!filteredTweets.length) {
+      console.warn('No tweets found')
+      break
+    }
+
+    if (filteredTweets.at(-1)?.id === lastTweetId) {
+      console.warn('Duplicate tweet found')
       break
     }
 
     Object.assign(user, filterUser(fetchedTweets[0].tweet_results.result as any))
 
     tweets.push(
-      ...fetchedTweets
-        .map(filterTweet)
-        .filter((tweet): tweet is Tweet => !!tweet),
+      ...filteredTweets
+        .filter(tweet => tweet.createdAt.getTime() >= fetchArgs.endAt.getTime()),
     )
 
-    const lastTweet = tweets.at(-1)?.createdAt || new Date()
+    const lastTweet = filteredTweets.at(-1)?.createdAt || new Date()
 
-    console.log({
-      lastTweet,
-      endAt: fetchArgs.endAt,
-      fetchedTweets: fetchedTweets.length,
-      cursor: nextCursor,
-    })
+    // console.log({
+    // lastTweet,
+    // endAt: fetchArgs.endAt,
+    // fetchedTweets: fetchedTweets.length,
+    // cursor: nextCursor,
+    // })
 
-    if (lastTweet.getTime() < fetchArgs.endAt.getTime()) {
+    // TODO: beacuse of rate-limt, maybe break at other condition
+    if (lastTweet.getTime() <= fetchArgs.endAt.getTime()) {
       break
     }
 
     cursor = nextCursor
+    lastTweetId = filteredTweets.at(-1)?.id || ''
   }
 
   user.tweetStart = tweets.at(-1)?.createdAt || new Date()
@@ -114,10 +126,6 @@ async function fetchTweet(fetchArgs: FetchArgs & { endAt: Date }) {
 }
 
 function filterTweet(data: ITeetsItemContent) {
-  if (!data?.tweet_results) {
-    return null
-  }
-
   const tweet = data.tweet_results.result
   return _filterTweet(tweet as any)
 }

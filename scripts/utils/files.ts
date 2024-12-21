@@ -9,6 +9,8 @@ import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { convertDate } from '../../src/utils/date'
+
 export const root = path.resolve(fileURLToPath(import.meta.url), '../../')
 
 interface DirOptions {
@@ -81,8 +83,9 @@ export async function readJson<T = any>(
   file = dir(file)
 
   try {
-    const data = await readFile(file, 'utf-8')
-    return JSON.parse(data) as T
+    const data = await readFile(file, 'utf-8').then(JSON.parse)
+    convertDate(data)
+    return data as T
   }
   catch {
     if (fallback) {
