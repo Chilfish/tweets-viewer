@@ -122,7 +122,7 @@ onMounted(() => {
 
 <template>
   <section
-    class="flex flex-col gap-3"
+    class="flex flex-col gap-2"
   >
     <Post
       v-for="tweet in tweets"

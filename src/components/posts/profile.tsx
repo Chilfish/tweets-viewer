@@ -29,19 +29,18 @@ export const PostProfile = defineComponent({
           />
           <AvatarFallback>{screenName}</AvatarFallback>
         </Avatar>
-        <div class="flex flex-wrap items-center gap-2">
+        <div class="flex flex-wrap items-center">
           <p class="text-3.5 font-semibold">
             {name}
           </p>
           <a
-            class="text-3.2 text-muted-foreground hover:text-main hover:underline"
+            class="mx-2 text-3.2 text-muted-foreground hover:text-main hover:underline"
             href={`https://twitter.com/${screenName}`}
             target="_blank"
           >
             @
             {screenName}
           </a>
-          <span>·</span>
           <time
             class="text-3.2 text-muted-foreground"
             title="东京时间"

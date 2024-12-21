@@ -20,7 +20,7 @@ onBeforeMount(async () => {
 
 <template>
   <main
-    class="mx-auto flex flex-col gap-0 transition-all duration-300 md:w-50% md:p-4"
+    class="mx-auto flex flex-col gap-0 transition-all duration-300 lg:w-60vw xl:w-50vw md:p-4"
   >
     <Header />
 

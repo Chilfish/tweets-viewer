@@ -6,7 +6,7 @@ import { placeholderSVG, proxyUrl } from '~/constant'
 const props = withDefaults(defineProps<{
   src: string
   alt?: string
-  width?: stirng
+  width?: string
   height?: string
   unsetWidth?: boolean
   lazy?: boolean

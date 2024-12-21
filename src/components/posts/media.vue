@@ -22,7 +22,7 @@ const modal = useModal()
 <template>
   <div
     v-if="media.length"
-    class="grid gap-2px py-2"
+    class="grid gap-2px pt-2"
     :style="{
       gridTemplateColumns: `repeat(${cols}, 1fr)`,
     }"
@@ -35,7 +35,7 @@ const modal = useModal()
       <Image
         v-if="type !== 'video'"
         :class="cn({
-          'max-h-80': size > 1,
+          'max-h-100': size > 1,
           'max-w-80': height > width && size === 1,
         })"
         :src="url?.replace('name=orig', 'name=small')"
