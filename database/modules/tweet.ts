@@ -1,4 +1,4 @@
-import type { DB } from '../../server/common'
+import type { DB } from '..'
 import type { InsertTweet } from '../schema'
 import {
   and,
@@ -9,7 +9,7 @@ import {
   sql,
 } from 'drizzle-orm'
 import { now } from '../../src/utils/date'
-import { tweetsTable } from '../schema'
+import { tweetsTable, usersTable } from '../schema'
 
 interface GetTweet {
   name: string
@@ -99,4 +99,24 @@ export async function getTweetsCount(db: DB, name: string) {
     })
     .from(tweetsTable)
     .where(eq(tweetsTable.userId, name))
+}
+
+export async function getLatestTweets(db: DB) {
+  const result = await db.execute(sql`
+    SELECT u.screen_name, u.rest_id, t.full_text, t.created_at
+    FROM ${usersTable} u
+    LEFT JOIN (
+        SELECT DISTINCT ON (user_name) *
+        FROM ${tweetsTable}
+        ORDER BY user_name, created_at DESC
+    ) t ON u.screen_name = t.user_name
+    ORDER BY t.created_at DESC NULLS LAST
+`)
+
+  return result.rows.map(row => ({
+    restId: row.rest_id as string,
+    screenName: row.screen_name as string,
+    fullText: row.full_text as string,
+    createdAt: new Date(row.created_at as string),
+  }))
 }

@@ -12,6 +12,7 @@ import {
 
 export const usersTable = pgTable('users', {
   id: serial('id').primaryKey(),
+  restId: text('rest_id').notNull().default(''),
   name: text('name').notNull(),
   screenName: text('screen_name').notNull().unique(),
   avatarUrl: text('avatar_url').notNull(),

@@ -1,10 +1,8 @@
-import type { drizzle } from 'drizzle-orm/neon-http'
+import type { DB } from '../database'
 
 export const staticUrl
 // = 'http://127.0.0.1:8080'
 = 'https://p.chilfish.top'
-
-export type DB = ReturnType<typeof drizzle>
 
 export interface AppType {
   Variables: {

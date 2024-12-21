@@ -60,6 +60,7 @@ export function filterUser(data: TweetData, birthday = new Date()): User {
 
   return {
     ...filterUserInfo(data),
+    restId: user.rest_id,
     profileBannerUrl,
     followersCount: legacy.followers_count,
     followingCount: legacy.friends_count,

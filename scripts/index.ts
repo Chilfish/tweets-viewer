@@ -3,7 +3,13 @@ import type { TweetData } from './filter'
 import glob from 'fast-glob'
 import pMap from 'p-map'
 import { filterTweet, filterUser } from './filter'
-import { isNotInImport, mergeData, readJson, uniqueObj, writeJson } from './utils'
+import {
+  isNotInImport,
+  mergeData,
+  readJson,
+  uniqueObj,
+  writeJson,
+} from './utils'
 
 export const dataFolder = `D:/Downloads/tweet-data`
 

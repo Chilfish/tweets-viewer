@@ -12,6 +12,7 @@ export interface UserInfo {
 }
 
 export interface User extends UserInfo {
+  restId: string
   profileBannerUrl: string
   followersCount: number
   followingCount: number

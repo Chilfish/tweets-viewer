@@ -1,4 +1,4 @@
-import type { DB } from '../../server/common'
+import type { DB } from '../'
 import type { InsertUser } from '../schema'
 import { usersTable } from '../schema'
 
