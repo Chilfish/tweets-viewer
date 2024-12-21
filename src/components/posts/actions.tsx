@@ -1,4 +1,4 @@
-import { ChartColumn, ExternalLink, HeartIcon, MessageCircle, Repeat2 } from 'lucide-vue-next'
+import { ExternalLink, HeartIcon, MessageCircle, Repeat2 } from 'lucide-vue-next'
 import { defineComponent } from 'vue'
 import { Button } from '../ui/button'
 import { CardFooter } from '../ui/card'
@@ -32,7 +32,7 @@ export const PostActions = defineComponent({
   setup(props) {
     const { comment, retweet, like, view } = props
     return () => (
-      <CardFooter class="flex justify-between pb-2">
+      <CardFooter class="flex justify-between pb-2 pr-30">
         <ActionButton
           class="hover:bg-#e1eef6 hover:text-#1d9bf0"
           count={comment}
@@ -54,12 +54,12 @@ export const PostActions = defineComponent({
           <HeartIcon class="mr-2 h-4 w-4" />
         </ActionButton>
 
-        <ActionButton
+        {/* <ActionButton
           class="hover:bg-#e1eef6 hover:text-#1d9bf0"
           count={view}
         >
           <ChartColumn class="mr-2 h-4 w-4" />
-        </ActionButton>
+        </ActionButton> */}
 
         <Button
           as="a"

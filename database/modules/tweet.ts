@@ -142,7 +142,7 @@ export async function updateUserTweets({
     .set({ tweetEnd: user.tweetEnd })
     .where(eq(usersTable.screenName, user.screenName))
 
-  insertedCount += res1.rowCount + res2.rowCount
+  insertedCount = res1.rowCount + res2.rowCount - 1
 
   return { rowCount: insertedCount }
 }

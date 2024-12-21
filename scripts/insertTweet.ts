@@ -3,7 +3,7 @@ import type { DB, InsertTweet, InsertUser } from '../database'
 import { createTweets, createUser } from '../database'
 import { convertDate } from '../src/utils/date'
 import { dataFolders } from './index'
-import { createDb, isNotInImport, readJson } from './utils'
+import { createDb, readJson } from './utils'
 
 async function insertUser(db: DB, user: InsertUser) {
   await createUser({ db, user })
@@ -36,9 +36,16 @@ async function insertTweets(db: DB, folder: string, uid: string) {
 
 async function main() {
   const isInsertUser = !process.argv.includes('--no-user')
+  const username = process.argv[process.argv.indexOf('--user') + 1]
+
   const db = createDb()
 
-  for (const folder of dataFolders) {
+  let dataFoldersToInsert = dataFolders
+  if (username) {
+    dataFoldersToInsert = dataFolders.filter(folder => folder.includes(username))
+  }
+
+  for (const folder of dataFoldersToInsert) {
     const user = await readJson<User>(`${folder}/data-user.json`)
     convertDate(user)
 
@@ -51,6 +58,4 @@ async function main() {
   }
 }
 
-if (isNotInImport(import.meta.url)) {
-  await main()
-}
+await main()

@@ -63,7 +63,7 @@ const PostCard = defineComponent({
 
     return () => (
       <Card
-        class="mx-auto w-full pt-2"
+        class="mx-auto w-full pt-2 text-3.8"
       >
         {retweet && (
           <div
@@ -98,7 +98,7 @@ const PostCard = defineComponent({
           <PostCard
             tweet={tweet.quotedStatus!.tweet}
             user={tweet.quotedStatus!.user}
-            class="mx-4 mb-2 shadow-none w-90%!"
+            class="mx-4 mb-2 text-3.5 shadow-none w-90%!"
           />
         )}
 

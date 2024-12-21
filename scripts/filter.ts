@@ -103,7 +103,7 @@ function _filterTweet(data: TextData): Tweet {
   })
 
   let text = mediaLinks.reduce(
-    (acc, m) => acc.replace(` ${m.url}`, ''),
+    (acc, m) => acc.toString().replace(` ${m.url}`, ''),
     tweet.full_text,
   )
 
