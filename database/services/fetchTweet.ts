@@ -52,8 +52,17 @@ async function _fetchTweet(
     .filter((res: any) => res.type === 'TimelineAddEntries')
     .at(0)
     .entries
-    .map((entry: any) => entry.content.itemContent)
-    .filter(Boolean) as ITeetsItemContent[]
+    .map(({ content }: any) => {
+      // Threads
+      if ('items' in content) {
+        return content.items.map(({ item }: any) => item?.itemContent)
+      }
+      // normal tweets
+      return content.itemContent
+    })
+    .flat()
+    .filter(Boolean)
+    .filter((tweet: any) => tweet.itemType === 'TimelineTweet') as ITeetsItemContent[]
 
   return {
     tweets,

@@ -27,6 +27,8 @@ async function updateTweet({ tweetApi, db, uid, latestTweet }: {
     userId: user.screenName,
   }))
 
+  console.log(`Fetched ${insertTweets.length} Tweets for ${user.screenName}`)
+
   if (!insertTweets.length) {
     return {
       rowCount: 0,
@@ -57,7 +59,7 @@ async function updateAllTeets({ db, tweetApi }: {
   const usersLatestTweets = await getLatestTweets(db)
 
   return pMap(
-    usersLatestTweets.slice(0, 1),
+    usersLatestTweets,
     data => updateTweet({
       tweetApi,
       db,
