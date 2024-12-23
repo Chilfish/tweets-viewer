@@ -6,19 +6,25 @@ import type {
   UserInfo,
 } from '@/types'
 
-import type quoteData from './data/quote.json'
-import type replyData from './data/reply.json'
-import type cardData from './data/retweet-card.json'
-import type retweetData from './data/retweet.json'
-import type textData from './data/text_img.json'
+import type { ITweet } from 'rettiwt-core/dist/types/base/Tweet'
+import type {
+  Result2 as ITweetsAndReplies,
+} from 'rettiwt-core/dist/types/user/TweetsAndReplies'
 
-type TextData = typeof textData
-type RetweetData = typeof retweetData
-type QuoteData = typeof quoteData
-type ReplyData = typeof replyData
-type CardData = typeof cardData
+// import type quoteData from './data/quote.json'
+// import type replyData from './data/reply.json'
+// import type cardData from './data/retweet-card.json'
+// import type retweetData from './data/retweet.json'
+// import type textData from './data/text_img.json'
 
-export type TweetData = TextData | RetweetData | QuoteData | ReplyData | CardData
+// type TextData = typeof textData
+// type RetweetData = typeof retweetData
+// type QuoteData = typeof quoteData
+// type ReplyData = typeof replyData
+// type CardData = typeof cardData
+
+// export type TweetData = TextData | RetweetData | QuoteData | ReplyData | CardData
+export type TweetData = { metadata: ITweetsAndReplies } & ITweet
 
 function _getUser(data: TweetData) {
   const _data = {
@@ -33,7 +39,7 @@ function _getUser(data: TweetData) {
   return user
 }
 
-export function filterUserInfo(data: TweetData): UserInfo {
+function filterUserInfo(data: TweetData): UserInfo {
   const user = _getUser(data)
   const { legacy } = user
 
@@ -44,7 +50,7 @@ export function filterUserInfo(data: TweetData): UserInfo {
   }
 }
 
-export function filterUser(data: TweetData, birthday = new Date()): User {
+function filterUser(data: TweetData, birthday = new Date()): User {
   const user = _getUser(data)
   const { legacy } = user
 
@@ -74,7 +80,7 @@ export function filterUser(data: TweetData, birthday = new Date()): User {
   }
 }
 
-function _filterTweet(data: TextData): Tweet {
+function _filterTweet(data: TweetData): Tweet {
   const tweet = data.metadata.legacy
 
   if (!tweet?.id_str) {
@@ -135,7 +141,7 @@ function _filterTweet(data: TextData): Tweet {
   }
 }
 
-export function filterTweet(data: TweetData): Tweet {
+function filterTweet(data: TweetData): Tweet {
   let _data = data as any
   if ('legacy' in data) {
     _data = {
@@ -152,7 +158,7 @@ export function filterTweet(data: TweetData): Tweet {
   return _filterTweet(_data)
 }
 
-export function filterRetweet(data: RetweetData): ReTweet | null {
+function filterRetweet(data: TweetData): ReTweet | null {
   const retweet = data.metadata?.legacy.retweeted_status_result?.result
 
   if (!retweet || retweet.__typename !== 'Tweet') {
@@ -168,7 +174,7 @@ export function filterRetweet(data: RetweetData): ReTweet | null {
   }
 }
 
-export function filterQuotedTweet(data: QuoteData): QuotedTweet | null {
+function filterQuotedTweet(data: TweetData): QuotedTweet | null {
   const quotedTweet = data.metadata?.quoted_status_result?.result
 
   if (!quotedTweet || quotedTweet.__typename !== 'Tweet') {
@@ -182,4 +188,10 @@ export function filterQuotedTweet(data: QuoteData): QuotedTweet | null {
     user: quoteUser,
     tweet: filterTweet(quotedTweet as any),
   }
+}
+
+export {
+  filterTweet,
+  filterUser,
+  filterUserInfo,
 }

@@ -6,7 +6,7 @@ import type {
   ItemContent as ITeetsItemContent,
   Root as ITweetsAndRepliesResponse,
 } from 'rettiwt-core/dist/types/user/TweetsAndReplies'
-import type { Tweet, User } from '../src/types'
+import type { Tweet, User } from '../../src/types'
 import {
   CursoredData,
   EResourceType,
@@ -15,12 +15,8 @@ import {
 import {
   filterTweet as _filterTweet,
   filterUser,
-} from './filter'
-import {
-  baseDir,
-  cachedData,
-  writeJson,
-} from './utils'
+} from './filterTweet'
+
 import 'dotenv/config'
 
 const { TWEET_KEY } = process.env
@@ -130,34 +126,7 @@ function filterTweet(data: ITeetsItemContent) {
   return _filterTweet(tweet as any)
 }
 
-async function _localTest() {
-  const username = process.argv[2] || 'elonmusk'
-  const isForce = process.argv.includes('--force')
-  const tmpDir = baseDir('tmp')
-
-  const userData = await cachedData(
-    tmpDir(`fetch/user-${username}.json`),
-    () => fetchUser(username),
-    isForce,
-  )
-
-  const { tweets, user } = await cachedData(
-    tmpDir(`fetch/tweets-${username}.json`),
-    () => fetchTweet({
-      id: userData.rest_id,
-      endAt: new Date('2024-11-21'),
-    }),
-    isForce,
-  )
-
-  await writeJson(tmpDir(`user-${username}.json`), user)
-
-  console.log('Fetched', tweets.length, 'tweets')
-  await writeJson(tmpDir(`tweets-${username}.json`), tweets)
-}
-
-// _localTest().catch(err => console.error(err.message, err.stack))
-
 export {
   fetchTweet,
+  fetchUser,
 }

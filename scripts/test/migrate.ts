@@ -1,8 +1,8 @@
 import type { Tweet } from '@/types'
 import path from 'node:path'
 import glob from 'fast-glob'
-import { dataFolder } from './index'
-import { readJson, writeJson } from './utils'
+import { dataFolder } from '../'
+import { readJson, writeJson } from '../utils'
 
 function toTweet(
   data: any,
