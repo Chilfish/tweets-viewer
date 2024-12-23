@@ -1,4 +1,7 @@
-import type { FetchArgs } from 'rettiwt-api'
+import type {
+  FetchArgs,
+  FetcherService,
+} from 'rettiwt-api'
 import type {
   Root as IUserDetailsResponse,
 } from 'rettiwt-core/dist/types/user/Details'
@@ -10,8 +13,8 @@ import type { Tweet, User } from '../../src/types'
 import {
   CursoredData,
   EResourceType,
-  FetcherService,
 } from 'rettiwt-api'
+
 import {
   filterTweet as _filterTweet,
   filterUser,
@@ -19,14 +22,10 @@ import {
 
 import 'dotenv/config'
 
-const { TWEET_KEY } = process.env
-if (!TWEET_KEY) {
-  throw new Error('TWEET_KEY is not set in .env')
-}
-
-const tweetApi = new FetcherService({ apiKey: TWEET_KEY })
-
-async function fetchUser(username: string) {
+async function fetchUser(
+  tweetApi: FetcherService,
+  username: string,
+) {
   const { data } = await tweetApi.request<IUserDetailsResponse>(
     EResourceType.USER_DETAILS_BY_USERNAME,
     { id: username },
@@ -35,7 +34,10 @@ async function fetchUser(username: string) {
   return data.user.result
 }
 
-async function _fetchTweet(fetchArgs: FetchArgs) {
+async function _fetchTweet(
+  tweetApi: FetcherService,
+  fetchArgs: FetchArgs,
+) {
   const res = await tweetApi.request<ITweetsAndRepliesResponse>(
     EResourceType.USER_TIMELINE_AND_REPLIES,
     fetchArgs,
@@ -59,7 +61,10 @@ async function _fetchTweet(fetchArgs: FetchArgs) {
   }
 }
 
-async function fetchTweet(fetchArgs: FetchArgs & { endAt: Date }) {
+async function fetchTweet(
+  tweetApi: FetcherService,
+  fetchArgs: FetchArgs & { endAt: Date },
+) {
   const tweets: Tweet[] = []
   const user = {} as User
   let cursor: string | undefined
@@ -68,7 +73,10 @@ async function fetchTweet(fetchArgs: FetchArgs & { endAt: Date }) {
   while (true) {
     fetchArgs.cursor = cursor
 
-    const { tweets: fetchedTweets, cursor: nextCursor } = await _fetchTweet(fetchArgs)
+    const {
+      tweets: fetchedTweets,
+      cursor: nextCursor,
+    } = await _fetchTweet(tweetApi, fetchArgs)
       .catch((err) => {
         console.dir(err, { depth: 3 })
         return { tweets: [] as ITeetsItemContent[], cursor: '' }
@@ -96,10 +104,10 @@ async function fetchTweet(fetchArgs: FetchArgs & { endAt: Date }) {
     const lastTweet = filteredTweets.at(-1)?.createdAt || new Date()
 
     // console.log({
-    // lastTweet,
-    // endAt: fetchArgs.endAt,
-    // fetchedTweets: fetchedTweets.length,
-    // cursor: nextCursor,
+    //   lastTweet,
+    //   endAt: fetchArgs.endAt,
+    //   fetchedTweets: fetchedTweets.length,
+    //   cursor: nextCursor,
     // })
 
     // TODO: beacuse of rate-limt, maybe break at other condition

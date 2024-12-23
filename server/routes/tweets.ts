@@ -5,10 +5,12 @@ import {
   getTweetsByDateRange,
   getTweetsByKeyword,
 } from '@db/index'
+import { updateAllTeets } from '@db/services'
 import { Hono } from 'hono'
 import { getContext } from 'hono/context-storage'
+import { FetcherService } from 'rettiwt-api'
 
-const app = new Hono()
+const app = new Hono<AppType>()
 
 app.get('/get/:name', async (c) => {
   const name = c.req.param('name')
@@ -59,6 +61,19 @@ app.get('/get/:name/last-years-today', async (c) => {
 
   const { db } = getContext<AppType>().var
   const tweets = await getLastYearsTodayTweets({ db, name, reverse, page: 0 })
+  return c.json(tweets)
+})
+
+app.get('/update', async (c) => {
+  const { db } = getContext<AppType>().var
+  const { TWEET_KEY } = c.env
+  if (!TWEET_KEY) {
+    return c.json({ error: 'TWEET_KEY is not set in .env' }, 500)
+  }
+
+  // NOTE: not working on Cloudflare Workers
+  const tweetApi = new FetcherService({ apiKey: TWEET_KEY })
+  const tweets = await updateAllTeets({ db, tweetApi })
   return c.json(tweets)
 })
 

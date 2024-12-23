@@ -1,14 +1,24 @@
+import type { FetcherService } from 'rettiwt-api'
 import type { DB } from '../'
 import type { InsertTweet } from '../schema'
-import { updateUserTweets } from '../modules/tweet'
+import pMap from 'p-map'
+import { getLatestTweets, updateUserTweets } from '../modules/tweet'
 import { fetchTweet } from './fetchTweet'
 
-async function updateTweet(db: DB, uid: string, latestTweet: Date) {
+async function updateTweet({ tweetApi, db, uid, latestTweet }: {
+  tweetApi: FetcherService
+  db: DB
+  uid: string
+  latestTweet: Date
+}) {
   if (!uid) {
     return
   }
 
-  const { tweets, user } = await fetchTweet({ id: uid, endAt: latestTweet })
+  const { tweets, user } = await fetchTweet(tweetApi, {
+    id: uid,
+    endAt: latestTweet,
+  })
 
   const insertTweets: InsertTweet[] = tweets.map(tweet => ({
     ...tweet,
@@ -17,7 +27,14 @@ async function updateTweet(db: DB, uid: string, latestTweet: Date) {
     userId: user.screenName,
   }))
 
-  await updateUserTweets({
+  if (!insertTweets.length) {
+    return {
+      rowCount: 0,
+      user: user.name || uid,
+    }
+  }
+
+  const { rowCount } = await updateUserTweets({
     db,
     user: {
       screenName: user.screenName,
@@ -25,11 +42,33 @@ async function updateTweet(db: DB, uid: string, latestTweet: Date) {
     },
     tweets: insertTweets,
   })
-    .then(({ rowCount }) => {
-      console.log(`Inserted ${rowCount} Tweets for ${user.screenName}`)
-    })
+
+  console.log(`Inserted ${rowCount} Tweets for ${user.screenName}`)
+  return {
+    rowCount,
+    user: user.name || uid,
+  }
+}
+
+async function updateAllTeets({ db, tweetApi }: {
+  db: DB
+  tweetApi: FetcherService
+}) {
+  const usersLatestTweets = await getLatestTweets(db)
+
+  return pMap(
+    usersLatestTweets.slice(0, 1),
+    data => updateTweet({
+      tweetApi,
+      db,
+      uid: data.restId,
+      latestTweet: data.createdAt,
+    }),
+    { concurrency: 1 },
+  )
 }
 
 export {
+  updateAllTeets,
   updateTweet,
 }

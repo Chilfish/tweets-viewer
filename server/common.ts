@@ -12,5 +12,6 @@ export interface AppType {
   Bindings: {
     RATE_LIMITER: RateLimit
     DATABASE_URL: string
+    TWEET_KEY: string
   }
 }
