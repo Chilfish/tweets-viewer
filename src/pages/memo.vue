@@ -31,7 +31,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <section>
+  <section class="flex flex-col gap-2">
     <Post
       v-for="tweet in tweets"
       :key="tweet.id"

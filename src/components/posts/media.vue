@@ -63,8 +63,8 @@ const modal = useModal()
       />
       <Video
         v-else
+        class="max-h-100"
         :src="url"
-        :width="width"
         :height="height"
       />
     </div>

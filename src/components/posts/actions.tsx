@@ -32,7 +32,7 @@ export const PostActions = defineComponent({
   setup(props) {
     const { comment, retweet, like, view } = props
     return () => (
-      <CardFooter class="flex justify-between pb-2 pr-30">
+      <CardFooter class="flex justify-between pb-2 lg:pr-30">
         <ActionButton
           class="hover:bg-#e1eef6 hover:text-#1d9bf0"
           count={comment}

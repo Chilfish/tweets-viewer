@@ -38,10 +38,7 @@ onMounted(() => {
     src=""
     controls
     class="rounded-lg object-contain"
-    :height="height"
-    :width="width"
-    :style="{
-      maxHeight: `${height}px`,
-    }"
+    :height="height ? `${height}px` : 'auto'"
+    :width="width ? `${width}px` : 'auto'"
   />
 </template>
