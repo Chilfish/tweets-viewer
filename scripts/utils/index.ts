@@ -3,6 +3,7 @@ import { neon } from '@neondatabase/serverless'
 import { drizzle } from 'drizzle-orm/neon-http'
 import 'dotenv/config'
 
+export * from './download'
 export * from './files'
 
 export function createDb() {

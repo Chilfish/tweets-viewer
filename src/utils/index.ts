@@ -1,6 +1,8 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 
+export * from './promise'
+
 export function tweetUrl(name: string, id: string) {
   return `https://twitter.com/${name}/status/${id}`
 }
