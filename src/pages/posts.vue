@@ -31,8 +31,9 @@ const queryInfo = ref<TweetsReturn>({
   queryFn: () => Promise.resolve([]),
 })
 watch(() => route.query, (query, oldQuery) => {
+  // TODO: 太耦合了
   const hasOtherQueryChanged = Object.keys(query).some(key =>
-    key !== 'page' && query[key] !== oldQuery?.[key],
+    key !== 'new' && key !== 'page' && query[key] !== oldQuery?.[key],
   )
 
   if (hasOtherQueryChanged) {

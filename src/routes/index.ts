@@ -11,25 +11,22 @@ import DefaultLayout from '../layouts/default.vue'
 function useLayout(
   page: string,
   layout: Component = DefaultLayout,
-  tsx = false,
 ): Component {
   return h(
     layout,
-    h(defineAsyncComponent(() => import(`../pages/${page}.${tsx ? 'tsx' : 'vue'}`))),
+    h(defineAsyncComponent(() => import(`../pages/${page}.vue`))),
   )
 }
 
-function useDefaultRoute(name = '', tsx = false) {
-  return {
-    path: `/${name}`,
-    name: name || 'index',
-    component: useLayout(name || 'index', DefaultLayout, tsx),
-  } as RouteRecordRaw
-}
-
 const routes: RouteRecordRaw[] = [
-  useDefaultRoute(),
-  useDefaultRoute('remote', true),
+  {
+    path: '/',
+    component: useLayout('index'),
+  },
+  // {
+  //   path: '/remote',
+  //   component: useLayout('remote', DefaultLayout, true),
+  // },
   {
     path: '/@:name',
     component: useLayout('posts'),
@@ -41,9 +38,9 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/@:name/pic',
     name: 'daily-pic',
-    component: h(
+    component: useLayout(
+      'pic',
       defineAsyncComponent(() => import('../layouts/pic.vue')),
-      h(defineAsyncComponent(() => import('../pages/pic.vue'))),
     ),
   },
   {

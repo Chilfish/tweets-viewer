@@ -25,7 +25,7 @@ export const useTweetStore = defineStore('tweets', () => {
   const page = ref(curPage())
 
   const isLoading = ref(false)
-  const isReverse = ref(true)
+  const isReverse = ref(route.query.new !== 'false')
 
   const curUser = computed(() => usersStore.curUser)
   const screenName = computed(() => curUser.value.screenName)
@@ -33,6 +33,7 @@ export const useTweetStore = defineStore('tweets', () => {
   const tweetService = new ServerTweetService(screenName.value)
 
   watch(screenName, async (newName) => {
+    tweetService.isReverse = isReverse.value
     tweetService.changeName(newName)
   }, { immediate: true })
 
@@ -42,6 +43,13 @@ export const useTweetStore = defineStore('tweets', () => {
 
   watch(isReverse, (val) => {
     tweetService.isReverse = val
+    router.push({
+      query: {
+        ...route.query,
+        page: 0,
+        new: val.toString(),
+      },
+    })
   })
 
   function resetPages() {
