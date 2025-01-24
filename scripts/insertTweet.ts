@@ -3,6 +3,7 @@ import type { DB, InsertTweet, InsertUser } from '../database'
 import { createTweets, createUser } from '../database'
 import { convertDate } from '../src/utils/date'
 import { dataFolders } from './'
+import { mergeLocal } from './mergeLocal'
 import { createDb, readJson } from './utils'
 
 async function insertUser(db: DB, user: InsertUser) {
@@ -46,6 +47,8 @@ async function main() {
   }
 
   for (const folder of dataFoldersToInsert) {
+    await mergeLocal(folder)
+
     const user = await readJson<User>(`${folder}/data-user.json`)
     convertDate(user)
 

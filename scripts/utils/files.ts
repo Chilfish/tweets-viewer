@@ -94,7 +94,7 @@ export async function readJson<T = any>(
       return fallback
     }
 
-    throw new Error('Invalid JSON data.')
+    throw new Error(`Invalid JSON data in ${file}`)
   }
 }
 

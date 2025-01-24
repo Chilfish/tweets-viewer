@@ -26,6 +26,7 @@ async function updateTweet({ tweetApi, db, uid, latestTweet }: {
     tweetId: tweet.id,
     userId: user.screenName,
   }))
+  // .filter(tweet => tweet.userId === )
 
   console.log(`Fetched ${insertTweets.length} Tweets for ${user.screenName}`)
 
@@ -65,8 +66,17 @@ async function updateAllTeets({ db, tweetApi }: {
       db,
       uid: data.restId,
       latestTweet: data.createdAt,
+    }).catch((err) => {
+      console.log(`${err.cause || err.message}`)
+      return {
+        rowCount: 0,
+        user: '',
+      }
     }),
-    { concurrency: 1 },
+    {
+      concurrency: 1,
+      stopOnError: false,
+    },
   )
 }
 

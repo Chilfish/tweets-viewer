@@ -52,7 +52,7 @@ async function mergeOld(
   return mergedData
 }
 
-async function main(folder: string) {
+export async function mergeLocal(folder: string) {
   const data = await readData(folder)
 
   const birthday = await glob(`${folder}/birthday_*`)
@@ -83,7 +83,7 @@ async function main(folder: string) {
 if (isNotInImport(import.meta.filename)) {
   await pMap(
     dataFolders,
-    async folder => main(folder)
+    async folder => mergeLocal(folder)
       .catch(err => console.error(`Error in ${folder}`, err)),
     { concurrency: 1 },
   )
