@@ -22,7 +22,7 @@ const modal = useModal()
 <template>
   <div
     v-if="media.length"
-    class="grid gap-2px pt-2"
+    class="tweet-media grid gap-2px pt-2"
     :style="{
       gridTemplateColumns: `repeat(${cols}, 1fr)`,
     }"
@@ -45,18 +45,18 @@ const modal = useModal()
           style: {
             width: 'auto',
             height: 'auto',
-            padding: 0,
           },
           contentStyle: {
-            padding: 0,
             borderRadius: '2px',
           },
+          class: 'media-modal',
           size: 'medium',
           bordered: false,
           closable: false,
           preset: 'card',
           content: () => h(Image, {
-            src: url?.replace('name=orig', 'name=small'),
+            src: url,
+            onClick: () => modal.destroyAll(),
           }),
         })"
         @error="() => $emit('error')"
@@ -70,3 +70,11 @@ const modal = useModal()
     </div>
   </div>
 </template>
+
+<style>
+.media-modal.n-card.n-modal {
+  background: none;
+  box-shadow: none;
+  border-color: transparent;
+}
+</style>
