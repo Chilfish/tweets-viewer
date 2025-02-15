@@ -66,6 +66,14 @@
     "vue-tsc": "^2.2.0",
     "wrangler": "^3.105.0"
   },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "simple-git-hooks",
+      "vue-demi",
+      "workerd"
+    ]
+  },
   "simple-git-hooks": {
     "pre-commit": "pnpm lint-staged"
   },
