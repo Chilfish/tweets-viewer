@@ -8,11 +8,14 @@ import {
 } from 'lucide-vue-next'
 import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { Input } from '~/components/ui/input'
+import { Label } from '~/components/ui/label'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '~/components/ui/popover'
+import { Switch } from '~/components/ui/switch'
 import { isDark } from '~/composables'
 import { fallbackUser } from '~/constant'
 import { useTweetStore } from '~/stores/tweets'
@@ -65,12 +68,14 @@ function search() {
           class="w-52 p-3 text-3.5"
         >
           <div class="flex items-center gap-3 pb-2 pl-1">
-            <span>
+            <Label
+              for="reverse-tweets"
+            >
               新帖子在前
-            </span>
-            <n-switch
-              v-model:value="tweetStore.isReverse"
-              size="small"
+            </Label>
+            <Switch
+              id="reverse-tweets"
+              v-model="tweetStore.isReverse"
             />
           </div>
           <UserList />
@@ -96,55 +101,42 @@ function search() {
     <div
       class="w-60 flex items-center gap-4 md:w-100"
     >
-      <n-input
-        v-model:value="searchText"
+      <Search
+        class="h-4 w-4 cursor-pointer"
+        @click="search"
+      />
+      <Input
+        id="tweets-search"
+        v-model="searchText"
         placeholder="Search"
-        :input-props="{
-          'aria-label': 'Search',
-          'aria-describedby': 'tweets search',
-          'type': 'search',
-          'id': 'tweets-search',
-        }"
         class="p-1"
         @keydown="(e: any) => {
           if (e.key === 'Enter') {
             search()
           }
         }"
-      >
-        <template #prefix>
-          <Search
-            class="h-4 w-4 cursor-pointer"
-            @click="search"
-          />
-        </template>
-      </n-input>
+      />
 
-      <n-popover
-        trigger="click"
-        placement="bottom"
-        :show-arrow="false"
-      >
-        <template #trigger>
-          <button>
-            <CalendarSearch class="h-6 w-6" />
-          </button>
-        </template>
-
-        <div class="w-fit p-2">
-          <p class="mb-4 text-4">
+      <Popover>
+        <PopoverTrigger>
+          <CalendarSearch class="h-6 w-6" />
+        </PopoverTrigger>
+        <PopoverContent class="w-auto p-4">
+          <p class="mb-4 text-sm">
             选择搜索的日期范围
           </p>
 
-          <n-date-picker
-            v-model:value="dateRange"
-            type="daterange"
-            clearable
-            bind-calendar-months
-            :is-date-disabled="disableDate"
-          />
-        </div>
-      </n-popover>
+          <div class="date-range-picker">
+            <DatePicker
+              v-model:value="dateRange"
+              type="daterange"
+              clearable
+              bind-calendar-months
+              :is-date-disabled="disableDate"
+            />
+          </div>
+        </PopoverContent>
+      </Popover>
     </div>
   </header>
 </template>

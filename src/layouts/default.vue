@@ -27,7 +27,5 @@ onBeforeMount(async () => {
     <slot />
 
     <Loading v-if="tweetStore.isLoading" />
-
-    <n-back-top :right="20" />
   </main>
 </template>

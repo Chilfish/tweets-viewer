@@ -142,20 +142,4 @@ onMounted(() => {
   >
     加载更多
   </Button>
-<!--
-  <n-empty
-    v-if="queryData.length === 0 && tweets.length === 0 && !isFetching"
-    class="my-8"
-    size="large"
-    description="没有任何推文欸"
-  >
-    <template #extra>
-      <n-button
-        size="small"
-        @click="refresh"
-      >
-        刷新试试？
-      </n-button>
-    </template>
-  </n-empty> -->
 </template>
