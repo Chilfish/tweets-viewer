@@ -1,7 +1,7 @@
 <script setup lang="tsx">
 import type { TweetMedia } from '~/types'
-import { useModal } from 'naive-ui'
 import { h } from 'vue'
+import { useDialog } from '~/components/ui/dialog'
 import { cn } from '~/utils'
 import Image from '../Image.vue'
 
@@ -16,7 +16,8 @@ defineEmits<{
 const size = props.media.length
 const cols = size > 1 ? 2 : 1
 
-const modal = useModal()
+const [openDialog, closeDialog] = useDialog()
+const dialogId = 'media-preview'
 </script>
 
 <template>
@@ -41,23 +42,13 @@ const modal = useModal()
         :src="url?.replace('name=orig', 'name=small')"
         :width="width ? `${width}px` : '100%'"
         :fit="size === 1 ? 'contain' : 'cover'"
-        @click="modal.create({
-          style: {
-            width: 'auto',
-            height: 'auto',
-          },
-          contentStyle: {
-            borderRadius: '2px',
-          },
-          class: 'media-modal',
-          size: 'medium',
-          bordered: false,
-          closable: false,
-          preset: 'card',
-          content: () => h(Image, {
+        @click="openDialog(dialogId, {
+          component: h(Image, {
             src: url,
-            onClick: () => modal.destroyAll(),
+            onClick: () => closeDialog(dialogId),
           }),
+          id: dialogId,
+          showClose: false,
         })"
         @error="() => $emit('error')"
       />
@@ -72,9 +63,18 @@ const modal = useModal()
 </template>
 
 <style>
-.media-modal.n-card.n-modal {
+#media-preview {
   background: none;
   box-shadow: none;
   border-color: transparent;
+  border-radius: 1rem;
+  padding: 0.6rem;
+  width: 100vw;
+  max-width: 100vw;
+  height: 100vh;
+  max-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>
