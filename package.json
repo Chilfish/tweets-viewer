@@ -17,7 +17,7 @@
   "dependencies": {
     "@date-fns/tz": "^1.2.0",
     "@tanstack/vue-query": "^5.66.9",
-    "@unhead/vue": "^2.0.0-alpha.19",
+    "@unhead/vue": "1.11.19",
     "@unocss/reset": "^66.0.0",
     "@vueuse/core": "^12.7.0",
     "@vueuse/router": "^12.7.0",
