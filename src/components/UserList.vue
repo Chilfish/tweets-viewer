@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import Loading from '~/components/icon/Loading'
 import { useUsersStore } from '~/stores/users'
-import { avatarUrl } from '~/utils'
 
 const usersStore = useUsersStore()
 </script>
@@ -32,7 +31,7 @@ const usersStore = useUsersStore()
         <Avatar size="sm">
           <AvatarImage
             :alt="`User avatar for ${user.name}}`"
-            :src="avatarUrl(user.screenName)"
+            :src="user.avatarUrl"
           />
           <AvatarFallback>{{ user.name }}</AvatarFallback>
         </Avatar>

@@ -1,6 +1,5 @@
 import type { AppType } from './common'
 import { formatDate, getDate, now } from '@/utils/date'
-import { cloudflareRateLimiter } from '@hono-rate-limiter/cloudflare'
 import { neon } from '@neondatabase/serverless'
 import { drizzle } from 'drizzle-orm/neon-http'
 import { Hono } from 'hono'
@@ -17,10 +16,10 @@ const app = new Hono<AppType>()
 app
   .use(contextStorage())
   .use(cors())
-  .use(cloudflareRateLimiter<AppType>({
-    rateLimitBinding: c => c.env.RATE_LIMITER,
-    keyGenerator: c => c.req.header('cf-connecting-ip') ?? c.req.header('x-forwarded-for') ?? 'unknown',
-  }))
+  // .use(cloudflareRateLimiter<AppType>({
+  //   rateLimitBinding: c => c.env.RATE_LIMITER,
+  //   keyGenerator: c => c.req.header('cf-connecting-ip') ?? c.req.header('x-forwarded-for') ?? 'unknown',
+  // }))
   .use(async (c, next) => {
     const { DATABASE_URL } = c.env
     const sql = neon(DATABASE_URL)

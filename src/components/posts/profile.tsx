@@ -1,5 +1,4 @@
 import { defineComponent } from 'vue'
-import { avatarUrl } from '~/utils'
 import { formatDate } from '~/utils/date'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 import { CardHeader } from '../ui/card'
@@ -18,14 +17,18 @@ export const PostProfile = defineComponent({
       type: String,
       required: true,
     },
+    avatar: {
+      type: String,
+      required: true,
+    },
   },
-  setup({ time, name, screenName }) {
+  setup({ time, name, screenName, avatar }) {
     return () => (
       <CardHeader class="flex flex-row items-center gap-2 py-2">
         <Avatar size="sm">
           <AvatarImage
             alt={`User avatar for ${screenName}`}
-            src={avatarUrl(screenName)}
+            src={avatar}
           />
           <AvatarFallback>{screenName}</AvatarFallback>
         </Avatar>

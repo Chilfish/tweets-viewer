@@ -37,7 +37,11 @@ export const useUsersStore = defineStore('users', () => {
     const { data } = await request<User[]>('/users/get', {
       id: 'get-users',
     })
-    users.value = data
+    users.value = data.sort((a, b) => {
+      const aDate = new Date(a.tweetStart)
+      const bDate = new Date(b.tweetStart)
+      return aDate.getTime() - bDate.getTime()
+    })
   }
 
   return {

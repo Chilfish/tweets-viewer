@@ -85,6 +85,7 @@ const PostCard = defineComponent({
           time={new Date(tweet.createdAt)}
           name={user.name}
           screenName={user.screenName}
+          avatar={user.avatarUrl}
         />
         <PostContent
           text={tweet.fullText}

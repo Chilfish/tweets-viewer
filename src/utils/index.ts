@@ -1,4 +1,5 @@
-import { type ClassValue, clsx } from 'clsx'
+import type { ClassValue } from 'clsx'
+import { clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 
 export * from './promise'
@@ -36,5 +37,5 @@ export async function canGoogle() {
 }
 
 export function avatarUrl(name: string) {
-  return `https://unavatar.io/twitter/${name}`
+  return `https://unavatar.io/${name}`
 }
