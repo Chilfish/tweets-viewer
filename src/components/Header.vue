@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import type { DateRange } from 'reka-ui'
+import type { Ref } from 'vue'
+import { getLocalTimeZone, today } from '@internationalized/date'
 import {
   CalendarSearch,
   History,
@@ -6,7 +9,7 @@ import {
   Search,
   Sun,
 } from 'lucide-vue-next'
-import { computed, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
@@ -15,33 +18,31 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '~/components/ui/popover'
+import { RangeCalendar } from '~/components/ui/range-calendar'
 import { Switch } from '~/components/ui/switch'
 import { isDark } from '~/composables'
 import { fallbackUser } from '~/constant'
 import { useTweetStore } from '~/stores/tweets'
-import { useUsersStore } from '~/stores/users'
 import TwitterIcon from './icon/TwitterIcon'
 import UserList from './UserList.vue'
 
 const tweetStore = useTweetStore()
-const usersStore = useUsersStore()
 const router = useRouter()
 
-const day = 24 * 60 * 60 * 1000
+const dateRange = ref({
+  start: today(getLocalTimeZone()),
+  end: today(getLocalTimeZone()),
+}) as Ref<DateRange>
 
-const tweetRange = computed(() => ({
-  start: usersStore.curUser.tweetStart.getTime(),
-  end: usersStore.curUser.tweetEnd.getTime(),
-}))
-
-function disableDate(ts: number) {
-  return ts < tweetRange.value.start - day || ts > tweetRange.value.end
-}
-
-const dateRange = ref<[number, number]>([Date.now(), Date.now()])
 watch(dateRange, async () => {
-  const [start, end] = dateRange.value || []
-  tweetStore.getTweetsByDateRange(start, end + day)
+  const { start, end } = dateRange.value || {}
+
+  if (start && end) {
+    const tz = getLocalTimeZone()
+    const startTs = start.toDate(tz).getTime()
+    const endTs = end.toDate(tz).getTime()
+    tweetStore.getTweetsByDateRange(startTs, endTs)
+  }
 })
 
 const searchText = ref(new URLSearchParams(location.search).get('q') || '')
@@ -126,15 +127,9 @@ function search() {
             选择搜索的日期范围
           </p>
 
-          <div class="date-range-picker">
-            <DatePicker
-              v-model:value="dateRange"
-              type="daterange"
-              clearable
-              bind-calendar-months
-              :is-date-disabled="disableDate"
-            />
-          </div>
+          <RangeCalendar
+            v-model="dateRange"
+          />
         </PopoverContent>
       </Popover>
     </div>

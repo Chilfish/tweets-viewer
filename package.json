@@ -52,7 +52,6 @@
     "eslint-plugin-format": "^1.0.1",
     "hono": "^4.7.2",
     "lint-staged": "^15.4.3",
-    "naive-ui": "^2.41.0",
     "ohash": "^2.0.5",
     "p-map": "^7.0.3",
     "rettiwt-api": "^4.2.0",

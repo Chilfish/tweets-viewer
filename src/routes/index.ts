@@ -1,10 +1,11 @@
 import type { Component } from 'vue'
 
+import type { RouteRecordRaw } from 'vue-router'
 import { defineAsyncComponent, h } from 'vue'
 import {
   createRouter,
   createWebHistory,
-  type RouteRecordRaw,
+
 } from 'vue-router'
 import DefaultLayout from '../layouts/default.vue'
 
@@ -42,6 +43,10 @@ const routes: RouteRecordRaw[] = [
       'pic',
       defineAsyncComponent(() => import('../layouts/pic.vue')),
     ),
+  },
+  {
+    path: '/test',
+    component: useLayout('test'),
   },
   {
     path: '/:pathMatch(.*)*',
