@@ -1,4 +1,5 @@
-import { cva, type VariantProps } from 'cva'
+import type { VariantProps } from 'cva'
+import { cva } from 'cva'
 
 export { default as Avatar } from './Avatar.vue'
 export { default as AvatarFallback } from './AvatarFallback.vue'

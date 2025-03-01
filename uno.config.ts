@@ -3,14 +3,16 @@ import {
   presetAttributify,
   presetIcons,
   presetTypography,
-  presetUno,
+  presetWind3,
+  transformerDirectives,
+  transformerVariantGroup,
 } from 'unocss'
 import presetAnimations from 'unocss-preset-animations'
 import { presetShadcn } from 'unocss-preset-shadcn'
 
 export default defineConfig({
   presets: [
-    presetUno(),
+    presetWind3(),
     presetAttributify(),
     presetIcons({
       scale: 1.2,
@@ -18,6 +20,10 @@ export default defineConfig({
     presetTypography(),
     presetAnimations(),
     presetShadcn(),
+  ],
+  transformers: [
+    transformerDirectives(),
+    transformerVariantGroup(),
   ],
   // By default, `.ts` and `.js` files are NOT extracted.
   // If you want to extract them, use the following configuration.
@@ -34,7 +40,9 @@ export default defineConfig({
   },
   theme: {
     colors: {
-      main: '#3388bb',
+      'main': '#3388bb',
+      'primary': '#3388bb',
+      'primary-foreground': '#fff',
     },
   },
   shortcuts: [

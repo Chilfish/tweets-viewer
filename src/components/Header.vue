@@ -102,28 +102,32 @@ function search() {
     <div
       class="w-60 flex items-center gap-4 md:w-100"
     >
-      <Search
-        class="h-4 w-4 cursor-pointer"
-        @click="search"
-      />
-      <Input
-        id="tweets-search"
-        v-model="searchText"
-        placeholder="Search"
-        class="p-1"
-        @keydown="(e: any) => {
-          if (e.key === 'Enter') {
-            search()
-          }
-        }"
-      />
+      <div class="relative max-w-sm w-full items-center rounded-lg bg-background">
+        <Input
+          id="tweets-search"
+          v-model="searchText"
+          type="text"
+          placeholder="Search..."
+          class="pl-10"
+          @keydown="(e: any) => {
+            if (e.key === 'Enter') {
+              search()
+            }
+          }"
+        />
+        <span class="absolute start-0 inset-y-0 flex items-center justify-center px-2">
+          <Search
+            class="cursor- pointer size-6 text-muted-foreground" @click="search"
+          />
+        </span>
+      </div>
 
       <Popover>
         <PopoverTrigger>
           <CalendarSearch class="h-6 w-6" />
         </PopoverTrigger>
-        <PopoverContent class="w-auto p-4">
-          <p class="mb-4 text-sm">
+        <PopoverContent class="w-auto">
+          <p class="text-sm">
             选择搜索的日期范围
           </p>
 
