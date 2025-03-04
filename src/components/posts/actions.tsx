@@ -2,21 +2,35 @@ import { ExternalLink, HeartIcon, MessageCircle, Repeat2 } from 'lucide-vue-next
 import { defineComponent } from 'vue'
 import { Button } from '../ui/button'
 import { CardFooter } from '../ui/card'
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
 
 const ActionButton = defineComponent({
   props: {
     count: Number,
+    label: {
+      type: String,
+      required: true,
+    },
   },
-  setup({ count }, { slots }) {
+  setup({ count, label }, { slots }) {
     return () => (
-      <Button
-        variant="ghost"
-        size="sm"
-        class="text-muted-foreground"
-      >
-        {slots.default?.()}
-        {count || 0}
-      </Button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="sm"
+            class="h-9 rounded-full px-3 transition-colors duration-200"
+          >
+            {slots.default?.()}
+            <span class="ml-1.5 text-sm font-medium">
+              {count?.toLocaleString() || 0}
+            </span>
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{label}</p>
+        </TooltipContent>
+      </Tooltip>
     )
   },
 })
@@ -32,26 +46,29 @@ export const PostActions = defineComponent({
   setup(props) {
     const { comment, retweet, like, view } = props
     return () => (
-      <CardFooter class="flex justify-between pb-2 lg:pr-30">
+      <CardFooter class="flex justify-between px-2 py-1">
         <ActionButton
-          class="hover:bg-#e1eef6 hover:text-#1d9bf0"
+          class="group hover:(bg-#e1eef6/80 text-#1d9bf0)"
           count={comment}
+          label="回复"
         >
-          <MessageCircle class="mr-2 h-4 w-4" />
+          <MessageCircle class="h-5 w-5 transition-transform group-hover:scale-110" />
         </ActionButton>
 
         <ActionButton
-          class="hover:bg-#def1eb hover:text-#00ba7c"
+          class="group hover:(bg-#def1eb/80 text-#00ba7c)"
           count={retweet}
+          label="转推"
         >
-          <Repeat2 class="mr-2 h-4 w-4" />
+          <Repeat2 class="h-5 w-5 transition-transform group-hover:scale-110" />
         </ActionButton>
 
         <ActionButton
-          class="hover:bg-#f7e0eb hover:text-#f9127e"
+          class="group hover:(bg-#f7e0eb/80 text-#f9127e)"
           count={like}
+          label="喜欢"
         >
-          <HeartIcon class="mr-2 h-4 w-4" />
+          <HeartIcon class="h-5 w-5 transition-transform group-hover:scale-110" />
         </ActionButton>
 
         {/* <ActionButton
@@ -61,19 +78,24 @@ export const PostActions = defineComponent({
           <ChartColumn class="mr-2 h-4 w-4" />
         </ActionButton> */}
 
-        <Button
-          as="a"
-          // @ts-expect-error as is fine
-          href={props.link}
-          target="_blank"
-          rel="noopener noreferrer"
-          title="Open in new tab"
-          variant="ghost"
-          size="sm"
-          class="text-muted-foreground"
-        >
-          <ExternalLink class="h-4 w-4" />
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              as="a"
+              href={props.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="ghost"
+              size="sm"
+              class="h-9 w-9 rounded-full p-0 transition-colors duration-200 hover:bg-#e1eef6/80 hover:text-#1d9bf0"
+            >
+              <ExternalLink class="h-5 w-5" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>在新标签页中打开</p>
+          </TooltipContent>
+        </Tooltip>
       </CardFooter>
     )
   },

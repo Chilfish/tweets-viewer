@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { DialogProvider } from '~/components/ui/dialog'
+import { TooltipProvider } from '~/components/ui/tooltip'
 import { checkNetwork, isDark } from '~/composables'
 
 checkNetwork()
@@ -16,6 +17,8 @@ checkNetwork()
   />
 
   <DialogProvider>
-    <RouterView />
+    <TooltipProvider>
+      <RouterView />
+    </TooltipProvider>
   </DialogProvider>
 </template>

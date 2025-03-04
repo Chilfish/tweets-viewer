@@ -25,7 +25,7 @@ const PostContent = defineComponent({
   emits: ['imgError'],
   setup({ text, media }, { emit }) {
     return () => (
-      <CardContent class="pb-2">
+      <CardContent class="px-4 pb-2">
         <PostText text={text} />
         <PostMedia
           onError={() => emit('imgError')}
@@ -63,15 +63,15 @@ const PostCard = defineComponent({
 
     return () => (
       <Card
-        class="mx-auto w-full pt-2 text-3.8"
+        class="mx-auto w-full border-b-0 transition-all duration-200 last:border-b first:rounded-t-xl last:rounded-b-xl hover:bg-card/80"
       >
         {retweet && (
           <div
-            class="flex cursor-pointer items-center px-6 text-gray-600 space-x-1.5 dark:text-gray-400 hover:text-main"
+            class="flex cursor-pointer items-center px-6 pt-3 text-gray-600 transition-colors space-x-1.5 dark:text-gray-400 hover:text-main"
           >
-            <Repeat2 />
+            <Repeat2 class="h-4 w-4" />
             <a
-              class="text-sm"
+              class="text-sm hover:underline"
               href={tweetUrl(curUserName.value, retweet.id)}
               target="_blank"
               rel="noopener noreferrer"
@@ -96,11 +96,13 @@ const PostCard = defineComponent({
         />
 
         {isQuote && (
-          <PostCard
-            tweet={tweet.quotedStatus!.tweet}
-            user={tweet.quotedStatus!.user}
-            class="mx-4 mb-2 text-3.5 shadow-none w-90%!"
-          />
+          <div class="mx-4 mb-4 overflow-hidden border rounded-xl bg-background/50">
+            <PostCard
+              tweet={tweet.quotedStatus!.tweet}
+              user={tweet.quotedStatus!.user}
+              class="shadow-none border-0!"
+            />
+          </div>
         )}
 
         { isMainTweet.value && (
