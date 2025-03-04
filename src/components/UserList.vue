@@ -25,7 +25,7 @@ const usersStore = useUsersStore()
       <RouterLink
         v-for="user in usersStore.users"
         :key="user.screenName"
-        :to="`/@${user.screenName}`"
+        :to="`/@${user.screenName}/`"
         class="flex items-center gap-2 rounded-2 p-2 transition-colors duration-200 hover:bg-gray-1 hover:dark:bg-gray-9"
       >
         <Avatar size="sm">
