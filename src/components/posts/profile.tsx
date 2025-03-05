@@ -30,16 +30,19 @@ export const PostProfile = defineComponent({
           <AvatarFallback>{screenName}</AvatarFallback>
         </Avatar>
         <div class='flex flex-wrap items-center gap-2'>
-          <p class='text-3.5 font-semibold'>{name}</p>
+          <p class='text-3.5 font-semibold truncate max-w-36'>{name}</p>
           <a
-            class='mx-2 font-medium text-3.2 link text-muted-foreground'
+            class='mx-2 font-medium text-3.2 link text-muted-foreground truncate max-w-[150px]'
             href={`https://twitter.com/${screenName}`}
             target='_blank'
             rel='noreferrer'
           >
             @{screenName}
           </a>
-          <time class='text-3.2 text-muted-foreground' title='东京时间'>
+          <time
+            class='text-3.2 text-muted-foreground truncate'
+            title='东京时间'
+          >
             {formatDate(time, { timezone: 'tokyo' })}
           </time>
         </div>

@@ -19,9 +19,8 @@ html {
 
 body {
   margin: 0;
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1.5;
-  /* min-height: 100dvh; */
   display: flex;
   flex-direction: column;
 }
@@ -29,5 +28,5 @@ body {
 p {
   white-space: pre-wrap;
   word-break: break-all;
-  line-height: 1.4rem;
+  line-height: 1.5rem;
 }

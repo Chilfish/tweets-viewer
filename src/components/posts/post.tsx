@@ -102,8 +102,12 @@ const PostCard = defineComponent({
       type: Object as () => UserInfo,
       required: true,
     },
+    showActions: {
+      type: Boolean,
+      default: true,
+    },
   },
-  setup({ tweet, user }) {
+  setup({ tweet, user, showActions }) {
     const curUserName = useRouteParams<string>('name', fallbackUser)
     const url = tweetUrl(user.screenName, tweet.tweetId)
     const link = ref(url)
@@ -131,12 +135,13 @@ const PostCard = defineComponent({
             <PostCard
               tweet={tweet.quotedStatus.tweet}
               user={tweet.quotedStatus.user}
+              showActions={false}
               class='shadow-none border-0!'
             />
           </div>
         )}
 
-        {isMainTweet.value && (
+        {isMainTweet.value && showActions && (
           <PostActions
             comment={tweet.replyCount}
             retweet={tweet.retweetCount + tweet.quoteCount}
