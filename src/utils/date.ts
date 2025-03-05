@@ -16,22 +16,12 @@ export function formatDate(
     fmt?: string
   } = {},
 ) {
-  const {
-    timezone,
-    fmt = 'yyyy-MM-dd HH:mm:ss',
-  } = options
+  const { timezone, fmt = 'yyyy-MM-dd HH:mm:ss' } = options
 
-  return format(
-    getDate(time, timezone),
-    fmt,
-    { locale: zhCN },
-  )
+  return format(getDate(time, timezone), fmt, { locale: zhCN })
 }
 
-export function getDate(
-  time: Time,
-  timezone?: TZ,
-) {
+export function getDate(time: Time, timezone?: TZ) {
   return new Date(
     new Date(time).toLocaleString(zhCN.code, {
       timeZone: timezone ? tzs[timezone] : undefined,
@@ -39,27 +29,26 @@ export function getDate(
   )
 }
 
-export function now(
-  timezone: TZ = 'beijing',
-) {
+export function now(timezone: TZ = 'beijing') {
   return getDate(new Date(), timezone)
 }
 
 export function convertDate(obj: Record<string, any>) {
-  Object.entries(obj).forEach(([key, value]) => {
+  for (const [key, value] of Object.entries(obj)) {
     if (value === null) {
-      return
+      continue
     }
     if (typeof value === 'object') {
-      return convertDate(value)
+      convertDate(value)
+      continue
     }
     if (typeof value !== 'string') {
-      return
+      continue
     }
 
     const date = new Date(value)
     if (!Number.isNaN(date.getTime())) {
       obj[key] = date
     }
-  })
+  }
 }

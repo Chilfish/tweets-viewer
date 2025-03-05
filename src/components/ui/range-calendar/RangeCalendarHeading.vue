@@ -5,7 +5,9 @@ import { RangeCalendarHeading, useForwardProps } from 'reka-ui'
 import { computed } from 'vue'
 import { cn } from '~/utils'
 
-const props = defineProps<RangeCalendarHeadingProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<
+  RangeCalendarHeadingProps & { class?: HTMLAttributes['class'] }
+>()
 
 defineSlots<{
   default: (props: { headingValue: string }) => any

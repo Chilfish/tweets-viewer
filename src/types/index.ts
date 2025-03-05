@@ -1,5 +1,4 @@
 export interface UserInfo {
-
   /**
    * display User name.
    */

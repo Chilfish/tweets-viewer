@@ -35,12 +35,12 @@ export default defineConfig({
       '/static': {
         target: 'http://localhost:8080',
         changeOrigin: true,
-        rewrite: path => path.replace(/^\/static/, ''),
+        rewrite: (path) => path.replace(/^\/static/, ''),
       },
       '/api': {
         target: 'http://localhost:8787/v2',
         changeOrigin: true,
-        rewrite: path => path.replace(/^\/api/, ''),
+        rewrite: (path) => path.replace(/^\/api/, ''),
       },
     },
   },

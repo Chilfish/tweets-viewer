@@ -11,8 +11,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "typecheck": "vue-tsc --noEmit",
-    "preview": "vite preview",
-    "postinstall": "simple-git-hooks"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@date-fns/tz": "^1.2.0",
@@ -38,7 +37,7 @@
     "vue-router": "^4.5.0"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^4.4.0",
+    "@biomejs/biome": "1.9.4",
     "@hono-rate-limiter/cloudflare": "^0.2.2",
     "@neondatabase/serverless": "^0.10.4",
     "@types/node": "^22.13.9",
@@ -49,9 +48,8 @@
     "dotenv": "^16.4.7",
     "drizzle-kit": "^0.30.5",
     "drizzle-orm": "^0.40.0",
-    "eslint": "^9.21.0",
-    "eslint-plugin-format": "^1.0.1",
     "hono": "^4.7.2",
+    "lefthook": "^1.11.2",
     "lint-staged": "^15.4.3",
     "ohash": "^2.0.10",
     "p-map": "^7.0.3",
@@ -65,11 +63,5 @@
     "vite-plugin-vue-devtools": "7.4.6",
     "vue-tsc": "^2.2.8",
     "wrangler": "^3.112.0"
-  },
-  "simple-git-hooks": {
-    "pre-commit": "bunx lint-staged"
-  },
-  "lint-staged": {
-    "*": "eslint --fix"
   }
 }

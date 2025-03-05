@@ -8,14 +8,11 @@ const [openDialog, closeDialog] = useDialog()
 
 function handleOpen() {
   openDialog('test', {
-    component: h(
-      Image,
-      {
-        src: 'https://placehold.co/600x400',
-        alt: 'Random image',
-        onClick: () => closeDialog('test'),
-      },
-    ),
+    component: h(Image, {
+      src: 'https://placehold.co/600x400',
+      alt: 'Random image',
+      onClick: () => closeDialog('test'),
+    }),
   })
 }
 </script>

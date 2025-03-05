@@ -22,8 +22,7 @@ function handleScroll() {
 
   if (isScrollDown) {
     show.value = true
-  }
-  else {
+  } else {
     show.value = false
   }
 

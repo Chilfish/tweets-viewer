@@ -1,12 +1,12 @@
-import type { TweetKey, User } from '.'
 import glob from 'fast-glob'
 import { hash } from 'ohash'
+import type { TweetKey, User } from '.'
 import { config, dataFolders, staticFolder } from '.'
 import { readJson, writeJson } from '../utils'
 import { filterData, readFiles } from './filterData'
 
 function getUserInfo(data: any[], name: string) {
-  const userTweet = data.find(el => el.screen_name === name)
+  const userTweet = data.find((el) => el.screen_name === name)
 
   const user = {
     screen_name: userTweet.screen_name,
@@ -32,7 +32,12 @@ for await (const folder of dataFolders) {
   const user = getUserInfo(data, screen_name)
   const filteredData = filterData(data, screen_name)
 
-  await writeJson(`${staticFolder}/data-${user.screen_name}.json`, filteredData, 'write', 0)
+  await writeJson(
+    `${staticFolder}/data-${user.screen_name}.json`,
+    filteredData,
+    'write',
+    0,
+  )
 
   await config.set({
     name: `data-${user.screen_name}`,

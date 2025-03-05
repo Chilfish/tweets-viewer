@@ -16,9 +16,18 @@ export abstract class TweetService {
 
   abstract getTweets(page: number): Promise<Tweet[]>
 
-  abstract getByDateRange(start: number, end: number, page: number): Promise<Tweet[]>
+  abstract getByDateRange(
+    start: number,
+    end: number,
+    page: number,
+  ): Promise<Tweet[]>
 
   abstract getLastYearsTodayData(): Promise<Tweet[]>
 
-  abstract searchTweets(keyword: string, page: number, start?: number, end?: number): Promise<Tweet[]>
+  abstract searchTweets(
+    keyword: string,
+    page: number,
+    start?: number,
+    end?: number,
+  ): Promise<Tweet[]>
 }

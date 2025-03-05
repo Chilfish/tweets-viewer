@@ -7,9 +7,7 @@ export * from './download'
 export * from './files'
 
 export function createDb() {
-  const {
-    DATABASE_URL,
-  } = process.env
+  const { DATABASE_URL } = process.env
 
   if (!DATABASE_URL) {
     throw new Error('DATABASE_URL is not set.')
@@ -19,7 +17,10 @@ export function createDb() {
   return drizzle({ client })
 }
 
-export function uniqueObj<T extends Record<string, any>[]>(arr: T, key: string) {
+export function uniqueObj<T extends Record<string, any>[]>(
+  arr: T,
+  key: string,
+) {
   const map = new Map()
   arr.forEach((item) => {
     map.set(item[key], item)

@@ -145,12 +145,8 @@
           "name": "tweets_user_name_users_screen_name_fk",
           "tableFrom": "tweets",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_name"
-          ],
-          "columnsTo": [
-            "screen_name"
-          ],
+          "columnsFrom": ["user_name"],
+          "columnsTo": ["screen_name"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -160,9 +156,7 @@
         "tweets_tweet_id_unique": {
           "name": "tweets_tweet_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "tweet_id"
-          ]
+          "columns": ["tweet_id"]
         }
       },
       "policies": {},
@@ -267,9 +261,7 @@
         "users_screen_name_unique": {
           "name": "users_screen_name_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "screen_name"
-          ]
+          "columns": ["screen_name"]
         }
       },
       "policies": {},

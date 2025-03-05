@@ -5,7 +5,9 @@ import { RangeCalendarHeader, useForwardProps } from 'reka-ui'
 import { computed } from 'vue'
 import { cn } from '~/utils'
 
-const props = defineProps<RangeCalendarHeaderProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<
+  RangeCalendarHeaderProps & { class?: HTMLAttributes['class'] }
+>()
 
 const delegatedProps = computed(() => {
   const { class: _, ...delegated } = props

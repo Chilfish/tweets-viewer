@@ -1,16 +1,13 @@
 <script setup lang="ts">
 import type { SwitchRootEmits, SwitchRootProps } from 'reka-ui'
 import type { HTMLAttributes } from 'vue'
-import {
-  SwitchRoot,
-
-  SwitchThumb,
-  useForwardPropsEmits,
-} from 'reka-ui'
+import { SwitchRoot, SwitchThumb, useForwardPropsEmits } from 'reka-ui'
 import { computed } from 'vue'
 import { cn } from '~/utils'
 
-const props = defineProps<SwitchRootProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<
+  SwitchRootProps & { class?: HTMLAttributes['class'] }
+>()
 
 const emits = defineEmits<SwitchRootEmits>()
 

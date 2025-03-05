@@ -2,9 +2,11 @@
 import type { AvatarImageProps } from 'radix-vue'
 import { AvatarImage } from 'radix-vue'
 
-const props = defineProps<AvatarImageProps & {
-  alt: string
-}>()
+const props = defineProps<
+  AvatarImageProps & {
+    alt: string
+  }
+>()
 </script>
 
 <template>

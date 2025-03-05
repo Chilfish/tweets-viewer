@@ -24,13 +24,16 @@ export async function canGoogle() {
     ]
     console.log('Checking network... ping to', urls)
 
-    await Promise.all(urls.map(url => fetch(url, {
-      mode: 'no-cors',
-      signal: aborter.signal,
-    })))
+    await Promise.all(
+      urls.map((url) =>
+        fetch(url, {
+          mode: 'no-cors',
+          signal: aborter.signal,
+        }),
+      ),
+    )
     return true
-  }
-  catch (error) {
+  } catch (error) {
     console.error('Google is not reachable', error)
     return false
   }

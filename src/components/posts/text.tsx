@@ -1,5 +1,5 @@
-import type { JSX } from 'vue/jsx-runtime'
 import { defineComponent } from 'vue'
+import type { JSX } from 'vue/jsx-runtime'
 import { HashTagLink, Link, PeopleLink } from './link'
 
 function retweetInfo(text: string) {
@@ -36,9 +36,7 @@ function hashTags(text: ParsedText) {
     if (regex.test(`#${part}`)) {
       return HashTagLink(part)
     }
-    else {
-      return part
-    }
+    return part
   })
 }
 function links(text: ParsedText) {
@@ -53,9 +51,7 @@ function links(text: ParsedText) {
     if (regex.test(part)) {
       return Link(part)
     }
-    else {
-      return part
-    }
+    return part
   })
 }
 function parseText(text: string): ParsedText[] {
@@ -92,22 +88,15 @@ export const PostText = defineComponent({
     if (replyTo.name) {
       return () => (
         <>
-          <p class="py-2">
+          <p class='py-2'>
             回复
-            {PeopleLink(replyTo.name!)}
-            :
+            {PeopleLink(replyTo.name || '')}:
           </p>
-          <p>
-            {parseText(replyTo.text)}
-          </p>
+          <p>{parseText(replyTo.text)}</p>
         </>
       )
     }
 
-    return () => (
-      <p class="pt-2">
-        {parseText(props.text)}
-      </p>
-    )
+    return () => <p class='pt-2'>{parseText(props.text)}</p>
   },
 })

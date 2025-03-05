@@ -2,13 +2,7 @@
 import type { DateRange } from 'reka-ui'
 import type { Ref } from 'vue'
 import { getLocalTimeZone, today } from '@internationalized/date'
-import {
-  CalendarSearch,
-  History,
-  Moon,
-  Search,
-  Sun,
-} from 'lucide-vue-next'
+import { CalendarSearch, History, Moon, Search, Sun } from 'lucide-vue-next'
 import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { Input } from '~/components/ui/input'

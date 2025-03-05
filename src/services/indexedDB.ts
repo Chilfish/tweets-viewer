@@ -1,7 +1,7 @@
 import type { Collection } from 'dexie'
-import type { TweetService } from '.'
-import type { Tweet } from '~/types'
 import Dexie from 'dexie'
+import type { Tweet } from '~/types'
+import type { TweetService } from '.'
 
 interface TweetWithUid extends Tweet {
   uid: string
@@ -35,7 +35,7 @@ export class TweetDBService implements TweetService {
   }
 
   private tweets() {
-    const collection = this.db.tweets.filter(t => t.uid === this.name)
+    const collection = this.db.tweets.filter((t) => t.uid === this.name)
     return this.isReverse ? collection.reverse() : collection
   }
 
@@ -69,18 +69,17 @@ export class TweetDBService implements TweetService {
     const lastYearsToday = await this.tweets()
       .filter((item) => {
         const date = new Date(item.createdAt)
-        return `${date.getMonth() + 1}-${date.getDate()}` === todayStr && item.uid === this.name
+        return (
+          `${date.getMonth() + 1}-${date.getDate()}` === todayStr &&
+          item.uid === this.name
+        )
       })
       .toArray()
 
     return lastYearsToday
   }
 
-  async getByDateRange(
-    start: number,
-    end: number,
-    page: number,
-  ) {
+  async getByDateRange(start: number, end: number, page: number) {
     return await this.pagedTweets(page)
       .filter((t) => {
         const date = new Date(t.createdAt).getTime()

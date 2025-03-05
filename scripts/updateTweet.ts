@@ -10,6 +10,7 @@ if (!TWEET_KEY) {
 
 const tweetApi = new FetcherService({ apiKey: TWEET_KEY })
 
-const res = await updateAllTeets({ db, tweetApi })
-  .catch(err => console.error(`[updateAllTeets] ${err.message}`))
+const res = await updateAllTeets({ db, tweetApi }).catch((err) =>
+  console.error(`[updateAllTeets] ${err.message}`),
+)
 console.log(res)

@@ -1,18 +1,11 @@
 import type { Component } from 'vue'
 
-import type { RouteRecordRaw } from 'vue-router'
 import { defineAsyncComponent, h } from 'vue'
-import {
-  createRouter,
-  createWebHistory,
-
-} from 'vue-router'
+import type { RouteRecordRaw } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import DefaultLayout from '../layouts/default.vue'
 
-function useLayout(
-  page: string,
-  layout: Component = DefaultLayout,
-): Component {
+function useLayout(page: string, layout: Component = DefaultLayout): Component {
   return h(
     layout,
     h(defineAsyncComponent(() => import(`../pages/${page}.vue`))),
@@ -55,11 +48,11 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/lsl',
-    redirect: `/@ttisrn_0710`,
+    redirect: '/@ttisrn_0710',
   },
   {
     path: '/memo',
-    redirect: `/@ttisrn_0710/memo`,
+    redirect: '/@ttisrn_0710/memo',
   },
   {
     path: '/likes',

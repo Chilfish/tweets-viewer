@@ -1,6 +1,6 @@
-import type { TweetService } from '.'
 import type { Tweet } from '~/types'
 import { request } from '~/utils/fetch'
+import type { TweetService } from '.'
 
 export class ServerTweetService implements TweetService {
   name: string
@@ -20,8 +20,7 @@ export class ServerTweetService implements TweetService {
   }
 
   async getTweets(page: number) {
-    if (!this.name)
-      return []
+    if (!this.name) return []
 
     const res = await request.get<Tweet[]>(`/tweets/get/${this.name}`, {
       params: {
@@ -33,13 +32,8 @@ export class ServerTweetService implements TweetService {
     return res.data
   }
 
-  async getByDateRange(
-    start: number,
-    end: number,
-    page: number,
-  ) {
-    if (!this.name)
-      return []
+  async getByDateRange(start: number, end: number, page: number) {
+    if (!this.name) return []
     const res = await request.get<Tweet[]>(`/tweets/get/${this.name}/range`, {
       params: {
         start,
@@ -57,12 +51,15 @@ export class ServerTweetService implements TweetService {
       console.warn('[ServerTweetService] name is not set')
       return []
     }
-    const res = await request.get<Tweet[]>(`/tweets/get/${this.name}/last-years-today`, {
-      params: {
-        reverse: this.isReverse,
+    const res = await request.get<Tweet[]>(
+      `/tweets/get/${this.name}/last-years-today`,
+      {
+        params: {
+          reverse: this.isReverse,
+        },
+        id: this.queryKey({}, 'last-years-today'),
       },
-      id: this.queryKey({}, 'last-years-today'),
-    })
+    )
     return res.data
   }
 
@@ -72,8 +69,7 @@ export class ServerTweetService implements TweetService {
     start?: number,
     end?: number,
   ) {
-    if (!this.name)
-      return []
+    if (!this.name) return []
     const res = await request.get<Tweet[]>(`/tweets/search/${this.name}`, {
       params: {
         q: keyword,

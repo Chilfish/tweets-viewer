@@ -1,11 +1,11 @@
-import type { DialogOptions } from './DialogProvider.vue'
 import { inject } from 'vue'
+import type { DialogOptions } from './DialogProvider.vue'
 
 interface DialogControl {
   openDialog: (id: string, options: DialogOptions) => void
   closeDialog: (id: string) => void
   registerDialog: (id: string) => void
-  dialogs: Record<string, { open: boolean, options: DialogOptions | null }>
+  dialogs: Record<string, { open: boolean; options: DialogOptions | null }>
 }
 
 export function useDialog() {
