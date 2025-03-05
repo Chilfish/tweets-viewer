@@ -44,8 +44,7 @@ const isVideo = computed(() => imgData.value?.url.includes('video.twimg.com'))
 
 <template>
   <div
-    class="mx-auto min-h-50vh w-90vw transition-all space-y-3"
-    md="max-w-36rem"
+    class="mx-auto min-h-[50vh] w-[90vw] transition-all space-y-3 md:max-w-[36rem]"
   >
     <Card v-if="imgData">
       <CardContent class="p-0">
