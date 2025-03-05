@@ -5,7 +5,6 @@ import { useQuery } from '@tanstack/vue-query'
 import { useEventListener, useThrottleFn } from '@vueuse/core'
 import {
   computed,
-  onMounted,
   ref,
   shallowRef,
   triggerRef,
@@ -43,10 +42,10 @@ watch(
       reset()
     }
 
-    if (route.query.q) {
+    if (query.q) {
       queryType.value = 'search'
       queryInfo.value = tweetStore.search()
-    } else if (route.query.from && route.query.to) {
+    } else if (query.from && query.to) {
       queryType.value = 'dateRange'
       queryInfo.value = tweetStore.getTweetsByDateRange()
     } else {
@@ -57,7 +56,7 @@ watch(
   { immediate: true },
 )
 
-const { data: queryData, refetch } = useQuery({
+const { data: queryData } = useQuery({
   queryKey: computed(() => queryInfo.value.queryKey),
   queryFn: computed(() => queryInfo.value.queryFn),
   initialData: [],
@@ -98,7 +97,6 @@ watch([() => route.params.name, () => tweetStore.isReverse], reset)
 function reset() {
   tweets.value = []
   noMore.value = false
-  tweetStore.resetPages()
   triggerRef(tweets)
 }
 
@@ -109,11 +107,6 @@ watchEffect(() => {
   })
 })
 
-onMounted(() => {
-  if (route.query.q) {
-    refetch()
-  }
-})
 </script>
 
 <template>

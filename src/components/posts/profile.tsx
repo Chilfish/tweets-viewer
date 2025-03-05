@@ -29,8 +29,10 @@ export const PostProfile = defineComponent({
           <AvatarImage alt={`User avatar for ${screenName}`} src={avatar} />
           <AvatarFallback>{screenName}</AvatarFallback>
         </Avatar>
-        <div class='flex flex-wrap items-center gap-2'>
-          <p class='text-3.5 font-semibold truncate max-w-36'>{name}</p>
+        <div class='flex flex-wrap items-center'>
+          <p class='text-3.5 font-semibold truncate max-w-36 sm:max-w-fit'>
+            {name}
+          </p>
           <a
             class='mx-2 font-medium text-3.2 link text-muted-foreground truncate max-w-[150px]'
             href={`https://twitter.com/${screenName}`}

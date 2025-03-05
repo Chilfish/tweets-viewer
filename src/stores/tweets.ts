@@ -5,48 +5,26 @@ import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ServerTweetService } from '~/services/server'
 import type { Tweet } from '~/types'
-import { useUsersStore } from './users'
 
 export interface TweetsReturn {
   queryFn: () => Promise<Tweet[]>
   queryKey: QueryKey
 }
 
-function curPage() {
-  return Number(new URLSearchParams(location.search).get('page') || 0)
-}
-
 export const useTweetStore = defineStore('tweets', () => {
-  const usersStore = useUsersStore()
-
   const router = useRouter()
   const route = useRoute()
 
-  const page = ref(curPage())
+  const page = computed(() => Number(route.query.page) || 0)
 
   const isLoading = ref(false)
   const isReverse = ref(route.query.new !== 'false')
 
-  const curUser = computed(() => usersStore.curUser)
-  const screenName = computed(() => curUser.value.screenName)
+  const screenName = computed(() => route.params.name as string)
 
   const tweetService = new ServerTweetService(screenName.value)
 
-  watch(
-    screenName,
-    async (newName) => {
-      tweetService.isReverse = isReverse.value
-      tweetService.changeName(newName)
-    },
-    { immediate: true },
-  )
-
-  watch(
-    () => route.path,
-    () => {
-      page.value = curPage()
-    },
-  )
+  watch(screenName, init, { immediate: true })
 
   watch(isReverse, (val) => {
     tweetService.isReverse = val
@@ -59,8 +37,9 @@ export const useTweetStore = defineStore('tweets', () => {
     })
   })
 
-  function resetPages() {
-    page.value = 0
+  function init() {
+    tweetService.isReverse = isReverse.value
+    tweetService.changeName(screenName.value)
   }
 
   function parseDateRange() {
@@ -129,12 +108,10 @@ export const useTweetStore = defineStore('tweets', () => {
   }
 
   function nextPage() {
-    page.value++
-
     router.push({
       query: {
         ...route.query,
-        page: page.value,
+        page: page.value + 1,
       },
     })
   }
@@ -148,7 +125,6 @@ export const useTweetStore = defineStore('tweets', () => {
     getTweets,
     search,
     getTweetsByDateRange,
-    resetPages,
     parseDateRange,
     nextPage,
   }
