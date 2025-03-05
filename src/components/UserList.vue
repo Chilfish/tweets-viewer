@@ -26,7 +26,7 @@ const usersStore = useUsersStore()
         v-for="user in usersStore.users"
         :key="user.screenName"
         :to="`/@${user.screenName}/`"
-        class="flex items-center gap-2 rounded-2 p-2 transition-colors duration-200 hover:bg-gray-1 hover:dark:bg-gray-9"
+        class="flex items-center gap-2 rounded-md p-2 transition-colors duration-200 hover:bg-gray-4 hover:dark:bg-gray-12"
       >
         <Avatar size="sm">
           <AvatarImage

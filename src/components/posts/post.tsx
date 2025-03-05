@@ -3,7 +3,7 @@ import { Repeat2 } from 'lucide-vue-next'
 import { computed, defineComponent, ref } from 'vue'
 import { Card, CardContent } from '~/components/ui/card'
 import { fallbackUser } from '~/constant'
-import type { Tweet, TweetMedia, UserInfo } from '~/types'
+import type { ReTweet, Tweet, TweetMedia, UserInfo } from '~/types'
 import { tweetUrl } from '~/utils'
 import { formatDate } from '~/utils/date'
 import { PostActions } from './actions'
@@ -36,48 +36,35 @@ const PostContent = defineComponent({
   },
 })
 
-const PostCard = defineComponent({
+const RetweetCard = defineComponent({
   props: {
-    tweet: {
-      type: Object as () => Tweet,
+    reTweet: {
+      type: Object as () => ReTweet,
       required: true,
     },
-    user: {
+    originalUser: {
       type: Object as () => UserInfo,
       required: true,
     },
-    retweet: {
-      type: Object as () => {
-        name: string
-        createdAt: Date
-        id: string
-      },
-    },
   },
-  setup({ tweet, user, retweet }) {
-    const curUserName = useRouteParams<string>('name', fallbackUser)
-    const url = tweetUrl(user.screenName, tweet.tweetId)
+  setup({ reTweet, originalUser }) {
+    const { user, tweet } = reTweet
+    const url = tweetUrl(originalUser.screenName, tweet.tweetId)
     const link = ref(url)
-    const isQuote = tweet.quotedStatus !== null
-    const isMainTweet = computed(
-      () => curUserName.value === user.screenName || !!retweet,
-    )
 
     return () => (
       <Card class='mx-auto w-full border-b-0 transition-all duration-200 last:border-b first:rounded-t-xl last:rounded-b-xl hover:bg-card/80'>
-        {retweet && (
-          <div class='flex cursor-pointer items-center gap-2 px-6 pt-3 text-gray-600 transition-colors space-x-1.5 dark:text-gray-400 hover:text-primary'>
-            <Repeat2 class='h-4 w-4' />
-            <a
-              class='text-sm hover:underline'
-              href={tweetUrl(curUserName.value, retweet.id)}
-              target='_blank'
-              rel='noopener noreferrer'
-            >
-              {`@${retweet.name} 在 ${formatDate(retweet.createdAt, { timezone: 'tokyo' })} 转推了`}
-            </a>
-          </div>
-        )}
+        <div class='flex items-center gap-2 p-3'>
+          <Repeat2 class='h-4 w-4' />
+          <a
+            class='text-sm hover:underline'
+            href={tweetUrl(originalUser.screenName, tweet.tweetId)}
+            target='_blank'
+            rel='noopener noreferrer'
+          >
+            {`@${originalUser.name} 在 ${formatDate(tweet.createdAt, { timezone: 'tokyo' })} 转推了`}
+          </a>
+        </div>
 
         <PostProfile
           time={new Date(tweet.createdAt)}
@@ -93,11 +80,57 @@ const PostCard = defineComponent({
           }}
         />
 
-        {isQuote && (
+        <PostActions
+          comment={tweet.replyCount}
+          retweet={tweet.retweetCount + tweet.quoteCount}
+          like={tweet.favoriteCount}
+          view={tweet.viewsCount}
+          link={link.value}
+        />
+      </Card>
+    )
+  },
+})
+
+const PostCard = defineComponent({
+  props: {
+    tweet: {
+      type: Object as () => Tweet,
+      required: true,
+    },
+    user: {
+      type: Object as () => UserInfo,
+      required: true,
+    },
+  },
+  setup({ tweet, user }) {
+    const curUserName = useRouteParams<string>('name', fallbackUser)
+    const url = tweetUrl(user.screenName, tweet.tweetId)
+    const link = ref(url)
+    const isQuote = tweet.quotedStatus !== null
+    const isMainTweet = computed(() => curUserName.value === user.screenName)
+
+    return () => (
+      <Card class='mx-auto py-2 w-full border-b-0 transition-all duration-200 last:border-b first:rounded-t-xl last:rounded-b-xl hover:bg-card/80'>
+        <PostProfile
+          time={new Date(tweet.createdAt)}
+          name={user.name}
+          screenName={user.screenName}
+          avatar={user.avatarUrl}
+        />
+        <PostContent
+          text={tweet.fullText}
+          media={tweet.media}
+          onImgError={() => {
+            link.value = `https://web.archive.org/web/${url}`
+          }}
+        />
+
+        {isQuote && tweet.quotedStatus && (
           <div class='mx-4 mb-4 overflow-hidden border rounded-xl bg-background/50'>
             <PostCard
-              tweet={tweet.quotedStatus?.tweet}
-              user={tweet.quotedStatus?.user}
+              tweet={tweet.quotedStatus.tweet}
+              user={tweet.quotedStatus.user}
               class='shadow-none border-0!'
             />
           </div>
@@ -132,19 +165,13 @@ export const Post = defineComponent({
     const isRetweet = tweet.retweetedStatus !== null
 
     return () => (
-      <PostCard
-        tweet={isRetweet ? tweet.retweetedStatus?.tweet : tweet}
-        user={isRetweet ? tweet.retweetedStatus?.user : user}
-        retweet={
-          isRetweet
-            ? {
-                name: user.name,
-                createdAt: tweet.createdAt,
-                id: tweet.tweetId,
-              }
-            : undefined
-        }
-      />
+      <>
+        {isRetweet && tweet.retweetedStatus ? (
+          <RetweetCard reTweet={tweet.retweetedStatus} originalUser={user} />
+        ) : (
+          <PostCard tweet={tweet} user={user} />
+        )}
+      </>
     )
   },
 })
