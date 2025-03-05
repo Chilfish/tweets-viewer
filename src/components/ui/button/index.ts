@@ -4,7 +4,7 @@ import { cva } from 'cva'
 export { default as Button } from './Button.vue'
 
 export const buttonVariants = cva(
-  'radix-btn',
+  '',
   {
     variants: {
       variant: {

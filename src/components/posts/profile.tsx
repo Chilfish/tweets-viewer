@@ -32,12 +32,12 @@ export const PostProfile = defineComponent({
           />
           <AvatarFallback>{screenName}</AvatarFallback>
         </Avatar>
-        <div class="flex flex-wrap items-center">
+        <div class="flex flex-wrap items-center gap-2">
           <p class="text-3.5 font-semibold">
             {name}
           </p>
           <a
-            class="mx-2 text-3.2 text-muted-foreground hover:text-main hover:underline"
+            class="mx-2 font-medium text-3.2 link text-muted-foreground"
             href={`https://twitter.com/${screenName}`}
             target="_blank"
           >

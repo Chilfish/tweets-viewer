@@ -22,7 +22,7 @@ const dialogId = 'media-preview'
 <template>
   <div
     v-if="media.length"
-    class="tweet-media grid gap-2 pt-2"
+    class="tweet-media grid gap-1 pt-2"
     :class="{
       'grid-cols-2': size > 1,
       'grid-cols-1': size === 1,
@@ -31,7 +31,7 @@ const dialogId = 'media-preview'
     <div
       v-for="({ url, type, width, height }) in media"
       :key="url"
-      class="group relative overflow-hidden rounded-xl transition-transform hover:scale-[1.02]"
+      class="group relative overflow-hidden rounded-md transition-transform hover:scale-[1.02]"
     >
       <Image
         v-if="type !== 'video'"

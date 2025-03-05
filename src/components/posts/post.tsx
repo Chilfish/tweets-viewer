@@ -67,7 +67,7 @@ const PostCard = defineComponent({
       >
         {retweet && (
           <div
-            class="flex cursor-pointer items-center px-6 pt-3 text-gray-600 transition-colors space-x-1.5 dark:text-gray-400 hover:text-main"
+            class="flex cursor-pointer items-center gap-2 px-6 pt-3 text-gray-600 transition-colors space-x-1.5 dark:text-gray-400 hover:text-primary"
           >
             <Repeat2 class="h-4 w-4" />
             <a

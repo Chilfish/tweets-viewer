@@ -1,6 +1,6 @@
 export default () => (
   <svg
-    class="text-blue"
+    class="text-blue-6"
     id="icon-twitter"
     xmlns="http://www.w3.org/2000/svg"
     width="32"

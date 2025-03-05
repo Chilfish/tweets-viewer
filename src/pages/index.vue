@@ -68,6 +68,7 @@ p {
 ul {
   list-style-type: disc;
 }
+
 li {
   margin-left: 3rem;
 }

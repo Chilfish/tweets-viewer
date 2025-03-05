@@ -7,30 +7,19 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
 const ActionButton = defineComponent({
   props: {
     count: Number,
-    label: {
-      type: String,
-      required: true,
-    },
   },
-  setup({ count, label }, { slots }) {
+  setup({ count }, { slots }) {
     return () => (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            class="h-9 rounded-full px-3 transition-colors duration-200"
-          >
-            {slots.default?.()}
-            <span class="ml-1.5 text-sm font-medium">
-              {count?.toLocaleString() || 0}
-            </span>
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>{label}</p>
-        </TooltipContent>
-      </Tooltip>
+      <Button
+        variant="ghost"
+        size="sm"
+        class="h-9 rounded-full px-3 transition-colors duration-200 center gap-2"
+      >
+        {slots.default?.()}
+        <span class="text-sm font-medium text-muted-foreground">
+          {count?.toLocaleString() || 0}
+        </span>
+      </Button>
     )
   },
 })
@@ -50,7 +39,6 @@ export const PostActions = defineComponent({
         <ActionButton
           class="group hover:(bg-#e1eef6/80 text-#1d9bf0)"
           count={comment}
-          label="回复"
         >
           <MessageCircle class="h-5 w-5 transition-transform group-hover:scale-110" />
         </ActionButton>
@@ -58,7 +46,6 @@ export const PostActions = defineComponent({
         <ActionButton
           class="group hover:(bg-#def1eb/80 text-#00ba7c)"
           count={retweet}
-          label="转推"
         >
           <Repeat2 class="h-5 w-5 transition-transform group-hover:scale-110" />
         </ActionButton>
@@ -66,7 +53,6 @@ export const PostActions = defineComponent({
         <ActionButton
           class="group hover:(bg-#f7e0eb/80 text-#f9127e)"
           count={like}
-          label="喜欢"
         >
           <HeartIcon class="h-5 w-5 transition-transform group-hover:scale-110" />
         </ActionButton>

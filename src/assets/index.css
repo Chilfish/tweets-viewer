@@ -18,7 +18,7 @@
 
     --popover-foreground: 0 0% 3.9%;
 
-    --primary: 0 0% 9%;
+    --primary: 203 57% 47%;
 
     --primary-foreground: 0 0% 98%;
 
@@ -69,9 +69,9 @@
 
     --popover-foreground: 0 0% 98%;
 
-    --primary: 0 0% 98%;
+    --primary: 203, 57%, 47%;
 
-    --primary-foreground: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
 
     --secondary: 0 0% 14.9%;
 
@@ -113,5 +113,19 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .link {
+    @apply text-primary font-bold hover:underline underline-offset-4;
+  }
+
+  .center {
+    @apply flex items-center justify-center;
+  }
+
+  .center-col {
+    @apply flex flex-col items-center justify-center;
   }
 }

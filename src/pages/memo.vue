@@ -30,7 +30,7 @@ watch(() => route.params.name as string, async (name) => {
 </script>
 
 <template>
-  <section class="flex flex-col gap-2">
+  <section class="flex flex-col gap-2 p-2">
     <Post
       v-for="tweet in tweets"
       :key="tweet.id"
