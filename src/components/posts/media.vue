@@ -22,7 +22,7 @@ const dialogId = 'media-preview'
 <template>
   <div
     v-if="media.length"
-    class="tweet-media grid gap-2 pt-2"
+    class="tweet-media grid gap-1 pt-2"
     :class="{
       'grid-cols-2': size > 1,
       'grid-cols-1': size === 1,
@@ -31,19 +31,17 @@ const dialogId = 'media-preview'
     <div
       v-for="({ url, type, width, height }) in media"
       :key="url"
-      class="group relative overflow-hidden rounded-xl transition-transform hover:scale-[1.02]"
+      class="relative overflow-hidden rounded-md"
     >
       <Image
         v-if="type !== 'video'"
         :class="cn({
-          'max-h-[512px]': size === 1,
-          'max-h-[320px]': size > 1,
-          'max-w-[80%] mx-auto': height > width && size === 1,
+          'max-h-[25rem]': size > 1,
+          'max-w-[20rem]': height > width && size === 1,
         })"
         :src="url.replace('name=orig', 'name=medium')"
         :width="width ? `${width}px` : '100%'"
         :fit="size === 1 ? 'contain' : 'cover'"
-        class="transition-transform duration-300 group-hover:scale-105"
         @click="openDialog(dialogId, {
           component: h(Image, {
             src: url.replace('name=orig', 'name=4096x4096'),
@@ -80,9 +78,5 @@ const dialogId = 'media-preview'
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(8px);
-}
-
-.dark #media-preview {
-  background: rgba(0, 0, 0, 0.9);
 }
 </style>

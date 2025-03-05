@@ -14,23 +14,27 @@ const route = useRoute()
 
 const tweets = ref<Tweet[]>([])
 
-watch(() => route.params.name as string, async (name) => {
-  tweetStore.tweetService.changeName(name)
-  const curName = usersStore.curUser.name
+watch(
+  () => route.params.name as string,
+  async (name) => {
+    tweetStore.tweetService.changeName(name)
+    const curName = usersStore.curUser.name
 
-  useSeo({
-    title: `@${curName} 推文的那年今日`,
-    description: `@${curName} 在这一天的推文`,
-  })
+    useSeo({
+      title: `@${curName} 推文的那年今日`,
+      description: `@${curName} 在这一天的推文`,
+    })
 
-  tweetStore.isLoading = true
-  tweets.value = await tweetStore.tweetService.getLastYearsTodayData()
-  tweetStore.isLoading = false
-}, { immediate: true })
+    tweetStore.isLoading = true
+    tweets.value = await tweetStore.tweetService.getLastYearsTodayData()
+    tweetStore.isLoading = false
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
-  <section class="flex flex-col gap-2">
+  <section class="flex flex-col gap-2 p-2">
     <Post
       v-for="tweet in tweets"
       :key="tweet.id"

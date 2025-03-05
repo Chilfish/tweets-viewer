@@ -12,39 +12,38 @@ import {
 } from './utils'
 
 async function readData(folder: string) {
-  const files = await glob(`${folder}/*.json`)
-    .then(files => files.filter(name => !name.includes('/data-')))
+  const files = await glob(`${folder}/*.json`).then((files) =>
+    files.filter((name) => !name.includes('/data-')),
+  )
 
   if (!files.length) {
     console.error(`No data found in ${folder}`)
     return []
   }
 
-  const data = (await pMap(files, file => readJson<any[]>(file))).flatMap(d => d)
+  const data = (await pMap(files, (file) => readJson<any[]>(file))).flat()
 
-  const mergedData = uniqueObj(data, 'id')
-    .sort((a, b) => {
-      const idA = 'id' in a ? a.id : a.rest_id
-      const idB = 'id' in b ? b.id : b.rest_id
-      return idB.localeCompare(idA)
-    })
+  const mergedData = uniqueObj(data, 'id').sort((a, b) => {
+    const idA = 'id' in a ? a.id : a.rest_id
+    const idB = 'id' in b ? b.id : b.rest_id
+    return idB.localeCompare(idA)
+  })
   await writeJson(`${folder}/data-merged.json`, mergedData)
 
   return mergedData
 }
 
-async function mergeOld(
-  folder: string,
-  newData: Tweet[],
-) {
+async function mergeOld(folder: string, newData: Tweet[]) {
   const oldFiles = await glob(`${folder}/data-old-*.json`)
-  const oldData = (await pMap(oldFiles, file => readJson<Tweet[]>(file))).flatMap(d => d)
+  const oldData = (
+    await pMap(oldFiles, (file) => readJson<Tweet[]>(file))
+  ).flat()
 
   // only add old data that is not in new data,
   // if the old data is in new data, it will be replaced
   const mergedData = mergeData(oldData, newData, 'id')
     .sort((a, b) => b.id.localeCompare(a.id))
-    .map(tweet => ({
+    .map((tweet) => ({
       ...tweet,
       userId: newData[0].userId,
     }))
@@ -55,8 +54,9 @@ async function mergeOld(
 export async function mergeLocal(folder: string) {
   const data = await readData(folder)
 
-  const birthday = await glob(`${folder}/birthday_*`)
-    .then(name => name[0]?.split('_').pop())
+  const birthday = await glob(`${folder}/birthday_*`).then((name) =>
+    name[0]?.split('_').pop(),
+  )
 
   if (!data.length) {
     return
@@ -65,7 +65,7 @@ export async function mergeLocal(folder: string) {
   const user = filterUser(data[0], new Date(birthday || ''))
   const tweet = data
     .map(filterTweet)
-    .filter(tweet => tweet.userId === user.screenName)
+    .filter((tweet) => tweet.userId === user.screenName)
 
   const mergedData = await mergeOld(folder, tweet)
 
@@ -83,8 +83,10 @@ export async function mergeLocal(folder: string) {
 if (isNotInImport(import.meta.filename)) {
   await pMap(
     dataFolders,
-    async folder => mergeLocal(folder)
-      .catch(err => console.error(`Error in ${folder}`, err)),
+    async (folder) =>
+      mergeLocal(folder).catch((err) =>
+        console.error(`Error in ${folder}`, err),
+      ),
     { concurrency: 1 },
   )
 }

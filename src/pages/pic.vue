@@ -20,14 +20,21 @@ interface ImgData {
 
 const name = location.pathname.split('/')[1]?.replace('@', '') || fallbackUser
 
-const { data: imgData, refetch, isFetching } = useQuery({
+const {
+  data: imgData,
+  refetch,
+  isFetching,
+} = useQuery({
   queryKey: ['tweets-pic'],
-  queryFn: () => request.get<ImgData>(`/image/get`, {
-    id: `tweets-pic-${name}-${Date.now()}`,
-    params: {
-      name,
-    },
-  }).then(res => res.data),
+  queryFn: () =>
+    request
+      .get<ImgData>('/image/get', {
+        id: `tweets-pic-${name}-${Date.now()}`,
+        params: {
+          name,
+        },
+      })
+      .then((res) => res.data),
   initialData: null,
   refetchOnWindowFocus: false,
 })
@@ -37,8 +44,7 @@ const isVideo = computed(() => imgData.value?.url.includes('video.twimg.com'))
 
 <template>
   <div
-    class="mx-auto min-h-50vh w-90vw transition-all space-y-3"
-    md="max-w-36rem"
+    class="mx-auto min-h-[50vh] w-[90vw] transition-all space-y-3 md:max-w-[36rem]"
   >
     <Card v-if="imgData">
       <CardContent class="p-0">

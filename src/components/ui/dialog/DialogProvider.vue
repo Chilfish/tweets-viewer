@@ -18,7 +18,9 @@ export interface DialogOptions {
   showClose?: boolean
 }
 
-const dialogs = reactive<Record<string, { open: boolean, options: DialogOptions | null }>>({})
+const dialogs = reactive<
+  Record<string, { open: boolean; options: DialogOptions | null }>
+>({})
 
 function registerDialog(id: string) {
   if (!dialogs[id]) {

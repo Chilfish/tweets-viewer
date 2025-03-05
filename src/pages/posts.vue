@@ -30,29 +30,32 @@ const queryInfo = ref<TweetsReturn>({
   queryKey: [],
   queryFn: () => Promise.resolve([]),
 })
-watch(() => route.query, (query, oldQuery) => {
-  // TODO: 太耦合了
-  const hasOtherQueryChanged = Object.keys(query).some(key =>
-    key !== 'new' && key !== 'page' && query[key] !== oldQuery?.[key],
-  )
+watch(
+  () => route.query,
+  (query, oldQuery) => {
+    // TODO: 太耦合了
+    const hasOtherQueryChanged = Object.keys(query).some(
+      (key) =>
+        key !== 'new' && key !== 'page' && query[key] !== oldQuery?.[key],
+    )
 
-  if (hasOtherQueryChanged) {
-    reset()
-  }
+    if (hasOtherQueryChanged) {
+      reset()
+    }
 
-  if (route.query.q) {
-    queryType.value = 'search'
-    queryInfo.value = tweetStore.search()
-  }
-  else if (route.query.from && route.query.to) {
-    queryType.value = 'dateRange'
-    queryInfo.value = tweetStore.getTweetsByDateRange()
-  }
-  else {
-    queryType.value = 'all'
-    queryInfo.value = tweetStore.getTweets()
-  }
-}, { immediate: true })
+    if (route.query.q) {
+      queryType.value = 'search'
+      queryInfo.value = tweetStore.search()
+    } else if (route.query.from && route.query.to) {
+      queryType.value = 'dateRange'
+      queryInfo.value = tweetStore.getTweetsByDateRange()
+    } else {
+      queryType.value = 'all'
+      queryInfo.value = tweetStore.getTweets()
+    }
+  },
+  { immediate: true },
+)
 
 const { data: queryData, refetch } = useQuery({
   queryKey: computed(() => queryInfo.value.queryKey),
@@ -66,22 +69,18 @@ watch(queryData, () => {
   isFetching.value = queryData.value.length === 0
   tweetStore.isLoading = isFetching.value
 
-  if (queryData.value.length < 10)
-    noMore.value = true
-  else
-    noMore.value = false
+  if (queryData.value.length < 10) noMore.value = true
+  else noMore.value = false
 
   const isSame = queryData.value[0]?.id === tweets.value[0]?.id
-  if (isSame)
-    return
+  if (isSame) return
 
   tweets.value.push(...queryData.value)
   triggerRef(tweets)
 })
 
 const loadMore = useThrottleFn(() => {
-  if (noMore.value)
-    return
+  if (noMore.value) return
   tweetStore.nextPage()
 }, 1000)
 
@@ -90,15 +89,11 @@ useEventListener(window, 'scroll', () => {
   const scrollHeight = document.documentElement.scrollHeight
   const isDown = window.scrollY + window.innerHeight >= scrollHeight - offset
 
-  if (isDown)
-    loadMore()
+  if (isDown) loadMore()
 })
 
 // 更换用户、查看顺序时重置
-watch([
-  () => route.params.name,
-  () => tweetStore.isReverse,
-], reset)
+watch([() => route.params.name, () => tweetStore.isReverse], reset)
 
 function reset() {
   tweets.value = []

@@ -5,7 +5,6 @@ import { X } from 'lucide-vue-next'
 import {
   DialogClose,
   DialogContent,
-
   DialogOverlay,
   DialogPortal,
   useForwardPropsEmits,
@@ -13,13 +12,18 @@ import {
 import { computed } from 'vue'
 import { cn } from '~/utils'
 
-const props = withDefaults(defineProps<DialogContentProps & {
-  class?: HTMLAttributes['class']
-  id?: string
-  showClose?: boolean
-}>(), {
-  showClose: true,
-})
+const props = withDefaults(
+  defineProps<
+    DialogContentProps & {
+      class?: HTMLAttributes['class']
+      id?: string
+      showClose?: boolean
+    }
+  >(),
+  {
+    showClose: true,
+  },
+)
 
 const emits = defineEmits<DialogContentEmits>()
 

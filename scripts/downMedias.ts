@@ -1,7 +1,7 @@
-import type { InsertTweet } from '../database'
 import { utimes } from 'node:fs/promises'
 import glob from 'fast-glob'
 import { dataFolder } from '.'
+import type { InsertTweet } from '../database'
 import { formatDate } from '../src/utils/date'
 import { downloadFiles, readJson, writeJson } from './utils'
 
@@ -13,20 +13,20 @@ interface Media {
 async function findImg(folder: string) {
   const tweets = await readJson<InsertTweet[]>(`${folder}/data-tweet.json`)
 
-  const media = tweets.map((tweet) => {
-    if (!tweet.media)
-      return null
+  const media = tweets
+    .map((tweet) => {
+      if (!tweet.media) return null
 
-    const { createdAt, tweetId } = tweet
-    const date = formatDate(createdAt, { fmt: 'yyyyMMdd_HHmmss' })
+      const { createdAt, tweetId } = tweet
+      const date = formatDate(createdAt, { fmt: 'yyyyMMdd_HHmmss' })
 
-    return tweet.media.map(({ url, type }, idx) => {
-      const ext = type === 'photo' ? 'jpg' : 'mp4'
-      const suffix = idx > 0 ? `-${idx}` : ''
-      const name = `${date}-${tweetId}${suffix}.${ext}`
-      return { url, name }
+      return tweet.media.map(({ url, type }, idx) => {
+        const ext = type === 'photo' ? 'jpg' : 'mp4'
+        const suffix = idx > 0 ? `-${idx}` : ''
+        const name = `${date}-${tweetId}${suffix}.${ext}`
+        return { url, name }
+      })
     })
-  })
     .filter((media): media is Media[] => !!media)
     .flat()
 
@@ -54,8 +54,7 @@ async function main() {
   for (const file of mediaFiles) {
     const createdAt = file.split('/').pop()?.split('-')[0]
 
-    if (!createdAt)
-      continue
+    if (!createdAt) continue
 
     const date = new Date(
       Number.parseInt(createdAt.substring(0, 4)), // year

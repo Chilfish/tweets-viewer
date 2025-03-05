@@ -28,32 +28,36 @@ export const usersTable = pgTable('users', {
   tweetEnd: timestamp('tweet_end').notNull().defaultNow(),
 })
 
-export const tweetsTable = pgTable('tweets', {
-  id: serial('id').primaryKey(),
-  tweetId: text('tweet_id').notNull().unique(),
-  userId: text('user_name')
-    .notNull()
-    .references(() => usersTable.screenName, { onDelete: 'cascade' }),
+export const tweetsTable = pgTable(
+  'tweets',
+  {
+    id: serial('id').primaryKey(),
+    tweetId: text('tweet_id').notNull().unique(),
+    userId: text('user_name')
+      .notNull()
+      .references(() => usersTable.screenName, { onDelete: 'cascade' }),
 
-  createdAt: timestamp('created_at').notNull(),
-  fullText: text('full_text').notNull(),
+    createdAt: timestamp('created_at').notNull(),
+    fullText: text('full_text').notNull(),
 
-  media: json('media').notNull().default([]).$type<TweetMedia[]>(),
+    media: json('media').notNull().default([]).$type<TweetMedia[]>(),
 
-  // Tweet metrics
-  retweetCount: integer('retweet_count').notNull().default(0),
-  quoteCount: integer('quote_count').notNull().default(0),
-  replyCount: integer('reply_count').notNull().default(0),
-  favoriteCount: integer('favorite_count').notNull().default(0),
-  viewsCount: integer('views_count').notNull().default(0),
+    // Tweet metrics
+    retweetCount: integer('retweet_count').notNull().default(0),
+    quoteCount: integer('quote_count').notNull().default(0),
+    replyCount: integer('reply_count').notNull().default(0),
+    favoriteCount: integer('favorite_count').notNull().default(0),
+    viewsCount: integer('views_count').notNull().default(0),
 
-  retweetedStatus: json('retweeted_status').$type<ReTweet>(),
-  quotedStatus: json('quoted_status').$type<QuotedTweet>(),
-}, table => ({
-  tweetIdIdx: index('tweet_id_idx').on(table.tweetId),
-  createdAtIdx: index('created_at_idx').on(table.createdAt),
-  textIdx: index('text_idx').on(table.fullText),
-}))
+    retweetedStatus: json('retweeted_status').$type<ReTweet>(),
+    quotedStatus: json('quoted_status').$type<QuotedTweet>(),
+  },
+  (table) => ({
+    tweetIdIdx: index('tweet_id_idx').on(table.tweetId),
+    createdAtIdx: index('created_at_idx').on(table.createdAt),
+    textIdx: index('text_idx').on(table.fullText),
+  }),
+)
 
 export type InsertUser = typeof usersTable.$inferInsert
 export type SelectUser = typeof usersTable.$inferSelect

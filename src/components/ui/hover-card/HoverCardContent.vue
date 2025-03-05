@@ -1,12 +1,7 @@
 <script setup lang="ts">
 import type { HoverCardContentProps } from 'reka-ui'
 import type { HTMLAttributes } from 'vue'
-import {
-  HoverCardContent,
-
-  HoverCardPortal,
-  useForwardProps,
-} from 'reka-ui'
+import { HoverCardContent, HoverCardPortal, useForwardProps } from 'reka-ui'
 import { computed } from 'vue'
 import { cn } from '~/utils'
 

@@ -1,10 +1,10 @@
-import type { PQueueOptions } from '../../src/utils/promise'
 import { createWriteStream, existsSync } from 'node:fs'
 import { utimes } from 'node:fs/promises'
 import path from 'node:path'
 import { pipeline } from 'node:stream'
 import { promisify } from 'node:util'
 import { consola } from 'consola'
+import type { PQueueOptions } from '../../src/utils/promise'
 import { PQueue } from '../../src/utils/promise'
 import { dir } from './files'
 
@@ -26,16 +26,17 @@ const defaultOptions = {
 export async function downloadBlob(
   options: (DownloadOptions & DownloadFileInfo) | string,
 ): Promise<boolean> {
-  const { url, ...optionsRest } = typeof options === 'string' ? { url: options } : options
+  const { url, ...optionsRest } =
+    typeof options === 'string' ? { url: options } : options
 
-  const {
-    dest,
-  } = { ...defaultOptions, ...optionsRest }
+  const { dest } = { ...defaultOptions, ...optionsRest }
 
-  if (!url)
-    throw new Error('URL is required')
+  if (!url) throw new Error('URL is required')
 
-  const name = optionsRest.name?.trim() || new URL(url).pathname.split('/').pop() || 'unknown_file'
+  const name =
+    optionsRest.name?.trim() ||
+    new URL(url).pathname.split('/').pop() ||
+    'unknown_file'
   let filename = dir(`${dest}/${name}`)
 
   if (existsSync(filename)) {
@@ -65,8 +66,7 @@ export async function downloadBlob(
 
     consola.success(`Downloaded ${res.url} to ${filename}`)
     return true
-  }
-  catch (error) {
+  } catch (error) {
     consola.error(`Failed to download ${url}:`, error)
     return false
   }
@@ -76,25 +76,29 @@ export async function downloadFiles(
   files: DownloadFileInfo[] | string[],
   options?: DownloadOptions & Partial<PQueueOptions>,
 ) {
-  options = {
+  const opts = {
     concurrency: 10,
     ...defaultOptions,
     ...options,
   }
 
   let downloaded = 0
-  const queue = new PQueue(options)
-  const fileArr = files.map(file => typeof file === 'string' ? { url: file } : file)
+  const queue = new PQueue(opts)
+  const fileArr = files.map((file) =>
+    typeof file === 'string' ? { url: file } : file,
+  )
 
-  queue.addAll(fileArr.map(file => async () => {
-    const res = await downloadBlob({
-      ...options,
-      ...file,
-    })
-    if (res) {
-      downloaded++
-    }
-  }))
+  queue.addAll(
+    fileArr.map((file) => async () => {
+      const res = await downloadBlob({
+        ...opts,
+        ...file,
+      })
+      if (res) {
+        downloaded++
+      }
+    }),
+  )
   await queue.onIdle()
 
   return downloaded

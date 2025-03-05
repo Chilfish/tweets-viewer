@@ -4,9 +4,23 @@ import type { HTMLAttributes } from 'vue'
 import { RangeCalendarRoot, useForwardPropsEmits } from 'reka-ui'
 import { computed } from 'vue'
 import { cn } from '~/utils'
-import { RangeCalendarCell, RangeCalendarCellTrigger, RangeCalendarGrid, RangeCalendarGridBody, RangeCalendarGridHead, RangeCalendarGridRow, RangeCalendarHeadCell, RangeCalendarHeader, RangeCalendarHeading, RangeCalendarNextButton, RangeCalendarPrevButton } from '.'
+import {
+  RangeCalendarCell,
+  RangeCalendarCellTrigger,
+  RangeCalendarGrid,
+  RangeCalendarGridBody,
+  RangeCalendarGridHead,
+  RangeCalendarGridRow,
+  RangeCalendarHeadCell,
+  RangeCalendarHeader,
+  RangeCalendarHeading,
+  RangeCalendarNextButton,
+  RangeCalendarPrevButton,
+} from '.'
 
-const props = defineProps<RangeCalendarRootProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<
+  RangeCalendarRootProps & { class?: HTMLAttributes['class'] }
+>()
 
 const emits = defineEmits<RangeCalendarRootEmits>()
 
@@ -31,7 +45,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
       <RangeCalendarNextButton />
     </RangeCalendarHeader>
 
-    <div class="mt-4 flex flex-col gap-y-4 sm:flex-row sm:gap-x-4 sm:gap-y-0">
+    <div class="flex flex-col gap-y-4 mt-4 sm:flex-row sm:gap-x-4 sm:gap-y-0">
       <RangeCalendarGrid v-for="month in grid" :key="month.value.toString()">
         <RangeCalendarGridHead>
           <RangeCalendarGridRow>

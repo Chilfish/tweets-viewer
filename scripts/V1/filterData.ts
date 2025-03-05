@@ -1,16 +1,11 @@
 import { existsSync } from 'node:fs'
 import glob from 'fast-glob'
-import {
-  dir,
-  isNotInImport,
-  readJson,
-  uniqueObj,
-  writeJson,
-} from '../utils'
+import { dir, isNotInImport, readJson, uniqueObj, writeJson } from '../utils'
 
 export async function readFiles(folder: string) {
-  const jsons = await glob(`${folder.replace(/\\/g, '/')}/*.json`)
-    .then(files => files.filter(name => !name.includes('data-')))
+  const jsons = await glob(`${folder.replace(/\\/g, '/')}/*.json`).then(
+    (files) => files.filter((name) => !name.includes('data-')),
+  )
 
   if (!jsons.length) {
     console.error(`No data found in ${folder}`)
@@ -30,10 +25,7 @@ export async function readFiles(folder: string) {
   return mergedData
 }
 
-export function filterData(
-  data: any[],
-  name: string | null = null,
-) {
+export function filterData(data: any[], name: string | null = null) {
   const removedKeys = [
     'bookmark_count',
     'bookmarked',
@@ -42,48 +34,50 @@ export function filterData(
     'url',
     'profile_image_url',
   ]
-  if (name)
-    removedKeys.push(...['screen_name', 'name'])
+  if (name) removedKeys.push(...['screen_name', 'name'])
 
-  return data.map((el) => {
-  // 一些错误的数据
-    const isOther = name && el.screen_name && el.screen_name !== name && !el.full_text.startsWith('RT @')
-    if (isOther) {
-      // console.log('Other:', el.screen_name, el.full_text)
-      return null
-    }
+  return data
+    .map((el) => {
+      // 一些错误的数据
+      const isOther =
+        name &&
+        el.screen_name &&
+        el.screen_name !== name &&
+        !el.full_text.startsWith('RT @')
+      if (isOther) {
+        // console.log('Other:', el.screen_name, el.full_text)
+        return null
+      }
 
-    removedKeys.forEach(key => delete el[key])
+      for (const key of removedKeys) {
+        delete el[key]
+      }
 
-    el.media = el.media.map((media: any) => {
-      let url = media.original
-      if (media.type === 'video')
-        url = media.original
+      el.media = el.media.map((media: any) => {
+        let url = media.original
+        if (media.type === 'video') url = media.original
 
-      return url || media
-    })
+        return url || media
+      })
 
-    el.full_text = el.full_text
-      .replace(/\xA0|\u3000/g, ' ') // 不可见空格
+      el.full_text = el.full_text.replace(/\xA0|\u3000/g, ' ') // 不可见空格
 
-    el.views_count = +el.views_count || 0
+      el.views_count = +el.views_count || 0
 
-    if (el.in_reply_to) {
-      const tweet = data.find(tweet => tweet.id === el.in_reply_to)
-      if (tweet) {
-        el.in_reply_to = {
-          id: tweet.id,
-          name: tweet.name,
+      if (el.in_reply_to) {
+        const tweet = data.find((tweet) => tweet.id === el.in_reply_to)
+        if (tweet) {
+          el.in_reply_to = {
+            id: tweet.id,
+            name: tweet.name,
+          }
         }
       }
-    }
 
-    el.created_at = el.created_at
-      .replace(/_/, ' ')
-      .replace(/ [+-]\d+/, '')
+      el.created_at = el.created_at.replace(/_/, ' ').replace(/ [+-]\d+/, '')
 
-    return el
-  })
+      return el
+    })
     .filter(Boolean)
     .sort((a, b) => a.created_at.localeCompare(b.created_at))
 }
@@ -96,22 +90,18 @@ export interface ImgData {
   [key: string]: any
 }
 
-function filterImgs(
-  data: any[],
-  name: string | null = null,
-) {
+function filterImgs(data: any[], name: string | null = null) {
   const imgs = new Set<ImgData>()
 
   data.forEach((el) => {
     if (
-      el.full_text.startsWith('RT @')
-      || (name && el.screen_name && el.screen_name !== name)
+      el.full_text.startsWith('RT @') ||
+      (name && el.screen_name && el.screen_name !== name)
     ) {
       return
     }
 
-    if (!el.media.length)
-      return
+    if (!el.media.length) return
 
     imgs.add({
       statusId: el.id,

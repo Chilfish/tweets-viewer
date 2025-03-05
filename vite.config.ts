@@ -2,10 +2,10 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import Vue from '@vitejs/plugin-vue'
 import VueJsx from '@vitejs/plugin-vue-jsx'
-import UnoCSS from 'unocss/vite'
+import autoprefixer from 'autoprefixer'
+import tailwind from 'tailwindcss'
 import Components from 'unplugin-vue-components/vite'
 import { defineConfig } from 'vite'
-import VueDevTools from 'vite-plugin-vue-devtools'
 
 const root = path.dirname(fileURLToPath(import.meta.url))
 
@@ -29,25 +29,24 @@ export default defineConfig({
     Components({
       dts: 'src/types/auto-components.d.ts',
     }),
-
-    // https://github.com/antfu/unocss
-    UnoCSS(),
-
-    // https://github.com/webfansplz/vite-plugin-vue-devtools
-    VueDevTools(),
   ],
   server: {
     proxy: {
       '/static': {
         target: 'http://localhost:8080',
         changeOrigin: true,
-        rewrite: path => path.replace(/^\/static/, ''),
+        rewrite: (path) => path.replace(/^\/static/, ''),
       },
       '/api': {
         target: 'http://localhost:8787/v2',
         changeOrigin: true,
-        rewrite: path => path.replace(/^\/api/, ''),
+        rewrite: (path) => path.replace(/^\/api/, ''),
       },
+    },
+  },
+  css: {
+    postcss: {
+      plugins: [tailwind(), autoprefixer()],
     },
   },
 })

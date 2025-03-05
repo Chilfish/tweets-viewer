@@ -1,11 +1,16 @@
+import pMap from 'p-map'
 import type { FetcherService } from 'rettiwt-api'
 import type { DB } from '../'
-import type { InsertTweet } from '../schema'
-import pMap from 'p-map'
 import { getLatestTweets, updateUserTweets } from '../modules/tweet'
+import type { InsertTweet } from '../schema'
 import { fetchTweet } from './fetchTweet'
 
-async function updateTweet({ tweetApi, db, uid, latestTweet }: {
+async function updateTweet({
+  tweetApi,
+  db,
+  uid,
+  latestTweet,
+}: {
   tweetApi: FetcherService
   db: DB
   uid: string
@@ -20,7 +25,7 @@ async function updateTweet({ tweetApi, db, uid, latestTweet }: {
     endAt: latestTweet,
   })
 
-  const insertTweets: InsertTweet[] = tweets.map(tweet => ({
+  const insertTweets: InsertTweet[] = tweets.map((tweet) => ({
     ...tweet,
     id: undefined,
     tweetId: tweet.id,
@@ -53,7 +58,10 @@ async function updateTweet({ tweetApi, db, uid, latestTweet }: {
   }
 }
 
-async function updateAllTeets({ db, tweetApi }: {
+async function updateAllTeets({
+  db,
+  tweetApi,
+}: {
   db: DB
   tweetApi: FetcherService
 }) {
@@ -61,18 +69,19 @@ async function updateAllTeets({ db, tweetApi }: {
 
   return pMap(
     usersLatestTweets,
-    data => updateTweet({
-      tweetApi,
-      db,
-      uid: data.restId,
-      latestTweet: data.createdAt,
-    }).catch((err) => {
-      console.log(`${err.cause || err.message}`)
-      return {
-        rowCount: 0,
-        user: '',
-      }
-    }),
+    (data) =>
+      updateTweet({
+        tweetApi,
+        db,
+        uid: data.restId,
+        latestTweet: data.createdAt,
+      }).catch((err) => {
+        console.log(`${err.cause || err.message}`)
+        return {
+          rowCount: 0,
+          user: '',
+        }
+      }),
     {
       concurrency: 1,
       stopOnError: false,
@@ -80,7 +89,4 @@ async function updateAllTeets({ db, tweetApi }: {
   )
 }
 
-export {
-  updateAllTeets,
-  updateTweet,
-}
+export { updateAllTeets, updateTweet }

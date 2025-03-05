@@ -34,7 +34,7 @@ export interface PQueueOptions {
 }
 
 const defaultOptions = {
-  concurrency: Infinity,
+  concurrency: Number.POSITIVE_INFINITY,
   delay: 0,
 } satisfies PQueueOptions
 
@@ -62,14 +62,14 @@ export class PQueue {
         this._pending++
         try {
           if (this._options.delay)
-            await new Promise(resolve => setTimeout(resolve, this._options.delay))
+            await new Promise((resolve) =>
+              setTimeout(resolve, this._options.delay),
+            )
 
           resolve(await fn())
-        }
-        catch (e) {
+        } catch (e) {
           reject(e)
-        }
-        finally {
+        } finally {
           this._pending--
           this._next()
         }
@@ -81,16 +81,14 @@ export class PQueue {
   }
 
   addAll(fns: PromiseFn[]) {
-    return Promise.all(fns.map(fn => this.add(fn)))
+    return Promise.all(fns.map((fn) => this.add(fn)))
   }
 
   private _next() {
-    if (this._pending >= this._options.concurrency)
-      return
+    if (this._pending >= this._options.concurrency) return
 
     const run = this._queue.dequeue()
-    if (run)
-      run()
+    if (run) run()
   }
 
   /**
@@ -99,10 +97,8 @@ export class PQueue {
   async onIdle() {
     return new Promise<void>((resolve) => {
       const check = () => {
-        if (this._queue.length === 0 && this._pending === 0)
-          resolve()
-        else
-          setTimeout(check, this._options.delay)
+        if (this._queue.length === 0 && this._pending === 0) resolve()
+        else setTimeout(check, this._options.delay)
       }
       check()
     })

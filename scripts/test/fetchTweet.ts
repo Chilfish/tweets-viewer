@@ -1,13 +1,6 @@
 import { FetcherService } from 'rettiwt-api'
-import {
-  fetchTweet,
-  fetchUser,
-} from '../../database/services'
-import {
-  baseDir,
-  cachedData,
-  writeJson,
-} from '../utils'
+import { fetchTweet, fetchUser } from '../../database/services'
+import { baseDir, cachedData, writeJson } from '../utils'
 import 'dotenv/config'
 
 const username = process.argv[2] || 'elonmusk'
@@ -29,10 +22,11 @@ const userData = await cachedData(
 
 const { tweets, user } = await cachedData(
   tmpDir(`fetch/tweets-${username}.json`),
-  () => fetchTweet(tweetApi, {
-    id: userData.rest_id,
-    endAt: new Date('2024-11-21'),
-  }),
+  () =>
+    fetchTweet(tweetApi, {
+      id: userData.rest_id,
+      endAt: new Date('2024-11-21'),
+    }),
   isForce,
 )
 

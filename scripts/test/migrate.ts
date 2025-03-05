@@ -1,13 +1,10 @@
-import type { Tweet } from '@/types'
 import path from 'node:path'
+import type { Tweet } from '@/types'
 import glob from 'fast-glob'
 import { dataFolder } from '../'
 import { readJson, writeJson } from '../utils'
 
-function toTweet(
-  data: any,
-  uid: string,
-): Tweet | null {
+function toTweet(data: any, uid: string): Tweet | null {
   if (data.retweeted_status) {
     return null
   }
@@ -41,9 +38,9 @@ for (const file of files) {
   const filename = path.basename(file)
   const screenName = filename.replace('data-', '').replace('.json', '')
   const data = await readJson(file, [])
-  const tweets = data.map(
-    tweet => toTweet(tweet, screenName),
-  ).filter(Boolean) as Tweet[]
+  const tweets = data
+    .map((tweet) => toTweet(tweet, screenName))
+    .filter(Boolean) as Tweet[]
 
   await writeJson(
     `${dataFolder}/${screenName}/${filename.replace('data-', 'data-old-')}`,

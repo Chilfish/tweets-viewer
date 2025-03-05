@@ -11,18 +11,17 @@
     "build": "vite build",
     "lint": "eslint .",
     "typecheck": "vue-tsc --noEmit",
-    "preview": "vite preview",
-    "postinstall": "simple-git-hooks"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@date-fns/tz": "^1.2.0",
     "@tanstack/vue-query": "^5.67.1",
     "@unhead/vue": "1.11.19",
-    "@unocss/reset": "^66.0.0",
     "@vueuse/core": "^12.7.0",
     "@vueuse/router": "^12.7.0",
     "axios": "^1.8.1",
     "axios-cache-interceptor": "^1.6.2",
+    "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cva": "npm:class-variance-authority@^0.7.1",
     "date-fns": "^4.1.0",
@@ -33,51 +32,37 @@
     "radix-vue": "^1.9.17",
     "reka-ui": "^2.0.2",
     "tailwind-merge": "^3.0.2",
+    "tailwindcss-animate": "^1.0.7",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^4.4.0",
+    "@biomejs/biome": "1.9.4",
     "@hono-rate-limiter/cloudflare": "^0.2.2",
     "@neondatabase/serverless": "^0.10.4",
     "@types/node": "^22.13.9",
-    "@unocss/eslint-plugin": "^66.0.0",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vitejs/plugin-vue-jsx": "^4.1.1",
+    "autoprefixer": "^10.4.20",
     "concurrently": "^9.1.2",
+    "consola": "^3.4.0",
     "dotenv": "^16.4.7",
     "drizzle-kit": "^0.30.5",
     "drizzle-orm": "^0.40.0",
-    "eslint": "^9.21.0",
-    "eslint-plugin-format": "^1.0.1",
     "hono": "^4.7.2",
+    "lefthook": "^1.11.2",
     "lint-staged": "^15.4.3",
     "ohash": "^2.0.10",
     "p-map": "^7.0.3",
     "rettiwt-api": "^4.2.0",
     "simple-git-hooks": "^2.11.1",
+    "tailwindcss": "3",
+    "tailwindcss-radix-colors": "1",
     "typescript": "^5.8.2",
-    "unocss": "^66.0.0",
-    "unocss-preset-animations": "^1.1.1",
-    "unocss-preset-shadcn": "^0.3.2",
     "unplugin-vue-components": "^28.4.1",
     "vite": "^6.2.0",
     "vite-plugin-vue-devtools": "7.4.6",
     "vue-tsc": "^2.2.8",
     "wrangler": "^3.112.0"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "simple-git-hooks",
-      "vue-demi",
-      "workerd"
-    ]
-  },
-  "simple-git-hooks": {
-    "pre-commit": "pnpm lint-staged"
-  },
-  "lint-staged": {
-    "*": "eslint --fix"
   }
 }

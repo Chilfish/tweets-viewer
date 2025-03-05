@@ -3,10 +3,12 @@ import { setupCache } from 'axios-cache-interceptor'
 import { apiUrl } from '~/constant'
 import { convertDate } from './date'
 
-const client = setupCache(axios.create({
-  baseURL: apiUrl,
-  timeout: 10000,
-}))
+const client = setupCache(
+  axios.create({
+    baseURL: apiUrl,
+    timeout: 10000,
+  }),
+)
 
 client.interceptors.response.use(
   (response) => {
@@ -18,6 +20,4 @@ client.interceptors.response.use(
   },
 )
 
-export {
-  client as request,
-}
+export { client as request }

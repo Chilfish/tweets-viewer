@@ -1,10 +1,6 @@
 export function Link(url: string, text?: string) {
   return (
-    <a
-      href={url}
-      class="px-1 text-main hover:underline"
-      target="_blank"
-    >
+    <a href={url} class='px-1 link' target='_blank' rel='noreferrer'>
       {text || url}
     </a>
   )

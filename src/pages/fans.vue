@@ -3,7 +3,8 @@ import { gsap } from 'gsap'
 import { onMounted, reactive, ref } from 'vue'
 import { proxyUrl } from '~/constant'
 
-const uid = (new URLSearchParams(document.location.search)).get('uid') || '3546759743670773'
+const uid =
+  new URLSearchParams(document.location.search).get('uid') || '3546759743670773'
 const user = reactive({
   name: '',
   fans: 0,
@@ -13,9 +14,7 @@ const user = reactive({
 const error = ref('')
 
 async function fetcher(url: string) {
-  const res = await fetch(
-    `${proxyUrl}${url}`,
-  )
+  const res = await fetch(`${proxyUrl}${url}`)
   if (!res.ok) {
     error.value = '获取接口失败，请稍后再试。'
     return null
@@ -28,8 +27,7 @@ async function fetcher(url: string) {
       return null
     }
     return data
-  }
-  catch (err) {
+  } catch (err) {
     error.value = '由于触发哔哩哔哩安全风控策略，该次访问请求被拒绝。'
     console.error(err)
     return null
@@ -40,15 +38,14 @@ async function fetchFans() {
   const res = await fetcher(
     `https://api.bilibili.com/x/relation/stat?vmid=${uid}`,
   )
-  if (!res)
-    return 0
+  if (!res) return 0
 
   return res.data.follower
 }
 
 async function getInfo() {
   const dom = await fetch(`${proxyUrl}https://space.bilibili.com/${uid}`)
-    .then(res => res.text())
+    .then((res) => res.text())
     .catch(() => {
       error.value = '获取用户信息失败，请稍后再试。'
       return ''
@@ -56,14 +53,12 @@ async function getInfo() {
 
   // get from <title> tag
   const title = dom.match(/<title>(.*?)<\/title>/)
-  if (!title)
-    return
+  if (!title) return
 
   user.name = title[1].split('的个人空间-')[0]
 
   const avatar = dom.match(/<link rel="apple-touch-icon" href="(.*?)">/)
-  if (avatar)
-    user.avatar = avatar[1]
+  if (avatar) user.avatar = avatar[1]
 }
 
 const tweened = reactive({

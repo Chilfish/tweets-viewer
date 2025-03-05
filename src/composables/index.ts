@@ -17,8 +17,7 @@ export function checkNetwork() {
   watchImmediate(isOnline, async () => {
     if (isOnline.value) {
       isGoodNetwork.value = await canGoogle()
-    }
-    else {
+    } else {
       isGoodNetwork.value = false
     }
     console.log('isGoodNetwork', isGoodNetwork.value)
@@ -35,15 +34,13 @@ export function useRetryFetch(
     retry = 0,
   ): Promise<T | null> {
     return fetch(url)
-      .then(res => res.json())
+      .then((res) => res.json())
       .catch(async () => {
         if (retry < 3) {
           return retryFetch(url, retry + 1)
         }
-        else {
-          onError(new Error(`Failed to fetch ${url}`), url)
-          return null
-        }
+        onError(new Error(`Failed to fetch ${url}`), url)
+        return null
       })
   }
 }

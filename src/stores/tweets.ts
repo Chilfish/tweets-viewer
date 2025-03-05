@@ -1,10 +1,10 @@
 import type { QueryKey } from '@tanstack/vue-query'
-import type { Tweet } from '~/types'
 import { useDateFormat } from '@vueuse/core'
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ServerTweetService } from '~/services/server'
+import type { Tweet } from '~/types'
 import { useUsersStore } from './users'
 
 export interface TweetsReturn {
@@ -32,14 +32,21 @@ export const useTweetStore = defineStore('tweets', () => {
 
   const tweetService = new ServerTweetService(screenName.value)
 
-  watch(screenName, async (newName) => {
-    tweetService.isReverse = isReverse.value
-    tweetService.changeName(newName)
-  }, { immediate: true })
+  watch(
+    screenName,
+    async (newName) => {
+      tweetService.isReverse = isReverse.value
+      tweetService.changeName(newName)
+    },
+    { immediate: true },
+  )
 
-  watch(() => route.path, () => {
-    page.value = curPage()
-  })
+  watch(
+    () => route.path,
+    () => {
+      page.value = curPage()
+    },
+  )
 
   watch(isReverse, (val) => {
     tweetService.isReverse = val
@@ -75,25 +82,21 @@ export const useTweetStore = defineStore('tweets', () => {
 
     // const { start, end } = parseDateRange()
     return {
-      queryFn: () => tweetService.searchTweets(
-        keyword,
-        page.value,
-        // start,
-        // end,
-      ),
+      queryFn: () =>
+        tweetService.searchTweets(
+          keyword,
+          page.value,
+          // start,
+          // end,
+        ),
       queryKey: ['tweets-search', page, keyword, isReverse],
     }
   }
 
-  function getTweetsByDateRange(
-    start?: number,
-    end?: number,
-  ): TweetsReturn {
+  function getTweetsByDateRange(start?: number, end?: number): TweetsReturn {
     let { start: queryStart, end: queryEnd } = parseDateRange()
-    if (start)
-      queryStart = start
-    if (end)
-      queryEnd = end
+    if (start) queryStart = start
+    if (end) queryEnd = end
 
     router.push({
       query: {
@@ -105,8 +108,16 @@ export const useTweetStore = defineStore('tweets', () => {
     })
 
     return {
-      queryKey: ['tweets-date-range', screenName, queryStart, queryEnd, page, isReverse],
-      queryFn: () => tweetService.getByDateRange(queryStart, queryEnd, page.value),
+      queryKey: [
+        'tweets-date-range',
+        screenName,
+        queryStart,
+        queryEnd,
+        page,
+        isReverse,
+      ],
+      queryFn: () =>
+        tweetService.getByDateRange(queryStart, queryEnd, page.value),
     }
   }
 

@@ -24,30 +24,22 @@ export const PostProfile = defineComponent({
   },
   setup({ time, name, screenName, avatar }) {
     return () => (
-      <CardHeader class="flex flex-row items-center gap-2 py-2">
-        <Avatar size="sm">
-          <AvatarImage
-            alt={`User avatar for ${screenName}`}
-            src={avatar}
-          />
+      <CardHeader class='flex flex-row items-center gap-2 py-2'>
+        <Avatar size='sm'>
+          <AvatarImage alt={`User avatar for ${screenName}`} src={avatar} />
           <AvatarFallback>{screenName}</AvatarFallback>
         </Avatar>
-        <div class="flex flex-wrap items-center">
-          <p class="text-3.5 font-semibold">
-            {name}
-          </p>
+        <div class='flex flex-wrap items-center gap-2'>
+          <p class='text-3.5 font-semibold'>{name}</p>
           <a
-            class="mx-2 text-3.2 text-muted-foreground hover:text-main hover:underline"
+            class='mx-2 font-medium text-3.2 link text-muted-foreground'
             href={`https://twitter.com/${screenName}`}
-            target="_blank"
+            target='_blank'
+            rel='noreferrer'
           >
-            @
-            {screenName}
+            @{screenName}
           </a>
-          <time
-            class="text-3.2 text-muted-foreground"
-            title="东京时间"
-          >
+          <time class='text-3.2 text-muted-foreground' title='东京时间'>
             {formatDate(time, { timezone: 'tokyo' })}
           </time>
         </div>

@@ -21,13 +21,16 @@ onBeforeMount(async () => {
 
 <template>
   <main
-    class="mx-auto flex flex-col gap-0 transition-all duration-300 lg:w-60vw xl:w-50vw md:p-4"
+    class="container mx-auto flex flex-col gap-0 transition-all duration-300 lg:w-[60vw] xl:w-[50vw] md:p-4"
   >
     <Header />
 
     <slot />
 
-    <Loading v-if="tweetStore.isLoading" />
+    <Loading
+      v-if="tweetStore.isLoading"
+      class="py-4"
+    />
 
     <BackToTop />
   </main>

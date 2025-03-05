@@ -22,8 +22,7 @@ function handleScroll() {
 
   if (isScrollDown) {
     show.value = true
-  }
-  else {
+  } else {
     show.value = false
   }
 
@@ -46,7 +45,7 @@ useEventListener(window, 'scroll', handleScroll)
       v-show="show"
       variant="default"
       size="icon"
-      class="fixed bottom-6 right-6 z-50 rounded-full shadow-lg transition-all duration-200 hover:(transform shadow-xl -translate-y-0.5)"
+      class="fixed bottom-6 right-6 z-50 rounded-full shadow-lg transition-all duration-200"
       @click="scrollToTop"
     >
       <ArrowUp class="h-5 w-5" />

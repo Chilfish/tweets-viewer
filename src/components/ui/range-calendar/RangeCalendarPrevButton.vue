@@ -7,7 +7,9 @@ import { computed } from 'vue'
 import { buttonVariants } from '~/components/ui/button'
 import { cn } from '~/utils'
 
-const props = defineProps<RangeCalendarPrevProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<
+  RangeCalendarPrevProps & { class?: HTMLAttributes['class'] }
+>()
 
 const delegatedProps = computed(() => {
   const { class: _, ...delegated } = props

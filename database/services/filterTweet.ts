@@ -1,15 +1,7 @@
-import type {
-  QuotedTweet,
-  ReTweet,
-  Tweet,
-  User,
-  UserInfo,
-} from '@/types'
+import type { QuotedTweet, ReTweet, Tweet, User, UserInfo } from '@/types'
 
 import type { ITweet } from 'rettiwt-core/dist/types/base/Tweet'
-import type {
-  Result2 as ITweetsAndReplies,
-} from 'rettiwt-core/dist/types/user/TweetsAndReplies'
+import type { Result2 as ITweetsAndReplies } from 'rettiwt-core/dist/types/user/TweetsAndReplies'
 
 // import type quoteData from './data/quote.json'
 // import type replyData from './data/reply.json'
@@ -56,13 +48,13 @@ function filterUser(data: TweetData, birthday = new Date()): User {
 
   const website = legacy.entities.url?.urls[0].expanded_url || ''
 
-  const bio = legacy.entities.description.urls
-    .reduce(
-      (acc, url) => acc.replace(url.url, url.expanded_url),
-      legacy.description,
-    )
+  const bio = legacy.entities.description.urls.reduce(
+    (acc, url) => acc.replace(url.url, url.expanded_url),
+    legacy.description,
+  )
 
-  const profileBannerUrl = 'profile_banner_url' in legacy ? legacy.profile_banner_url : ''
+  const profileBannerUrl =
+    'profile_banner_url' in legacy ? legacy.profile_banner_url : ''
 
   return {
     ...filterUserInfo(data),
@@ -96,8 +88,7 @@ function _filterTweet(data: TweetData): Tweet {
       // @ts-expect-error it's a video
       url = m.video_info.variants
         .filter((v: any) => v.content_type === 'video/mp4')
-        .sort((a: any, b: any) => b.bitrate - a.bitrate)[0]
-        .url
+        .sort((a: any, b: any) => b.bitrate - a.bitrate)[0].url
     }
 
     return {
@@ -148,8 +139,7 @@ function filterTweet(data: TweetData): Tweet {
       ...data,
       metadata: data,
     }
-  }
-  else if (!('metadata' in data && 'legacy' in data.metadata)) {
+  } else if (!('metadata' in data && 'legacy' in data.metadata)) {
     _data = {
       ...data,
       metadata: { legacy: data },
@@ -190,8 +180,4 @@ function filterQuotedTweet(data: TweetData): QuotedTweet | null {
   }
 }
 
-export {
-  filterTweet,
-  filterUser,
-  filterUserInfo,
-}
+export { filterTweet, filterUser, filterUserInfo }

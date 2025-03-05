@@ -7,13 +7,14 @@ import { mergeLocal } from './mergeLocal'
 import { createDb, readJson } from './utils'
 
 async function insertUser(db: DB, user: InsertUser) {
-  await createUser({ db, user })
-    .then(({ rowCount }) => console.log(`Inserted ${rowCount} User`))
+  await createUser({ db, user }).then(({ rowCount }) =>
+    console.log(`Inserted ${rowCount} User`),
+  )
 }
 
 async function insertTweets(db: DB, folder: string, uid: string) {
   const tweets = await readJson<Tweet[]>(`${folder}/data-tweet.json`)
-  const insertTweets: InsertTweet[] = tweets.map(tweet => ({
+  const insertTweets: InsertTweet[] = tweets.map((tweet) => ({
     ...tweet,
     id: undefined,
     tweetId: tweet.id,
@@ -28,8 +29,9 @@ async function insertTweets(db: DB, folder: string, uid: string) {
 
   for (let i = 0; i < insertTweets.length; i += chunkSize) {
     const chunk = insertTweets.slice(i, i + chunkSize)
-    await createTweets(db, chunk)
-      .then(({ rowCount }) => insertedCount += rowCount)
+    await createTweets(db, chunk).then(({ rowCount }) => {
+      insertedCount += rowCount
+    })
   }
 
   console.log(`Inserted ${insertedCount} Tweets`)
@@ -43,7 +45,9 @@ async function main() {
 
   let dataFoldersToInsert = dataFolders
   if (username) {
-    dataFoldersToInsert = dataFolders.filter(folder => folder.includes(username))
+    dataFoldersToInsert = dataFolders.filter((folder) =>
+      folder.includes(username),
+    )
   }
 
   for (const folder of dataFoldersToInsert) {
