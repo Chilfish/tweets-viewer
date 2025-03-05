@@ -6,9 +6,8 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import routes from './routes'
 
-import '@unocss/reset/tailwind.css'
-import 'virtual:uno.css'
-import './style.css'
+import './assets/style.css'
+import './assets/index.css'
 
 createApp(App)
   .use(routes)
