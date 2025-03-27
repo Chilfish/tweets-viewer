@@ -20,11 +20,7 @@ function handleScroll() {
 
   const isScrollDown = currentScrollY > lastScrollY.value
 
-  if (isScrollDown) {
-    show.value = true
-  } else {
-    show.value = false
-  }
+  show.value = !isScrollDown
 
   lastScrollY.value = currentScrollY
 }
