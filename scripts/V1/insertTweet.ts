@@ -1,10 +1,10 @@
 import type { Tweet, User } from '@/types'
-import type { DB, InsertTweet, InsertUser } from '../database'
-import { createTweets, createUser } from '../database'
-import { convertDate } from '../src/utils/date'
-import { dataFolders } from './'
+import { dataFolders } from '../'
+import type { DB, InsertTweet, InsertUser } from '../../database'
+import { createTweets, createUser } from '../../database'
+import { convertDate } from '../../src/utils/date'
+import { createDb, readJson } from '../utils'
 import { mergeLocal } from './mergeLocal'
-import { createDb, readJson } from './utils'
 
 async function insertUser(db: DB, user: InsertUser) {
   await createUser({ db, user }).then(({ rowCount }) =>

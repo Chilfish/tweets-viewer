@@ -1,15 +1,15 @@
 import type { Tweet } from '@/types'
 import glob from 'fast-glob'
 import pMap from 'p-map'
-import { filterTweet, filterUser } from '../database/services'
-import { dataFolders } from './'
+import { filterTweet, filterUser } from '../../database/services'
 import {
   isNotInImport,
   mergeData,
   readJson,
   uniqueObj,
   writeJson,
-} from './utils'
+} from '../utils'
+import { dataFolders } from './'
 
 async function readData(folder: string) {
   const files = await glob(`${folder}/*.json`).then((files) =>

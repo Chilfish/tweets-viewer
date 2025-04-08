@@ -14,7 +14,18 @@ interface GetTweet {
 const pageSize = 10
 
 export async function createTweets(db: DB, tweets: InsertTweet[]) {
-  return db.insert(tweetsTable).values(tweets).onConflictDoNothing()
+  const banchSize = 1000
+  let insertedCount = 0
+  for (let i = 0; i < tweets.length; i += banchSize) {
+    const chunk = tweets.slice(i, i + banchSize)
+
+    const { rowCount } = await db
+      .insert(tweetsTable)
+      .values(chunk)
+      .onConflictDoNothing()
+    insertedCount += rowCount
+  }
+  return { rowCount: insertedCount }
 }
 
 const _order = (reverse: boolean) =>

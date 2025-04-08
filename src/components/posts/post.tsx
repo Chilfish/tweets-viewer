@@ -38,7 +38,7 @@ const PostContent = defineComponent({
 
 const RetweetCard = defineComponent({
   props: {
-    reTweet: {
+    retweet: {
       type: Object as () => ReTweet,
       required: true,
     },
@@ -46,9 +46,13 @@ const RetweetCard = defineComponent({
       type: Object as () => UserInfo,
       required: true,
     },
+    retweetAt: {
+      type: Date,
+      required: true,
+    },
   },
-  setup({ reTweet, originalUser }) {
-    const { user, tweet } = reTweet
+  setup({ retweet, originalUser, retweetAt }) {
+    const { user, tweet } = retweet
     const url = tweetUrl(originalUser.screenName, tweet.tweetId)
     const link = ref(url)
 
@@ -62,7 +66,7 @@ const RetweetCard = defineComponent({
             target='_blank'
             rel='noopener noreferrer'
           >
-            {`@${originalUser.name} 在 ${formatDate(tweet.createdAt, { timezone: 'tokyo' })} 转推了`}
+            {`@${originalUser.name} 在 ${formatDate(retweetAt, { timezone: 'tokyo' })} 转推了`}
           </a>
         </div>
 
@@ -172,7 +176,11 @@ export const Post = defineComponent({
     return () => (
       <>
         {isRetweet && tweet.retweetedStatus ? (
-          <RetweetCard reTweet={tweet.retweetedStatus} originalUser={user} />
+          <RetweetCard
+            retweet={tweet.retweetedStatus}
+            retweetAt={tweet.createdAt}
+            originalUser={user}
+          />
         ) : (
           <PostCard tweet={tweet} user={user} />
         )}

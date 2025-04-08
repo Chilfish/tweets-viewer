@@ -30,3 +30,4 @@ wrangler.toml
 .vercel
 tmp
 src/utils/utils.ts
+scripts/data/
