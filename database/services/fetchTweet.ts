@@ -7,7 +7,7 @@ import type {
 } from 'rettiwt-core/dist/types/user/TweetsAndReplies'
 import type { Tweet, User } from '../../src/types'
 
-import { filterTweet as _filterTweet, filterUser } from './filterTweet'
+import { filterTweet, filterUser } from './filterTweet'
 
 import 'dotenv/config'
 
@@ -22,7 +22,7 @@ async function fetchUser(tweetApi: FetcherService, username: string) {
 
 async function _fetchTweet(tweetApi: FetcherService, fetchArgs: FetchArgs) {
   const res = await tweetApi.request<ITweetsAndRepliesResponse>(
-    EResourceType.USER_TIMELINE_AND_REPLIES,
+    EResourceType.USER_TIMELINE,
     fetchArgs,
   )
 
@@ -70,7 +70,15 @@ async function fetchTweet(
       return { tweets: [] as ITeetsItemContent[], cursor: '' }
     })
 
-    const filteredTweets = fetchedTweets.map(filterTweet)
+    const filteredTweets: Tweet[] = []
+    for (const rawTeeet of fetchedTweets) {
+      try {
+        const tweet = filterTweet(rawTeeet.tweet_results.result as any)
+        if (tweet) filteredTweets.push(tweet)
+      } catch (e) {
+        console.error(e)
+      }
+    }
 
     if (!filteredTweets.length) {
       console.warn('No tweets found')
@@ -119,11 +127,6 @@ async function fetchTweet(
     user,
     cursor: cursor || '',
   }
-}
-
-function filterTweet(data: ITeetsItemContent) {
-  const tweet = data.tweet_results.result
-  return _filterTweet(tweet as any)
 }
 
 export { fetchTweet, fetchUser }

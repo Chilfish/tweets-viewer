@@ -72,11 +72,11 @@ function filterUser(data: TweetData, birthday = new Date()): User {
   }
 }
 
-function _filterTweet(data: TweetData): Tweet {
+function _filterTweet(data: TweetData): Tweet | null {
   const tweet = data.metadata.legacy
 
   if (!tweet?.id_str) {
-    throw new Error('Tweet not found')
+    return null
   }
 
   const mediaLinks = tweet.extended_entities?.media || []
@@ -132,7 +132,7 @@ function _filterTweet(data: TweetData): Tweet {
   }
 }
 
-function filterTweet(data: TweetData): Tweet {
+function filterTweet(data: TweetData): Tweet | null {
   let _data = data as any
   if ('legacy' in data) {
     _data = {
@@ -157,10 +157,14 @@ function filterRetweet(data: TweetData): ReTweet | null {
 
   // @ts-expect-error it's a tweet
   const retweetedUser = filterUserInfo({ metadata: retweet })
+  const tweet = filterTweet(retweet as any)
+  if (!tweet) {
+    return null
+  }
 
   return {
     user: retweetedUser,
-    tweet: filterTweet(retweet as any),
+    tweet,
   }
 }
 
@@ -173,10 +177,15 @@ function filterQuotedTweet(data: TweetData): QuotedTweet | null {
 
   // @ts-expect-error it's a tweet
   const quoteUser = filterUserInfo({ metadata: quotedTweet })
+  const tweet = filterTweet(quotedTweet as any)
+
+  if (!tweet) {
+    return null
+  }
 
   return {
     user: quoteUser,
-    tweet: filterTweet(quotedTweet as any),
+    tweet,
   }
 }
 
