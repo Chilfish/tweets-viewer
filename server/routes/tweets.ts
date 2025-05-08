@@ -4,7 +4,7 @@ import {
   getTweetsByDateRange,
   getTweetsByKeyword,
 } from '@db/index'
-import { updateAllTeets } from '@db/services'
+import { updateAllTweets } from '@db/services'
 import type { AppType } from 'common'
 import { Hono } from 'hono'
 import { getContext } from 'hono/context-storage'
@@ -78,7 +78,7 @@ app.get('/update', async (c) => {
 
   // NOTE: not working on Cloudflare Workers
   const tweetApi = new FetcherService({ apiKey: TWEET_KEY })
-  const tweets = await updateAllTeets({ db, tweetApi })
+  const tweets = await updateAllTweets({ db, tweetApi })
   return c.json(tweets)
 })
 

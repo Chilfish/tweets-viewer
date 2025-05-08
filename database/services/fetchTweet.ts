@@ -1,11 +1,11 @@
+import type { Tweet, User } from '@/types'
 import type { FetchArgs, FetcherService } from 'rettiwt-api'
 import { CursoredData, EResourceType } from 'rettiwt-api'
 import type { Root as IUserDetailsResponse } from 'rettiwt-core/dist/types/user/Details'
 import type {
-  ItemContent as ITeetsItemContent,
   Root as ITweetsAndRepliesResponse,
+  ItemContent as ITweetsItemContent,
 } from 'rettiwt-core/dist/types/user/TweetsAndReplies'
-import type { Tweet, User } from '../../src/types'
 
 import { filterTweet, filterUser } from './filterTweet'
 
@@ -42,7 +42,7 @@ async function _fetchTweet(tweetApi: FetcherService, fetchArgs: FetchArgs) {
     .filter(Boolean)
     .filter(
       (tweet: any) => tweet.itemType === 'TimelineTweet',
-    ) as ITeetsItemContent[]
+    ) as ITweetsItemContent[]
 
   return {
     tweets,
@@ -56,24 +56,26 @@ async function fetchTweet(
 ) {
   const tweets: Tweet[] = []
   const user = {} as User
-  let cursor: string | undefined
+  let cursor = ''
   let lastTweetId = ''
 
   while (true) {
-    fetchArgs.cursor = cursor
+    if (cursor) {
+      fetchArgs.cursor = cursor
+    }
 
     const { tweets: fetchedTweets, cursor: nextCursor } = await _fetchTweet(
       tweetApi,
       fetchArgs,
     ).catch((err) => {
       console.dir(err, { depth: 3 })
-      return { tweets: [] as ITeetsItemContent[], cursor: '' }
+      return { tweets: [] as ITweetsItemContent[], cursor: '' }
     })
 
     const filteredTweets: Tweet[] = []
-    for (const rawTeeet of fetchedTweets) {
+    for (const rawTweet of fetchedTweets) {
       try {
-        const tweet = filterTweet(rawTeeet.tweet_results.result as any)
+        const tweet = filterTweet(rawTweet.tweet_results.result as any)
         if (tweet) filteredTweets.push(tweet)
       } catch (e) {
         console.error(e)
@@ -110,7 +112,7 @@ async function fetchTweet(
     //   cursor: nextCursor,
     // })
 
-    // TODO: beacuse of rate-limt, maybe break at other condition
+    // TODO: because of rate-limit, maybe break at other condition
     if (lastTweet.getTime() <= fetchArgs.endAt.getTime()) {
       break
     }

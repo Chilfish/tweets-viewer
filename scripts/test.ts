@@ -1,23 +1,20 @@
-import { createUser } from '../database'
-import type { InsertTweet, InsertUser } from '../database'
-import { createTweets } from '../database/modules/tweet'
-import { readJson } from './utils'
-import { createDb } from './utils'
+import { FetcherService } from 'rettiwt-api'
+import { fetchTweet } from '../database/services'
+import { writeJson } from './utils'
 
-const db = createDb()
+const { TWEET_KEY } = process.env
+if (!TWEET_KEY) {
+  throw new Error('TWEET_KEY is not set in .env')
+}
 
-const user = await readJson<InsertUser>('data/user.json')
-const tweets = await readJson<InsertTweet[]>('data/tweets.json').then((data) =>
-  data
-    .map((tweet) => ({
-      ...tweet,
-      id: undefined,
-    }))
-    .filter((tweet) => tweet.userId === user.screenName),
-)
+const tweetApi = new FetcherService({
+  apiKey: TWEET_KEY,
+  logging: true,
+})
 
-await createUser({ db, user })
+const data = await fetchTweet(tweetApi, {
+  endAt: new Date('2025-04-10'),
+  id: '1253494572841201665',
+})
 
-const { rowCount } = await createTweets(db, tweets)
-
-console.log('inserted tweets count:', rowCount, tweets.length)
+await writeJson('data/tweets.json', data)

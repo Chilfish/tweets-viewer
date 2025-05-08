@@ -58,7 +58,7 @@ async function updateTweet({
   }
 }
 
-async function updateAllTeets({
+async function updateAllTweets({
   db,
   tweetApi,
 }: {
@@ -89,4 +89,4 @@ async function updateAllTeets({
   )
 }
 
-export { updateAllTeets, updateTweet }
+export { updateAllTweets, updateTweet }

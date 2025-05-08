@@ -1,5 +1,5 @@
 import { FetcherService } from 'rettiwt-api'
-import { updateAllTeets } from '../database/services'
+import { updateAllTweets } from '../database/services'
 import { createDb } from './utils'
 
 const db = createDb()
@@ -10,7 +10,7 @@ if (!TWEET_KEY) {
 
 const tweetApi = new FetcherService({ apiKey: TWEET_KEY })
 
-const res = await updateAllTeets({ db, tweetApi }).catch((err) =>
-  console.error(`[updateAllTeets] ${err.message}`),
+const res = await updateAllTweets({ db, tweetApi }).catch((err) =>
+  console.error(`[updateAllTweets] ${err.message}`),
 )
 console.log(res)
