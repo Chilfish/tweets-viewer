@@ -80,7 +80,7 @@ export default defineComponent({
 
     watch([() => route.query.q, () => tweets.value], () => {
       if (!tweets.value?.length) return
-      searchTweets((route.query.q as string).trim() || '')
+      searchTweets((route.query.q as string)?.trim() || '')
     })
 
     return () => (

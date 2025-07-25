@@ -112,11 +112,13 @@ const PostCard = defineComponent({
     },
   },
   setup({ tweet, user, showActions }) {
-    const curUserName = useRouteParams<string>('name', fallbackUser)
+    const curUserName = useRouteParams<string>('name', '')
     const url = tweetUrl(user.screenName, tweet.tweetId)
     const link = ref(url)
     const isQuote = tweet.quotedStatus !== null
-    const isMainTweet = computed(() => curUserName.value === user.screenName)
+    const isMainTweet = computed(
+      () => curUserName.value === '' || curUserName.value === user.screenName,
+    )
 
     return () => (
       <Card class='mx-auto py-2 w-full border-b-0 transition-all duration-200 last:border-b first:rounded-t-xl last:rounded-b-xl hover:bg-card/80'>
