@@ -1,35 +1,37 @@
 import type { Tweet } from '@/types'
 import glob from 'fast-glob'
-import { createTweets, createUser } from '../database'
-import { filterTweet, filterUser } from '../database/services'
 import type { TweetData } from '../database/services'
-import { createDb, readJson, writeJson } from './utils'
+import { filterTweet, filterUser } from '../database/services/filterTweet'
+import { readJson, writeJson } from './utils'
 
-const db = createDb()
+const uid = 'sonysmasme'
 
-const uid = 'mika_d_dr'
-const birthday = '1983-06-24'
-
-const dir = `F:/Downloads/tweet-data/${uid}`
-const jsons = await glob(`${dir}/**/*.json`)
+const dir = `F:/Documents/Tweets/${uid}`
+const jsons = await glob(`${dir}/**/twitter-*.json`)
 
 const data = (await Promise.all<any[]>(jsons.map(readJson)).then((data) =>
   data.flat(),
 )) as TweetData[]
 
-let user: any = {}
+console.log(`Found ${data.length} tweets`)
+
+const user = filterUser(data[0])
+
+if (!user) {
+  console.error('No user found in the tweets')
+  process.exit(1)
+}
 
 const filtered = data
   .map((tweet) => {
     try {
-      user = filterUser(tweet, new Date(birthday))
       return filterTweet(tweet)
     } catch (e) {
       return null
     }
   })
-  .filter((tweet) => tweet?.userId === uid)
   .filter((tweet): tweet is Tweet => Boolean(tweet))
+  // .filter((tweet) => tweet?.userId === uid)
   .sort((a, b) => Number(b.id) - Number(a.id))
 
 await writeJson(`${dir}/data.json`, filtered)
@@ -40,5 +42,12 @@ const insertTweets: any[] = filtered.map((tweet: any) => {
   return tweet
 })
 
-await createUser({ db, user })
-await createTweets(db, insertTweets)
+await writeJson(
+  `${dir}/${uid}.json`,
+  {
+    user,
+    tweets: insertTweets,
+  },
+  'write',
+  0,
+)

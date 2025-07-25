@@ -4,6 +4,7 @@ import { defineAsyncComponent, h } from 'vue'
 import type { RouteRecordRaw } from 'vue-router'
 import { createRouter, createWebHistory } from 'vue-router'
 import DefaultLayout from '../layouts/default.vue'
+import RemoteLayout from '../layouts/remote.vue'
 
 function useLayout(page: string, layout: Component = DefaultLayout): Component {
   return h(
@@ -17,10 +18,13 @@ const routes: RouteRecordRaw[] = [
     path: '/',
     component: useLayout('index'),
   },
-  // {
-  //   path: '/remote',
-  //   component: useLayout('remote', DefaultLayout, true),
-  // },
+  {
+    path: '/remote',
+    component: h(
+      RemoteLayout,
+      h(defineAsyncComponent(() => import('../pages/remote.tsx'))),
+    ),
+  },
   {
     path: '/@:name',
     component: useLayout('posts'),

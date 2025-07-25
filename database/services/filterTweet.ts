@@ -31,14 +31,14 @@ function _getUser(data: TweetData) {
   return user
 }
 
-function filterUserInfo(data: TweetData): UserInfo {
-  const user = _getUser(data)
-  const { legacy } = user
+function filterUserInfo(data: any): UserInfo {
+  const user = _getUser(data) as any
+  const { core: legacy } = user
 
   return {
     name: legacy.name,
     screenName: legacy.screen_name,
-    avatarUrl: legacy.profile_image_url_https,
+    avatarUrl: user.avatar.image_url,
   }
 }
 
