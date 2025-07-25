@@ -35,7 +35,7 @@ export default defineComponent({
     ).json<TweetWithUser>()
 
     const page = ref(0)
-    const pageSize = 30
+    const pageSize = 20
     const pagedTweets = ref<Tweet[]>([])
     const searchResult = ref<Tweet[]>([])
     const user = computed(() => data.value?.user || ({} as UserInfo))
@@ -45,19 +45,21 @@ export default defineComponent({
     function loadTweets() {
       const start = page.value * pageSize
       const end = start + pageSize
-      const loadFrom = route.query.q ? searchResult.value : tweets.value
+      let loadFrom = route.query.q ? searchResult.value : tweets.value
+      if (reverse === 'true') {
+        loadFrom = loadFrom.toReversed()
+      }
       const sliced = loadFrom.slice(start, end)
 
       noMore.value = sliced.length < pageSize
 
       pagedTweets.value = [...pagedTweets.value, ...sliced]
+
       page.value += 1
     }
 
     watch(isFinished, (finished) => {
       if (!finished) return
-
-      if (reverse) tweets.value.reverse()
 
       loadTweets()
     })
