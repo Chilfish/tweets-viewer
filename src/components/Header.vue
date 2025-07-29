@@ -102,16 +102,17 @@ function search() {
           v-model="searchText"
           type="text"
           placeholder="Search..."
-          class="pl-10"
+          class="pl-10 bg-card"
           @keydown="(e: any) => {
             if (e.key === 'Enter') {
               search()
             }
           }"
         />
-        <span class="absolute start-0 inset-y-0 flex items-center justify-center px-2">
+        <span class="absolute start-0 inset-y-0 flex items-center justify-center px-3">
           <Search
-            class="cursor- pointer size-6 text-muted-foreground" @click="search"
+            class="cursor-pointer size-4 text-muted-foreground"
+             @click="search"
           />
         </span>
       </div>

@@ -25,14 +25,14 @@ export const PostProfile = defineComponent({
   setup({ time, name, screenName, avatar }) {
     return () => (
       <CardHeader class='flex flex-row items-center gap-2 py-2'>
-        <Avatar size='sm'>
+        <Avatar>
           <AvatarImage alt={`User avatar for ${screenName}`} src={avatar} />
           <AvatarFallback>{screenName}</AvatarFallback>
         </Avatar>
         <div class='flex flex-wrap items-center'>
-          <p class='text-3.5 font-semibold truncate max-w-36 sm:max-w-fit'>
+          <span class='text-3.5 font-semibold truncate max-w-36 sm:max-w-fit'>
             {name}
-          </p>
+          </span>
           <a
             class='mx-2 font-medium text-3.2 link text-muted-foreground truncate max-w-[150px]'
             href={`https://twitter.com/${screenName}`}

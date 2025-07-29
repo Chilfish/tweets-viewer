@@ -12,6 +12,8 @@ import {
   watchEffect,
 } from 'vue'
 import { useRoute } from 'vue-router'
+import { Button } from '~/components/ui/button'
+
 import { Post } from '~/components/posts/post'
 import { useSeo } from '~/composables'
 import { useTweetStore } from '~/stores/tweets'
@@ -19,7 +21,7 @@ import { useUsersStore } from '~/stores/users'
 
 const usersStore = useUsersStore()
 const tweetStore = useTweetStore()
-const tweets = shallowRef<Tweet[]>([])
+const tweets = ref<Tweet[]>([])
 const noMore = ref(false)
 const isFetching = ref(false)
 const route = useRoute()
@@ -75,7 +77,7 @@ watch(queryData, () => {
   if (isSame) return
 
   tweets.value.push(...queryData.value)
-  triggerRef(tweets)
+  // triggerRef(tweets)
 })
 
 const loadMore = useThrottleFn(() => {
@@ -111,7 +113,7 @@ watchEffect(() => {
 
 <template>
   <section
-    class="flex flex-col gap-2"
+    class="flex flex-col gap-3"
   >
     <Post
       v-for="tweet in tweets"

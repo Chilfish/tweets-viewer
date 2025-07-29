@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, useTemplateRef, watch } from 'vue'
-import { isGoodNetwork } from '~/composables'
-import { placeholderSVG, proxyUrl } from '~/constant'
+import { placeholderSVG } from '~/constant'
 
 const props = withDefaults(
   defineProps<{
@@ -19,16 +18,16 @@ const props = withDefaults(
   },
 )
 
-const emits = defineEmits<{
+defineEmits<{
   error: []
 }>()
 
 function setSrc(url: string) {
   return url
-  if (isGoodNetwork.value) {
-    return url
-  }
-  return proxyUrl + url
+  // if (isGoodNetwork.value) {
+  //   return url
+  // }
+  // return proxyUrl + url
 }
 
 const observer = new IntersectionObserver((entries) => {
@@ -92,7 +91,7 @@ watch(
 <template>
   <img
     ref="imgRef"
-    class="rounded-lg object-cover"
+    class="rounded object-cover"
     :loading="lazy ? 'lazy' : 'eager'"
     referrerpolicy="no-referrer"
     :alt

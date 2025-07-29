@@ -1,7 +1,10 @@
 <script setup lang="tsx">
+import { onBeforeMount } from 'vue';
 import { useSeo } from '~/composables'
 
-useSeo()
+onBeforeMount(() => {
+  useSeo()
+})
 </script>
 
 <template>

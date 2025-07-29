@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { setupCache } from 'axios-cache-interceptor'
+import { setupCache, buildWebStorage } from 'axios-cache-interceptor'
 import { apiUrl } from '~/constant'
 import { convertDate } from './date'
 
@@ -8,6 +8,9 @@ const client = setupCache(
     baseURL: apiUrl,
     timeout: 10000,
   }),
+  {
+  storage: buildWebStorage(localStorage, "axios-cache:"),
+}
 )
 
 client.interceptors.response.use(

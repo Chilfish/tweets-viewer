@@ -2,7 +2,6 @@ import { useRouteParams } from '@vueuse/router'
 import { Repeat2 } from 'lucide-vue-next'
 import { computed, defineComponent, ref } from 'vue'
 import { Card, CardContent } from '~/components/ui/card'
-import { fallbackUser } from '~/constant'
 import type { ReTweet, Tweet, TweetMedia, UserInfo } from '~/types'
 import { tweetUrl } from '~/utils'
 import { formatDate } from '~/utils/date'
@@ -12,6 +11,7 @@ import { PostProfile } from './profile'
 import { PostText } from './text'
 
 const PostContent = defineComponent({
+  name: 'PostContent',
   props: {
     text: {
       type: String,
@@ -37,6 +37,7 @@ const PostContent = defineComponent({
 })
 
 const RetweetCard = defineComponent({
+  name: 'RetweetCard',
   props: {
     retweet: {
       type: Object as () => ReTweet,
@@ -57,7 +58,7 @@ const RetweetCard = defineComponent({
     const link = ref(url)
 
     return () => (
-      <Card class='mx-auto w-full border-b-0 transition-all duration-200 last:border-b first:rounded-t-xl last:rounded-b-xl hover:bg-card/80'>
+      <Card class='mx-auto w-full'>
         <div class='flex items-center gap-2 p-3'>
           <Repeat2 class='h-4 w-4' />
           <a
@@ -97,6 +98,7 @@ const RetweetCard = defineComponent({
 })
 
 const PostCard = defineComponent({
+  name: 'PostCard',
   props: {
     tweet: {
       type: Object as () => Tweet,
@@ -121,7 +123,7 @@ const PostCard = defineComponent({
     )
 
     return () => (
-      <Card class='mx-auto py-2 w-full border-b-0 transition-all duration-200 last:border-b first:rounded-t-xl last:rounded-b-xl hover:bg-card/80'>
+      <Card class='mx-auto py-2 w-full transition-all duration-200 first:rounded-t-xl last:rounded-b-xl hover:bg-card/80'>
         <PostProfile
           time={new Date(tweet.createdAt)}
           name={user.name}
@@ -142,7 +144,7 @@ const PostCard = defineComponent({
               tweet={tweet.quotedStatus.tweet}
               user={tweet.quotedStatus.user}
               showActions={false}
-              class='shadow-none border-0!'
+              class='shadow-none border-0! bg-background'
             />
           </div>
         )}
@@ -162,6 +164,7 @@ const PostCard = defineComponent({
 })
 
 export const Post = defineComponent({
+  name: 'Post',
   props: {
     tweet: {
       type: Object as () => Tweet,

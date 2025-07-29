@@ -9,28 +9,32 @@ import RemoteLayout from '../layouts/remote.vue'
 function useLayout(page: string, layout: Component = DefaultLayout): Component {
   return h(
     layout,
-    h(defineAsyncComponent(() => import(`../pages/${page}.vue`))),
+    () => h(defineAsyncComponent(() => import(`../pages/${page}.vue`))),
   )
 }
 
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
+    name: 'index',
     component: useLayout('index'),
   },
   {
     path: '/remote',
+    name: 'remote',
     component: h(
       RemoteLayout,
       h(defineAsyncComponent(() => import('../pages/remote.tsx'))),
     ),
   },
   {
-    path: '/@:name',
+    path: '/@:name/',
+    name: 'user-posts',
     component: useLayout('posts'),
   },
   {
     path: '/@:name/memo',
+    name: 'user-memo',
     component: useLayout('memo'),
   },
   {
@@ -43,6 +47,7 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/test',
+    name: 'test',
     component: useLayout('test'),
   },
   {

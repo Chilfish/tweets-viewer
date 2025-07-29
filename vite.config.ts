@@ -2,9 +2,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import Vue from '@vitejs/plugin-vue'
 import VueJsx from '@vitejs/plugin-vue-jsx'
-import autoprefixer from 'autoprefixer'
-import tailwind from 'tailwindcss'
-import Components from 'unplugin-vue-components/vite'
+import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'vite'
 
 const root = path.dirname(fileURLToPath(import.meta.url))
@@ -24,11 +22,7 @@ export default defineConfig({
       },
     }),
     VueJsx(),
-
-    // https://github.com/antfu/vite-plugin-components
-    Components({
-      dts: 'src/types/auto-components.d.ts',
-    }),
+    tailwindcss()
   ],
   server: {
     proxy: {
@@ -42,11 +36,6 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
-    },
-  },
-  css: {
-    postcss: {
-      plugins: [tailwind(), autoprefixer()],
     },
   },
 })

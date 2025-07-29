@@ -3,6 +3,7 @@ import { onBeforeMount } from 'vue'
 import { useRoute } from 'vue-router'
 import BackToTop from '~/components/BackToTop.vue'
 import Loading from '~/components/icon/Loading'
+import Header from '~/components/Header.vue'
 
 import { useTweetStore } from '~/stores/tweets'
 import { useUsersStore } from '~/stores/users'

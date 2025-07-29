@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Tweet } from '~/types'
 import { CircleMinus } from 'lucide-vue-next'
-import { ref, watch } from 'vue'
+import { onBeforeMount, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { Post } from '~/components/posts/post'
 import { useSeo } from '~/composables'
@@ -13,24 +13,24 @@ const usersStore = useUsersStore()
 const route = useRoute()
 
 const tweets = ref<Tweet[]>([])
+const isLoading = ref(false)
 
-watch(
-  () => route.params.name as string,
-  async (name) => {
-    tweetStore.tweetService.changeName(name)
-    const curName = usersStore.curUser.name
+onBeforeMount(async () => {
+  isLoading.value = true
+  const name = route.params.name as string
+  tweetStore.tweetService.changeName(name)
+  const curName = usersStore.curUser.name
 
-    useSeo({
-      title: `@${curName} 推文的那年今日`,
-      description: `@${curName} 在这一天的推文`,
-    })
+  useSeo({
+    title: `@${curName} 推文的那年今日`,
+    description: `@${curName} 在这一天的推文`,
+  })
 
-    tweetStore.isLoading = true
-    tweets.value = await tweetStore.tweetService.getLastYearsTodayData()
-    tweetStore.isLoading = false
-  },
-  { immediate: true },
-)
+  tweets.value = await tweetStore.tweetService.getLastYearsTodayData()
+  console.log(`@${curName} 推文的那年今日`, tweets.value.length)
+  isLoading.value = false
+})
+
 </script>
 
 <template>
@@ -43,7 +43,7 @@ watch(
     />
 
     <div
-      v-if="!tweets.length && !tweetStore.isLoading"
+      v-if="!tweets.length && !isLoading"
       class="my-8 flex flex-col items-center justify-center text-center"
     >
       <CircleMinus class="h-10 w-10" />

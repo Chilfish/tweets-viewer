@@ -4,6 +4,7 @@ import { h } from 'vue'
 import { useDialog } from '~/components/ui/dialog'
 import { cn } from '~/utils'
 import Image from '../Image.vue'
+import Video from '../Video.vue'
 
 const props = defineProps<{
   media: TweetMedia[]
@@ -31,7 +32,7 @@ const dialogId = 'media-preview'
     <div
       v-for="({ url, type, width, height }) in media"
       :key="url"
-      class="relative overflow-hidden rounded-md"
+      class="relative overflow-hidden"
     >
       <Image
         v-if="type !== 'video'"
@@ -44,7 +45,7 @@ const dialogId = 'media-preview'
         :fit="size === 1 ? 'contain' : 'cover'"
         @click="openDialog(dialogId, {
           component: h(Image, {
-            src: url.replace('name=orig', 'name=4096x4096'),
+            src: url,
             onClick: () => closeDialog(dialogId),
             class: 'max-h-[90vh] max-w-[90vw] object-contain',
           }),
