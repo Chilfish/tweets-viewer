@@ -1,0 +1,12 @@
+{
+  "references": [{ "path": "../../tsconfig.base.json" }],
+  "compilerOptions": {
+    "jsx": "preserve",
+    "jsxImportSource": "vue",
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["./src/*"]
+    }
+  },
+  "include": ["**/**/*.ts", "**/**/*.tsx", "**/**/*.vue"]
+}

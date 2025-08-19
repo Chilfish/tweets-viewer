@@ -1,0 +1,13 @@
+{
+  "name": "@tweets-viewer/database",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {},
+  "dependencies": {
+    "drizzle-kit": "^0.31.4",
+    "drizzle-orm": "^0.44.4"
+  },
+  "devDependencies": {},
+  "packageManager": "bun@1.2.20"
+}

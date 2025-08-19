@@ -1,0 +1,13 @@
+{
+  "name": "@tweets-viewer/scripts",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {},
+  "dependencies": {
+    "p-map": "^7.0.3",
+    "rettiwt-api": "^6.0.5",
+    "@tweets-viewer/database": "workspace:*"
+  },
+  "packageManager": "bun@1.2.20"
+}
