@@ -3,12 +3,12 @@ import {
   getTweets,
   getTweetsByDateRange,
   getTweetsByKeyword,
-} from '@db/index'
-import { updateAllTweets } from '@db/services'
-import type { AppType } from 'common'
+  updateAllTweets,
+} from '@tweets-viewer/database'
 import { Hono } from 'hono'
 import { getContext } from 'hono/context-storage'
 import { FetcherService } from 'rettiwt-api'
+import type { AppType } from '../common'
 
 const app = new Hono<AppType>()
 

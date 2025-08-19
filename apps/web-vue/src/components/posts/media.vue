@@ -1,5 +1,5 @@
 <script setup lang="tsx">
-import type { TweetMedia } from '~/types'
+import type { TweetMedia } from '@tweets-viewer/shared'
 import { h } from 'vue'
 import { useDialog } from '~/components/ui/dialog'
 import { cn } from '~/utils'

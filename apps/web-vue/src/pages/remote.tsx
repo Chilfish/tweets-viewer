@@ -1,10 +1,10 @@
+import type { Tweet, UserInfo } from '@tweets-viewer/shared'
 import { useFetch } from '@vueuse/core'
 import { computed, defineComponent, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import Loading from '~/components/icon/Loading'
 import { Post } from '~/components/posts/post'
 import { Button } from '~/components/ui/button'
-import type { Tweet, UserInfo } from '~/types'
 
 interface TweetWithUser {
   user: UserInfo

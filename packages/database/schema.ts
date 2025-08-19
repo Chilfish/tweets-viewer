@@ -1,3 +1,4 @@
+import type { QuotedTweet, ReTweet, TweetMedia } from '@tweets-viewer/shared'
 import {
   index,
   integer,
@@ -7,7 +8,6 @@ import {
   text,
   timestamp,
 } from 'drizzle-orm/pg-core'
-import type { QuotedTweet, ReTweet, TweetMedia } from '@/types'
 
 export const usersTable = pgTable('users', {
   id: serial('id').primaryKey(),

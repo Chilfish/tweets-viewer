@@ -26,7 +26,7 @@ const filtered = data
   .map((tweet) => {
     try {
       return filterTweet(tweet)
-    } catch (e) {
+    } catch (_e) {
       return null
     }
   })

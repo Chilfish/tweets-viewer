@@ -1,10 +1,10 @@
 import type { QueryKey } from '@tanstack/vue-query'
+import type { Tweet } from '@tweets-viewer/shared'
 import { useDateFormat } from '@vueuse/core'
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ServerTweetService } from '~/services/server'
-import type { Tweet } from '~/types'
 
 export interface TweetsReturn {
   queryFn: () => Promise<Tweet[]>
@@ -51,8 +51,8 @@ export const useTweetStore = defineStore('tweets', () => {
       }
     }
     return {
-      start: new Date().getTime(),
-      end: new Date().getTime(),
+      start: Date.now(),
+      end: Date.now(),
     }
   }
 

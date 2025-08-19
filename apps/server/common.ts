@@ -1,4 +1,4 @@
-import type { DB } from '../database'
+import type { DB } from '@tweets-viewer/database'
 
 export const staticUrl =
   // = 'http://127.0.0.1:8080'

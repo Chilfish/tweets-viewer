@@ -2,7 +2,7 @@ import { defineComponent } from 'vue'
 import type { JSX } from 'vue/jsx-runtime'
 import { HashTagLink, Link, PeopleLink } from './link'
 
-function retweetInfo(text: string) {
+function _retweetInfo(text: string) {
   const regex = /^RT @(?<author>[^:]+):\s*(?<content>.+)/s
   const [_, name, restText] = text.match(regex) || [null, null, text]
   return {

@@ -1,18 +1,22 @@
-import type { FetchArgs, FetcherService } from 'rettiwt-api'
-import { CursoredData, ResourceType } from 'rettiwt-api'
-import type { Root as IUserDetailsResponse } from 'rettiwt-core/dist/types/user/Details'
+import type { Tweet, User } from '@tweets-viewer/shared'
 import type {
-  Root as ITweetsAndRepliesResponse,
-  ItemContent as ITweetsItemContent,
-} from 'rettiwt-core/dist/types/user/TweetsAndReplies'
-import type { Tweet, User } from '@/types'
-
+  FetchArgs,
+  FetcherService,
+  IRawUserDetailsResponse,
+  IRawUserTweetsAndRepliesResponse,
+} from 'rettiwt-api'
+import { CursoredData, ResourceType } from 'rettiwt-api'
 import { filterTweet, filterUser } from './filterTweet'
 
 import 'dotenv/config'
 
+type ITweetsItemContent = Exclude<
+  IRawUserTweetsAndRepliesResponse['data']['user']['result']['timeline_v2']['timeline']['instructions'][number]['entries'][number]['content']['itemContent'],
+  undefined
+>
+
 async function fetchUser(tweetApi: FetcherService, username: string) {
-  const { data } = await tweetApi.request<IUserDetailsResponse>(
+  const { data } = await tweetApi.request<IRawUserDetailsResponse>(
     ResourceType.USER_DETAILS_BY_USERNAME,
     { id: username },
   )
@@ -21,7 +25,7 @@ async function fetchUser(tweetApi: FetcherService, username: string) {
 }
 
 async function _fetchTweet(tweetApi: FetcherService, fetchArgs: FetchArgs) {
-  const res = await tweetApi.request<ITweetsAndRepliesResponse>(
+  const res = await tweetApi.request<IRawUserTweetsAndRepliesResponse>(
     ResourceType.USER_TIMELINE,
     fetchArgs,
   )

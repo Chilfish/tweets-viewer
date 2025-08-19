@@ -1,8 +1,8 @@
 import { request } from '@tweets-viewer/shared'
+import type { User } from '@tweets-viewer/shared/types'
 import { useRouteParams } from '@vueuse/router'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import type { User } from '../types'
 
 export const useUsersStore = defineStore('users', () => {
   const users = ref<User[]>([])

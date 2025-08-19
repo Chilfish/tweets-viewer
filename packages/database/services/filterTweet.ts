@@ -1,21 +1,18 @@
-import type { ITweet } from 'rettiwt-core/dist/types/base/Tweet'
-import type { Result2 as ITweetsAndReplies } from 'rettiwt-core/dist/types/user/TweetsAndReplies'
-import type { QuotedTweet, ReTweet, Tweet, User, UserInfo } from '@/types'
+import type {
+  QuotedTweet,
+  ReTweet,
+  Tweet,
+  User,
+  UserInfo,
+} from '@tweets-viewer/shared'
+import type { IRawTweet, IRawUserTweetsAndRepliesResponse } from 'rettiwt-api'
 
-// import type quoteData from './data/quote.json'
-// import type replyData from './data/reply.json'
-// import type cardData from './data/retweet-card.json'
-// import type retweetData from './data/retweet.json'
-// import type textData from './data/text_img.json'
+type IRawTweetsAndReplies = Exclude<
+  IRawUserTweetsAndRepliesResponse['data']['user']['result']['timeline_v2']['timeline']['instructions'][number]['entries'][number]['content'],
+  undefined
+>
 
-// type TextData = typeof textData
-// type RetweetData = typeof retweetData
-// type QuoteData = typeof quoteData
-// type ReplyData = typeof replyData
-// type CardData = typeof cardData
-
-// export type TweetData = TextData | RetweetData | QuoteData | ReplyData | CardData
-export type TweetData = { metadata: ITweetsAndReplies } & ITweet
+export type TweetData = { metadata: IRawTweetsAndReplies } & IRawTweet
 
 function _getUser(data: TweetData) {
   const _data = {

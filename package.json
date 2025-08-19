@@ -4,14 +4,15 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently -n \"web,server\" \"bun dev:web\" \"bun dev:server\"",
-    "dev:web": "vite --host --port 3000 --mode development",
-    "dev:server": "wrangler dev",
-    "deploy:server": "wrangler deploy --minify",
-    "build": "vite build",
-    "lint": "eslint .",
-    "typecheck": "vue-tsc --noEmit",
-    "preview": "vite preview"
+    "dev": "concurrently \"bun run dev:server\" \"bun run dev:client\"",
+    "dev:server": "bun run --cwd ./apps/server dev",
+    "dev:client": "bun run --cwd ./apps/client dev",
+    "build": "concurrently \"bun run build:server\" \"bun run build:client\"",
+    "build:server": "bun run --cwd ./apps/server build",
+    "build:client": "bun run --cwd ./apps/client build",
+    "lint": "biome check .",
+    "format": "biome format .",
+    "test": "biome test"
   },
   "dependencies": {},
   "devDependencies": {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Tweet } from '~/types'
+import type { Tweet } from '@tweets-viewer/shared/types'
 import { CircleMinus } from 'lucide-vue-next'
 import { onBeforeMount, ref } from 'vue'
 import { useRoute } from 'vue-router'

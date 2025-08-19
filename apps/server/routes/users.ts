@@ -1,4 +1,4 @@
-import { getUsers } from '@db/index'
+import { getUsers } from '@tweets-viewer/database'
 import { Hono } from 'hono'
 import { getContext } from 'hono/context-storage'
 import type { AppType } from '../../server/common'

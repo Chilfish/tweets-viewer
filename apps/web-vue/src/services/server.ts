@@ -1,5 +1,5 @@
 import { request } from '@tweets-viewer/shared'
-import type { Tweet } from '../types'
+import type { Tweet } from '@tweets-viewer/shared/types'
 import type { TweetService } from '.'
 
 export class ServerTweetService implements TweetService {

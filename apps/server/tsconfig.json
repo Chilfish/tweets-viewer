@@ -1,4 +1,5 @@
 {
+  "references": [{ "path": "../../tsconfig.base.json" }],
   "compilerOptions": {
     "composite": true,
     "target": "ESNext",
@@ -7,8 +8,7 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "paths": {
-      "@/*": ["../src/*"],
-      "@db/*": ["../database/*"]
+      "@/*": ["../src/*"]
     },
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
@@ -20,10 +20,5 @@
     "isolatedModules": true,
     "skipLibCheck": true
   },
-  "include": [
-    "**/*.ts",
-    "../src/types/**/*.ts",
-    "../src/utils/**/*.ts",
-    "../database/**/*.ts"
-  ]
+  "include": ["**/*.ts"]
 }

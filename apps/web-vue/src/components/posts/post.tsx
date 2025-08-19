@@ -1,9 +1,14 @@
+import type {
+  ReTweet,
+  Tweet,
+  TweetMedia,
+  UserInfo,
+} from '@tweets-viewer/shared'
 import { formatDate } from '@tweets-viewer/shared'
 import { useRouteParams } from '@vueuse/router'
 import { Repeat2 } from 'lucide-vue-next'
 import { computed, defineComponent, ref } from 'vue'
 import { Card, CardContent } from '~/components/ui/card'
-import type { ReTweet, Tweet, TweetMedia, UserInfo } from '~/types'
 import { tweetUrl } from '~/utils'
 import { PostActions } from './actions'
 import PostMedia from './media.vue'

@@ -28,7 +28,10 @@
       "dependencies": {
         "@hono-rate-limiter/cloudflare": "^0.2.2",
         "@neondatabase/serverless": "^1.0.1",
+        "@tweets-viewer/database": "workspace:*",
+        "@tweets-viewer/shared": "workspace:*",
         "hono": "^4.9.2",
+        "rettiwt-api": "^6.0.5",
       },
       "devDependencies": {
         "wrangler": "^4.31.0",
@@ -73,6 +76,9 @@
       "dependencies": {
         "drizzle-kit": "^0.31.4",
         "drizzle-orm": "^0.44.4",
+      },
+      "devDependencies": {
+        "rettiwt-api": "^6.0.5",
       },
     },
     "packages/shared": {

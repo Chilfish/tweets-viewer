@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { TweetsReturn } from '~/stores/tweets'
-import type { Tweet } from '~/types'
+import type { Tweet } from '@tweets-viewer/shared/types'
 import { useQuery } from '@tanstack/vue-query'
 import { useEventListener, useThrottleFn } from '@vueuse/core'
 import {

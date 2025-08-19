@@ -1,4 +1,4 @@
-import type { Tweet } from '~/types'
+import type { Tweet } from '@tweets-viewer/shared'
 
 export abstract class TweetService {
   pageSize = 10

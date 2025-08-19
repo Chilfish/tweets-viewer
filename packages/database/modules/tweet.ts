@@ -1,5 +1,5 @@
+import { now } from '@tweets-viewer/shared'
 import { and, asc, count, desc, eq, sql } from 'drizzle-orm'
-import { now } from '../../src/utils/date'
 import type { DB } from '..'
 import type { InsertTweet } from '../schema'
 import { tweetsTable, usersTable } from '../schema'
