@@ -1,8 +1,8 @@
+import type { TweetData } from '@tweets-viewer/database'
+import { filterTweet, filterUser } from '@tweets-viewer/database'
+import type { Tweet } from '@tweets-viewer/shared'
+import { readJson, writeJson } from '@tweets-viewer/shared/utils/files'
 import glob from 'fast-glob'
-import type { Tweet } from '@/types'
-import { readJson, writeJson } from '../../packages/shared/utils'
-import type { TweetData } from '../database/services'
-import { filterTweet, filterUser } from '../database/services/filterTweet'
 
 const uid = 'sonysmasme'
 
