@@ -23,4 +23,4 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           TWEET_KEY: ${{ secrets.TWEET_KEY }}
-        run: bun run scripts/updateTweet.ts
+        run: bun run apps/scripts/updateTweet.ts

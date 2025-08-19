@@ -6,10 +6,8 @@
   "scripts": {
     "dev": "concurrently \"bun run dev:server\" \"bun run dev:client\"",
     "dev:server": "bun run --cwd ./apps/server dev",
-    "dev:client": "bun run --cwd ./apps/client dev",
-    "build": "concurrently \"bun run build:server\" \"bun run build:client\"",
-    "build:server": "bun run --cwd ./apps/server build",
-    "build:client": "bun run --cwd ./apps/client build",
+    "dev:client": "bun run --cwd ./apps/web-vue dev",
+    "deploy": "bun run --cwd ./apps/server deploy",
     "lint": "biome check .",
     "format": "biome format .",
     "test": "biome test"
