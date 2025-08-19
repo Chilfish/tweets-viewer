@@ -1,0 +1,15 @@
+{
+  "name": "@tweets-viewer/scripts",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {},
+  "dependencies": {
+    "@tweets-viewer/database": "workspace:*",
+    "@tweets-viewer/shared": "workspace:*",
+    "fast-glob": "^3.3.3",
+    "p-map": "^7.0.3",
+    "rettiwt-api": "^6.0.5"
+  },
+  "packageManager": "bun@1.2.20"
+}
