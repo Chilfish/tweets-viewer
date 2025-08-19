@@ -7,9 +7,7 @@ import { Button } from '~/components/ui/button'
 import { Card, CardContent, CardFooter } from '~/components/ui/card'
 import { Skeleton } from '~/components/ui/skeleton'
 import Video from '~/components/Video.vue'
-import { fallbackUser } from '~/constant'
-import { formatDate } from '~/utils/date'
-import { request } from '~/utils/fetch'
+import { fallbackUser,formatDate, request} from '@tweets-viewer/shared'
 
 interface ImgData {
   url: string
