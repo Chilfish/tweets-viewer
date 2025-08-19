@@ -1,7 +1,6 @@
-import type { QuotedTweet, ReTweet, Tweet, User, UserInfo } from '@/types'
-
 import type { ITweet } from 'rettiwt-core/dist/types/base/Tweet'
 import type { Result2 as ITweetsAndReplies } from 'rettiwt-core/dist/types/user/TweetsAndReplies'
+import type { QuotedTweet, ReTweet, Tweet, User, UserInfo } from '@/types'
 
 // import type quoteData from './data/quote.json'
 // import type replyData from './data/reply.json'
@@ -31,14 +30,14 @@ function _getUser(data: TweetData) {
   return user
 }
 
-function filterUserInfo(data: any): UserInfo {
-  const user = _getUser(data) as any
-  const { core: legacy } = user
+function filterUserInfo(data: TweetData): UserInfo {
+  const user = _getUser(data)
+  const { legacy } = user
 
   return {
     name: legacy.name,
     screenName: legacy.screen_name,
-    avatarUrl: user.avatar.image_url,
+    avatarUrl: legacy.profile_image_url_https,
   }
 }
 
@@ -155,7 +154,6 @@ function filterRetweet(data: TweetData): ReTweet | null {
     return null
   }
 
-  // @ts-expect-error it's a tweet
   const retweetedUser = filterUserInfo({ metadata: retweet })
   const tweet = filterTweet(retweet as any)
   if (!tweet) {
@@ -175,7 +173,6 @@ function filterQuotedTweet(data: TweetData): QuotedTweet | null {
     return null
   }
 
-  // @ts-expect-error it's a tweet
   const quoteUser = filterUserInfo({ metadata: quotedTweet })
   const tweet = filterTweet(quotedTweet as any)
 

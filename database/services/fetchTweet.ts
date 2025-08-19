@@ -1,11 +1,11 @@
-import type { Tweet, User } from '@/types'
 import type { FetchArgs, FetcherService } from 'rettiwt-api'
-import { CursoredData, EResourceType } from 'rettiwt-api'
+import { CursoredData, ResourceType } from 'rettiwt-api'
 import type { Root as IUserDetailsResponse } from 'rettiwt-core/dist/types/user/Details'
 import type {
   Root as ITweetsAndRepliesResponse,
   ItemContent as ITweetsItemContent,
 } from 'rettiwt-core/dist/types/user/TweetsAndReplies'
+import type { Tweet, User } from '@/types'
 
 import { filterTweet, filterUser } from './filterTweet'
 
@@ -13,7 +13,7 @@ import 'dotenv/config'
 
 async function fetchUser(tweetApi: FetcherService, username: string) {
   const { data } = await tweetApi.request<IUserDetailsResponse>(
-    EResourceType.USER_DETAILS_BY_USERNAME,
+    ResourceType.USER_DETAILS_BY_USERNAME,
     { id: username },
   )
 
@@ -22,11 +22,11 @@ async function fetchUser(tweetApi: FetcherService, username: string) {
 
 async function _fetchTweet(tweetApi: FetcherService, fetchArgs: FetchArgs) {
   const res = await tweetApi.request<ITweetsAndRepliesResponse>(
-    EResourceType.USER_TIMELINE,
+    ResourceType.USER_TIMELINE,
     fetchArgs,
   )
 
-  const cursor = new CursoredData(res, 'Tweet' as any).next.value
+  const cursor = new CursoredData(res, 'Tweet' as any).next
 
   const tweets = (res.data.user.result as any).timeline.timeline.instructions
     .filter((res: any) => res.type === 'TimelineAddEntries')
