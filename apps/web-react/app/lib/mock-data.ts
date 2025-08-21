@@ -190,6 +190,8 @@ export const getUser = (screenName: string): User => {
   return mockUsers[screenName] || mockUsers['elonmusk']
 }
 
+export const fetchUsers = () => mockUsers
+
 // 生成推文列表
 export const generateTweets = (screenName: string, count: number): Tweet[] => {
   return Array.from({ length: count }, () => generateTweet(screenName))

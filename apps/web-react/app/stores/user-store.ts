@@ -1,9 +1,10 @@
 import { create } from 'zustand'
-import { getUser as fetchUser } from '~/lib/mock-data'
+import { fetchUsers } from '~/lib/mock-data'
 import type { User } from '~/types'
 
 interface UserState {
   users: Record<string, User>
+  curUser: User | null
   isLoading: boolean
   error: string | null
 }
@@ -11,6 +12,7 @@ interface UserState {
 interface UserActions {
   getUser: (screenName: string) => Promise<User>
   setUser: (screenName: string, user: User) => void
+  setCurUser: (screenName: string) => void
   clearError: () => void
 }
 
@@ -20,6 +22,7 @@ const initialState: UserState = {
   users: {},
   isLoading: false,
   error: null,
+  curUser: null,
 }
 
 export const useUserStore = create<UserStore>((set, get) => ({
@@ -38,14 +41,14 @@ export const useUserStore = create<UserStore>((set, get) => ({
     try {
       // 模拟异步获取用户数据
       await new Promise((resolve) => setTimeout(resolve, 300))
-      const user = fetchUser(screenName)
+      const users = fetchUsers()
 
-      set((state) => ({
-        users: { ...state.users, [screenName]: user },
+      set(() => ({
+        users,
         isLoading: false,
       }))
 
-      return user
+      return users[screenName] || null
     } catch (error) {
       set({
         error: 'Failed to load user data. Please try again.',
@@ -59,6 +62,12 @@ export const useUserStore = create<UserStore>((set, get) => ({
   setUser: (screenName, user) => {
     set((state) => ({
       users: { ...state.users, [screenName]: user },
+    }))
+  },
+
+  setCurUser: (screenName) => {
+    set((state) => ({
+      curUser: state.users[screenName] || null,
     }))
   },
 
