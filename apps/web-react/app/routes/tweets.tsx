@@ -1,4 +1,3 @@
-/** biome-ignore-all lint/a11y/useButtonType: <explanation> */
 import { useEffect } from 'react'
 import { TweetsList } from '~/components/tweets/tweets-list'
 import { UserHeader } from '~/components/user-header'
@@ -49,12 +48,12 @@ export default function TweetsPage({ params }: Route.ComponentProps) {
         {/* Tabs */}
         <div className='border-b border-gray-200 px-4'>
           <div className='flex'>
-            <button className='px-4 py-3 text-sm font-medium border-b-2 border-blue-500 text-blue-600'>
+            <div className='px-4 py-3 text-sm font-medium border-b-2 border-blue-500 text-blue-600'>
               Tweets
-            </button>
-            <button className='px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700'>
+            </div>
+            <div className='px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700'>
               Media
-            </button>
+            </div>
           </div>
         </div>
 
