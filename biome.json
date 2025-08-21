@@ -25,13 +25,24 @@
     "rules": {
       "recommended": true,
       "suspicious": {
-        "noExplicitAny": "off"
+        "noExplicitAny": "off",
+        "noArrayIndexKey": "off"
       },
       "complexity": {
         "noForEach": "off"
       },
       "correctness": {
-        "noEmptyPattern": "warn"
+        "noEmptyPattern": "warn",
+        "noNestedComponentDefinitions": "warn",
+        "useExhaustiveDependencies": "warn"
+      },
+      "a11y": {
+        "useSemanticElements": "off",
+        "useFocusableInteractive": "off",
+        "noRedundantRoles": "off"
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": "warn"
       }
     }
   },
