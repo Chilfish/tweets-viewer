@@ -1,0 +1,40 @@
+{
+  "name": "@tweets-viewer/web-react",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview",
+    "format": "biome format --write .",
+    "lint": "biome lint --cache .",
+    "postinstall": "lefthook install"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.12",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.23.12",
+    "lucide-react": "^0.540.0",
+    "motion": "^12.23.12",
+    "radix-ui": "^1.4.3",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-webcam": "^7.2.0",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss": "^4.1.12",
+    "zustand": "^5.0.8",
+    "@tweets-viewer/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
+    "@vitejs/plugin-react": "^5.0.1",
+    "globals": "^16.3.0",
+    "tw-animate-css": "^1.3.7",
+    "typescript": "~5.9.2",
+    "vite": "^7.1.3"
+  },
+  "packageManager": "bun@1.2.20"
+}
