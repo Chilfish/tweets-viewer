@@ -29,6 +29,9 @@
       },
       "complexity": {
         "noForEach": "off"
+      },
+      "correctness": {
+        "noEmptyPattern": "warn"
       }
     }
   },
