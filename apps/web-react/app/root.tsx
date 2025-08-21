@@ -22,7 +22,7 @@ export const links: Route.LinksFunction = () => [
   },
 ]
 
-export default function App() {
+export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang='en'>
       <head>
@@ -32,11 +32,21 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <Outlet />
+        {children}
         <ScrollRestoration />
         <Scripts />
       </body>
     </html>
+  )
+}
+
+export default function App() {
+  return <Outlet />
+}
+
+export function HydrateFallback() {
+  return (
+    <div className='flex items-center justify-center h-screen'>Loading...</div>
   )
 }
 
