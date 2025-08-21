@@ -7,7 +7,7 @@ import { useAppStore } from '~/stores/app-store'
 import { BottomNav } from './bottom-nav'
 import { Sidebar } from './sidebar'
 
-export function Layout() {
+export default function Layout() {
   const params = useParams()
   const isMobile = useIsMobile()
   const { setCurrentLayout, sidebarCollapsed } = useAppStore()
