@@ -6,12 +6,14 @@ import { cn } from '~/lib/utils'
 import { useTweetsStore } from '~/stores/tweets-store'
 import type { User } from '~/types'
 import { TweetCard } from './tweet-card'
+import { TweetsSortControls } from './tweets-sort-controls'
 
 interface TweetsListProps {
   user: User
+  showSortControls?: boolean
 }
 
-export function TweetsList({ user }: TweetsListProps) {
+export function TweetsList({ user, showSortControls = true }: TweetsListProps) {
   const {
     tweets,
     isLoading,
@@ -63,10 +65,19 @@ export function TweetsList({ user }: TweetsListProps) {
   }
 
   return (
-    <div className='divide-y divide-border'>
-      {tweets.map((tweet) => (
-        <TweetCard key={tweet.id} tweet={tweet} user={user} />
-      ))}
+    <div>
+      {/* Sort Controls */}
+      {showSortControls && tweets.length > 0 && (
+        <div className='p-4 border-b border-border bg-card'>
+          <TweetsSortControls />
+        </div>
+      )}
+
+      <div className='divide-y divide-border'>
+        {tweets.map((tweet) => (
+          <TweetCard key={tweet.id} tweet={tweet} user={user} />
+        ))}
+      </div>
 
       {/* Loading indicator */}
       <div ref={loadingRef} className='py-4'>

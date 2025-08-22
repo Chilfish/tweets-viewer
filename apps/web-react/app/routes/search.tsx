@@ -1,9 +1,9 @@
 import { Search, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { TweetCard } from '~/components/tweets/tweet-card'
+import { TweetsSortControls } from '~/components/tweets/tweets-sort-controls'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
-import { useAppStore } from '~/stores/app-store'
 import { useTweetsStore } from '~/stores/tweets-store'
 import { useUserStore } from '~/stores/user-store'
 import type { Tweet } from '~/types'
@@ -22,7 +22,7 @@ export default function SearchPage() {
   const [hasSearched, setHasSearched] = useState(false)
 
   const { findUserById, curUser } = useUserStore()
-  const { tweets, loadTweets } = useTweetsStore()
+  const { tweets, loadTweets, sortTweets } = useTweetsStore()
 
   const handleSearch = async () => {
     if (!query.trim()) return
@@ -41,7 +41,9 @@ export default function SearchPage() {
       tweet.fullText.toLowerCase().includes(query.toLowerCase()),
     )
 
-    setSearchResults(results)
+    // 应用当前的排序设置
+    const sortedResults = sortTweets(results)
+    setSearchResults(sortedResults)
     setIsSearching(false)
   }
 
@@ -125,14 +127,15 @@ export default function SearchPage() {
             </div>
           ) : (
             <div>
-              <div className='mb-4 pb-2 border-b border-border'>
+              <div className='mb-4 pb-2 border-b border-border flex items-center justify-between'>
                 <p className='text-sm text-muted-foreground'>
                   Found {searchResults.length} result
                   {searchResults.length !== 1 ? 's' : ''} for "{query}"
                 </p>
+                <TweetsSortControls showDateFilter={false} />
               </div>
 
-              <div className='space-y-4'>
+              <div className='divide-y divide-border'>
                 {searchResults.map((tweet) => (
                   <TweetCard
                     key={tweet.id}

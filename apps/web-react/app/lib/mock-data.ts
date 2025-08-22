@@ -201,15 +201,43 @@ export const generateTweets = (screenName: string, count: number): Tweet[] => {
 export const delay = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms))
 
+// API查询参数接口（为未来API对接准备）
+export interface TweetsQueryParams {
+  sortBy?: 'date'
+  sortOrder?: 'asc' | 'desc'
+  startDate?: Date | null
+  endDate?: Date | null
+}
+
 // 分页获取推文
 export const getTweets = async (
   screenName: string,
   page: number = 1,
   pageSize: number = 10,
+  params?: TweetsQueryParams,
 ): Promise<{ tweets: Tweet[]; hasMore: boolean }> => {
   await delay(randomInt(300, 800)) // 模拟网络延迟
 
-  const tweets = generateTweets(screenName, pageSize)
+  let tweets = generateTweets(screenName, pageSize)
+
+  // 在mock阶段应用筛选（未来会在API层处理）
+  if (params?.startDate || params?.endDate) {
+    tweets = tweets.filter((tweet) => {
+      const tweetDate = new Date(tweet.createdAt)
+      if (params.startDate && tweetDate < params.startDate) return false
+      if (params.endDate && tweetDate > params.endDate) return false
+      return true
+    })
+  }
+
+  // 在mock阶段应用排序（未来会在API层处理）
+  if (params?.sortBy === 'date') {
+    tweets.sort((a, b) => {
+      const dateA = new Date(a.createdAt).getTime()
+      const dateB = new Date(b.createdAt).getTime()
+      return params.sortOrder === 'asc' ? dateA - dateB : dateB - dateA
+    })
+  }
 
   // 模拟是否还有更多数据（90%的概率有更多）
   const hasMore = page < 20 && randomInt(1, 10) > 1
