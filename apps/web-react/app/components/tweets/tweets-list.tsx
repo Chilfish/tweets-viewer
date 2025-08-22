@@ -4,25 +4,27 @@ import { useEffect } from 'react'
 import { useInfiniteScroll } from '~/hooks/use-infinite-scroll'
 import { cn } from '~/lib/utils'
 import { useTweetsStore } from '~/stores/tweets-store'
-import type { User } from '~/types'
+import type { Tweet, User } from '~/types'
 import { TweetCard } from './tweet-card'
 import { TweetsSortControls } from './tweets-sort-controls'
 
 interface TweetsListProps {
   user: User
+  tweets: Tweet[]
+  showDateFilter?: boolean
   showSortControls?: boolean
+  dontHasMore?: boolean
 }
 
-export function TweetsList({ user, showSortControls = true }: TweetsListProps) {
-  const {
-    tweets,
-    isLoading,
-    hasMore,
-    error,
-    loadTweets,
-    loadMoreTweets,
-    setCurrentUser,
-  } = useTweetsStore()
+export function TweetsList({
+  user,
+  tweets,
+  showDateFilter = true,
+  showSortControls = true,
+  dontHasMore = false,
+}: TweetsListProps) {
+  const { isLoading, hasMore, error, loadTweets, loadMoreTweets } =
+    useTweetsStore()
 
   const handleLoadMore = () => {
     loadMoreTweets(user.screenName)
@@ -33,11 +35,6 @@ export function TweetsList({ user, showSortControls = true }: TweetsListProps) {
     isLoading,
     onLoadMore: handleLoadMore,
   })
-
-  useEffect(() => {
-    setCurrentUser(user)
-    loadTweets(user.screenName, true)
-  }, [user.screenName, setCurrentUser, loadTweets])
 
   if (tweets.length === 0 && isLoading) {
     return (
@@ -66,12 +63,12 @@ export function TweetsList({ user, showSortControls = true }: TweetsListProps) {
 
   return (
     <div className='pb-8'>
-      {/* Sort Controls */}
-      {showSortControls && (
-        <div className='p-4 border-b border-border bg-card'>
-          <TweetsSortControls />
-        </div>
-      )}
+      <div className='p-4 border-b border-border bg-card'>
+        <TweetsSortControls
+          showDateFilter={showDateFilter}
+          showSortControls={showSortControls}
+        />
+      </div>
 
       <div className='divide-y divide-border'>
         {tweets.map((tweet) => (
@@ -81,7 +78,7 @@ export function TweetsList({ user, showSortControls = true }: TweetsListProps) {
 
       {/* Loading indicator */}
       <div ref={loadingRef} className='py-4'>
-        {isLoading && (
+        {!dontHasMore && isLoading && (
           <div className='flex items-center justify-center'>
             <Loader2 className='size-5 animate-spin' />
             <span className='ml-2 text-sm text-muted-foreground'>

@@ -15,6 +15,11 @@ export function meta({ params }: Route.MetaArgs) {
 
 export default function TweetsPage({ params }: Route.ComponentProps) {
   const { isLoading: userLoading, curUser } = useUserStore()
+  const { data, loadTweets } = useTweetsStore()
+
+  useEffect(() => {
+    if (curUser?.screenName) loadTweets(curUser.screenName)
+  }, [curUser, loadTweets])
 
   if (userLoading || !curUser) {
     return (
@@ -41,7 +46,7 @@ export default function TweetsPage({ params }: Route.ComponentProps) {
           </div>
         </div>
 
-        <TweetsList user={curUser} />
+        <TweetsList user={curUser} tweets={data} />
       </div>
     </div>
   )

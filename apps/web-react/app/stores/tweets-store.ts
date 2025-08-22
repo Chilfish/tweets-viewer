@@ -1,9 +1,13 @@
 import { create } from 'zustand'
 import { getTweets, getTweetsByDateRange } from '~/lib/tweets-api'
+import {
+  createInitialPaginatedState,
+  createLoadDataAction,
+  type PaginatedStore,
+} from '~/lib/use-paginated-data'
 import type { Tweet, User } from '~/types'
 
 export type SortOrder = 'asc' | 'desc'
-export type SortBy = 'date'
 
 export interface DateRange {
   startDate: Date | null
@@ -12,16 +16,10 @@ export interface DateRange {
 
 export interface TweetsFilters {
   dateRange: DateRange
-  sortBy: SortBy
   sortOrder: SortOrder
 }
 
-interface TweetsState {
-  tweets: Tweet[]
-  isLoading: boolean
-  hasMore: boolean
-  error: string | null
-  page: number
+interface TweetsState extends PaginatedStore<Tweet> {
   currentUser: User | null
   filters: TweetsFilters
 }
@@ -30,108 +28,66 @@ interface TweetsActions {
   setCurrentUser: (user: User) => void
   loadTweets: (screenName: string, isFirstLoad?: boolean) => Promise<void>
   loadMoreTweets: (screenName: string) => Promise<void>
-  updateFilters: (filters: Partial<TweetsFilters>) => void
   setSortOrder: (order: SortOrder) => Promise<void>
   setDateRange: (range: DateRange) => Promise<void>
-  reset: () => void
-  sortTweets: (tweets: Tweet[]) => Tweet[]
+  updateFilters: (filters: Partial<TweetsFilters>) => void
 }
 
 type TweetsStore = TweetsState & TweetsActions
 
-const initialState: TweetsState = {
-  tweets: [],
-  isLoading: false,
-  hasMore: true,
-  error: null,
-  page: 1,
+const initialState: Omit<TweetsState, keyof PaginatedStore<Tweet>> = {
   currentUser: null,
   filters: {
     dateRange: { startDate: null, endDate: null },
-    sortBy: 'date',
-    sortOrder: 'desc', // 默认最新的在前
+    sortOrder: 'desc',
   },
 }
 
+// 创建数据加载函数
+const loadTweetsData = async (
+  page: number,
+  screenName: string,
+  filters: TweetsFilters,
+): Promise<Tweet[]> => {
+  const reverse = filters.sortOrder === 'desc'
+
+  // 如果有日期范围筛选，使用日期范围API
+  if (filters.dateRange.startDate || filters.dateRange.endDate) {
+    const start = filters.dateRange.startDate?.getTime() || 0
+    const end = filters.dateRange.endDate?.getTime() || Date.now()
+
+    return getTweetsByDateRange(screenName, {
+      start,
+      end,
+      page,
+      reverse,
+    })
+  }
+
+  // 使用普通的推文获取API
+  return getTweets(screenName, {
+    page,
+    reverse,
+  })
+}
+
 export const useTweetsStore = create<TweetsStore>((set, get) => ({
+  ...createInitialPaginatedState<Tweet>(),
   ...initialState,
 
   setCurrentUser: (user) => {
     set({ currentUser: user })
   },
 
-  sortTweets: (tweets) => {
-    const { filters } = get()
-    const sortedTweets = [...tweets]
-
-    // 按日期排序
-    if (filters.sortBy === 'date') {
-      sortedTweets.sort((a, b) => {
-        const dateA = new Date(a.createdAt).getTime()
-        const dateB = new Date(b.createdAt).getTime()
-        return filters.sortOrder === 'asc' ? dateA - dateB : dateB - dateA
-      })
-    }
-
-    return sortedTweets
-  },
-
   loadTweets: async (screenName, isFirstLoad = true) => {
     const state = get()
-    if (state.isLoading) return
-
-    set({ isLoading: true, error: null })
-
-    try {
-      const currentPage = isFirstLoad ? 1 : state.page
-      const reverse = state.filters.sortOrder === 'desc'
-
-      let tweets: Tweet[]
-
-      // 如果有日期范围筛选，使用日期范围API
-      if (
-        state.filters.dateRange.startDate ||
-        state.filters.dateRange.endDate
-      ) {
-        const start = state.filters.dateRange.startDate?.getTime() || 0
-        const end = state.filters.dateRange.endDate?.getTime() || Date.now()
-
-        tweets = await getTweetsByDateRange(screenName, {
-          start,
-          end,
-          page: currentPage,
-          reverse,
-        })
-      } else {
-        // 使用普通的推文获取API
-        tweets = await getTweets(screenName, {
-          page: currentPage,
-          reverse,
-        })
-      }
-
-      const allTweets = isFirstLoad ? tweets : [...state.tweets, ...tweets]
-      const hasMore = tweets.length === 10 // 假设每页10条，如果少于10条说明没有更多了
-
-      set({
-        tweets: allTweets,
-        hasMore,
-        page: isFirstLoad ? 2 : state.page + 1,
-        isLoading: false,
-      })
-    } catch (error) {
-      set({
-        error: 'Failed to load tweets. Please try again.',
-        isLoading: false,
-      })
-      console.error('Error loading tweets:', error)
-    }
+    const loadData = createLoadDataAction(loadTweetsData)
+    await loadData(isFirstLoad, set, get, screenName, state.filters)
   },
 
   loadMoreTweets: async (screenName) => {
     const state = get()
     if (!state.hasMore || state.isLoading) return
-
     await state.loadTweets(screenName, false)
   },
 
@@ -165,7 +121,14 @@ export const useTweetsStore = create<TweetsStore>((set, get) => ({
     }
   },
 
-  reset: () => {
-    set(initialState)
-  },
+  // 通用分页操作
+  setData: (data) => set({ data }),
+  appendData: (newData) =>
+    set((state) => ({ data: [...state.data, ...newData] })),
+  setLoading: (loading) => set({ isLoading: loading }),
+  setError: (error) => set({ error, isLoading: false }),
+  setHasMore: (hasMore) => set({ hasMore }),
+  nextPage: () => set((state) => ({ page: state.page + 1 })),
+  reset: () =>
+    set({ ...createInitialPaginatedState<Tweet>(), ...initialState }),
 }))

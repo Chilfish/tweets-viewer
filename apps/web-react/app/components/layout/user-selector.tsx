@@ -38,9 +38,7 @@ export function UserSelector() {
                 <AvatarFallback>{curUser.name.charAt(0)}</AvatarFallback>
               </Avatar>
               <div className='flex flex-col items-start'>
-                <span className='font-medium text-sm'>
-                  @{curUser.screenName}
-                </span>
+                <span className='font-medium text-sm'>@{curUser.name}</span>
               </div>
             </>
           ) : (
@@ -69,9 +67,7 @@ export function UserSelector() {
                   <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className='flex flex-col flex-1'>
-                  <span className='font-medium text-sm'>
-                    @{user.screenName}
-                  </span>
+                  <span className='font-medium text-sm'>@{user.name}</span>
                 </div>
                 {curUser?.screenName === user.screenName && (
                   <Check className='size-4 text-blue-600' />

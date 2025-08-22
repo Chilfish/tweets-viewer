@@ -9,7 +9,7 @@ export default [
   layout('./components/layout/layout.tsx', [
     index('routes/home.tsx'),
     route('/tweets/:name', 'routes/tweets.tsx'),
-    route('/search', 'routes/search.tsx'),
+    route('/search/:name', 'routes/search.tsx'),
     route('/memo/:name', 'routes/memo.tsx'),
   ]),
 ] satisfies RouteConfig

@@ -42,8 +42,8 @@ export function Sidebar({ currentUser }: SidebarProps) {
     {
       label: 'Search',
       icon: Search,
-      href: '/search',
-      isActive: location.pathname === '/search',
+      href: currentUser ? `/search/${currentUser}` : '/',
+      isActive: location.pathname === `/search/${currentUser}`,
     },
   ]
 

@@ -1,12 +1,11 @@
 import { Search, X } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { TweetCard } from '~/components/tweets/tweet-card'
 import { TweetsSortControls } from '~/components/tweets/tweets-sort-controls'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
-import { useTweetsStore } from '~/stores/tweets-store'
+import { useSearchStore } from '~/stores'
 import { useUserStore } from '~/stores/user-store'
-import type { Tweet } from '~/types'
 
 export function meta() {
   return [
@@ -16,48 +15,24 @@ export function meta() {
 }
 
 export default function SearchPage() {
-  const [query, setQuery] = useState('')
-  const [searchResults, setSearchResults] = useState<Tweet[]>([])
-  const [isSearching, setIsSearching] = useState(false)
-  const [hasSearched, setHasSearched] = useState(false)
+  const { curUser } = useUserStore()
+  const {
+    data,
+    searchTweets,
+    clearSearch,
+    setKeyword,
+    keyword,
+    isLoading: isSearching,
+    setCurrentUser,
+  } = useSearchStore()
 
-  const { findUserById, curUser } = useUserStore()
-  const { tweets, loadTweets, sortTweets } = useTweetsStore()
-
-  const handleSearch = async () => {
-    if (!query.trim()) return
-
-    setIsSearching(true)
-    setHasSearched(true)
-
-    loadTweets(curUser?.screenName!)
-
-    // 模拟搜索延迟
-    await new Promise((resolve) => setTimeout(resolve, 300))
-
-    // 简单的文本搜索实现
-    const allTweets = tweets
-    const results = allTweets.filter((tweet) =>
-      tweet.fullText.toLowerCase().includes(query.toLowerCase()),
-    )
-
-    // 应用当前的排序设置
-    const sortedResults = sortTweets(results)
-    setSearchResults(sortedResults)
-    setIsSearching(false)
-  }
-
-  const clearSearch = () => {
-    setQuery('')
-    setSearchResults([])
-    setHasSearched(false)
-  }
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSearch()
+  useEffect(() => {
+    if (curUser) {
+      setCurrentUser(curUser.screenName)
     }
-  }
+  }, [curUser])
+
+  if (!curUser) return null
 
   return (
     <div className='min-h-screen bg-background text-foreground transition-colors duration-200'>
@@ -71,12 +46,11 @@ export default function SearchPage() {
                 <Input
                   type='text'
                   placeholder='Search tweets...'
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  onKeyPress={handleKeyPress}
+                  value={keyword}
+                  onChange={(e) => setKeyword(e.target.value)}
                   className='pl-10 pr-10 bg-input border-border text-foreground placeholder:text-muted-foreground transition-colors duration-200'
                 />
-                {query && (
+                {keyword && (
                   <Button
                     variant='ghost'
                     size='sm'
@@ -88,8 +62,8 @@ export default function SearchPage() {
                 )}
               </div>
               <Button
-                onClick={handleSearch}
-                disabled={!query.trim() || isSearching}
+                onClick={() => searchTweets()}
+                disabled={!keyword.trim() || isSearching}
                 className='bg-primary hover:bg-primary/90 text-primary-foreground transition-colors duration-200'
               >
                 {isSearching ? 'Searching...' : 'Search'}
@@ -100,7 +74,7 @@ export default function SearchPage() {
 
         {/* Search Results */}
         <div className='p-4'>
-          {!hasSearched ? (
+          {!keyword?.trim() ? (
             <div className='text-center py-12'>
               <Search className='h-12 w-12 mx-auto text-gray-400 mb-4' />
               <h2 className='text-xl font-semibold mb-2 text-muted-foreground'>
@@ -115,7 +89,7 @@ export default function SearchPage() {
               <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4'></div>
               <p className='text-muted-foreground'>Searching...</p>
             </div>
-          ) : searchResults.length === 0 ? (
+          ) : data.length === 0 ? (
             <div className='text-center py-12'>
               <Search className='h-12 w-12 mx-auto text-gray-400 mb-4' />
               <h2 className='text-xl font-semibold mb-2 text-muted-foreground'>
@@ -129,19 +103,15 @@ export default function SearchPage() {
             <div>
               <div className='mb-4 pb-2 border-b border-border flex items-center justify-between'>
                 <p className='text-sm text-muted-foreground'>
-                  Found {searchResults.length} result
-                  {searchResults.length !== 1 ? 's' : ''} for "{query}"
+                  Found {data.length} result
+                  {data.length !== 1 ? 's' : ''} for "{keyword}"
                 </p>
                 <TweetsSortControls showDateFilter={false} />
               </div>
 
               <div className='divide-y divide-border'>
-                {searchResults.map((tweet) => (
-                  <TweetCard
-                    key={tweet.id}
-                    tweet={tweet}
-                    user={findUserById(tweet.userId)!}
-                  />
+                {data.map((tweet) => (
+                  <TweetCard key={tweet.id} tweet={tweet} user={curUser} />
                 ))}
               </div>
             </div>

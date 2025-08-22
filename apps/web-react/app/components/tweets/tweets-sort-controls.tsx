@@ -25,11 +25,13 @@ import {
 interface TweetsSortControlsProps {
   className?: string
   showDateFilter?: boolean
+  showSortControls?: boolean
 }
 
 export function TweetsSortControls({
   className,
   showDateFilter = true,
+  showSortControls = true,
 }: TweetsSortControlsProps) {
   const { filters, setSortOrder, setDateRange } = useTweetsStore()
   const [datePickerOpen, setDatePickerOpen] = useState(false)
@@ -87,47 +89,49 @@ export function TweetsSortControls({
   return (
     <div className={cn('flex items-center gap-2', className)}>
       {/* Sort Order Control */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant='outline'
-            size='sm'
-            className='h-8 border-border bg-background hover:bg-accent'
-          >
-            {filters.sortOrder === 'desc' ? (
-              <SortDesc className='h-3 w-3' />
-            ) : (
-              <SortAsc className='h-3 w-3' />
-            )}
-            <span className='ml-1 hidden sm:inline'>
-              {filters.sortOrder === 'desc' ? 'Newest first' : 'Oldest first'}
-            </span>
-            <ChevronDown className='h-3 w-3 ml-1' />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align='start' className='w-[140px]'>
-          <DropdownMenuItem
-            onClick={() => handleSortOrderChange('desc')}
-            className={cn(
-              'cursor-pointer',
-              filters.sortOrder === 'desc' && 'bg-accent',
-            )}
-          >
-            <SortDesc className='h-3 w-3 mr-2' />
-            Newest first
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => handleSortOrderChange('asc')}
-            className={cn(
-              'cursor-pointer',
-              filters.sortOrder === 'asc' && 'bg-accent',
-            )}
-          >
-            <SortAsc className='h-3 w-3 mr-2' />
-            Oldest first
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      {showSortControls && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant='outline'
+              size='sm'
+              className='h-8 border-border bg-background hover:bg-accent'
+            >
+              {filters.sortOrder === 'desc' ? (
+                <SortDesc className='h-3 w-3' />
+              ) : (
+                <SortAsc className='h-3 w-3' />
+              )}
+              <span className='ml-1 hidden sm:inline'>
+                {filters.sortOrder === 'desc' ? 'Newest first' : 'Oldest first'}
+              </span>
+              <ChevronDown className='h-3 w-3 ml-1' />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align='start' className='w-[140px]'>
+            <DropdownMenuItem
+              onClick={() => handleSortOrderChange('desc')}
+              className={cn(
+                'cursor-pointer',
+                filters.sortOrder === 'desc' && 'bg-accent',
+              )}
+            >
+              <SortDesc className='h-3 w-3 mr-2' />
+              Newest first
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => handleSortOrderChange('asc')}
+              className={cn(
+                'cursor-pointer',
+                filters.sortOrder === 'asc' && 'bg-accent',
+              )}
+            >
+              <SortAsc className='h-3 w-3 mr-2' />
+              Oldest first
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
 
       {/* Date Range Filter */}
       {showDateFilter && (

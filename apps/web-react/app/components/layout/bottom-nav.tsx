@@ -21,8 +21,8 @@ export function BottomNav({ currentUser }: BottomNavProps) {
     {
       label: 'Search',
       icon: Search,
-      href: '/search',
-      isActive: location.pathname === '/search',
+      href: currentUser ? `/search/${currentUser}` : '/search',
+      isActive: location.pathname === `/search/${currentUser}`,
     },
     {
       label: 'Memory',
