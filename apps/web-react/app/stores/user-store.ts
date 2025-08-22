@@ -13,6 +13,7 @@ interface UserActions {
   getUser: (screenName: string) => Promise<User>
   setUser: (screenName: string, user: User) => void
   setCurUser: (screenName: string) => void
+  findUserById: (userId: string) => User | null
   clearError: () => void
 }
 
@@ -69,6 +70,13 @@ export const useUserStore = create<UserStore>((set, get) => ({
     set((state) => ({
       curUser: state.users[screenName] || null,
     }))
+  },
+
+  findUserById: (userId) => {
+    const state = get()
+    return (
+      Object.values(state.users).find((user) => user.restId === userId) || null
+    )
   },
 
   clearError: () => {

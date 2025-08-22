@@ -7,6 +7,7 @@ import {
   ScrollRestoration,
 } from 'react-router'
 import type { Route } from './+types/root'
+import { useAppStore } from './stores/app-store'
 import './app.css'
 
 export const links: Route.LinksFunction = () => [
@@ -23,8 +24,9 @@ export const links: Route.LinksFunction = () => [
 ]
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const { isDarkMode } = useAppStore()
   return (
-    <html lang='en'>
+    <html lang='en' className={isDarkMode ? 'dark' : ''}>
       <head>
         <meta charSet='utf-8' />
         <meta name='viewport' content='width=device-width, initial-scale=1' />
@@ -46,7 +48,9 @@ export default function App() {
 
 export function HydrateFallback() {
   return (
-    <div className='flex items-center justify-center h-screen'>Loading...</div>
+    <div className='flex items-center justify-center h-screen bg-background text-foreground'>
+      Loading...
+    </div>
   )
 }
 
@@ -67,11 +71,11 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   }
 
   return (
-    <main className='pt-16 p-4 container mx-auto'>
+    <main className='pt-16 p-4 container mx-auto bg-background text-foreground'>
       <h1>{message}</h1>
       <p>{details}</p>
       {stack && (
-        <pre className='w-full p-4 overflow-x-auto'>
+        <pre className='w-full p-4 overflow-x-auto bg-muted text-muted-foreground rounded'>
           <code>{stack}</code>
         </pre>
       )}

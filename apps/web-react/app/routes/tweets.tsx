@@ -14,44 +14,28 @@ export function meta({ params }: Route.MetaArgs) {
 }
 
 export default function TweetsPage({ params }: Route.ComponentProps) {
-  const {
-    getUser,
-    isLoading: userLoading,
-    curUser,
-    setCurUser,
-  } = useUserStore()
-  const { reset: resetTweets } = useTweetsStore()
-
-  useEffect(() => {
-    // 重置推文状态当切换用户时
-    resetTweets()
-
-    // 获取用户数据
-    getUser(params.name).then(() => {
-      setCurUser(params.name)
-    })
-  }, [])
+  const { isLoading: userLoading, curUser } = useUserStore()
 
   if (userLoading || !curUser) {
     return (
       <div className='flex min-h-svh items-center justify-center'>
-        <div className='text-gray-500'>Loading...</div>
+        <div className='text-muted-foreground'>Loading...</div>
       </div>
     )
   }
 
   return (
-    <div className='min-h-svh bg-white'>
+    <div className='min-h-svh bg-background transition-colors duration-200'>
       <div className='max-w-2xl mx-auto'>
         <UserHeader user={curUser} />
 
         {/* Tabs */}
-        <div className='border-b border-gray-200 px-4'>
+        <div className='border-b border-border px-4 transition-colors duration-200'>
           <div className='flex'>
-            <div className='px-4 py-3 text-sm font-medium border-b-2 border-blue-500 text-blue-600'>
+            <div className='px-4 py-3 text-sm font-medium border-b-2 border-primary text-primary'>
               Tweets
             </div>
-            <div className='px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700'>
+            <div className='px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-200'>
               Media
             </div>
           </div>

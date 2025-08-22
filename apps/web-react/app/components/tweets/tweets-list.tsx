@@ -2,6 +2,7 @@
 import { Loader2 } from 'lucide-react'
 import { useEffect } from 'react'
 import { useInfiniteScroll } from '~/hooks/use-infinite-scroll'
+import { cn } from '~/lib/utils'
 import { useTweetsStore } from '~/stores/tweets-store'
 import type { User } from '~/types'
 import { TweetCard } from './tweet-card'
@@ -40,7 +41,9 @@ export function TweetsList({ user }: TweetsListProps) {
     return (
       <div className='flex items-center justify-center py-12'>
         <Loader2 className='size-6 animate-spin' />
-        <span className='ml-2 text-sm text-gray-500'>Loading tweets...</span>
+        <span className='ml-2 text-sm text-muted-foreground'>
+          Loading tweets...
+        </span>
       </div>
     )
   }
@@ -60,7 +63,7 @@ export function TweetsList({ user }: TweetsListProps) {
   }
 
   return (
-    <div className='divide-y divide-gray-200'>
+    <div className='divide-y divide-border'>
       {tweets.map((tweet) => (
         <TweetCard key={tweet.id} tweet={tweet} user={user} />
       ))}
@@ -70,14 +73,14 @@ export function TweetsList({ user }: TweetsListProps) {
         {isLoading && (
           <div className='flex items-center justify-center'>
             <Loader2 className='size-5 animate-spin' />
-            <span className='ml-2 text-sm text-gray-500'>
+            <span className='ml-2 text-sm text-muted-foreground'>
               Loading more tweets...
             </span>
           </div>
         )}
 
         {!hasMore && tweets.length > 0 && (
-          <div className='text-center text-gray-500 text-sm'>
+          <div className='text-center text-sm text-muted-foreground'>
             No more tweets to load
           </div>
         )}

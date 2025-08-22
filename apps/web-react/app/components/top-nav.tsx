@@ -9,9 +9,10 @@ interface TopNavProps {
 }
 
 export function TopNav({ title, children }: TopNavProps) {
-  const { isDarkMode, toggleDarkMode } = useAppStore()
+  const { toggleDarkMode } = useAppStore()
+
   return (
-    <div className='sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200'>
+    <div className='sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border transition-colors duration-200'>
       <div className='flex items-center py-1 px-4'>
         <UserSelector />
 
@@ -20,13 +21,10 @@ export function TopNav({ title, children }: TopNavProps) {
           variant='ghost'
           size='sm'
           onClick={toggleDarkMode}
-          className='flex flex-col items-center gap-1 py-2 px-3 h-auto ml-auto'
+          className='flex flex-col items-center gap-1 py-2 px-3 h-auto ml-auto text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-200'
         >
-          {isDarkMode ? (
-            <Sun className='size-5' />
-          ) : (
-            <Moon className='size-5' />
-          )}
+          <Sun className='size-5 dark:hidden' />
+          <Moon className='size-5 hidden dark:block' />
         </Button>
       </div>
     </div>

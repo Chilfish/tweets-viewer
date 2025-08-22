@@ -9,6 +9,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent } from '~/components/ui/card'
+import { cn } from '~/lib/utils'
 import type { Tweet, TweetMedia, UserInfo } from '~/types'
 
 interface TweetCardProps {
@@ -60,7 +61,7 @@ export function TweetCard({ tweet, user }: TweetCardProps) {
     if (!tweet.quotedStatus) return null
 
     return (
-      <Card className='mt-3 border border-gray-200'>
+      <Card className='mt-3 border border-border bg-card transition-colors duration-200'>
         <CardContent className='p-3'>
           <div className='flex items-center gap-2 mb-2'>
             <Avatar className='size-5'>
@@ -69,14 +70,16 @@ export function TweetCard({ tweet, user }: TweetCardProps) {
                 {tweet.quotedStatus.user.name.charAt(0)}
               </AvatarFallback>
             </Avatar>
-            <span className='text-sm font-semibold'>
+            <span className='text-sm font-semibold text-card-foreground'>
               {tweet.quotedStatus.user.name}
             </span>
-            <span className='text-sm text-gray-500'>
+            <span className='text-sm text-muted-foreground'>
               @{tweet.quotedStatus.user.screenName}
             </span>
           </div>
-          <p className='text-sm'>{tweet.quotedStatus.tweet.fullText}</p>
+          <p className='text-sm text-card-foreground'>
+            {tweet.quotedStatus.tweet.fullText}
+          </p>
           {tweet.quotedStatus.tweet.media.length > 0 &&
             renderMedia(tweet.quotedStatus.tweet.media)}
         </CardContent>
@@ -88,9 +91,9 @@ export function TweetCard({ tweet, user }: TweetCardProps) {
     if (!tweet.retweetedStatus) return null
 
     return (
-      <div className='flex items-center gap-2 mb-2 text-gray-500 text-sm'>
+      <div className='flex items-center gap-2 mb-2 text-sm text-muted-foreground'>
         <Repeat2 className='size-4' />
-        <span>{user.name} retweeted</span>
+        <span>@{user.screenName} retweeted</span>
       </div>
     )
   }
@@ -98,8 +101,10 @@ export function TweetCard({ tweet, user }: TweetCardProps) {
   const actualTweet = tweet.retweetedStatus?.tweet || tweet
   const actualUser = tweet.retweetedStatus?.user || user
 
+  if (!actualTweet || !actualUser) return null
+
   return (
-    <Card className='border-0 border-b border-gray-200 rounded-none p-4'>
+    <Card className='border-0 border-b border-border rounded-none p-4 bg-card transition-colors duration-200'>
       <CardContent className='p-0'>
         {renderRetweetHeader()}
 
@@ -111,24 +116,28 @@ export function TweetCard({ tweet, user }: TweetCardProps) {
 
           <div className='flex-1 min-w-0'>
             <div className='flex items-center gap-1 mb-1'>
-              <span className='font-semibold text-sm truncate'>
+              <span className='font-semibold text-sm truncate text-card-foreground'>
                 {actualUser.name}
               </span>
-              <span className='text-gray-500 text-sm'>
+              <span className='text-sm text-muted-foreground'>
                 @{actualUser.screenName}
               </span>
-              <span className='text-gray-500 text-sm'>·</span>
-              <span className='text-gray-500 text-sm'>
+              <span className='text-sm text-muted-foreground'>·</span>
+              <span className='text-sm text-muted-foreground'>
                 {formatDistanceToNow(new Date(actualTweet.createdAt), {
                   addSuffix: false,
                 })}
               </span>
-              <Button variant='ghost' size='icon' className='size-5 ml-auto'>
+              <Button
+                variant='ghost'
+                size='icon'
+                className='size-5 ml-auto text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-200'
+              >
                 <MoreHorizontal className='size-4' />
               </Button>
             </div>
 
-            <div className='text-sm leading-relaxed mb-3'>
+            <div className='text-sm leading-relaxed mb-3 text-card-foreground'>
               {actualTweet.fullText}
             </div>
 
@@ -139,7 +148,7 @@ export function TweetCard({ tweet, user }: TweetCardProps) {
               <Button
                 variant='ghost'
                 size='sm'
-                className='flex items-center gap-2 text-gray-500 hover:text-blue-500 p-0'
+                className='flex items-center gap-2 text-muted-foreground hover:text-blue-500 p-0 transition-colors duration-200'
               >
                 <MessageCircle className='size-4' />
                 <span className='text-xs'>
@@ -150,7 +159,7 @@ export function TweetCard({ tweet, user }: TweetCardProps) {
               <Button
                 variant='ghost'
                 size='sm'
-                className='flex items-center gap-2 text-gray-500 hover:text-green-500 p-0'
+                className='flex items-center gap-2 text-muted-foreground hover:text-green-500 p-0 transition-colors duration-200'
               >
                 <Repeat2 className='size-4' />
                 <span className='text-xs'>
@@ -161,7 +170,7 @@ export function TweetCard({ tweet, user }: TweetCardProps) {
               <Button
                 variant='ghost'
                 size='sm'
-                className='flex items-center gap-2 text-gray-500 hover:text-red-500 p-0'
+                className='flex items-center gap-2 text-muted-foreground hover:text-red-500 p-0 transition-colors duration-200'
               >
                 <Heart className='size-4' />
                 <span className='text-xs'>
@@ -172,7 +181,7 @@ export function TweetCard({ tweet, user }: TweetCardProps) {
               <Button
                 variant='ghost'
                 size='sm'
-                className='flex items-center gap-2 text-gray-500 hover:text-blue-500 p-0'
+                className='flex items-center gap-2 text-muted-foreground hover:text-blue-500 p-0 transition-colors duration-200'
               >
                 <Share className='size-4' />
               </Button>

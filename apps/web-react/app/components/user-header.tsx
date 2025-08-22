@@ -42,7 +42,7 @@ export function UserHeader({ user }: UserHeaderProps) {
       <div className='px-4 pb-4'>
         {/* Avatar */}
         <div className='relative -mt-16 mb-4'>
-          <Avatar className='size-32 border-4 border-white bg-white'>
+          <Avatar className='size-32 border-4 border-background bg-background'>
             <AvatarImage src={user.avatarUrl} />
             <AvatarFallback className='text-2xl'>
               {user.name.charAt(0)}
@@ -52,15 +52,19 @@ export function UserHeader({ user }: UserHeaderProps) {
 
         {/* Name and Username */}
         <div className='mb-3'>
-          <h1 className='text-xl font-bold'>{user.name}</h1>
-          <p className='text-gray-500'>@{user.screenName}</p>
+          <h1 className='text-xl font-bold text-foreground'>{user.name}</h1>
+          <p className='text-muted-foreground'>@{user.screenName}</p>
         </div>
 
         {/* Bio */}
-        {user.bio && <p className='text-sm leading-relaxed mb-3'>{user.bio}</p>}
+        {user.bio && (
+          <p className='text-sm leading-relaxed mb-3 text-foreground'>
+            {user.bio}
+          </p>
+        )}
 
         {/* Location, Website, Join Date */}
-        <div className='flex flex-wrap gap-4 mb-3 text-sm text-gray-500'>
+        <div className='flex flex-wrap gap-4 mb-3 text-sm text-muted-foreground'>
           {user.location && (
             <div className='flex items-center gap-1'>
               <MapPin className='size-4' />
@@ -75,7 +79,7 @@ export function UserHeader({ user }: UserHeaderProps) {
                 href={user.website}
                 target='_blank'
                 rel='noopener noreferrer'
-                className='text-blue-500 hover:underline'
+                className='text-primary hover:underline'
               >
                 {user.website.replace(/^https?:\/\//, '')}
               </a>
@@ -94,13 +98,13 @@ export function UserHeader({ user }: UserHeaderProps) {
             <span className='font-semibold'>
               {formatCount(user.followingCount)}
             </span>
-            <span className='text-gray-500 ml-1'>Following</span>
+            <span className='text-muted-foreground ml-1'>Following</span>
           </div>
           <div>
             <span className='font-semibold'>
               {formatCount(user.followersCount)}
             </span>
-            <span className='text-gray-500 ml-1'>Followers</span>
+            <span className='text-muted-foreground ml-1'>Followers</span>
           </div>
         </div>
       </div>

@@ -19,7 +19,7 @@ interface SidebarProps {
 
 export function Sidebar({ currentUser }: SidebarProps) {
   const location = useLocation()
-  const { isDarkMode, toggleDarkMode } = useAppStore()
+  const { toggleDarkMode } = useAppStore()
 
   const navItems = [
     {
@@ -42,36 +42,31 @@ export function Sidebar({ currentUser }: SidebarProps) {
     {
       label: 'Search',
       icon: Search,
-      href: currentUser ? `/search/${currentUser}` : '/',
-      isActive: currentUser
-        ? location.pathname === `/search/${currentUser}`
-        : false,
-      disabled: !currentUser,
+      href: '/search',
+      isActive: location.pathname === '/search',
     },
   ]
 
   return (
-    <aside
-      className={cn(
-        'hidden md:flex sticky top-0 z-50 h-screen flex-col bg-white border-r border-gray-200 justify-between p-4',
-      )}
-    >
-      <header className='flex items-center justify-between border-b border-gray-200'>
-        <h2 className='text-lg font-semibold text-gray-900'>Tweets Viewer</h2>
+    <aside className='hidden md:flex sticky top-0 z-50 h-screen flex-col justify-between p-4 bg-sidebar border-r border-sidebar-border transition-colors duration-200'>
+      <header className='flex items-center justify-between border-b border-sidebar-border pb-4 mb-4'>
+        <h2 className='text-lg font-semibold text-sidebar-foreground'>
+          Tweets Viewer
+        </h2>
       </header>
 
-      <div className=''>
+      <div className='flex-1'>
         <nav className='space-y-2'>
           {navItems.map((item) => (
             <Link
               key={item.label}
               to={item.href}
               className={cn(
-                'flex items-center gap-3 px-3 py-2 rounded-lg transition-colors',
+                'flex items-center gap-3 px-3 py-2 rounded-lg transition-colors duration-200',
                 item.disabled && 'pointer-events-none opacity-50',
                 item.isActive
-                  ? 'bg-blue-50 text-blue-600'
-                  : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900',
+                  ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                  : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
               )}
             >
               <item.icon className='size-5 flex-shrink-0' />
@@ -82,21 +77,19 @@ export function Sidebar({ currentUser }: SidebarProps) {
           <Button
             variant='ghost'
             onClick={toggleDarkMode}
-            className={cn('w-full justify-start gap-3')}
+            className='w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors duration-200'
           >
-            {isDarkMode ? (
-              <Sun className='size-5 flex-shrink-0' />
-            ) : (
-              <Moon className='size-5 flex-shrink-0' />
-            )}
+            <Sun className='size-5 flex-shrink-0 dark:hidden' />
+            <Moon className='size-5 flex-shrink-0 hidden dark:block' />
             <span className='font-medium'>
-              {isDarkMode ? 'Light Mode' : 'Dark Mode'}
+              <span className='dark:hidden'>Dark Mode</span>
+              <span className='hidden dark:inline'>Light Mode</span>
             </span>
           </Button>
         </nav>
       </div>
 
-      <footer className='border-t border-gray-200 flex flex-col gap-4'>
+      <footer className='border-t border-sidebar-border pt-4 flex flex-col gap-4'>
         <UserSelector />
       </footer>
     </aside>
