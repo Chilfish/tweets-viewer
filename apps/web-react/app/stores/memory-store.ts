@@ -6,15 +6,22 @@ import {
   type PaginatedStore,
 } from '~/lib/use-paginated-data'
 import type { Tweet } from '~/types'
-
-export type SortOrder = 'asc' | 'desc'
+import type {
+  DateRange,
+  PaginatedListActions,
+  SortFilterActions,
+  SortOrder,
+} from './index'
 
 interface MemoryState extends PaginatedStore<Tweet> {
   currentUser: string | null
-  sortOrder: SortOrder
+  filters: {
+    sortOrder: SortOrder
+    dateRange: DateRange
+  }
 }
 
-interface MemoryActions {
+interface MemoryActions extends PaginatedListActions, SortFilterActions {
   setCurrentUser: (screenName: string | null) => void
   loadMemoryTweets: (screenName: string, isFirstLoad?: boolean) => Promise<void>
 }
@@ -23,15 +30,19 @@ type MemoryStore = MemoryState & MemoryActions
 
 const initialState: Omit<MemoryState, keyof PaginatedStore<Tweet>> = {
   currentUser: null,
-  sortOrder: 'desc',
+  filters: {
+    sortOrder: 'desc',
+    dateRange: { startDate: null, endDate: null },
+  },
 }
 
 // 创建那年今日数据加载函数
 const loadMemoryData = async (
   page: number,
   screenName: string,
-  reverse: boolean,
+  sortOrder: SortOrder,
 ): Promise<Tweet[]> => {
+  const reverse = sortOrder === 'desc'
   // 注意：那年今日通常是一次性加载所有数据，不需要分页
   // 但这里保持接口一致性，如果API支持分页的话
   return getLastYearsTodayTweets(screenName, reverse)
@@ -40,6 +51,8 @@ const loadMemoryData = async (
 export const useMemoryStore = create<MemoryStore>((set, get) => ({
   ...createInitialPaginatedState<Tweet>(),
   ...initialState,
+
+  hasMore: false, // 那年今日不需要分页，所以设置为false
 
   setCurrentUser: (screenName) => {
     set({ currentUser: screenName })
@@ -54,11 +67,38 @@ export const useMemoryStore = create<MemoryStore>((set, get) => ({
     }
 
     const loadData = createLoadDataAction((page) =>
-      loadMemoryData(page, screenName, reverse),
+      loadMemoryData(page, screenName, state.filters.sortOrder),
     )
-    const reverse = state.sortOrder === 'desc'
 
-    await loadData(isFirstLoad, set, get, state.currentUser, reverse)
+    await loadData(isFirstLoad, set, get, screenName, state.filters.sortOrder)
+  },
+
+  loadMore: async () => {
+    const state = get()
+    if (state.currentUser) {
+      await state.loadMemoryTweets(state.currentUser, false)
+    }
+  },
+
+  setSortOrder: async (order) => {
+    const state = get()
+    set((prevState) => ({
+      filters: { ...prevState.filters, sortOrder: order },
+    }))
+
+    // 重新加载数据以应用新的排序
+    if (state.currentUser) {
+      await state.loadMemoryTweets(state.currentUser, true)
+    }
+  },
+
+  setDateRange: async (range) => {
+    const state = get()
+    set((prevState) => ({
+      filters: { ...prevState.filters, dateRange: range },
+    }))
+
+    // 那年今日不需要日期筛选，但保持接口一致
   },
 
   // 通用分页操作

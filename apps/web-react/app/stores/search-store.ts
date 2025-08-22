@@ -6,21 +6,26 @@ import {
   type PaginatedStore,
 } from '~/lib/use-paginated-data'
 import type { Tweet } from '~/types'
-
-export interface DateRange {
-  startDate: Date | null
-  endDate: Date | null
-}
+import type {
+  DateRange,
+  PaginatedListActions,
+  SortFilterActions,
+  SortOrder,
+} from './index'
 
 interface SearchState extends PaginatedStore<Tweet> {
   keyword: string
-  dateRange: DateRange
+  filters: {
+    dateRange: DateRange
+    sortOrder: SortOrder
+  }
   currentUser: string | null
 }
 
-interface SearchActions {
+interface SearchActions extends PaginatedListActions {
   setKeyword: (keyword: string) => void
-  setDateRange: (range: DateRange) => void
+  setDateRange: (range: DateRange) => Promise<void>
+  setSortOrder: (order: SortOrder) => Promise<void>
   setCurrentUser: (screenName: string | null) => void
   searchTweets: (isFirstLoad?: boolean) => Promise<void>
   loadMoreResults: () => Promise<void>
@@ -31,7 +36,10 @@ type SearchStore = SearchState & SearchActions
 
 const initialState: Omit<SearchState, keyof PaginatedStore<Tweet>> = {
   keyword: '',
-  dateRange: { startDate: null, endDate: null },
+  filters: {
+    dateRange: { startDate: null, endDate: null },
+    sortOrder: 'desc',
+  },
   currentUser: null,
 }
 
@@ -40,15 +48,16 @@ const loadSearchData = async (
   page: number,
   screenName: string,
   keyword: string,
-  dateRange: DateRange,
+  filters: { dateRange: DateRange; sortOrder: SortOrder },
 ): Promise<Tweet[]> => {
-  const start = dateRange.startDate?.getTime()
-  const end = dateRange.endDate?.getTime()
+  const start = filters.dateRange.startDate?.getTime()
+  const end = filters.dateRange.endDate?.getTime()
+  const reverse = filters.sortOrder === 'desc'
 
   return searchTweets(screenName, {
     q: keyword,
     page,
-    reverse: true, // 搜索结果默认按时间倒序
+    reverse,
     start,
     end,
   })
@@ -62,8 +71,28 @@ export const useSearchStore = create<SearchStore>((set, get) => ({
     set({ keyword })
   },
 
-  setDateRange: (range) => {
-    set({ dateRange: range })
+  setDateRange: async (range) => {
+    const state = get()
+    set((prevState) => ({
+      filters: { ...prevState.filters, dateRange: range },
+    }))
+
+    // 重新搜索以应用新的筛选
+    if (state.keyword.trim() && state.currentUser) {
+      await state.searchTweets(true)
+    }
+  },
+
+  setSortOrder: async (order) => {
+    const state = get()
+    set((prevState) => ({
+      filters: { ...prevState.filters, sortOrder: order },
+    }))
+
+    // 重新搜索以应用新的排序
+    if (state.keyword.trim() && state.currentUser) {
+      await state.searchTweets(true)
+    }
   },
 
   setCurrentUser: (screenName) => {
@@ -85,7 +114,7 @@ export const useSearchStore = create<SearchStore>((set, get) => ({
       get,
       state.currentUser,
       state.keyword.trim(),
-      state.dateRange,
+      state.filters,
     )
   },
 
@@ -95,11 +124,19 @@ export const useSearchStore = create<SearchStore>((set, get) => ({
     await state.searchTweets(false)
   },
 
+  loadMore: async () => {
+    const state = get()
+    await state.loadMoreResults()
+  },
+
   clearSearch: () => {
     set({
       ...createInitialPaginatedState<Tweet>(),
       keyword: '',
-      dateRange: { startDate: null, endDate: null },
+      filters: {
+        dateRange: { startDate: null, endDate: null },
+        sortOrder: 'desc',
+      },
     })
   },
 

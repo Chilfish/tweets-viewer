@@ -6,13 +6,12 @@ import {
   type PaginatedStore,
 } from '~/lib/use-paginated-data'
 import type { Tweet, User } from '~/types'
-
-export type SortOrder = 'asc' | 'desc'
-
-export interface DateRange {
-  startDate: Date | null
-  endDate: Date | null
-}
+import type {
+  DateRange,
+  PaginatedListActions,
+  SortFilterActions,
+  SortOrder,
+} from './index'
 
 export interface TweetsFilters {
   dateRange: DateRange
@@ -24,12 +23,10 @@ interface TweetsState extends PaginatedStore<Tweet> {
   filters: TweetsFilters
 }
 
-interface TweetsActions {
+interface TweetsActions extends PaginatedListActions, SortFilterActions {
   setCurrentUser: (user: User) => void
   loadTweets: (screenName: string, isFirstLoad?: boolean) => Promise<void>
   loadMoreTweets: (screenName: string) => Promise<void>
-  setSortOrder: (order: SortOrder) => Promise<void>
-  setDateRange: (range: DateRange) => Promise<void>
   updateFilters: (filters: Partial<TweetsFilters>) => void
 }
 
@@ -89,6 +86,13 @@ export const useTweetsStore = create<TweetsStore>((set, get) => ({
     const state = get()
     if (!state.hasMore || state.isLoading) return
     await state.loadTweets(screenName, false)
+  },
+
+  loadMore: async () => {
+    const state = get()
+    if (state.currentUser) {
+      await state.loadMoreTweets(state.currentUser.screenName)
+    }
   },
 
   updateFilters: (newFilters) => {

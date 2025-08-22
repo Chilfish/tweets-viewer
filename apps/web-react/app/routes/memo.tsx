@@ -2,7 +2,6 @@ import { ArrowLeft, ArrowRight, Calendar, Clock } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { TweetsList } from '~/components/tweets/tweets-list'
 import { useMemoryStore } from '~/stores'
-import { useTweetsStore } from '~/stores/tweets-store'
 import { useUserStore } from '~/stores/user-store'
 import type { Route } from './+types/memo'
 
@@ -17,18 +16,21 @@ export function meta({ params }: Route.MetaArgs) {
 export default function MemoPage({ params }: Route.ComponentProps) {
   const currentYear = new Date().getFullYear()
   const { curUser } = useUserStore()
-  const { data, loadMemoryTweets, isLoading } = useMemoryStore()
+  const {
+    data,
+    loadMemoryTweets,
+    isLoading,
+    hasMore,
+    error,
+    loadMore,
+    setSortOrder,
+    setDateRange,
+    filters,
+  } = useMemoryStore()
 
   useEffect(() => {
     if (curUser) loadMemoryTweets(curUser.screenName)
   }, [curUser])
-
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('zh-CN', {
-      month: 'long',
-      day: 'numeric',
-    })
-  }
 
   if (!curUser) {
     return (
@@ -68,7 +70,12 @@ export default function MemoPage({ params }: Route.ComponentProps) {
               user={curUser}
               showDateFilter={false}
               showSortControls={false}
-              dontHasMore={true}
+              paginationActions={{
+                isLoading,
+                hasMore,
+                error,
+                loadMore,
+              }}
             />
           )}
         </main>

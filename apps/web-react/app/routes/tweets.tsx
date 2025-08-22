@@ -15,11 +15,25 @@ export function meta({ params }: Route.MetaArgs) {
 
 export default function TweetsPage({ params }: Route.ComponentProps) {
   const { isLoading: userLoading, curUser } = useUserStore()
-  const { data, loadTweets } = useTweetsStore()
+  const {
+    data,
+    loadTweets,
+    setCurrentUser,
+    isLoading,
+    hasMore,
+    error,
+    loadMore,
+    setSortOrder,
+    setDateRange,
+    filters,
+  } = useTweetsStore()
 
   useEffect(() => {
-    if (curUser?.screenName) loadTweets(curUser.screenName)
-  }, [curUser, loadTweets])
+    if (curUser?.screenName) {
+      setCurrentUser(curUser)
+      loadTweets(curUser.screenName)
+    }
+  }, [curUser])
 
   if (userLoading || !curUser) {
     return (
@@ -46,7 +60,21 @@ export default function TweetsPage({ params }: Route.ComponentProps) {
           </div>
         </div>
 
-        <TweetsList user={curUser} tweets={data} />
+        <TweetsList
+          user={curUser}
+          tweets={data}
+          paginationActions={{
+            isLoading,
+            hasMore,
+            error,
+            loadMore,
+          }}
+          sortControlsActions={{
+            setSortOrder,
+            setDateRange,
+            filters,
+          }}
+        />
       </div>
     </div>
   )

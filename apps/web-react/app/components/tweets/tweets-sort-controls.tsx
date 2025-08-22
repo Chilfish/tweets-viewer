@@ -16,42 +16,46 @@ import {
   PopoverTrigger,
 } from '~/components/ui/popover'
 import { cn } from '~/lib/utils'
-import {
-  type DateRange,
-  type SortOrder,
-  useTweetsStore,
-} from '~/stores/tweets-store'
+import type { DateRange, SortOrder } from '~/stores'
 
 interface TweetsSortControlsProps {
   className?: string
   showDateFilter?: boolean
   showSortControls?: boolean
+  sortFilterActions?: {
+    setSortOrder: (order: SortOrder) => Promise<void>
+    setDateRange: (range: DateRange) => Promise<void>
+    filters: {
+      sortOrder: SortOrder
+      dateRange: DateRange
+    }
+  }
 }
 
 export function TweetsSortControls({
   className,
   showDateFilter = true,
   showSortControls = true,
+  sortFilterActions,
 }: TweetsSortControlsProps) {
-  const { filters, setSortOrder, setDateRange } = useTweetsStore()
   const [datePickerOpen, setDatePickerOpen] = useState(false)
   const [tempDateRange, setTempDateRange] = useState<DateRange>(
-    filters.dateRange,
+    sortFilterActions?.filters.dateRange || { startDate: null, endDate: null },
   )
 
   const handleSortOrderChange = async (order: SortOrder) => {
-    await setSortOrder(order)
+    await sortFilterActions?.setSortOrder(order)
   }
 
   const handleDateRangeApply = async () => {
-    await setDateRange(tempDateRange)
+    await sortFilterActions?.setDateRange(tempDateRange)
     setDatePickerOpen(false)
   }
 
   const handleDateRangeClear = async () => {
     const emptyRange = { startDate: null, endDate: null }
     setTempDateRange(emptyRange)
-    await setDateRange(emptyRange)
+    await sortFilterActions?.setDateRange(emptyRange)
     setDatePickerOpen(false)
   }
 
@@ -81,6 +85,11 @@ export function TweetsSortControls({
     }
 
     return 'All dates'
+  }
+
+  const filters = sortFilterActions?.filters || {
+    sortOrder: 'desc' as SortOrder,
+    dateRange: { startDate: null, endDate: null },
   }
 
   const hasActiveFilters =

@@ -1,7 +1,6 @@
 import { Search, X } from 'lucide-react'
 import { useEffect } from 'react'
-import { TweetCard } from '~/components/tweets/tweet-card'
-import { TweetsSortControls } from '~/components/tweets/tweets-sort-controls'
+import { TweetsList } from '~/components/tweets/tweets-list'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { useSearchStore } from '~/stores'
@@ -24,6 +23,12 @@ export default function SearchPage() {
     keyword,
     isLoading: isSearching,
     setCurrentUser,
+    hasMore,
+    error,
+    loadMore,
+    setSortOrder,
+    setDateRange,
+    filters,
   } = useSearchStore()
 
   useEffect(() => {
@@ -100,21 +105,23 @@ export default function SearchPage() {
               </p>
             </div>
           ) : (
-            <div>
-              <div className='mb-4 pb-2 border-b border-border flex items-center justify-between'>
-                <p className='text-sm text-muted-foreground'>
-                  Found {data.length} result
-                  {data.length !== 1 ? 's' : ''} for "{keyword}"
-                </p>
-                <TweetsSortControls showDateFilter={false} />
-              </div>
-
-              <div className='divide-y divide-border'>
-                {data.map((tweet) => (
-                  <TweetCard key={tweet.id} tweet={tweet} user={curUser} />
-                ))}
-              </div>
-            </div>
+            <TweetsList
+              user={curUser}
+              tweets={data}
+              showDateFilter={false}
+              showSortControls={false}
+              paginationActions={{
+                isLoading: isSearching,
+                hasMore,
+                error,
+                loadMore,
+              }}
+              sortControlsActions={{
+                setSortOrder,
+                setDateRange,
+                filters,
+              }}
+            />
           )}
         </div>
       </div>

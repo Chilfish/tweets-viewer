@@ -1,9 +1,7 @@
 /** biome-ignore-all lint/a11y/useButtonType: <explanation> */
 import { Loader2 } from 'lucide-react'
-import { useEffect } from 'react'
 import { useInfiniteScroll } from '~/hooks/use-infinite-scroll'
-import { cn } from '~/lib/utils'
-import { useTweetsStore } from '~/stores/tweets-store'
+import type { PaginatedListActions } from '~/stores'
 import type { Tweet, User } from '~/types'
 import { TweetCard } from './tweet-card'
 import { TweetsSortControls } from './tweets-sort-controls'
@@ -13,7 +11,18 @@ interface TweetsListProps {
   tweets: Tweet[]
   showDateFilter?: boolean
   showSortControls?: boolean
-  dontHasMore?: boolean
+  paginationActions?: PaginatedListActions
+  sortControlsActions?: {
+    setSortOrder: (order: 'asc' | 'desc') => Promise<void>
+    setDateRange: (range: {
+      startDate: Date | null
+      endDate: Date | null
+    }) => Promise<void>
+    filters: {
+      sortOrder: 'asc' | 'desc'
+      dateRange: { startDate: Date | null; endDate: Date | null }
+    }
+  }
 }
 
 export function TweetsList({
@@ -21,13 +30,15 @@ export function TweetsList({
   tweets,
   showDateFilter = true,
   showSortControls = true,
-  dontHasMore = false,
+  paginationActions,
+  sortControlsActions,
 }: TweetsListProps) {
-  const { isLoading, hasMore, error, loadTweets, loadMoreTweets } =
-    useTweetsStore()
+  const isLoading = paginationActions?.isLoading || false
+  const hasMore = paginationActions?.hasMore || false
+  const error = paginationActions?.error || null
 
   const handleLoadMore = () => {
-    loadMoreTweets(user.screenName)
+    paginationActions?.loadMore()
   }
 
   const { loadingRef } = useInfiniteScroll({
@@ -52,7 +63,7 @@ export function TweetsList({
       <div className='text-center py-12'>
         <p className='text-red-500 mb-4'>{error}</p>
         <button
-          onClick={() => loadTweets(user.screenName, true)}
+          onClick={handleLoadMore}
           className='text-blue-500 hover:text-blue-600'
         >
           Try again
@@ -67,18 +78,19 @@ export function TweetsList({
         <TweetsSortControls
           showDateFilter={showDateFilter}
           showSortControls={showSortControls}
+          sortFilterActions={sortControlsActions}
         />
       </div>
 
       <div className='divide-y divide-border'>
         {tweets.map((tweet) => (
-          <TweetCard key={tweet.id} tweet={tweet} user={user} />
+          <TweetCard key={tweet.tweetId} tweet={tweet} user={user} />
         ))}
       </div>
 
       {/* Loading indicator */}
       <div ref={loadingRef} className='py-4'>
-        {!dontHasMore && isLoading && (
+        {isLoading && (
           <div className='flex items-center justify-center'>
             <Loader2 className='size-5 animate-spin' />
             <span className='ml-2 text-sm text-muted-foreground'>
