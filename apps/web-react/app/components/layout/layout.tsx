@@ -15,12 +15,13 @@ export default function Layout() {
 
   const curUserName = params.name
 
-  const { getUser, setCurUser } = useUserStore()
+  const { getUser, fetchUsers } = useUserStore()
 
   useEffect(() => {
-    if (!curUserName) return
-    getUser(curUserName).then(() => {
-      setCurUser(curUserName)
+    fetchUsers().then(() => {
+      if (curUserName) {
+        getUser(curUserName)
+      }
     })
   }, [])
 
@@ -49,17 +50,11 @@ export default function Layout() {
     <div className='min-h-screen flex bg-muted transition-colors duration-200'>
       <Sidebar currentUser={curUserName} />
 
-      <div className='flex-1 flex flex-col'>
-        <div className='sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border transition-colors duration-200'>
-          <div className='h-12'></div>
+      <main className='flex-1 bg-background transition-colors duration-200'>
+        <div className='max-w-2xl mx-auto'>
+          <Outlet />
         </div>
-
-        <main className='flex-1 bg-background transition-colors duration-200'>
-          <div className='max-w-2xl mx-auto'>
-            <Outlet />
-          </div>
-        </main>
-      </div>
+      </main>
     </div>
   )
 }

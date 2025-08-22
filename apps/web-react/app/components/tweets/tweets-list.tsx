@@ -65,9 +65,9 @@ export function TweetsList({ user, showSortControls = true }: TweetsListProps) {
   }
 
   return (
-    <div>
+    <div className='pb-8'>
       {/* Sort Controls */}
-      {showSortControls && tweets.length > 0 && (
+      {showSortControls && (
         <div className='p-4 border-b border-border bg-card'>
           <TweetsSortControls />
         </div>
@@ -105,6 +105,12 @@ export function TweetsList({ user, showSortControls = true }: TweetsListProps) {
             >
               Try again
             </button>
+          </div>
+        )}
+
+        {tweets.length < 1 && !isLoading && (
+          <div className='text-center text-sm text-muted-foreground'>
+            No tweets found
           </div>
         )}
       </div>

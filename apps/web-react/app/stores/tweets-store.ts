@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { getTweets as fetchTweets } from '~/lib/mock-data'
+import { getTweets, getTweetsByDateRange } from '~/lib/tweets-api'
 import type { Tweet, User } from '~/types'
 
 export type SortOrder = 'asc' | 'desc'
@@ -83,45 +83,39 @@ export const useTweetsStore = create<TweetsStore>((set, get) => ({
     set({ isLoading: true, error: null })
 
     try {
-      // 未来API调用时，这里会传递筛选参数
-      const result = await fetchTweets(
-        screenName,
-        isFirstLoad ? 1 : state.page,
-        10,
-        // 为未来API准备的参数
-        {
-          sortBy: state.filters.sortBy,
-          sortOrder: state.filters.sortOrder,
-          startDate: state.filters.dateRange.startDate,
-          endDate: state.filters.dateRange.endDate,
-        },
-      )
+      const currentPage = isFirstLoad ? 1 : state.page
+      const reverse = state.filters.sortOrder === 'desc'
 
-      let tweets = result.tweets
+      let tweets: Tweet[]
 
-      // 应用日期范围筛选（在mock数据阶段进行客户端筛选）
+      // 如果有日期范围筛选，使用日期范围API
       if (
         state.filters.dateRange.startDate ||
         state.filters.dateRange.endDate
       ) {
-        tweets = tweets.filter((tweet) => {
-          const tweetDate = new Date(tweet.createdAt)
-          const { startDate, endDate } = state.filters.dateRange
+        const start = state.filters.dateRange.startDate?.getTime() || 0
+        const end = state.filters.dateRange.endDate?.getTime() || Date.now()
 
-          if (startDate && tweetDate < startDate) return false
-          if (endDate && tweetDate > endDate) return false
-          return true
+        tweets = await getTweetsByDateRange(screenName, {
+          start,
+          end,
+          page: currentPage,
+          reverse,
+        })
+      } else {
+        // 使用普通的推文获取API
+        tweets = await getTweets(screenName, {
+          page: currentPage,
+          reverse,
         })
       }
 
-      // 应用排序
-      tweets = state.sortTweets(tweets)
-
       const allTweets = isFirstLoad ? tweets : [...state.tweets, ...tweets]
+      const hasMore = tweets.length === 10 // 假设每页10条，如果少于10条说明没有更多了
 
       set({
         tweets: allTweets,
-        hasMore: result.hasMore,
+        hasMore,
         page: isFirstLoad ? 2 : state.page + 1,
         isLoading: false,
       })

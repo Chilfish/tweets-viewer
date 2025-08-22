@@ -11,7 +11,7 @@ export default function HomePage() {
       <p className='text-lg text-muted-foreground mb-8'>
         Explore tweets from your favorite users.
       </p>
-      <Button onClick={() => navigate('/tweets/1')}>Get Started</Button>
+      <Button onClick={() => navigate('/tweets/240y_k')}>Get Started</Button>
     </div>
   )
 }

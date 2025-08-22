@@ -1,16 +1,17 @@
 import { create } from 'zustand'
-import { fetchUsers } from '~/lib/mock-data'
+import { getUsers } from '~/lib/users-api'
 import type { User } from '~/types'
 
 interface UserState {
-  users: Record<string, User>
+  users: User[]
   curUser: User | null
   isLoading: boolean
   error: string | null
 }
 
 interface UserActions {
-  getUser: (screenName: string) => Promise<User>
+  fetchUsers: () => Promise<void>
+  getUser: (screenName: string) => Promise<User | null>
   setUser: (screenName: string, user: User) => void
   setCurUser: (screenName: string) => void
   findUserById: (userId: string) => User | null
@@ -20,7 +21,7 @@ interface UserActions {
 type UserStore = UserState & UserActions
 
 const initialState: UserState = {
-  users: {},
+  users: [],
   isLoading: false,
   error: null,
   curUser: null,
@@ -29,35 +30,23 @@ const initialState: UserState = {
 export const useUserStore = create<UserStore>((set, get) => ({
   ...initialState,
 
+  fetchUsers: async () => {
+    set({ isLoading: true, error: null })
+    const users = await getUsers()
+    set({ users, isLoading: false, error: null })
+  },
+
   getUser: async (screenName) => {
     const state = get()
+    const user =
+      state.users.find((user) => user.screenName === screenName) || null
 
-    // 如果已经缓存了用户数据，直接返回
-    if (state.users[screenName]) {
-      return state.users[screenName]
+    if (user) {
+      set({ curUser: user })
+      return user
     }
 
-    set({ isLoading: true, error: null })
-
-    try {
-      // 模拟异步获取用户数据
-      await new Promise((resolve) => setTimeout(resolve, 300))
-      const users = fetchUsers()
-
-      set(() => ({
-        users,
-        isLoading: false,
-      }))
-
-      return users[screenName] || null
-    } catch (error) {
-      set({
-        error: 'Failed to load user data. Please try again.',
-        isLoading: false,
-      })
-      console.error('Error loading user:', error)
-      throw error
-    }
+    return null
   },
 
   setUser: (screenName, user) => {
