@@ -1,5 +1,3 @@
-import { create } from 'zustand'
-
 // 通用的分页状态接口
 export interface PaginatedState<T> {
   data: T[]
@@ -29,7 +27,7 @@ export const createInitialPaginatedState = <T>(): PaginatedState<T> => ({
   isLoading: false,
   hasMore: true,
   error: null,
-  page: 1,
+  page: 0,
 })
 
 // 创建通用的分页操作
@@ -85,7 +83,7 @@ export const createLoadDataAction = <T>(
     set(createPaginatedActions<T>().setLoading(true))
 
     try {
-      const currentPage = isFirstLoad ? 1 : state.page
+      const currentPage = isFirstLoad ? 0 : state.page
       const newData = await loadFn(currentPage, ...args)
 
       const hasMore = newData.length === pageSize
@@ -94,7 +92,7 @@ export const createLoadDataAction = <T>(
         set((state) => ({
           ...createPaginatedActions<T>().setData(newData)(state),
           hasMore,
-          page: 2,
+          page: 0,
           isLoading: false,
           error: null,
         }))
