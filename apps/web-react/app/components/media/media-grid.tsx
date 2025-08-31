@@ -3,53 +3,20 @@ import { Loader2, Play } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useInfiniteScroll } from '~/hooks/use-infinite-scroll'
 import type { PaginatedListActions } from '~/stores'
+import { useAppStore } from '~/stores/app-store'
 import type { MediaItem } from '~/stores/media-store'
+import type { Tweet, User } from '~/types'
 import { MediaItemComponent } from './media-item'
 
 interface MediaGridProps {
   mediaItems: MediaItem[]
   paginationActions?: PaginatedListActions
-}
-
-interface MediaItemCardProps {
-  item: MediaItem
-}
-
-function MediaItemCard({ item }: MediaItemCardProps) {
-  const isVideo = item.type === 'video' || item.url.includes('.mp4')
-
-  return (
-    <div className='group relative overflow-hidden rounded-md bg-muted transition-all duration-200 hover:scale-[1.01] cursor-pointer mb-2'>
-      <div className='relative'>
-        {isVideo ? (
-          <div className='relative'>
-            <img
-              src={item.url}
-              alt=''
-              className='w-full h-auto object-cover'
-              loading='lazy'
-              style={{
-                aspectRatio: `${item.width} / ${item.height}`,
-              }}
-            />
-            <div className='absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200'>
-              <Play className='size-8 text-white fill-white' />
-            </div>
-          </div>
-        ) : (
-          <img
-            src={item.url}
-            alt=''
-            className='w-full h-auto object-cover'
-            loading='lazy'
-            style={{
-              aspectRatio: `${item.width} / ${item.height}`,
-            }}
-          />
-        )}
-      </div>
-    </div>
-  )
+  // 为每个媒体项提供关联的推文和用户信息
+  getMediaContext?: (mediaItem: MediaItem) => {
+    tweet: Tweet
+    user: User
+    allMediaInTweet: MediaItem[]
+  } | null
 }
 
 function useResponsiveColumns() {
@@ -113,7 +80,13 @@ function useMasonryLayout(mediaItems: MediaItem[], columnCount: number) {
   return columns
 }
 
-export function MediaGrid({ mediaItems, paginationActions }: MediaGridProps) {
+export function MediaGrid({
+  mediaItems,
+  paginationActions,
+  getMediaContext,
+}: MediaGridProps) {
+  const { openTweetMediaModal } = useAppStore()
+
   const isLoading = paginationActions?.isLoading || false
   const hasMore = paginationActions?.hasMore || false
   const error = paginationActions?.error || null
@@ -123,6 +96,24 @@ export function MediaGrid({ mediaItems, paginationActions }: MediaGridProps) {
 
   const handleLoadMore = () => {
     paginationActions?.loadMore()
+  }
+
+  const handleMediaClick = (clickedMedia: MediaItem) => {
+    if (!getMediaContext) return
+
+    const context = getMediaContext(clickedMedia)
+    if (!context) return
+
+    const startIndex = context.allMediaInTweet.findIndex(
+      (m) => m.id === clickedMedia.id,
+    )
+
+    openTweetMediaModal({
+      mediaItems: context.allMediaInTweet,
+      startIndex: Math.max(0, startIndex),
+      tweet: context.tweet,
+      user: context.user,
+    })
   }
 
   const { loadingRef } = useInfiniteScroll({
@@ -171,7 +162,12 @@ export function MediaGrid({ mediaItems, paginationActions }: MediaGridProps) {
         {columns.map((column, columnIndex) => (
           <div key={columnIndex} className='flex-1'>
             {column.map((item) => (
-              <MediaItemComponent className='mb-1' key={item.id} item={item} />
+              <MediaItemComponent
+                className='mb-1'
+                key={item.id}
+                item={item}
+                onClick={() => handleMediaClick(item)}
+              />
             ))}
           </div>
         ))}

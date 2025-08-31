@@ -9,16 +9,18 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent } from '~/components/ui/card'
-import { cn } from '~/lib/utils'
+import { useAppStore } from '~/stores/app-store'
 import type { Tweet, TweetMedia, UserInfo } from '~/types'
 import { MediaItemComponent } from '../media/media-item'
 
 interface TweetCardProps {
   tweet: Tweet
   user: UserInfo
+  showMedia?: boolean
 }
 
-export function TweetCard({ tweet, user }: TweetCardProps) {
+export function TweetCard({ tweet, user, showMedia }: TweetCardProps) {
+  const { openMediaPreviewModal } = useAppStore()
   const formatCount = (count: number) => {
     if (count >= 1000000) {
       return `${(count / 1000000).toFixed(1)}M`
@@ -29,17 +31,75 @@ export function TweetCard({ tweet, user }: TweetCardProps) {
     return count.toString()
   }
 
+  const handleMediaClick = (
+    clickedMedia: TweetMedia,
+    allMedia: TweetMedia[],
+  ) => {
+    const startIndex = allMedia.findIndex((m) => m.url === clickedMedia.url)
+    openMediaPreviewModal({
+      mediaItems: allMedia,
+      startIndex: Math.max(0, startIndex),
+    })
+  }
+
   const renderMedia = (media: TweetMedia[]) => {
-    if (!media.length) return null
+    if (!media.length || !showMedia) return null
+
+    // 单张图片情况下，如果高比宽大于1，则限制最大宽度
+    const ratio = media[0].height / media[0].width
+    let maxWidthClass = ''
+    if (media.length === 1 && ratio > 1) {
+      maxWidthClass = 'max-h-120 max-w-100 max-h-140'
+    }
 
     return (
-      <div className='mt-3 rounded-md overflow-hidden'>
+      <div className='mt-3 rounded-md overflow-hidden w-fit'>
         {media.length === 1 ? (
-          <MediaItemComponent item={media[0]} />
+          <MediaItemComponent
+            item={media[0]}
+            className={maxWidthClass}
+            onClick={(item) => handleMediaClick(item as TweetMedia, media)}
+          />
+        ) : media.length === 2 ? (
+          <div className='flex gap-0.5 h-90'>
+            {media.map((item, index) => (
+              <MediaItemComponent
+                key={index}
+                item={item}
+                className='flex-1'
+                onClick={(item) => handleMediaClick(item as TweetMedia, media)}
+              />
+            ))}
+          </div>
+        ) : media.length === 3 ? (
+          <div className='flex gap-0.5 h-90'>
+            <MediaItemComponent
+              item={media[0]}
+              className='h-full flex-1'
+              onClick={(item) => handleMediaClick(item as TweetMedia, media)}
+            />
+            <div className='flex flex-col gap-0.5 flex-1'>
+              <MediaItemComponent
+                item={media[1]}
+                className='flex-1'
+                onClick={(item) => handleMediaClick(item as TweetMedia, media)}
+              />
+              <MediaItemComponent
+                item={media[2]}
+                className='flex-1'
+                onClick={(item) => handleMediaClick(item as TweetMedia, media)}
+              />
+            </div>
+          </div>
         ) : (
           <div className='grid grid-cols-2 gap-0.5'>
             {media.slice(0, 4).map((item, index) => (
-              <MediaItemComponent key={index} item={item} />
+              <MediaItemComponent
+                key={index}
+                item={item}
+                className='h-60'
+                onClick={(item) => handleMediaClick(item as TweetMedia, media)}
+              />
             ))}
           </div>
         )}
@@ -51,7 +111,10 @@ export function TweetCard({ tweet, user }: TweetCardProps) {
     if (!tweet.quotedStatus) return null
 
     return (
-      <Card className='mt-3 border border-border bg-card transition-colors duration-200'>
+      <Card
+        id={tweet.quotedStatus.tweet.tweetId}
+        className='mt-3 border border-border bg-card transition-colors duration-200'
+      >
         <CardContent className='p-3'>
           <div className='flex items-center gap-2 mb-2'>
             <Avatar className='size-5'>
@@ -94,7 +157,10 @@ export function TweetCard({ tweet, user }: TweetCardProps) {
   if (!actualTweet || !actualUser) return null
 
   return (
-    <Card className='border-0 border-b border-border rounded-none p-4 bg-card transition-colors duration-200'>
+    <Card
+      id={actualTweet.tweetId}
+      className='border-0 border-b border-border rounded-none p-4 bg-card transition-colors duration-200'
+    >
       <CardContent className='p-0'>
         {renderRetweetHeader()}
 

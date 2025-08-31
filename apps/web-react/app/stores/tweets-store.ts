@@ -26,8 +26,9 @@ interface TweetsState extends PaginatedStore<Tweet> {
 interface TweetsActions extends PaginatedListActions, SortFilterActions {
   setCurrentUser: (user: User) => void
   loadTweets: (screenName: string, isFirstLoad?: boolean) => Promise<void>
-  loadMoreTweets: (screenName: string) => Promise<void>
+  loadMoreTweets: (screenName: string) => Promise<Tweet[]>
   updateFilters: (filters: Partial<TweetsFilters>) => void
+  getTweetById: (id: string) => Tweet | undefined
 }
 
 type TweetsStore = TweetsState & TweetsActions
@@ -84,8 +85,10 @@ export const useTweetsStore = create<TweetsStore>((set, get) => ({
 
   loadMoreTweets: async (screenName) => {
     const state = get()
-    if (!state.hasMore || state.isLoading) return
+    if (!state.hasMore || state.isLoading) return []
     await state.loadTweets(screenName, false)
+
+    return state.data
   },
 
   loadMore: async () => {
@@ -123,6 +126,11 @@ export const useTweetsStore = create<TweetsStore>((set, get) => ({
     if (state.currentUser) {
       await state.loadTweets(state.currentUser.screenName, true)
     }
+  },
+
+  getTweetById: (id) => {
+    const state = get()
+    return state.data.find((tweet) => tweet.tweetId === id)
   },
 
   // 通用分页操作

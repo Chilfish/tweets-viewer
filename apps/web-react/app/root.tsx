@@ -7,6 +7,7 @@ import {
   ScrollRestoration,
 } from 'react-router'
 import type { Route } from './+types/root'
+import { GlobalMediaModal } from './components/media/global-media-modal'
 import { useAppStore } from './stores/app-store'
 import './app.css'
 
@@ -35,6 +36,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         {children}
+        <GlobalMediaModal />
         <ScrollRestoration />
         <Scripts />
       </body>

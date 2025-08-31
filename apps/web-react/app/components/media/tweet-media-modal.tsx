@@ -1,6 +1,6 @@
 /** biome-ignore-all lint/a11y/useButtonType: <explanation> */
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { TweetCard } from '~/components/tweets/tweet-card'
 import { Button } from '~/components/ui/button'
 import {
@@ -10,52 +10,44 @@ import {
   DialogHeader,
   DialogTitle,
 } from '~/components/ui/dialog'
-import type { MediaItem } from '~/stores/media-store'
-import type { Tweet, User } from '~/types'
+import { useAppStore } from '~/stores/app-store'
 import { MediaItemComponent } from './media-item'
 
-interface TweetMediaModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  tweet: Tweet
-  user: User
-  mediaItems: MediaItem[]
-  currentMediaIndex: number
-  onMediaIndexChange?: (index: number) => void
-}
+export function TweetMediaModal() {
+  const { tweetMediaModal, closeTweetMediaModal, setTweetMediaIndex } =
+    useAppStore()
 
-export function TweetMediaModal({
-  open,
-  onOpenChange,
-  tweet,
-  user,
-  mediaItems,
-  currentMediaIndex,
-  onMediaIndexChange,
-}: TweetMediaModalProps) {
-  const currentMedia = mediaItems[currentMediaIndex]
-  const hasMultipleMedia = mediaItems.length > 1
+  const {
+    isOpen,
+    currentMediaItems,
+    currentMediaIndex,
+    currentTweet,
+    currentUser,
+  } = tweetMediaModal
+
+  const currentMedia = currentMediaItems[currentMediaIndex]
+  const hasMultipleMedia = currentMediaItems.length > 1
   const canGoPrev = hasMultipleMedia && currentMediaIndex > 0
   const canGoNext =
-    hasMultipleMedia && currentMediaIndex < mediaItems.length - 1
+    hasMultipleMedia && currentMediaIndex < currentMediaItems.length - 1
 
   // 键盘快捷键
   useEffect(() => {
-    if (!open) return
+    if (!isOpen) return
 
     const handleKeyDown = (e: KeyboardEvent) => {
       switch (e.key) {
         case 'Escape':
-          onOpenChange(false)
+          closeTweetMediaModal()
           break
         case 'ArrowLeft':
           if (canGoPrev) {
-            onMediaIndexChange?.(currentMediaIndex - 1)
+            setTweetMediaIndex(currentMediaIndex - 1)
           }
           break
         case 'ArrowRight':
           if (canGoNext) {
-            onMediaIndexChange?.(currentMediaIndex + 1)
+            setTweetMediaIndex(currentMediaIndex + 1)
           }
           break
       }
@@ -64,30 +56,35 @@ export function TweetMediaModal({
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [
-    open,
+    isOpen,
     currentMediaIndex,
     canGoPrev,
     canGoNext,
-    onOpenChange,
-    onMediaIndexChange,
+    closeTweetMediaModal,
+    setTweetMediaIndex,
   ])
 
   const handlePrevious = () => {
     if (canGoPrev) {
-      onMediaIndexChange?.(currentMediaIndex - 1)
+      setTweetMediaIndex(currentMediaIndex - 1)
     }
   }
 
   const handleNext = () => {
     if (canGoNext) {
-      onMediaIndexChange?.(currentMediaIndex + 1)
+      setTweetMediaIndex(currentMediaIndex + 1)
     }
   }
 
-  if (!currentMedia) return null
+  if (!currentMedia || !currentTweet || !currentUser) return null
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) closeTweetMediaModal()
+      }}
+    >
       <DialogContent
         className='max-w-6xl max-h-[90vh] p-0 bg-background border'
         showCloseButton={false}
@@ -101,7 +98,7 @@ export function TweetMediaModal({
         <Button
           variant='ghost'
           size='icon'
-          onClick={() => onOpenChange(false)}
+          onClick={closeTweetMediaModal}
           className='absolute top-4 right-4 z-10 text-muted-foreground hover:text-foreground hover:bg-accent rounded-full'
         >
           <X className='size-4' />
@@ -113,7 +110,7 @@ export function TweetMediaModal({
             {/* 媒体计数器 */}
             {hasMultipleMedia && (
               <div className='absolute top-4 left-4 z-10 bg-black/50 text-white px-3 py-1 rounded-full text-sm'>
-                {currentMediaIndex + 1} / {mediaItems.length}
+                {currentMediaIndex + 1} / {currentMediaItems.length}
               </div>
             )}
 
@@ -147,10 +144,10 @@ export function TweetMediaModal({
             {/* 底部媒体指示器 */}
             {hasMultipleMedia && (
               <div className='absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2'>
-                {mediaItems.map((_, index) => (
+                {currentMediaItems.map((_, index) => (
                   <button
                     key={index}
-                    onClick={() => onMediaIndexChange?.(index)}
+                    onClick={() => setTweetMediaIndex(index)}
                     className={`w-2 h-2 rounded-full transition-colors ${
                       index === currentMediaIndex ? 'bg-white' : 'bg-white/40'
                     }`}
@@ -163,7 +160,7 @@ export function TweetMediaModal({
           {/* 右侧：推文详情 */}
           <div className='w-80 lg:w-96 border-l border-border bg-background overflow-y-auto'>
             <div className='p-4'>
-              <TweetCard tweet={tweet} user={user} />
+              <TweetCard tweet={currentTweet} user={currentUser} />
             </div>
           </div>
         </div>

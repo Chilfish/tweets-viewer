@@ -66,7 +66,7 @@ export function MediaItemComponent({
         <div className='relative'>
           <video
             src={item.url}
-            className={`w-full h-auto object-cover transition-opacity duration-200 ${
+            className={`w-full h-full object-cover transition-opacity duration-200 ${
               imageLoaded ? 'opacity-100' : 'opacity-0'
             }`}
             style={{
@@ -90,7 +90,7 @@ export function MediaItemComponent({
         <img
           src={item.url}
           alt=''
-          className={`w-full h-auto object-cover transition-opacity duration-200 ${
+          className={`w-full h-full object-cover transition-opacity duration-200 ${
             imageLoaded ? 'opacity-100' : 'opacity-0'
           }`}
           style={{

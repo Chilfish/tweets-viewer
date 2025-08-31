@@ -3,7 +3,8 @@ import { Link } from 'react-router'
 import { MediaGrid } from '~/components/media/media-grid'
 import { TweetsSortControls } from '~/components/tweets/tweets-sort-controls'
 import { UserHeader } from '~/components/user-header'
-import { useMediaStore } from '~/stores'
+import { useMediaStore, useTweetsStore } from '~/stores'
+import type { MediaItem } from '~/stores/media-store'
 import { useUserStore } from '~/stores/user-store'
 import type { Route } from './+types/media'
 
@@ -17,6 +18,7 @@ export function meta({ params }: Route.MetaArgs) {
 
 export default function MediaPage({ params }: Route.ComponentProps) {
   const { isLoading: userLoading, curUser } = useUserStore()
+  const { getTweetById } = useTweetsStore()
   const {
     data,
     loadMedia,
@@ -66,6 +68,16 @@ export default function MediaPage({ params }: Route.ComponentProps) {
     )
   }
 
+  function getMediaContext(item: MediaItem) {
+    const tweet = getTweetById(item.tweetId)
+    if (!tweet || !curUser) return null
+    return {
+      tweet,
+      user: curUser,
+      allMediaInTweet: tweet.media as MediaItem[],
+    }
+  }
+
   return (
     <div className='min-h-svh bg-background transition-colors duration-200'>
       <div className='max-w-6xl mx-auto'>
@@ -107,6 +119,7 @@ export default function MediaPage({ params }: Route.ComponentProps) {
             error,
             loadMore,
           }}
+          getMediaContext={getMediaContext}
         />
       </div>
     </div>

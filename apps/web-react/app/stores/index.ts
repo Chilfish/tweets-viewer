@@ -1,7 +1,3 @@
-// 用户相关状态管理
-
-import type { Tweet } from '~/types'
-
 // 通用分页接口
 export interface PaginatedListActions {
   isLoading: boolean

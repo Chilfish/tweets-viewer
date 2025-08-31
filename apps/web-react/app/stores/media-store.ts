@@ -6,11 +6,12 @@ import {
   type PaginatedStore,
 } from '~/lib/use-paginated-data'
 import type { Tweet, TweetMedia, User } from '~/types'
-import type {
-  DateRange,
-  PaginatedListActions,
-  SortFilterActions,
-  SortOrder,
+import {
+  type DateRange,
+  type PaginatedListActions,
+  type SortFilterActions,
+  type SortOrder,
+  useTweetsStore,
 } from './index'
 
 export interface MediaItem {
@@ -81,6 +82,7 @@ const loadMediaData = async (
   screenName: string,
   filters: MediaFilters,
   minMediaCount = 10,
+  appendTweets: (newTweets: Tweet[]) => void,
 ): Promise<{ mediaItems: MediaItem[]; hasMore: boolean; nextPage: number }> => {
   const reverse = filters.sortOrder === 'desc'
   const allMediaItems: MediaItem[] = []
@@ -116,6 +118,8 @@ const loadMediaData = async (
         hasMore = false
         break
       }
+
+      appendTweets(tweets)
 
       // 提取媒体并添加到结果中
       const mediaItems = extractMediaFromTweets(tweets)
@@ -153,6 +157,7 @@ export const useMediaStore = create<MediaStore>((set, get) => ({
 
   loadMedia: async (screenName, isFirstLoad = true) => {
     const state = get()
+    const { appendData } = useTweetsStore.getState()
     if (state.isLoading) return
 
     set({ isLoading: true, error: null })
@@ -166,6 +171,7 @@ export const useMediaStore = create<MediaStore>((set, get) => ({
         screenName,
         state.filters,
         minMediaCount,
+        appendData,
       )
 
       if (isFirstLoad) {
