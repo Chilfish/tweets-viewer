@@ -11,5 +11,6 @@ export default [
     route('/tweets/:name', 'routes/tweets.tsx'),
     route('/search/:name', 'routes/search.tsx'),
     route('/memo/:name', 'routes/memo.tsx'),
+    route('/media/:name', 'routes/media.tsx'),
   ]),
 ] satisfies RouteConfig

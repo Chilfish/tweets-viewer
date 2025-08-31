@@ -29,6 +29,8 @@ export interface DateRange {
 
 // 应用设置状态管理
 export { useAppStore } from './app-store'
+// 媒体页面状态管理
+export { useMediaStore } from './media-store'
 // 那年今日功能状态管理
 export { useMemoryStore } from './memory-store'
 // 搜索功能状态管理

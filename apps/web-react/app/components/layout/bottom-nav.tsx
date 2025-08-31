@@ -1,39 +1,13 @@
-import { Calendar, Home, Search } from 'lucide-react'
-import { Link, useLocation } from 'react-router'
+import { Link } from 'react-router'
 import { cn } from '~/lib/utils'
+import { getNavItems } from './nav'
 
 interface BottomNavProps {
   currentUser?: string
 }
 
 export function BottomNav({ currentUser }: BottomNavProps) {
-  const location = useLocation()
-
-  const navItems = [
-    {
-      label: 'Home',
-      icon: Home,
-      href: currentUser ? `/tweets/${currentUser}` : '/',
-      isActive: currentUser
-        ? location.pathname === `/tweets/${currentUser}`
-        : location.pathname === '/',
-    },
-    {
-      label: 'Search',
-      icon: Search,
-      href: currentUser ? `/search/${currentUser}` : '/search',
-      isActive: location.pathname === `/search/${currentUser}`,
-    },
-    {
-      label: 'Memory',
-      icon: Calendar,
-      href: currentUser ? `/memo/${currentUser}` : '/',
-      isActive: currentUser
-        ? location.pathname === `/memo/${currentUser}`
-        : false,
-      disabled: !currentUser,
-    },
-  ]
+  const navItems = getNavItems(currentUser)
 
   return (
     <div className='fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-t border-border transition-colors duration-200 md:hidden'>

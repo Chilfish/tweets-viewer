@@ -1,16 +1,9 @@
-import {
-  Calendar,
-  ChevronLeft,
-  ChevronRight,
-  Home,
-  Moon,
-  Search,
-  Sun,
-} from 'lucide-react'
-import { Link, useLocation } from 'react-router'
+import { Moon, Sun } from 'lucide-react'
+import { Link } from 'react-router'
 import { Button } from '~/components/ui/button'
 import { cn } from '~/lib/utils'
 import { useAppStore } from '~/stores/app-store'
+import { getNavItems } from './nav'
 import { UserSelector } from './user-selector'
 
 interface SidebarProps {
@@ -18,34 +11,8 @@ interface SidebarProps {
 }
 
 export function Sidebar({ currentUser }: SidebarProps) {
-  const location = useLocation()
   const { toggleDarkMode } = useAppStore()
-
-  const navItems = [
-    {
-      label: 'Tweets',
-      icon: Home,
-      href: currentUser ? `/tweets/${currentUser}` : '/',
-      isActive: currentUser
-        ? location.pathname === `/tweets/${currentUser}`
-        : location.pathname === '/',
-    },
-    {
-      label: 'Memory',
-      icon: Calendar,
-      href: currentUser ? `/memo/${currentUser}` : '/',
-      isActive: currentUser
-        ? location.pathname === `/memo/${currentUser}`
-        : false,
-      disabled: !currentUser,
-    },
-    {
-      label: 'Search',
-      icon: Search,
-      href: currentUser ? `/search/${currentUser}` : '/',
-      isActive: location.pathname === `/search/${currentUser}`,
-    },
-  ]
+  const navItems = getNavItems(currentUser)
 
   return (
     <aside className='hidden md:flex sticky top-0 z-50 h-screen flex-col justify-between p-4 bg-sidebar border-r border-sidebar-border transition-colors duration-200'>
