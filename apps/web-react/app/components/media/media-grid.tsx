@@ -63,6 +63,7 @@ export function MediaGrid({ mediaItems, paginationActions }: MediaGridProps) {
     hasMore,
     isLoading,
     onLoadMore: handleLoadMore,
+    threshold: 800, // 提前800px开始加载
   })
 
   if (mediaItems.length === 0 && isLoading) {

@@ -28,14 +28,35 @@ export default function MediaPage({ params }: Route.ComponentProps) {
     setSortOrder,
     setDateRange,
     filters,
+    reset,
   } = useMediaStore()
 
   useEffect(() => {
     if (curUser?.screenName) {
+      // 重置store状态，清除之前用户的数据
+      reset()
       setCurrentUser(curUser)
       loadMedia(curUser.screenName)
     }
-  }, [curUser])
+  }, [curUser, reset, setCurrentUser, loadMedia])
+
+  // 自动加载更多内容确保页面有足够的媒体项
+  useEffect(() => {
+    const autoLoadMore = async () => {
+      // 如果初始加载完成，媒体数量少于15个，且还有更多数据，就自动加载更多
+      if (
+        !isLoading &&
+        data.length > 0 &&
+        data.length < 15 &&
+        hasMore &&
+        curUser
+      ) {
+        await loadMore()
+      }
+    }
+
+    autoLoadMore()
+  }, [data.length, isLoading, hasMore, loadMore, curUser])
 
   if (userLoading || !curUser) {
     return (

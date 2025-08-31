@@ -75,36 +75,72 @@ const extractMediaFromTweets = (tweets: Tweet[]): MediaItem[] => {
   return mediaItems
 }
 
-// 创建媒体数据加载函数
+// 智能加载媒体数据 - 持续获取直到有足够媒体或无更多数据
 const loadMediaData = async (
-  page: number,
+  startPage: number,
   screenName: string,
   filters: MediaFilters,
-): Promise<MediaItem[]> => {
+  minMediaCount = 10,
+): Promise<{ mediaItems: MediaItem[]; hasMore: boolean; nextPage: number }> => {
   const reverse = filters.sortOrder === 'desc'
+  const allMediaItems: MediaItem[] = []
+  let currentPage = startPage
+  let hasMore = true
 
-  let tweets: Tweet[]
+  // 持续加载直到有足够媒体或无更多数据
+  while (allMediaItems.length < minMediaCount && hasMore) {
+    let tweets: Tweet[]
 
-  // 如果有日期范围筛选，使用日期范围API
-  if (filters.dateRange.startDate || filters.dateRange.endDate) {
-    const start = filters.dateRange.startDate?.getTime() || 0
-    const end = filters.dateRange.endDate?.getTime() || Date.now()
+    try {
+      // 如果有日期范围筛选，使用日期范围API
+      if (filters.dateRange.startDate || filters.dateRange.endDate) {
+        const start = filters.dateRange.startDate?.getTime() || 0
+        const end = filters.dateRange.endDate?.getTime() || Date.now()
 
-    tweets = await getTweetsByDateRange(screenName, {
-      start,
-      end,
-      page,
-      reverse,
-    })
-  } else {
-    // 使用普通的推文获取API
-    tweets = await getTweets(screenName, {
-      page,
-      reverse,
-    })
+        tweets = await getTweetsByDateRange(screenName, {
+          start,
+          end,
+          page: currentPage,
+          reverse,
+        })
+      } else {
+        // 使用普通的推文获取API
+        tweets = await getTweets(screenName, {
+          page: currentPage,
+          reverse,
+        })
+      }
+
+      // 如果没有获取到推文，说明没有更多数据
+      if (tweets.length === 0) {
+        hasMore = false
+        break
+      }
+
+      // 提取媒体并添加到结果中
+      const mediaItems = extractMediaFromTweets(tweets)
+      allMediaItems.push(...mediaItems)
+
+      // 准备获取下一页
+      currentPage++
+
+      // 如果推文数量少于预期，可能没有更多数据了
+      if (tweets.length < 10) {
+        hasMore = false
+        break
+      }
+    } catch (error) {
+      console.error('Error loading tweets for media:', error)
+      hasMore = false
+      break
+    }
   }
 
-  return extractMediaFromTweets(tweets)
+  return {
+    mediaItems: allMediaItems,
+    hasMore,
+    nextPage: currentPage,
+  }
 }
 
 export const useMediaStore = create<MediaStore>((set, get) => ({
@@ -117,8 +153,45 @@ export const useMediaStore = create<MediaStore>((set, get) => ({
 
   loadMedia: async (screenName, isFirstLoad = true) => {
     const state = get()
-    const loadData = createLoadDataAction(loadMediaData, 20) // 每次加载更多推文来获取媒体
-    await loadData(isFirstLoad, set, get, screenName, state.filters)
+    if (state.isLoading) return
+
+    set({ isLoading: true, error: null })
+
+    try {
+      const startPage = isFirstLoad ? 0 : state.page
+      const minMediaCount = isFirstLoad ? 20 : 10 // 首次加载更多媒体
+
+      const result = await loadMediaData(
+        startPage,
+        screenName,
+        state.filters,
+        minMediaCount,
+      )
+
+      if (isFirstLoad) {
+        set({
+          data: result.mediaItems,
+          hasMore: result.hasMore,
+          page: result.nextPage,
+          isLoading: false,
+          error: null,
+        })
+      } else {
+        set((prevState) => ({
+          data: [...prevState.data, ...result.mediaItems],
+          hasMore: result.hasMore,
+          page: result.nextPage,
+          isLoading: false,
+          error: null,
+        }))
+      }
+    } catch (error) {
+      set({
+        error: 'Failed to load media. Please try again.',
+        isLoading: false,
+      })
+      console.error('Error loading media:', error)
+    }
   },
 
   loadMoreMedia: async (screenName) => {
@@ -144,6 +217,7 @@ export const useMediaStore = create<MediaStore>((set, get) => ({
     const state = get()
     set((prevState) => ({
       filters: { ...prevState.filters, sortOrder: order },
+      page: 0, // 重置页码
     }))
 
     // 重新加载数据以应用新的排序
@@ -156,6 +230,7 @@ export const useMediaStore = create<MediaStore>((set, get) => ({
     const state = get()
     set((prevState) => ({
       filters: { ...prevState.filters, dateRange: range },
+      page: 0, // 重置页码
     }))
 
     // 重新加载数据以应用新的筛选
