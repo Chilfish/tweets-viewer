@@ -7,6 +7,7 @@
     "dev": "concurrently \"bun run dev:server\" \"bun run dev:client\"",
     "dev:server": "bun run --cwd ./apps/server dev",
     "dev:client": "bun run --cwd ./apps/web-react dev",
+    "build:client": "bun run --cwd ./apps/web-react build",
     "deploy": "bun run --cwd ./apps/server deploy",
     "lint": "biome check .",
     "format": "biome format .",
@@ -14,17 +15,17 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@biomejs/biome": "^2.2.0",
-    "@types/node": "^24.3.0",
-    "concurrently": "^9.2.0",
-    "dotenv": "^17.2.1",
-    "lefthook": "^1.12.3",
-    "lint-staged": "^16.1.5",
+    "@biomejs/biome": "^2.2.4",
+    "@types/node": "^24.3.1",
+    "concurrently": "^9.2.1",
+    "dotenv": "^17.2.2",
+    "lefthook": "^1.13.0",
+    "lint-staged": "^16.1.6",
     "typescript": "^5.9.2"
   },
   "workspaces": [
     "packages/*",
     "apps/*"
   ],
-  "packageManager": "bun@1.2.20"
+  "packageManager": "bun@1.2.21"
 }
