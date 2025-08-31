@@ -44,37 +44,45 @@ export default function SearchPage() {
       <div className='max-w-2xl mx-auto'>
         {/* Search Header */}
         <div className='sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border transition-colors duration-200'>
-          <div className='p-4'>
-            <div className='flex items-center gap-2'>
-              <div className='relative flex-1'>
-                <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400' />
-                <Input
-                  type='text'
-                  placeholder='Search tweets...'
-                  value={keyword}
-                  onChange={(e) => setKeyword(e.target.value)}
-                  className='pl-10 pr-10 bg-input border-border text-foreground placeholder:text-muted-foreground transition-colors duration-200'
-                />
-                {keyword && (
-                  <Button
-                    variant='ghost'
-                    size='sm'
-                    onClick={clearSearch}
-                    className='absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0'
-                  >
-                    <X className='h-3 w-3' />
-                  </Button>
-                )}
-              </div>
-              <Button
-                onClick={() => searchTweets()}
-                disabled={!keyword.trim() || isSearching}
-                className='bg-primary hover:bg-primary/90 text-primary-foreground transition-colors duration-200'
-              >
-                {isSearching ? 'Searching...' : 'Search'}
-              </Button>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              console.log(keyword)
+              searchTweets()
+            }}
+            className='p-4 flex items-center gap-2'
+          >
+            <div className='relative flex-1'>
+              <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400' />
+              <Input
+                name='search'
+                type='text'
+                placeholder='Search tweets...'
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                className='pl-10 pr-10 bg-input border-border text-foreground placeholder:text-muted-foreground transition-colors duration-200'
+              />
+              {keyword && (
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  onClick={clearSearch}
+                  type='reset'
+                  className='absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0'
+                >
+                  <X className='h-3 w-3' />
+                </Button>
+              )}
             </div>
-          </div>
+            <Button
+              type='submit'
+              onClick={() => searchTweets()}
+              disabled={!keyword.trim() || isSearching}
+              className='bg-primary hover:bg-primary/90 text-primary-foreground transition-colors duration-200'
+            >
+              {isSearching ? 'Searching...' : 'Search'}
+            </Button>
+          </form>
         </div>
 
         {/* Search Results */}
@@ -104,25 +112,24 @@ export default function SearchPage() {
                 Try different keywords or check your spelling
               </p>
             </div>
-          ) : (
-            <TweetsList
-              user={curUser}
-              tweets={data}
-              showDateFilter={false}
-              showSortControls={false}
-              paginationActions={{
-                isLoading: isSearching,
-                hasMore,
-                error,
-                loadMore,
-              }}
-              sortControlsActions={{
-                setSortOrder,
-                setDateRange,
-                filters,
-              }}
-            />
-          )}
+          ) : null}
+          <TweetsList
+            user={curUser}
+            tweets={data}
+            showDateFilter={false}
+            showSortControls={false}
+            paginationActions={{
+              isLoading: isSearching,
+              hasMore,
+              error,
+              loadMore,
+            }}
+            sortControlsActions={{
+              setSortOrder,
+              setDateRange,
+              filters,
+            }}
+          />
         </div>
       </div>
     </div>

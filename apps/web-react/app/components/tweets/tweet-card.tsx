@@ -19,7 +19,7 @@ interface TweetCardProps {
   showMedia?: boolean
 }
 
-export function TweetCard({ tweet, user, showMedia }: TweetCardProps) {
+export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
   const { openMediaPreviewModal } = useAppStore()
   const formatCount = (count: number) => {
     if (count >= 1000000) {

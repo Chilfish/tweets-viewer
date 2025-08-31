@@ -132,7 +132,7 @@ export function MediaPreviewModal() {
 
           {/* 媒体内容 */}
           <div className='flex items-center justify-center w-full h-full p-6'>
-            <MediaItemComponent item={currentMedia} />
+            <MediaItemComponent item={currentMedia} isInPreview />
           </div>
         </div>
 

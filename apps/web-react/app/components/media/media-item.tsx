@@ -1,4 +1,5 @@
 /** biome-ignore-all lint/a11y/noStaticElementInteractions: <explanation> */
+/** biome-ignore-all lint/a11y/useMediaCaption: <explanation> */
 /** biome-ignore-all lint/a11y/useKeyWithClickEvents: <explanation> */
 import type { TweetMedia } from '@tweets-viewer/shared'
 import { Play } from 'lucide-react'
@@ -10,15 +11,18 @@ interface MediaItemProps {
   item: MediaItem | TweetMedia
   onClick?: (item: MediaItem | TweetMedia) => void
   className?: string
+  isInPreview?: boolean
 }
 
 export function MediaItemComponent({
   item,
   onClick,
   className,
+  isInPreview,
 }: MediaItemProps) {
   const [imageLoaded, setImageLoaded] = useState(false)
   const [imageError, setImageError] = useState(false)
+  const [playVideo, setPlayVideo] = useState(false)
 
   const isVideo = item.type === 'video' || item.url.includes('.mp4')
 
@@ -63,7 +67,7 @@ export function MediaItemComponent({
       )}
 
       {isVideo ? (
-        <div className='relative'>
+        <div className='relative h-full w-full'>
           <video
             src={item.url}
             className={`w-full h-full object-cover transition-opacity duration-200 ${
@@ -73,18 +77,25 @@ export function MediaItemComponent({
               aspectRatio: `${item.width} / ${item.height}`,
             }}
             preload='metadata'
-            muted
             playsInline
+            controls={playVideo && isInPreview}
+            autoPlay={playVideo && isInPreview}
+            loop
             onLoadedData={handleImageLoad}
             onError={handleImageError}
           />
 
           {/* 视频播放按钮 overlay */}
-          <div className='absolute inset-0 bg-black/20 flex items-center justify-center opacity-70 group-hover:opacity-100 transition-opacity duration-200'>
-            <div className='bg-black/60 rounded-full p-3'>
-              <Play className='size-6 text-white fill-white' />
+          {!playVideo && (
+            <div
+              onClick={() => setPlayVideo(true)}
+              className='absolute inset-0 bg-black/20 flex items-center justify-center opacity-70 group-hover:opacity-100 transition-opacity duration-200'
+            >
+              <div className='bg-black/60 rounded-full p-3'>
+                <Play className='size-6 text-white fill-white' />
+              </div>
             </div>
-          </div>
+          )}
         </div>
       ) : (
         <img

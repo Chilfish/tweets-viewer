@@ -139,7 +139,7 @@ export function TweetMediaModal() {
             )}
 
             {/* 媒体内容 */}
-            <MediaItemComponent item={currentMedia} />
+            <MediaItemComponent item={currentMedia} isInPreview />
 
             {/* 底部媒体指示器 */}
             {hasMultipleMedia && (
@@ -160,7 +160,11 @@ export function TweetMediaModal() {
           {/* 右侧：推文详情 */}
           <div className='w-80 lg:w-96 border-l border-border bg-background overflow-y-auto'>
             <div className='p-4'>
-              <TweetCard tweet={currentTweet} user={currentUser} />
+              <TweetCard
+                showMedia={false}
+                tweet={currentTweet}
+                user={currentUser}
+              />
             </div>
           </div>
         </div>
