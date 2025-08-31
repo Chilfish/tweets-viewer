@@ -22,7 +22,7 @@ export default function Layout() {
         getUser(curUserName)
       }
     })
-  }, [])
+  }, [curUserName, fetchUsers, getUser])
 
   // Update layout based on screen size
   useEffect(() => {
