@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useInfiniteScroll } from '~/hooks/use-infinite-scroll'
 import type { PaginatedListActions } from '~/stores'
 import type { MediaItem } from '~/stores/media-store'
+import { MediaItemComponent } from './media-item'
 
 interface MediaGridProps {
   mediaItems: MediaItem[]
@@ -166,11 +167,11 @@ export function MediaGrid({ mediaItems, paginationActions }: MediaGridProps) {
 
   return (
     <div className='pb-8'>
-      <div className='flex gap-2 p-4'>
+      <div className='flex gap-1 px-2 sm:px-0'>
         {columns.map((column, columnIndex) => (
           <div key={columnIndex} className='flex-1'>
             {column.map((item) => (
-              <MediaItemCard key={item.id} item={item} />
+              <MediaItemComponent className='mb-1' key={item.id} item={item} />
             ))}
           </div>
         ))}

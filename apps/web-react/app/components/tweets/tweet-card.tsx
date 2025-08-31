@@ -11,6 +11,7 @@ import { Button } from '~/components/ui/button'
 import { Card, CardContent } from '~/components/ui/card'
 import { cn } from '~/lib/utils'
 import type { Tweet, TweetMedia, UserInfo } from '~/types'
+import { MediaItemComponent } from '../media/media-item'
 
 interface TweetCardProps {
   tweet: Tweet
@@ -32,24 +33,13 @@ export function TweetCard({ tweet, user }: TweetCardProps) {
     if (!media.length) return null
 
     return (
-      <div className='mt-3 rounded-2xl overflow-hidden'>
+      <div className='mt-3 rounded-md overflow-hidden'>
         {media.length === 1 ? (
-          <img
-            src={media[0].url}
-            alt=''
-            className='w-full max-h-96 object-cover'
-            loading='lazy'
-          />
+          <MediaItemComponent item={media[0]} />
         ) : (
           <div className='grid grid-cols-2 gap-0.5'>
             {media.slice(0, 4).map((item, index) => (
-              <img
-                key={index}
-                src={item.url}
-                alt=''
-                className='w-full aspect-square object-cover'
-                loading='lazy'
-              />
+              <MediaItemComponent key={index} item={item} />
             ))}
           </div>
         )}

@@ -83,7 +83,7 @@ export const createLoadDataAction = <T>(
     set(createPaginatedActions<T>().setLoading(true))
 
     try {
-      const currentPage = isFirstLoad ? 0 : state.page
+      const currentPage = isFirstLoad ? 0 : state.page + 1
       const newData = await loadFn(currentPage, ...args)
 
       const hasMore = newData.length === pageSize

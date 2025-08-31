@@ -95,8 +95,18 @@ export function TweetsSortControls({
   const hasActiveFilters =
     filters.dateRange.startDate || filters.dateRange.endDate
 
+  const dontShowAnything = !showDateFilter && !showSortControls
+  if (dontShowAnything) {
+    return null
+  }
+
   return (
-    <div className={cn('flex items-center gap-2', className)}>
+    <div
+      className={cn(
+        'flex items-center gap-2 border-b border-border bg-card',
+        className,
+      )}
+    >
       {/* Sort Order Control */}
       {showSortControls && (
         <DropdownMenu>

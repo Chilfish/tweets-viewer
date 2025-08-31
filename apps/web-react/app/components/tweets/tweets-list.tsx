@@ -74,13 +74,11 @@ export function TweetsList({
 
   return (
     <div className='pb-8'>
-      <div className='p-4 border-b border-border bg-card'>
-        <TweetsSortControls
-          showDateFilter={showDateFilter}
-          showSortControls={showSortControls}
-          sortFilterActions={sortControlsActions}
-        />
-      </div>
+      <TweetsSortControls
+        showDateFilter={showDateFilter}
+        showSortControls={showSortControls}
+        sortFilterActions={sortControlsActions}
+      />
 
       <div className='divide-y divide-border'>
         {tweets.map((tweet) => (
