@@ -11,6 +11,7 @@ export interface NavItem {
 
 export function getNavItems(currentUser?: string): NavItem[] {
   const location = useLocation()
+  const curPath = location.pathname.split('/')[1]
 
   return [
     {

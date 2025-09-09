@@ -99,7 +99,7 @@ export function MediaGrid({
   }
 
   const handleMediaClick = (clickedMedia: MediaItem) => {
-    if (!getMediaContext) return
+    return
 
     const context = getMediaContext(clickedMedia)
     if (!context) return

@@ -34,7 +34,8 @@
       "correctness": {
         "noEmptyPattern": "warn",
         "noNestedComponentDefinitions": "warn",
-        "useExhaustiveDependencies": "warn"
+        "useExhaustiveDependencies": "warn",
+        "noUnreachable": "warn"
       },
       "a11y": {
         "useSemanticElements": "off",

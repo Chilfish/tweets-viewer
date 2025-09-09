@@ -1,10 +1,10 @@
-import { formatDistanceToNow } from 'date-fns'
+import { formatDate } from '@tweets-viewer/shared'
 import {
   Heart,
   MessageCircle,
   MoreHorizontal,
   Repeat2,
-  Share,
+  Share2Icon,
 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import { Button } from '~/components/ui/button'
@@ -12,6 +12,7 @@ import { Card, CardContent } from '~/components/ui/card'
 import { useAppStore } from '~/stores/app-store'
 import type { Tweet, TweetMedia, UserInfo } from '~/types'
 import { MediaItemComponent } from '../media/media-item'
+import { Link, TweetText } from './tweet-text'
 
 interface TweetCardProps {
   tweet: Tweet
@@ -40,6 +41,13 @@ export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
       mediaItems: allMedia,
       startIndex: Math.max(0, startIndex),
     })
+  }
+
+  const openTweetInNewTab = () => {
+    window.open(
+      `https://twitter.com/${user.screenName}/status/${tweet.tweetId}`,
+      '_blank',
+    )
   }
 
   const renderMedia = (media: TweetMedia[]) => {
@@ -130,9 +138,7 @@ export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
               @{tweet.quotedStatus.user.screenName}
             </span>
           </div>
-          <p className='text-sm text-card-foreground'>
-            {tweet.quotedStatus.tweet.fullText}
-          </p>
+          <TweetText text={tweet.quotedStatus.tweet.fullText} />
           {tweet.quotedStatus.tweet.media.length > 0 &&
             renderMedia(tweet.quotedStatus.tweet.media)}
         </CardContent>
@@ -146,7 +152,10 @@ export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
     return (
       <div className='flex items-center gap-2 mb-2 text-sm text-muted-foreground'>
         <Repeat2 className='size-4' />
-        <span>@{user.screenName} retweeted</span>
+        <Link
+          url={`https://twitter.com/${user.screenName}/status/${tweet.tweetId}`}
+          text={`@${user.name} retweeted at ${formatDate(tweet.createdAt)}`}
+        />
       </div>
     )
   }
@@ -180,9 +189,7 @@ export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
               </span>
               <span className='text-sm text-muted-foreground'>·</span>
               <span className='text-sm text-muted-foreground'>
-                {formatDistanceToNow(new Date(actualTweet.createdAt), {
-                  addSuffix: false,
-                })}
+                {formatDate(actualTweet.createdAt)}
               </span>
               <Button
                 variant='ghost'
@@ -193,9 +200,7 @@ export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
               </Button>
             </div>
 
-            <div className='text-sm leading-relaxed mb-3 text-card-foreground'>
-              {actualTweet.fullText}
-            </div>
+            <TweetText text={actualTweet.fullText} />
 
             {actualTweet.media.length > 0 && renderMedia(actualTweet.media)}
             {renderQuotedTweet()}
@@ -234,12 +239,12 @@ export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
                 </span>
               </Button>
 
-              <Button
-                variant='ghost'
-                size='sm'
-                className='flex items-center gap-2 text-muted-foreground hover:text-blue-500 p-0 transition-colors duration-200'
-              >
-                <Share className='size-4' />
+              <Button asChild variant='ghost' size='sm'>
+                <Link
+                  text={<Share2Icon className='size-4' />}
+                  url={`https://twitter.com/${user.screenName}/status/${tweet.tweetId}`}
+                  className='text-foreground!'
+                />
               </Button>
             </div>
           </div>

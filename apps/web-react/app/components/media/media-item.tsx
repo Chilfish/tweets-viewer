@@ -5,6 +5,7 @@ import type { TweetMedia } from '@tweets-viewer/shared'
 import { Play } from 'lucide-react'
 import { useState } from 'react'
 import { Skeleton } from '~/components/ui/skeleton'
+import { cn } from '~/lib/utils'
 import type { MediaItem } from '~/stores/media-store'
 
 interface MediaItemProps {
@@ -12,6 +13,7 @@ interface MediaItemProps {
   onClick?: (item: MediaItem | TweetMedia) => void
   className?: string
   isInPreview?: boolean
+  displayMode?: 'fit' | 'scroll'
 }
 
 export function MediaItemComponent({
@@ -19,6 +21,7 @@ export function MediaItemComponent({
   onClick,
   className,
   isInPreview,
+  displayMode = 'fit',
 }: MediaItemProps) {
   const [imageLoaded, setImageLoaded] = useState(false)
   const [imageError, setImageError] = useState(false)
@@ -101,9 +104,17 @@ export function MediaItemComponent({
         <img
           src={item.url}
           alt=''
-          className={`w-full h-full object-cover transition-opacity duration-200 ${
-            imageLoaded ? 'opacity-100' : 'opacity-0'
-          }`}
+          className={cn(
+            `w-full h-full object-cover transition-opacity duration-200`,
+            {
+              'opacity-100': imageLoaded,
+              'opacity-0': !imageLoaded,
+            },
+            isInPreview && {
+              'max-w-full max-h-full object-contain': displayMode === 'fit',
+              'w-full h-auto': displayMode === 'scroll',
+            },
+          )}
           style={{
             aspectRatio: `${item.width} / ${item.height}`,
           }}

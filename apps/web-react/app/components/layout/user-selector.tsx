@@ -1,5 +1,5 @@
 import { Check, ChevronDown, Plus, User } from 'lucide-react'
-import { useNavigate } from 'react-router'
+import { NavLink, useLocation } from 'react-router'
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import { Button } from '~/components/ui/button'
 import {
@@ -13,14 +13,11 @@ import { cn } from '~/lib/utils'
 import { useUserStore } from '~/stores/user-store'
 
 export function UserSelector() {
-  const navigate = useNavigate()
+  const location = useLocation()
+  const curPath = location.pathname.split('/')[1]
   const { users, curUser } = useUserStore()
 
   const userList = Object.values(users)
-
-  const handleUserSelect = (screenName: string) => {
-    navigate(`/tweets/${screenName}`)
-  }
 
   return (
     <DropdownMenu>
@@ -59,19 +56,21 @@ export function UserSelector() {
             {userList.map((user) => (
               <DropdownMenuItem
                 key={user.screenName}
-                onClick={() => handleUserSelect(user.screenName)}
                 className='flex items-center gap-3 p-2'
+                asChild
               >
-                <Avatar className='size-6'>
-                  <AvatarImage src={user.avatarUrl} />
-                  <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-                </Avatar>
-                <div className='flex flex-col flex-1'>
-                  <span className='font-medium text-sm'>@{user.name}</span>
-                </div>
-                {curUser?.screenName === user.screenName && (
-                  <Check className='size-4 text-blue-600' />
-                )}
+                <NavLink to={`/${curPath}/${user.screenName}`}>
+                  <Avatar className='size-6'>
+                    <AvatarImage src={user.avatarUrl} />
+                    <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  <div className='flex flex-col flex-1'>
+                    <span className='font-medium text-sm'>@{user.name}</span>
+                  </div>
+                  {curUser?.screenName === user.screenName && (
+                    <Check className='size-4 text-blue-600' />
+                  )}
+                </NavLink>
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
