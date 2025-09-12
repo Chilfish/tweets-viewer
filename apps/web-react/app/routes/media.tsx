@@ -142,21 +142,6 @@ export default function MediaPage({ params }: Route.ComponentProps) {
       <div className='max-w-6xl mx-auto'>
         <UserHeader user={curUser} />
 
-        {/* Tabs */}
-        <div className='border-b border-border px-4 transition-colors duration-200'>
-          <div className='flex'>
-            <Link
-              to={`/tweets/${curUser.screenName}`}
-              className='px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-200'
-            >
-              推文
-            </Link>
-            <div className='px-4 py-3 text-sm font-medium border-b-2 border-primary text-primary'>
-              媒体
-            </div>
-          </div>
-        </div>
-
         <TweetsSortControls
           showDateFilter={true}
           showSortControls={true}

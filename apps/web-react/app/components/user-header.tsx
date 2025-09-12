@@ -1,7 +1,7 @@
 import { Calendar, LinkIcon, MapPin } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
-import { Button } from '~/components/ui/button'
 import type { User } from '~/types'
+import { UserTabs } from './layout/user-tabs'
 
 interface UserHeaderProps {
   user: User
@@ -26,9 +26,9 @@ export function UserHeader({ user }: UserHeaderProps) {
   }
 
   return (
-    <div className='relative'>
+    <div>
       {/* Banner */}
-      <div className='h-48 bg-gradient-to-r from-blue-400 to-purple-500 relative'>
+      <div className='h-48 bg-muted relative'>
         {user.profileBannerUrl && (
           <img
             src={user.profileBannerUrl}
@@ -39,9 +39,8 @@ export function UserHeader({ user }: UserHeaderProps) {
       </div>
 
       {/* Profile Content */}
-      <div className='px-4 pb-4'>
-        {/* Avatar */}
-        <div className='relative -mt-16 mb-4'>
+      <div className='p-4 pb-0'>
+        <div className='flex justify-between items-end -mt-16 mb-4'>
           <Avatar className='size-32 border-4 border-background bg-background'>
             <AvatarImage src={user.avatarUrl} />
             <AvatarFallback className='text-2xl'>
@@ -50,30 +49,27 @@ export function UserHeader({ user }: UserHeaderProps) {
           </Avatar>
         </div>
 
-        {/* Name and Username */}
         <div className='mb-3'>
-          <h1 className='text-xl font-bold text-foreground'>{user.name}</h1>
+          <h1 className='text-2xl font-bold text-foreground'>{user.name}</h1>
           <p className='text-muted-foreground'>@{user.screenName}</p>
         </div>
 
-        {/* Bio */}
         {user.bio && (
-          <p className='text-sm leading-relaxed mb-3 text-foreground'>
+          <p className='text-base leading-relaxed mb-4 text-foreground whitespace-pre-wrap'>
             {user.bio}
           </p>
         )}
 
-        {/* Location, Website, Join Date */}
-        <div className='flex flex-wrap gap-4 mb-3 text-sm text-muted-foreground'>
+        <div className='flex flex-wrap items-center gap-x-4 gap-y-2 mb-4 text-muted-foreground'>
           {user.location && (
-            <div className='flex items-center gap-1'>
+            <div className='flex items-center gap-1.5'>
               <MapPin className='size-4' />
               <span>{user.location}</span>
             </div>
           )}
 
           {user.website && (
-            <div className='flex items-center gap-1'>
+            <div className='flex items-center gap-1.5'>
               <LinkIcon className='size-4' />
               <a
                 href={user.website}
@@ -86,28 +82,30 @@ export function UserHeader({ user }: UserHeaderProps) {
             </div>
           )}
 
-          <div className='flex items-center gap-1'>
+          <div className='flex items-center gap-1.5'>
             <Calendar className='size-4' />
             <span>加入于 {formatDate(user.createdAt)}</span>
           </div>
         </div>
 
-        {/* Following and Followers */}
-        <div className='flex gap-4 text-sm'>
+        <div className='flex gap-6 text-sm mb-4'>
           <div>
-            <span className='font-semibold'>
+            <span className='font-bold text-foreground'>
               {formatCount(user.followingCount)}
             </span>
             <span className='text-muted-foreground ml-1'>关注</span>
           </div>
           <div>
-            <span className='font-semibold'>
+            <span className='font-bold text-foreground'>
               {formatCount(user.followersCount)}
             </span>
             <span className='text-muted-foreground ml-1'>粉丝</span>
           </div>
         </div>
       </div>
+
+      {/* INTEGRATED TABS */}
+      <UserTabs user={user} />
     </div>
   )
 }

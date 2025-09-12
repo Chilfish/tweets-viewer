@@ -103,7 +103,7 @@ export function TweetsSortControls({
   return (
     <div
       className={cn(
-        'flex items-center gap-2 border-b border-border bg-card p-3 rounded-md mb-2',
+        'flex items-center gap-2 border-b border-border bg-card p-3 rounded-md my-2',
         className,
       )}
     >
