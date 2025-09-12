@@ -6,10 +6,10 @@
   "scripts": {},
   "dependencies": {
     "drizzle-kit": "^0.31.4",
-    "drizzle-orm": "^0.44.4"
+    "drizzle-orm": "^0.44.5"
   },
   "devDependencies": {
-    "rettiwt-api": "^6.0.5"
+    "rettiwt-api": "^6.0.6"
   },
-  "packageManager": "bun@1.2.20"
+  "packageManager": "bun@1.2.21"
 }

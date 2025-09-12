@@ -25,10 +25,27 @@
     "rules": {
       "recommended": true,
       "suspicious": {
-        "noExplicitAny": "off"
+        "noExplicitAny": "off",
+        "noArrayIndexKey": "off"
       },
       "complexity": {
         "noForEach": "off"
+      },
+      "correctness": {
+        "noEmptyPattern": "warn",
+        "noNestedComponentDefinitions": "warn",
+        "useExhaustiveDependencies": "warn",
+        "noUnreachable": "warn",
+        "useJsxKeyInIterable": "off",
+        "noUnusedVariables": "warn"
+      },
+      "a11y": {
+        "useSemanticElements": "off",
+        "useFocusableInteractive": "off",
+        "noRedundantRoles": "off"
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": "warn"
       }
     }
   },

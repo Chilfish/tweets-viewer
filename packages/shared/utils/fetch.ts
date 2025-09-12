@@ -1,13 +1,18 @@
 import axios from 'axios'
-import { setupCache } from 'axios-cache-interceptor'
+import { buildWebStorage, setupCache } from 'axios-cache-interceptor'
 import { apiUrl } from '../constant'
 import { convertDate } from './date'
+
+const storage = typeof sessionStorage === 'undefined' ? {} : sessionStorage
 
 const client = setupCache(
   axios.create({
     baseURL: apiUrl,
     timeout: 10000,
   }),
+  {
+    storage: buildWebStorage(storage as any),
+  },
 )
 
 client.interceptors.response.use(

@@ -10,13 +10,13 @@
   "dependencies": {
     "@hono-rate-limiter/cloudflare": "^0.2.2",
     "@neondatabase/serverless": "^1.0.1",
-    "hono": "^4.9.2",
-    "rettiwt-api": "^6.0.5",
+    "@tweets-viewer/database": "workspace:*",
     "@tweets-viewer/shared": "workspace:*",
-    "@tweets-viewer/database": "workspace:*"
+    "hono": "^4.9.7",
+    "rettiwt-api": "^6.0.6"
   },
   "devDependencies": {
-    "wrangler": "^4.31.0"
+    "wrangler": "^4.36.0"
   },
-  "packageManager": "bun@1.2.20"
+  "packageManager": "bun@1.2.21"
 }

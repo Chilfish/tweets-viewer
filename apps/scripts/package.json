@@ -9,7 +9,7 @@
     "@tweets-viewer/shared": "workspace:*",
     "fast-glob": "^3.3.3",
     "p-map": "^7.0.3",
-    "rettiwt-api": "^6.0.5"
+    "rettiwt-api": "^6.0.6"
   },
-  "packageManager": "bun@1.2.20"
+  "packageManager": "bun@1.2.21"
 }

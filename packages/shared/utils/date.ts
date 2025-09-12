@@ -32,14 +32,34 @@ export function getDate(time: Time, timezone?: TZ) {
 export function now(timezone: TZ = 'beijing') {
   return getDate(new Date(), timezone)
 }
-
-export function convertDate(obj: Record<string, any>) {
+const DATE_KEYS = [
+  'createdAt',
+  'updatedAt',
+  'date',
+  'time',
+  'timestamp',
+  'created_at',
+  'updated_at',
+  'date_time',
+  'time_stamp',
+  'startDate',
+  'endDate',
+  'start_date',
+  'end_date',
+]
+export function convertDate(
+  obj: Record<string, any>,
+  keys: string[] = DATE_KEYS,
+) {
   for (const [key, value] of Object.entries(obj)) {
     if (value === null) {
       continue
     }
     if (typeof value === 'object') {
       convertDate(value)
+      continue
+    }
+    if (!keys.includes(key)) {
       continue
     }
     if (typeof value !== 'string') {
