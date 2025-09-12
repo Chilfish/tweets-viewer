@@ -1,8 +1,10 @@
 import { Search, X } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
+import { useSearchParams } from 'react-router'
 import { TweetsList } from '~/components/tweets/tweets-list'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
+import type { SortOrder } from '~/stores'
 import { useSearchStore } from '~/stores'
 import { useUserStore } from '~/stores/user-store'
 
@@ -30,14 +32,85 @@ export default function SearchPage() {
     setDateRange,
     filters,
     clearData,
+    page,
+    setPage,
+    currentUser: storeUser,
   } = useSearchStore()
 
+  const [searchParams, setSearchParams] = useSearchParams()
+  const isInitialized = useRef(false)
+
   useEffect(() => {
-    if (curUser) {
+    if (!curUser) return
+
+    const userChanged = storeUser !== curUser.screenName
+    if (userChanged) {
       clearData()
       setCurrentUser(curUser.screenName)
+      isInitialized.current = false
     }
-  }, [curUser, clearData, setCurrentUser])
+
+    if (!isInitialized.current) {
+      const q = searchParams.get('q') || ''
+      const pageParam = parseInt(searchParams.get('page') || '1', 10) - 1
+      const sortParam = (searchParams.get('sort') as SortOrder) || 'desc'
+      const startDateParam = searchParams.get('startDate')
+      const endDateParam = searchParams.get('endDate')
+
+      setKeyword(q)
+      setPage(pageParam)
+      setSortOrder(sortParam)
+      setDateRange({
+        startDate: startDateParam ? new Date(startDateParam) : null,
+        endDate: endDateParam ? new Date(endDateParam) : null,
+      })
+
+      if (q) {
+        searchTweets(true)
+      }
+      isInitialized.current = true
+    }
+  }, [
+    curUser,
+    storeUser,
+    searchParams,
+    clearData,
+    setCurrentUser,
+    setKeyword,
+    setPage,
+    setSortOrder,
+    setDateRange,
+    searchTweets,
+  ])
+
+  useEffect(() => {
+    if (!isInitialized.current) return
+
+    const params = new URLSearchParams()
+    if (keyword) {
+      params.set('q', keyword)
+    }
+    if (page > 0) {
+      params.set('page', String(page + 1))
+    }
+    if (filters.sortOrder !== 'desc') {
+      params.set('sort', filters.sortOrder)
+    }
+    if (filters.dateRange.startDate) {
+      params.set(
+        'startDate',
+        filters.dateRange.startDate.toISOString().split('T')[0],
+      )
+    }
+    if (filters.dateRange.endDate) {
+      params.set(
+        'endDate',
+        filters.dateRange.endDate.toISOString().split('T')[0],
+      )
+    }
+
+    setSearchParams(params, { replace: true })
+  }, [keyword, page, filters, setSearchParams])
 
   if (!curUser) return null
 
@@ -49,8 +122,7 @@ export default function SearchPage() {
           <form
             onSubmit={(e) => {
               e.preventDefault()
-              console.log(keyword)
-              searchTweets()
+              searchTweets(true)
             }}
             className='p-4 flex items-center gap-2'
           >
@@ -78,7 +150,6 @@ export default function SearchPage() {
             </div>
             <Button
               type='submit'
-              onClick={() => searchTweets()}
               disabled={!keyword.trim() || isSearching}
               className='bg-primary hover:bg-primary/90 text-primary-foreground transition-colors duration-200'
             >
@@ -115,23 +186,25 @@ export default function SearchPage() {
               </p>
             </div>
           ) : null}
-          <TweetsList
-            user={curUser}
-            tweets={data}
-            showDateFilter={false}
-            showSortControls={false}
-            paginationActions={{
-              isLoading: isSearching,
-              hasMore,
-              error,
-              loadMore,
-            }}
-            sortControlsActions={{
-              setSortOrder,
-              setDateRange,
-              filters,
-            }}
-          />
+          {data.length > 0 && (
+            <TweetsList
+              user={curUser}
+              tweets={data}
+              showDateFilter={false}
+              showSortControls={false}
+              paginationActions={{
+                isLoading: isSearching,
+                hasMore,
+                error,
+                loadMore,
+              }}
+              sortControlsActions={{
+                setSortOrder,
+                setDateRange,
+                filters,
+              }}
+            />
+          )}
         </div>
       </div>
     </div>

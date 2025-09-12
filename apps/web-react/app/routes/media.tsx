@@ -1,8 +1,9 @@
-import { useEffect } from 'react'
-import { Link } from 'react-router'
+import { useEffect, useRef } from 'react'
+import { Link, useSearchParams } from 'react-router'
 import { MediaGrid } from '~/components/media/media-grid'
 import { TweetsSortControls } from '~/components/tweets/tweets-sort-controls'
 import { UserHeader } from '~/components/user-header'
+import type { SortOrder } from '~/stores'
 import { useMediaStore, useTweetsStore } from '~/stores'
 import type { MediaItem } from '~/stores/media-store'
 import { useUserStore } from '~/stores/user-store'
@@ -31,16 +32,69 @@ export default function MediaPage({ params }: Route.ComponentProps) {
     setDateRange,
     filters,
     reset,
+    currentUser: storeUser,
   } = useMediaStore()
 
+  const [searchParams, setSearchParams] = useSearchParams()
+  const isInitialized = useRef(false)
+
   useEffect(() => {
-    if (curUser?.screenName) {
-      // 重置store状态，清除之前用户的数据
+    if (!curUser) return
+
+    const userChanged = storeUser?.screenName !== curUser.screenName
+    if (userChanged) {
       reset()
       setCurrentUser(curUser)
-      loadMedia(curUser.screenName)
+      isInitialized.current = false
     }
-  }, [curUser, reset, setCurrentUser, loadMedia])
+
+    if (!isInitialized.current) {
+      const sortParam = (searchParams.get('sort') as SortOrder) || 'desc'
+      const startDateParam = searchParams.get('startDate')
+      const endDateParam = searchParams.get('endDate')
+
+      setSortOrder(sortParam)
+      setDateRange({
+        startDate: startDateParam ? new Date(startDateParam) : null,
+        endDate: endDateParam ? new Date(endDateParam) : null,
+      })
+
+      loadMedia(curUser.screenName, true)
+      isInitialized.current = true
+    }
+  }, [
+    curUser,
+    storeUser,
+    searchParams,
+    reset,
+    setCurrentUser,
+    setSortOrder,
+    setDateRange,
+    loadMedia,
+  ])
+
+  useEffect(() => {
+    if (!isInitialized.current) return
+
+    const params = new URLSearchParams()
+    if (filters.sortOrder !== 'desc') {
+      params.set('sort', filters.sortOrder)
+    }
+    if (filters.dateRange.startDate) {
+      params.set(
+        'startDate',
+        filters.dateRange.startDate.toISOString().split('T')[0],
+      )
+    }
+    if (filters.dateRange.endDate) {
+      params.set(
+        'endDate',
+        filters.dateRange.endDate.toISOString().split('T')[0],
+      )
+    }
+
+    setSearchParams(params, { replace: true })
+  }, [filters, setSearchParams])
 
   // 自动加载更多内容确保页面有足够的媒体项
   useEffect(() => {
@@ -98,7 +152,6 @@ export default function MediaPage({ params }: Route.ComponentProps) {
           </div>
         </div>
 
-        {/* Sort Controls */}
         <TweetsSortControls
           showDateFilter={true}
           showSortControls={true}

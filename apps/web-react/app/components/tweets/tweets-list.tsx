@@ -47,6 +47,7 @@ export function TweetsList({
     hasMore,
     isLoading,
     onLoadMore: handleLoadMore,
+    threshold: 600,
   })
 
   if (tweets.length === 0 && isLoading) {

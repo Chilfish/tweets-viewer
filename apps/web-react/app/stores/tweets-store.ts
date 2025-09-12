@@ -29,6 +29,7 @@ interface TweetsActions extends PaginatedListActions, SortFilterActions {
   loadMoreTweets: (screenName: string) => Promise<Tweet[]>
   updateFilters: (filters: Partial<TweetsFilters>) => void
   getTweetById: (id: string) => Tweet | undefined
+  setPage: (page: number) => void
 }
 
 type TweetsStore = TweetsState & TweetsActions
@@ -141,6 +142,7 @@ export const useTweetsStore = create<TweetsStore>((set, get) => ({
   setError: (error) => set({ error, isLoading: false }),
   setHasMore: (hasMore) => set({ hasMore }),
   nextPage: () => set((state) => ({ page: state.page + 1 })),
+  setPage: (page) => set({ page }),
   reset: () =>
     set({ ...createInitialPaginatedState<Tweet>(), ...initialState }),
 }))

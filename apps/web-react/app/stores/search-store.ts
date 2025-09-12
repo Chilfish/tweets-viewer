@@ -22,15 +22,14 @@ interface SearchState extends PaginatedStore<Tweet> {
   currentUser: string | null
 }
 
-interface SearchActions extends PaginatedListActions {
+interface SearchActions extends PaginatedListActions, SortFilterActions {
   setKeyword: (keyword: string) => void
-  setDateRange: (range: DateRange) => Promise<void>
-  setSortOrder: (order: SortOrder) => Promise<void>
   setCurrentUser: (screenName: string | null) => void
   searchTweets: (isFirstLoad?: boolean) => Promise<void>
   loadMoreResults: () => Promise<void>
   clearSearch: () => void
   clearData: () => void
+  setPage: (page: number) => void
 }
 
 type SearchStore = SearchState & SearchActions
@@ -155,6 +154,7 @@ export const useSearchStore = create<SearchStore>((set, get) => ({
   setError: (error) => set({ error, isLoading: false }),
   setHasMore: (hasMore) => set({ hasMore }),
   nextPage: () => set((state) => ({ page: state.page + 1 })),
+  setPage: (page) => set({ page }),
   reset: () =>
     set({ ...createInitialPaginatedState<Tweet>(), ...initialState }),
 }))

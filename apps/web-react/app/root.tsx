@@ -40,7 +40,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <body>
         {children}
         <GlobalMediaModal />
-        <ScrollRestoration />
+        <ScrollRestoration getKey={(location) => location.pathname} />
         <Scripts />
       </body>
     </html>
