@@ -36,7 +36,7 @@ export default function Layout() {
           title={curUserName ? `@${curUserName}` : 'Tweets Viewer'}
         ></TopNav>
 
-        <main className='pb-20'>
+        <main className='min-h-full'>
           <Outlet />
         </main>
 
@@ -50,7 +50,7 @@ export default function Layout() {
       <Sidebar currentUser={curUserName} />
 
       <main className='flex-1 bg-background transition-colors duration-200'>
-        <div className='max-w-2xl mx-auto'>
+        <div className='max-w-2xl mx-auto h-full'>
           <Outlet />
         </div>
       </main>
