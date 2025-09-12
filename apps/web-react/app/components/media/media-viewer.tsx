@@ -3,12 +3,11 @@ import type { ReactNode } from 'react'
 import Lightbox from 'yet-another-react-lightbox'
 import Counter from 'yet-another-react-lightbox/plugins/counter'
 import Video from 'yet-another-react-lightbox/plugins/video'
-import Zoom from 'yet-another-react-lightbox/plugins/zoom'
 
 import 'yet-another-react-lightbox/styles.css'
 import 'yet-another-react-lightbox/plugins/counter.css'
-import 'yet-another-react-lightbox/plugins/video.css'
 
+import { X } from 'lucide-react'
 import type { MediaItem } from '~/stores/media-store'
 import type { TweetMedia } from '~/types'
 
@@ -54,7 +53,7 @@ export function MediaViewer({
       close={onClose}
       slides={slides}
       index={startIndex}
-      plugins={[Video, Zoom, Counter]}
+      plugins={[Counter, Video]}
       closeOnBackdropClick
       animation={{
         fade: 250,
@@ -80,27 +79,19 @@ export function MediaViewer({
           backdropFilter: 'blur(8px)',
         },
       }}
+      toolbar={{
+        buttons: [
+          <div className='flex gap-4 items-center text-gray-100 hover:text-gray-50 absolute right-6 top-5'>
+            {additionalToolbarContent}
+            <button onClick={onClose}>
+              <X className='size-8' />
+            </button>
+          </div>,
+        ],
+      }}
       render={{
         buttonPrev: mediaItems.length <= 1 ? () => null : undefined,
         buttonNext: mediaItems.length <= 1 ? () => null : undefined,
-        buttonZoom: () => null, // hide zoom button
-        toolbar: ({ renderDefaultToolbar }) => (
-          <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-            {renderDefaultToolbar()}
-            {additionalToolbarContent && (
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '12px',
-                  right: '56px',
-                  zIndex: 100,
-                }}
-              >
-                {additionalToolbarContent}
-              </div>
-            )}
-          </div>
-        ),
       }}
       counter={{
         container: {

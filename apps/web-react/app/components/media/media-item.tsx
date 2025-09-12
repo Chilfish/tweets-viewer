@@ -22,6 +22,7 @@ export function MediaItemComponent({
   const [imageError, setImageError] = useState(false)
 
   const isVideo = item.type === 'video' || item.url.includes('.mp4')
+  const imageUrl = item.url
 
   const handleClick = () => {
     onClick?.(item)
@@ -61,26 +62,29 @@ export function MediaItemComponent({
         </div>
       )}
 
-      <img
-        src={item.url}
-        alt=''
-        className={`w-full h-full object-cover transition-opacity duration-200 ${
-          imageLoaded ? 'opacity-100' : 'opacity-0'
-        }`}
-        style={{
-          aspectRatio: `${item.width} / ${item.height}`,
-        }}
-        loading='lazy'
-        onLoad={handleImageLoad}
-        onError={handleImageError}
-      />
-
-      {isVideo && (
-        <div className='absolute inset-0 bg-black/20 flex items-center justify-center opacity-70 group-hover:opacity-100 transition-opacity duration-200'>
-          <div className='bg-black/60 rounded-full p-3'>
-            <Play className='size-6 text-white fill-white' />
+      {isVideo ? (
+        <div className='relative'>
+          <video autoPlay={false} src={item.url}></video>
+          <div className='absolute inset-0 bg-black/20 flex items-center justify-center opacity-70 group-hover:opacity-100 transition-opacity duration-200'>
+            <div className='bg-black/60 rounded-full p-3'>
+              <Play className='size-6 text-white fill-white' />
+            </div>
           </div>
         </div>
+      ) : (
+        <img
+          src={imageUrl}
+          alt=''
+          className={`w-full h-full object-cover transition-opacity duration-200 ${
+            imageLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
+          style={{
+            aspectRatio: `${item.width} / ${item.height}`,
+          }}
+          loading='lazy'
+          onLoad={handleImageLoad}
+          onError={handleImageError}
+        />
       )}
     </div>
   )
