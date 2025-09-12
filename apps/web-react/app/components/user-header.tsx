@@ -75,7 +75,7 @@ export function UserHeader({ user }: UserHeaderProps) {
                 href={user.website}
                 target='_blank'
                 rel='noopener noreferrer'
-                className='text-primary hover:underline'
+                className='text-primary wrap-anywhere hover:underline'
               >
                 {user.website.replace(/^https?:\/\//, '')}
               </a>

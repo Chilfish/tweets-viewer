@@ -14,7 +14,7 @@ export function Link({ url, text, className }: LinkProps) {
       href={url}
       className={cn(
         className,
-        'px-1 text-primary hover:underline underline-offset-4',
+        'px-1 text-primary hover:underline underline-offset-4 wrap-anywhere',
       )}
       target='_blank'
       rel='noreferrer'

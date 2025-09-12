@@ -2,10 +2,12 @@
 import type { ReactNode } from 'react'
 import Lightbox from 'yet-another-react-lightbox'
 import Counter from 'yet-another-react-lightbox/plugins/counter'
+import Video from 'yet-another-react-lightbox/plugins/video'
 import Zoom from 'yet-another-react-lightbox/plugins/zoom'
 
 import 'yet-another-react-lightbox/styles.css'
 import 'yet-another-react-lightbox/plugins/counter.css'
+import 'yet-another-react-lightbox/plugins/video.css'
 
 import type { MediaItem } from '~/stores/media-store'
 import type { TweetMedia } from '~/types'
@@ -52,7 +54,7 @@ export function MediaViewer({
       close={onClose}
       slides={slides}
       index={startIndex}
-      plugins={[Zoom, Counter]}
+      plugins={[Video, Zoom, Counter]}
       closeOnBackdropClick
       animation={{
         fade: 250,
@@ -81,15 +83,16 @@ export function MediaViewer({
       render={{
         buttonPrev: mediaItems.length <= 1 ? () => null : undefined,
         buttonNext: mediaItems.length <= 1 ? () => null : undefined,
-        buttonZoom: ({}) => (
+        buttonZoom: () => null, // hide zoom button
+        toolbar: ({ renderDefaultToolbar }) => (
           <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-            {/* {renderDefaultToolbar()} */}
+            {renderDefaultToolbar()}
             {additionalToolbarContent && (
               <div
                 style={{
                   position: 'absolute',
-                  top: '-10px',
-                  right: '0px',
+                  top: '12px',
+                  right: '56px',
                   zIndex: 100,
                 }}
               >

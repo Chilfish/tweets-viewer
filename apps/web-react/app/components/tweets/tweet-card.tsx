@@ -43,13 +43,6 @@ export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
     })
   }
 
-  const openTweetInNewTab = () => {
-    window.open(
-      `https://twitter.com/${user.screenName}/status/${tweet.tweetId}`,
-      '_blank',
-    )
-  }
-
   const renderMedia = (media: TweetMedia[]) => {
     if (!media.length || !showMedia) return null
 
@@ -69,7 +62,7 @@ export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
             onClick={(item) => handleMediaClick(item as TweetMedia, media)}
           />
         ) : media.length === 2 ? (
-          <div className='flex gap-0.5 h-90'>
+          <div className='flex gap-0.5 h-60 sm:h-90'>
             {media.map((item, index) => (
               <MediaItemComponent
                 key={index}
@@ -80,7 +73,7 @@ export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
             ))}
           </div>
         ) : media.length === 3 ? (
-          <div className='flex gap-0.5 h-90'>
+          <div className='flex gap-0.5 h-60 sm:h-90'>
             <MediaItemComponent
               item={media[0]}
               className='h-full flex-1'
@@ -105,7 +98,7 @@ export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
               <MediaItemComponent
                 key={index}
                 item={item}
-                className='h-60'
+                className='h-40 sm:h-60'
                 onClick={(item) => handleMediaClick(item as TweetMedia, media)}
               />
             ))}
@@ -123,10 +116,10 @@ export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
     return (
       <Card
         id={quotedTweet.tweetId}
-        className='mt-3 border border-border bg-card transition-colors duration-200'
+        className='mt-3 border border-border bg-card transition-colors duration-200 p-0'
       >
         <CardContent className='p-3'>
-          <div className='flex items-center gap-2 mb-1'>
+          <div className='flex items-center gap-2'>
             <Avatar className='size-8 flex-shrink-0'>
               <AvatarImage src={quotedUser.avatarUrl} />
               <AvatarFallback>{quotedUser.name.charAt(0)}</AvatarFallback>
@@ -140,6 +133,9 @@ export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
               </span>
             </div>
           </div>
+          <div className='text-sm text-muted-foreground flex-shrink-0 ml-10'>
+            {formatDate(quotedTweet.createdAt)}
+          </div>
           <TweetText text={quotedTweet.fullText} />
           {quotedTweet.media.length > 0 && renderMedia(quotedTweet.media)}
         </CardContent>
@@ -151,7 +147,7 @@ export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
     if (!tweet.retweetedStatus) return null
 
     return (
-      <div className='flex items-center gap-2 mb-2 text-sm text-muted-foreground'>
+      <div className='flex items-center gap-2 pl-2 mb-4 text-sm text-muted-foreground'>
         <Repeat2 className='size-4' />
         <Link
           url={`https://twitter.com/${user.screenName}/status/${tweet.tweetId}`}
@@ -171,7 +167,7 @@ export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
       id={actualTweet.tweetId}
       className='border-border bg-card transition-colors duration-200 pb-2'
     >
-      <CardContent>
+      <CardContent className='px-3 sm:px-4'>
         {renderRetweetHeader()}
 
         <div className='flex gap-3'>
@@ -190,19 +186,10 @@ export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
                   @{actualUser.screenName}
                 </span>
               </div>
-              <span className='text-sm text-muted-foreground flex-shrink-0'>
-                ·
-              </span>
-              <span className='text-sm text-muted-foreground flex-shrink-0'>
-                {formatDate(actualTweet.createdAt)}
-              </span>
-              <Button
-                variant='ghost'
-                size='icon'
-                className='size-5 ml-auto flex-shrink-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-200'
-              >
-                <MoreHorizontal className='size-4' />
-              </Button>
+            </div>
+
+            <div className='text-sm text-muted-foreground flex-shrink-0'>
+              {formatDate(actualTweet.createdAt)}
             </div>
 
             <TweetText text={actualTweet.fullText} />

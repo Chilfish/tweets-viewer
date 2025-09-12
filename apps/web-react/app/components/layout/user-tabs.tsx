@@ -94,7 +94,7 @@ export function UserTabs({ user }: UserTabsProps) {
           <Input
             type='search'
             placeholder='搜索推文...'
-            className='pl-9 h-9 w-40 md:w-56'
+            className='pl-9 h-9 w-32 md:w-56'
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
           />

@@ -73,15 +73,15 @@ export function TweetsSortControls({
     }
 
     if (range.startDate && range.endDate) {
-      return `${format(range.startDate)} - ${format(range.endDate)}`
+      return `${format(range.startDate)} ~ ${format(range.endDate)}`
     }
 
     if (range.startDate) {
-      return `从 ${format(range.startDate)}`
+      return `从 ${format(range.startDate)} 开始`
     }
 
     if (range.endDate) {
-      return `到 ${format(range.endDate)}`
+      return `到 ${format(range.endDate)} 为止`
     }
 
     return '所有日期'
@@ -121,10 +121,8 @@ export function TweetsSortControls({
               ) : (
                 <SortAsc className='h-3 w-3' />
               )}
-              <span className='ml-1'>
-                {filters.sortOrder === 'desc' ? '倒序' : '顺序'}
-              </span>
-              <ChevronDown className='h-3 w-3 ml-1' />
+              <span>{filters.sortOrder === 'desc' ? '倒序' : '顺序'}</span>
+              <ChevronDown className='h-3 w-3' />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='start' className='w-fit'>
@@ -167,14 +165,11 @@ export function TweetsSortControls({
               )}
             >
               <Calendar className='h-3 w-3 mr-1' />
-              <span className='hidden sm:inline'>
-                {formatDateRange(filters.dateRange)}
-              </span>
-              <span className='sm:hidden'>日期</span>
+              <span>{formatDateRange(filters.dateRange)}</span>
             </Button>
           </PopoverTrigger>
           <PopoverContent className='w-auto p-0' align='start'>
-            <div className='flex gap-4 p-3'>
+            <div className='flex sm:flex-row flex-col gap-4 p-3'>
               <div className='space-y-2'>
                 <Label className='text-sm font-medium'>开始日期</Label>
                 <CalendarComponent

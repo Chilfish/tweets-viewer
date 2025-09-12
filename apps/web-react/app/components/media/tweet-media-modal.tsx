@@ -29,7 +29,7 @@ export function TweetMediaModal() {
       target='_blank'
       rel='noopener noreferrer'
       title='View on Twitter'
-      className='text-gray-200 w-fit p-2'
+      className='w-fit'
     >
       <ExternalLink className='size-6' />
     </a>

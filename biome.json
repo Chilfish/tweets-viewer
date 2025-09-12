@@ -36,6 +36,7 @@
         "noNestedComponentDefinitions": "warn",
         "useExhaustiveDependencies": "warn",
         "noUnreachable": "warn",
+        "useJsxKeyInIterable": "off",
         "noUnusedVariables": "warn"
       },
       "a11y": {
