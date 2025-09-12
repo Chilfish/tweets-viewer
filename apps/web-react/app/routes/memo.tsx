@@ -26,11 +26,15 @@ export default function MemoPage({ params }: Route.ComponentProps) {
     setSortOrder,
     setDateRange,
     filters,
+    reset,
   } = useMemoryStore()
 
   useEffect(() => {
-    if (curUser) loadMemoryTweets(curUser.screenName)
-  }, [curUser])
+    if (curUser) {
+      reset()
+      loadMemoryTweets(curUser.screenName)
+    }
+  }, [curUser, reset, loadMemoryTweets])
 
   if (!curUser) {
     return (
@@ -49,19 +53,19 @@ export default function MemoPage({ params }: Route.ComponentProps) {
 
         {/* Content */}
         <main className='p-4'>
-          {isLoading ? (
+          {isLoading && data.length === 0 ? (
             <div className='text-center py-12'>
-              <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4'></div>
+              <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4'></div>
               <p className='text-muted-foreground'>Loading memories...</p>
             </div>
-          ) : data.length === 0 ? (
+          ) : !isLoading && data.length === 0 ? (
             <div className='text-center py-12'>
               <Calendar className='h-12 w-12 mx-auto text-muted-foreground mb-4' />
               <h2 className='text-xl font-semibold mb-2 text-muted-foreground'>
                 No memories found
               </h2>
               <p className='text-muted-foreground'>
-                No tweets found for {currentYear} in {currentYear}
+                No historical tweets found for this day.
               </p>
             </div>
           ) : (

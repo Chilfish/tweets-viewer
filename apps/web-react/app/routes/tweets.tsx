@@ -27,14 +27,16 @@ export default function TweetsPage({ params }: Route.ComponentProps) {
     setSortOrder,
     setDateRange,
     filters,
+    reset,
   } = useTweetsStore()
 
   useEffect(() => {
     if (curUser?.screenName) {
+      reset()
       setCurrentUser(curUser)
       loadTweets(curUser.screenName)
     }
-  }, [curUser])
+  }, [curUser, reset, setCurrentUser, loadTweets])
 
   if (userLoading || !curUser) {
     return (

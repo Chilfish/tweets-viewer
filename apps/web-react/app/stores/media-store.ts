@@ -81,7 +81,7 @@ const loadMediaData = async (
   startPage: number,
   screenName: string,
   filters: MediaFilters,
-  minMediaCount = 10,
+  minMediaCount = 6,
   appendTweets: (newTweets: Tweet[]) => void,
 ): Promise<{ mediaItems: MediaItem[]; hasMore: boolean; nextPage: number }> => {
   const reverse = filters.sortOrder === 'desc'

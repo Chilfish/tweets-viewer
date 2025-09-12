@@ -30,6 +30,7 @@ interface SearchActions extends PaginatedListActions {
   searchTweets: (isFirstLoad?: boolean) => Promise<void>
   loadMoreResults: () => Promise<void>
   clearSearch: () => void
+  clearData: () => void
 }
 
 type SearchStore = SearchState & SearchActions
@@ -137,6 +138,12 @@ export const useSearchStore = create<SearchStore>((set, get) => ({
         dateRange: { startDate: null, endDate: null },
         sortOrder: 'desc',
       },
+    })
+  },
+
+  clearData: () => {
+    set({
+      ...createInitialPaginatedState<Tweet>(),
     })
   },
 
