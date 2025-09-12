@@ -99,17 +99,15 @@ export default function MediaPage({ params }: Route.ComponentProps) {
         </div>
 
         {/* Sort Controls */}
-        <div className='p-4 border-b border-border bg-card'>
-          <TweetsSortControls
-            showDateFilter={true}
-            showSortControls={true}
-            sortFilterActions={{
-              setSortOrder,
-              setDateRange,
-              filters,
-            }}
-          />
-        </div>
+        <TweetsSortControls
+          showDateFilter={true}
+          showSortControls={true}
+          sortFilterActions={{
+            setSortOrder,
+            setDateRange,
+            filters,
+          }}
+        />
 
         <MediaGrid
           mediaItems={data}

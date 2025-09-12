@@ -10,6 +10,8 @@ import type { Route } from './+types/root'
 import { GlobalMediaModal } from './components/media/global-media-modal'
 import { useAppStore } from './stores/app-store'
 import './app.css'
+import { AlertTriangle, Loader2 } from 'lucide-react'
+import { Button } from './components/ui/button'
 
 export const links: Route.LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -51,37 +53,49 @@ export default function App() {
 
 export function HydrateFallback() {
   return (
-    <div className='flex items-center justify-center h-screen bg-background text-foreground'>
-      Loading...
+    <div className='flex flex-col items-center justify-center h-screen bg-background text-foreground'>
+      <Loader2 className='size-8 animate-spin text-primary' />
+      <p className='mt-4 text-muted-foreground'>Loading...</p>
     </div>
   )
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  let message = 'Oops!'
-  let details = 'An unexpected error occurred.'
+  let message = 'Oops! Something went wrong.'
+  let details = 'An unexpected error occurred. Please try again later.'
   let stack: string | undefined
 
   if (isRouteErrorResponse(error)) {
-    message = error.status === 404 ? '404' : 'Error'
+    message = error.status === 404 ? 'Page Not Found' : 'An Error Occurred'
     details =
       error.status === 404
-        ? 'The requested page could not be found.'
-        : error.statusText || details
+        ? "The page you're looking for doesn't exist."
+        : error.data?.message || error.statusText
   } else if (import.meta.env.DEV && error && error instanceof Error) {
-    details = error.message
+    message = error.message
+    details = 'Something went wrong.'
     stack = error.stack
   }
 
   return (
-    <main className='pt-16 p-4 container mx-auto bg-background text-foreground'>
-      <h1>{message}</h1>
-      <p>{details}</p>
-      {stack && (
-        <pre className='w-full p-4 overflow-x-auto bg-muted text-muted-foreground rounded'>
-          <code>{stack}</code>
-        </pre>
-      )}
-    </main>
+    <Layout>
+      <div className='flex flex-col items-center justify-center min-h-screen bg-background text-foreground p-4'>
+        <div className='text-center max-w-md'>
+          <AlertTriangle className='mx-auto h-16 w-16 text-destructive mb-4' />
+          <h1 className='text-3xl font-bold text-destructive mb-2'>
+            {message}
+          </h1>
+          <p className='text-muted-foreground mb-6'>{details}</p>
+          {stack && (
+            <pre className='w-full p-4 overflow-x-auto bg-muted text-muted-foreground rounded text-left text-sm'>
+              <code>{stack}</code>
+            </pre>
+          )}
+          <Button asChild>
+            <a href='/'>Go back to Home</a>
+          </Button>
+        </div>
+      </div>
+    </Layout>
   )
 }

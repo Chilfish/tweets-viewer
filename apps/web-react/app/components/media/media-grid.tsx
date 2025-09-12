@@ -1,6 +1,8 @@
 /** biome-ignore-all lint/a11y/useButtonType: <explanation> */
-import { Loader2, Play } from 'lucide-react'
+import { AlertCircle, ImageIcon, Loader2, Play } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert'
+import { Button } from '~/components/ui/button'
 import { useInfiniteScroll } from '~/hooks/use-infinite-scroll'
 import type { PaginatedListActions } from '~/stores'
 import { useAppStore } from '~/stores/app-store'
@@ -99,21 +101,17 @@ export function MediaGrid({
   }
 
   const handleMediaClick = (clickedMedia: MediaItem) => {
-    return
-
-    const context = getMediaContext(clickedMedia)
-    if (!context) return
-
-    const startIndex = context.allMediaInTweet.findIndex(
-      (m) => m.id === clickedMedia.id,
-    )
-
-    openTweetMediaModal({
-      mediaItems: context.allMediaInTweet,
-      startIndex: Math.max(0, startIndex),
-      tweet: context.tweet,
-      user: context.user,
-    })
+    // const context = getMediaContext?.(clickedMedia)
+    // if (!context) return
+    // const startIndex = context.allMediaInTweet.findIndex(
+    //   (m) => m.id === clickedMedia.id,
+    // )
+    // openTweetMediaModal({
+    //   mediaItems: context.allMediaInTweet,
+    //   startIndex: Math.max(0, startIndex),
+    //   tweet: context.tweet,
+    //   user: context.user,
+    // })
   }
 
   const { loadingRef } = useInfiniteScroll({
@@ -136,14 +134,21 @@ export function MediaGrid({
 
   if (error && mediaItems.length === 0) {
     return (
-      <div className='text-center py-12'>
-        <p className='text-red-500 mb-4'>{error}</p>
-        <button
-          onClick={handleLoadMore}
-          className='text-blue-500 hover:text-blue-600'
-        >
-          Try again
-        </button>
+      <div className='p-4'>
+        <Alert variant='destructive'>
+          <AlertCircle className='h-4 w-4' />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            {error}
+            <Button
+              onClick={handleLoadMore}
+              variant='link'
+              className='p-0 h-auto ml-2'
+            >
+              Try again
+            </Button>
+          </AlertDescription>
+        </Alert>
       </div>
     )
   }
@@ -151,7 +156,13 @@ export function MediaGrid({
   if (mediaItems.length === 0 && !isLoading) {
     return (
       <div className='text-center py-12'>
-        <div className='text-muted-foreground'>No media found</div>
+        <ImageIcon className='h-12 w-12 mx-auto text-muted-foreground mb-4' />
+        <h2 className='text-xl font-semibold mb-2 text-muted-foreground'>
+          No Media Found
+        </h2>
+        <p className='text-muted-foreground'>
+          This user hasn't posted any photos or videos yet.
+        </p>
       </div>
     )
   }
@@ -160,14 +171,21 @@ export function MediaGrid({
     <div className='pb-8'>
       <div className='flex gap-1 px-2 sm:px-0'>
         {columns.map((column, columnIndex) => (
-          <div key={columnIndex} className='flex-1'>
-            {column.map((item) => (
-              <MediaItemComponent
-                className='mb-1'
+          <div key={columnIndex} className='flex flex-col gap-1 flex-1'>
+            {column.map((item, itemIndex) => (
+              <div
                 key={item.id}
-                item={item}
-                onClick={() => handleMediaClick(item)}
-              />
+                className='animate-in fade-in-0'
+                style={{
+                  animationDelay: `${Math.min((columnIndex * 5 + itemIndex) * 50, 800)}ms`,
+                  animationFillMode: 'backwards',
+                }}
+              >
+                <MediaItemComponent
+                  item={item}
+                  onClick={() => handleMediaClick(item)}
+                />
+              </div>
             ))}
           </div>
         ))}
@@ -191,14 +209,21 @@ export function MediaGrid({
         )}
 
         {error && mediaItems.length > 0 && (
-          <div className='text-center'>
-            <p className='text-red-500 text-sm mb-2'>{error}</p>
-            <button
-              onClick={handleLoadMore}
-              className='text-blue-500 hover:text-blue-600 text-sm'
-            >
-              Try again
-            </button>
+          <div className='p-4'>
+            <Alert variant='destructive'>
+              <AlertCircle className='h-4 w-4' />
+              <AlertTitle>Error loading more media</AlertTitle>
+              <AlertDescription>
+                {error}
+                <Button
+                  onClick={handleLoadMore}
+                  variant='link'
+                  className='p-0 h-auto ml-2'
+                >
+                  Try again
+                </Button>
+              </AlertDescription>
+            </Alert>
           </div>
         )}
       </div>

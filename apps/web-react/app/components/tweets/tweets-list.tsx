@@ -1,5 +1,7 @@
 /** biome-ignore-all lint/a11y/useButtonType: <explanation> */
-import { Loader2 } from 'lucide-react'
+import { AlertCircle, Loader2, MessageSquareX } from 'lucide-react'
+import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert'
+import { Button } from '~/components/ui/button'
 import { useInfiniteScroll } from '~/hooks/use-infinite-scroll'
 import type { PaginatedListActions } from '~/stores'
 import type { Tweet, User } from '~/types'
@@ -60,14 +62,21 @@ export function TweetsList({
 
   if (error && tweets.length === 0) {
     return (
-      <div className='text-center py-12'>
-        <p className='text-red-500 mb-4'>{error}</p>
-        <button
-          onClick={handleLoadMore}
-          className='text-blue-500 hover:text-blue-600'
-        >
-          Try again
-        </button>
+      <div className='p-4'>
+        <Alert variant='destructive'>
+          <AlertCircle className='h-4 w-4' />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            {error}
+            <Button
+              onClick={handleLoadMore}
+              variant='link'
+              className='p-0 h-auto ml-2'
+            >
+              Try again
+            </Button>
+          </AlertDescription>
+        </Alert>
       </div>
     )
   }
@@ -81,8 +90,17 @@ export function TweetsList({
       />
 
       <div className='divide-y divide-border'>
-        {tweets.map((tweet) => (
-          <TweetCard key={tweet.tweetId} tweet={tweet} user={user} />
+        {tweets.map((tweet, index) => (
+          <div
+            key={tweet.tweetId}
+            className='animate-in fade-in-0'
+            style={{
+              animationDelay: `${Math.min(index * 50, 500)}ms`,
+              animationFillMode: 'backwards',
+            }}
+          >
+            <TweetCard tweet={tweet} user={user} />
+          </div>
         ))}
       </div>
 
@@ -104,20 +122,33 @@ export function TweetsList({
         )}
 
         {error && tweets.length > 0 && (
-          <div className='text-center'>
-            <p className='text-red-500 text-sm mb-2'>{error}</p>
-            <button
-              onClick={handleLoadMore}
-              className='text-blue-500 hover:text-blue-600 text-sm'
-            >
-              Try again
-            </button>
+          <div className='p-4'>
+            <Alert variant='destructive'>
+              <AlertCircle className='h-4 w-4' />
+              <AlertTitle>Error loading more tweets</AlertTitle>
+              <AlertDescription>
+                {error}
+                <Button
+                  onClick={handleLoadMore}
+                  variant='link'
+                  className='p-0 h-auto ml-2'
+                >
+                  Try again
+                </Button>
+              </AlertDescription>
+            </Alert>
           </div>
         )}
 
         {tweets.length < 1 && !isLoading && (
-          <div className='text-center text-sm text-muted-foreground'>
-            No tweets found
+          <div className='text-center py-12'>
+            <MessageSquareX className='h-12 w-12 mx-auto text-muted-foreground mb-4' />
+            <h2 className='text-xl font-semibold mb-2 text-muted-foreground'>
+              No Tweets Found
+            </h2>
+            <p className='text-muted-foreground'>
+              There are no tweets to display at the moment.
+            </p>
           </div>
         )}
       </div>

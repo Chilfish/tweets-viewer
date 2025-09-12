@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Outlet, useParams } from 'react-router'
+import { Outlet, useLocation, useParams } from 'react-router'
 import { TopNav } from '~/components/top-nav'
 import { useIsMobile } from '~/hooks/use-mobile'
 import { useAppStore } from '~/stores/app-store'
@@ -9,6 +9,7 @@ import { Sidebar } from './sidebar'
 
 export default function Layout() {
   const params = useParams()
+  const location = useLocation()
   const isMobile = useIsMobile()
   const { setCurrentLayout } = useAppStore()
 
@@ -29,6 +30,12 @@ export default function Layout() {
     setCurrentLayout(isMobile ? 'mobile' : 'desktop')
   }, [isMobile, setCurrentLayout])
 
+  const outletWrapper = (
+    <div key={location.pathname} className='animate-in fade-in-0 duration-300'>
+      <Outlet />
+    </div>
+  )
+
   if (isMobile) {
     return (
       <div className='min-h-screen bg-background transition-colors duration-200'>
@@ -36,9 +43,7 @@ export default function Layout() {
           title={curUserName ? `@${curUserName}` : 'Tweets Viewer'}
         ></TopNav>
 
-        <main className='min-h-full'>
-          <Outlet />
-        </main>
+        <main className='min-h-full'>{outletWrapper}</main>
 
         <BottomNav currentUser={curUserName} />
       </div>
@@ -50,9 +55,7 @@ export default function Layout() {
       <Sidebar currentUser={curUserName} />
 
       <main className='flex-1 bg-background transition-colors duration-200'>
-        <div className='max-w-2xl mx-auto h-full'>
-          <Outlet />
-        </div>
+        <div className='max-w-2xl mx-auto h-full'>{outletWrapper}</div>
       </main>
     </div>
   )
