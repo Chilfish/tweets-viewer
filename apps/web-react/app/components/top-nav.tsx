@@ -12,7 +12,7 @@ export function TopNav({ title, children }: TopNavProps) {
   const { toggleDarkMode } = useAppStore()
 
   return (
-    <div className='sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border transition-colors duration-200'>
+    <div className='sticky top-0 z-50 bg-background/60 backdrop-blur-lg border-b border-border transition-colors duration-200'>
       <div className='flex items-center py-1 px-4'>
         <UserSelector />
 

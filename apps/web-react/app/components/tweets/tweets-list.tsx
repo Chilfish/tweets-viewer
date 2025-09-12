@@ -90,7 +90,7 @@ export function TweetsList({
         sortFilterActions={sortControlsActions}
       />
 
-      <div className='divide-y divide-border'>
+      <div className='space-y-1'>
         {tweets.map((tweet, index) => (
           <div
             key={tweet.tweetId}

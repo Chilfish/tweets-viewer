@@ -10,7 +10,7 @@ export function BottomNav({ currentUser }: BottomNavProps) {
   const navItems = getNavItems(currentUser)
 
   return (
-    <div className='fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-t border-border transition-colors duration-200 md:hidden'>
+    <div className='fixed bottom-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-lg border-t border-border transition-colors duration-200 md:hidden'>
       <div className='flex items-center justify-around py-2 px-4'>
         {navItems.map((item) => (
           <Link

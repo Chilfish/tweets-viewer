@@ -169,9 +169,9 @@ export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
   return (
     <Card
       id={actualTweet.tweetId}
-      className='border-0 border-b border-border rounded-none p-4 bg-card transition-colors duration-200'
+      className='border-border bg-card transition-colors duration-200 pb-2'
     >
-      <CardContent className='p-0'>
+      <CardContent>
         {renderRetweetHeader()}
 
         <div className='flex gap-3'>
@@ -196,6 +196,13 @@ export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
               <span className='text-sm text-muted-foreground flex-shrink-0'>
                 {formatDate(actualTweet.createdAt)}
               </span>
+              <Button
+                variant='ghost'
+                size='icon'
+                className='size-5 ml-auto flex-shrink-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-200'
+              >
+                <MoreHorizontal className='size-4' />
+              </Button>
             </div>
 
             <TweetText text={actualTweet.fullText} />
@@ -203,11 +210,11 @@ export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
             {actualTweet.media.length > 0 && renderMedia(actualTweet.media)}
             {renderQuotedTweet()}
 
-            <div className='flex items-center justify-between mt-3 max-w-md'>
+            <div className='flex items-center justify-between mt-4 max-w-md text-muted-foreground'>
               <Button
                 variant='ghost'
                 size='sm'
-                className='flex items-center gap-2 text-muted-foreground hover:text-blue-500 p-0 transition-colors duration-200'
+                className='flex items-center gap-1.5 hover:text-blue-500 p-1 transition-colors duration-200'
               >
                 <MessageCircle className='size-4' />
                 <span className='text-xs'>
@@ -218,7 +225,7 @@ export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
               <Button
                 variant='ghost'
                 size='sm'
-                className='flex items-center gap-2 text-muted-foreground hover:text-green-500 p-0 transition-colors duration-200'
+                className='flex items-center gap-1.5 hover:text-green-500 p-1 transition-colors duration-200'
               >
                 <Repeat2 className='size-4' />
                 <span className='text-xs'>
@@ -229,7 +236,7 @@ export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
               <Button
                 variant='ghost'
                 size='sm'
-                className='flex items-center gap-2 text-muted-foreground hover:text-red-500 p-0 transition-colors duration-200'
+                className='flex items-center gap-1.5 hover:text-red-500 p-1 transition-colors duration-200'
               >
                 <Heart className='size-4' />
                 <span className='text-xs'>
@@ -237,11 +244,16 @@ export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
                 </span>
               </Button>
 
-              <Button asChild variant='ghost' size='sm'>
+              <Button
+                asChild
+                variant='ghost'
+                size='icon'
+                className='h-auto p-1'
+              >
                 <Link
                   text={<Share2Icon className='size-4' />}
                   url={`https://twitter.com/${user.screenName}/status/${tweet.tweetId}`}
-                  className='text-foreground!'
+                  className='text-muted-foreground! hover:text-blue-500'
                 />
               </Button>
             </div>

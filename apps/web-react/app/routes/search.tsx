@@ -118,7 +118,7 @@ export default function SearchPage() {
     <div className='min-h-screen bg-background text-foreground transition-colors duration-200'>
       <div className='max-w-2xl mx-auto'>
         {/* Search Header */}
-        <div className='sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border transition-colors duration-200'>
+        <div className='sticky top-0 z-10 bg-background/60 backdrop-blur-lg border-b border-border transition-colors duration-200'>
           <form
             onSubmit={(e) => {
               e.preventDefault()
@@ -159,50 +159,48 @@ export default function SearchPage() {
         </div>
 
         {/* Search Results */}
-        <div className='p-4'>
-          {!keyword?.trim() ? (
-            <div className='text-center py-12'>
-              <Search className='h-12 w-12 mx-auto text-gray-400 mb-4' />
-              <h2 className='text-xl font-semibold mb-2 text-muted-foreground'>
-                搜索推文
-              </h2>
-            </div>
-          ) : isSearching && data.length === 0 ? (
-            <div className='text-center py-12'>
-              <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4'></div>
-              <p className='text-muted-foreground'>Searching...</p>
-            </div>
-          ) : !isSearching && data.length === 0 ? (
-            <div className='text-center py-12'>
-              <Search className='h-12 w-12 mx-auto text-gray-400 mb-4' />
-              <h2 className='text-xl font-semibold mb-2 text-muted-foreground'>
-                找不到结果
-              </h2>
-              <p className='text-muted-foreground'>
-                请尝试不同的关键词或检查拼写
-              </p>
-            </div>
-          ) : null}
-          {data.length > 0 && (
-            <TweetsList
-              user={curUser}
-              tweets={data}
-              showDateFilter={false}
-              showSortControls={false}
-              paginationActions={{
-                isLoading: isSearching,
-                hasMore,
-                error,
-                loadMore,
-              }}
-              sortControlsActions={{
-                setSortOrder,
-                setDateRange,
-                filters,
-              }}
-            />
-          )}
-        </div>
+        {!keyword?.trim() ? (
+          <div className='text-center py-12'>
+            <Search className='h-12 w-12 mx-auto text-gray-400 mb-4' />
+            <h2 className='text-xl font-semibold mb-2 text-muted-foreground'>
+              搜索推文
+            </h2>
+          </div>
+        ) : isSearching && data.length === 0 ? (
+          <div className='text-center py-12'>
+            <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4'></div>
+            <p className='text-muted-foreground'>Searching...</p>
+          </div>
+        ) : !isSearching && data.length === 0 ? (
+          <div className='text-center py-12'>
+            <Search className='h-12 w-12 mx-auto text-gray-400 mb-4' />
+            <h2 className='text-xl font-semibold mb-2 text-muted-foreground'>
+              找不到结果
+            </h2>
+            <p className='text-muted-foreground'>
+              请尝试不同的关键词或检查拼写
+            </p>
+          </div>
+        ) : null}
+        {data.length > 0 && (
+          <TweetsList
+            user={curUser}
+            tweets={data}
+            showDateFilter={false}
+            showSortControls={false}
+            paginationActions={{
+              isLoading: isSearching,
+              hasMore,
+              error,
+              loadMore,
+            }}
+            sortControlsActions={{
+              setSortOrder,
+              setDateRange,
+              filters,
+            }}
+          />
+        )}
       </div>
     </div>
   )
