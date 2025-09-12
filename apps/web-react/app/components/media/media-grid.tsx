@@ -8,6 +8,7 @@ import type { PaginatedListActions } from '~/stores'
 import { useAppStore } from '~/stores/app-store'
 import type { MediaItem } from '~/stores/media-store'
 import type { Tweet, User } from '~/types'
+import { Skeleton } from '../ui/skeleton'
 import { MediaItemComponent } from './media-item'
 
 interface MediaGridProps {
@@ -63,8 +64,9 @@ function useMasonryLayout(mediaItems: MediaItem[], columnCount: number) {
     // 将每个媒体项分配到最短的列
     mediaItems.forEach((item) => {
       // 找到最短的列
-      const shortestColumnIndex = columnHeights.indexOf(
-        Math.min(...columnHeights),
+      const shortestColumnIndex = Math.max(
+        columnHeights.indexOf(Math.min(...columnHeights)),
+        0,
       )
 
       // 将项目添加到最短的列
@@ -72,7 +74,9 @@ function useMasonryLayout(mediaItems: MediaItem[], columnCount: number) {
 
       // 估算这个项目的高度并更新列高度
       // 使用宽高比来估算高度，假设列宽为固定值
-      const estimatedHeight = (item.height / item.width) * 300 + 16 // 300px列宽 + 16px间距
+      const aspectRatio =
+        item.width > 0 && item.height > 0 ? item.height / item.width : 1
+      const estimatedHeight = aspectRatio * 300 + 16 // 300px列宽 + 16px间距
       columnHeights[shortestColumnIndex] += estimatedHeight
     })
 
@@ -123,11 +127,27 @@ export function MediaGrid({
 
   if (mediaItems.length === 0 && isLoading) {
     return (
-      <div className='flex items-center justify-center py-12'>
-        <Loader2 className='size-6 animate-spin' />
-        <span className='ml-2 text-sm text-muted-foreground'>
-          Loading media...
-        </span>
+      <div className='pb-8 pt-4'>
+        <div className='flex gap-1 px-2 sm:px-0'>
+          {Array.from({ length: columnCount }).map((_, columnIndex) => (
+            <div key={columnIndex} className='flex flex-col gap-1 flex-1'>
+              {Array.from({ length: 4 }).map((_, itemIndex) => (
+                <Skeleton
+                  key={itemIndex}
+                  className='w-full rounded-lg'
+                  style={{
+                    height: `${120 + Math.random() * 160}px`, // 120px to 280px
+                    animationDelay: `${Math.min(
+                      (columnIndex * 5 + itemIndex) * 60,
+                      700,
+                    )}ms`,
+                    animationFillMode: 'backwards',
+                  }}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
     )
   }

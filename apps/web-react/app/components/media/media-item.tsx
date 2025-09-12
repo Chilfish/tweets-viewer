@@ -65,7 +65,7 @@ export function MediaItemComponent({
             aspectRatio: `${item.width} / ${item.height}`,
           }}
         >
-          媒体加载失败
+          媒体可能是被删除了
         </div>
       )}
 

@@ -61,7 +61,7 @@ export function TweetsSortControls({
 
   const formatDateRange = (range: DateRange) => {
     if (!range.startDate && !range.endDate) {
-      return 'All dates'
+      return '所有日期'
     }
 
     const format = (date: Date) => {
@@ -77,14 +77,14 @@ export function TweetsSortControls({
     }
 
     if (range.startDate) {
-      return `From ${format(range.startDate)}`
+      return `从 ${format(range.startDate)}`
     }
 
     if (range.endDate) {
-      return `Until ${format(range.endDate)}`
+      return `到 ${format(range.endDate)}`
     }
 
-    return 'All dates'
+    return '所有日期'
   }
 
   const filters = sortFilterActions?.filters || {
@@ -121,7 +121,7 @@ export function TweetsSortControls({
               ) : (
                 <SortAsc className='h-3 w-3' />
               )}
-              <span className='ml-1 hidden sm:inline'>
+              <span className='ml-1'>
                 {filters.sortOrder === 'desc' ? '倒序' : '顺序'}
               </span>
               <ChevronDown className='h-3 w-3 ml-1' />
@@ -174,11 +174,12 @@ export function TweetsSortControls({
             </Button>
           </PopoverTrigger>
           <PopoverContent className='w-auto p-0' align='start'>
-            <div className='p-3 space-y-3'>
+            <div className='flex gap-4 p-3'>
               <div className='space-y-2'>
                 <Label className='text-sm font-medium'>开始日期</Label>
                 <CalendarComponent
                   mode='single'
+                  captionLayout='dropdown'
                   selected={tempDateRange.startDate || undefined}
                   onSelect={(date) =>
                     setTempDateRange((prev) => ({
@@ -186,7 +187,6 @@ export function TweetsSortControls({
                       startDate: date || null,
                     }))
                   }
-                  initialFocus
                   className='rounded-md border border-border'
                 />
               </div>
@@ -195,6 +195,7 @@ export function TweetsSortControls({
                 <Label className='text-sm font-medium'>结束日期</Label>
                 <CalendarComponent
                   mode='single'
+                  captionLayout='dropdown'
                   selected={tempDateRange.endDate || undefined}
                   onSelect={(date) =>
                     setTempDateRange((prev) => ({
@@ -210,25 +211,21 @@ export function TweetsSortControls({
                   className='rounded-md border border-border'
                 />
               </div>
+            </div>
 
-              <div className='flex justify-between pt-2'>
-                <Button
-                  variant='outline'
-                  size='sm'
-                  onClick={handleDateRangeClear}
-                  className='h-8'
-                >
-                  <X className='h-3 w-3 mr-1' />
-                  清空
-                </Button>
-                <Button
-                  size='sm'
-                  onClick={handleDateRangeApply}
-                  className='h-8'
-                >
-                  应用
-                </Button>
-              </div>
+            <div className='w-full flex gap-4 p-3 pt-0'>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={handleDateRangeClear}
+                className='h-8 ml-auto'
+              >
+                <X className='h-3 w-3 mr-1' />
+                清空
+              </Button>
+              <Button size='sm' onClick={handleDateRangeApply} className='h-8'>
+                应用
+              </Button>
             </div>
           </PopoverContent>
         </Popover>

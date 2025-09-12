@@ -12,6 +12,16 @@ import {
 import { Separator } from '~/components/ui/separator'
 import { cn } from '~/lib/utils'
 
+export function meta() {
+  return [
+    { title: `推文存档站` },
+    {
+      name: 'description',
+      content: `一个第三方 Twitter 查看器，专注于阅读体验和用户友好的界面设计。`,
+    },
+  ]
+}
+
 interface LinkProps {
   to: string
   className?: string
@@ -39,8 +49,7 @@ export default function HomePage() {
         <CardHeader>
           <CardTitle className='text-2xl font-bold'>推文存档站</CardTitle>
           <CardDescription>
-            一个移动优先的第三方 Twitter
-            查看器，专注于阅读体验和用户友好的界面设计。
+            一个第三方 Twitter 存档站，专注于阅读体验和用户友好的界面设计。
           </CardDescription>
         </CardHeader>
         <CardContent className='space-y-6'>

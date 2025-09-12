@@ -9,6 +9,7 @@ import {
   DayPicker,
   getDefaultClassNames,
 } from 'react-day-picker'
+import { zhCN } from 'react-day-picker/locale'
 import { Button, buttonVariants } from '~/components/ui/button'
 import { cn } from '~/lib/utils'
 
@@ -41,6 +42,7 @@ function Calendar({
           date.toLocaleString('default', { month: 'short' }),
         ...formatters,
       }}
+      locale={zhCN}
       classNames={{
         root: cn('w-fit', defaultClassNames.root),
         months: cn(
