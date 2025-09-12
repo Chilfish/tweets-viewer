@@ -127,10 +127,18 @@ export default function MediaPage({ params }: Route.ComponentProps) {
   function getMediaContext(item: MediaItem) {
     const tweet = getTweetById(item.tweetId)
     if (!tweet || !curUser) return null
+
+    const allMediaInTweet: MediaItem[] = tweet.media.map((media, index) => ({
+      ...media,
+      id: `${tweet.tweetId}-${index}`,
+      tweetId: tweet.tweetId,
+      createdAt: tweet.createdAt,
+    }))
+
     return {
       tweet,
       user: curUser,
-      allMediaInTweet: tweet.media as MediaItem[],
+      allMediaInTweet,
     }
   }
 

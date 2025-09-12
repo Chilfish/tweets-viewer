@@ -69,6 +69,7 @@
         "swr": "^2.3.6",
         "tailwind-merge": "^3.3.1",
         "vaul": "^1.1.2",
+        "yet-another-react-lightbox": "^3.19.0",
         "zod": "^4.0.17",
         "zustand": "^5.0.8",
       },
@@ -1562,6 +1563,8 @@
     "yargs": ["yargs@17.7.2", "", { "dependencies": { "cliui": "^8.0.1", "escalade": "^3.1.1", "get-caller-file": "^2.0.5", "require-directory": "^2.1.1", "string-width": "^4.2.3", "y18n": "^5.0.5", "yargs-parser": "^21.1.1" } }, "sha512-7dSzzRQ++CKnNI/krKnYRV7JKKPUXMEh61soaHKg9mrWEhzFWhFnxPxGl+69cD1Ou63C13NUPCnmIcrvqCuM6w=="],
 
     "yargs-parser": ["yargs-parser@21.1.1", "", {}, "sha512-tVpsJW7DdjecAiFpbIB1e3qxIQsE6NoPc5/eTdrbbIC4h0LVsWhnoa3g+m2HclBIujHzsxZ4VJVA+GUuc2/LBw=="],
+
+    "yet-another-react-lightbox": ["yet-another-react-lightbox@3.25.0", "", { "peerDependencies": { "@types/react": "^16 || ^17 || ^18 || ^19", "@types/react-dom": "^16 || ^17 || ^18 || ^19", "react": "^16.8.0 || ^17 || ^18 || ^19", "react-dom": "^16.8.0 || ^17 || ^18 || ^19" }, "optionalPeers": ["@types/react", "@types/react-dom"] }, "sha512-NaCeEXCpdwoTvoOpxNK9gdW8+oHs79yVH+D2YeVQWRjH5i32e5CoXndAAFP2p8awzVYfSonherrE9JMTpfD3EA=="],
 
     "youch": ["youch@4.1.0-beta.10", "", { "dependencies": { "@poppinss/colors": "^4.1.5", "@poppinss/dumper": "^0.6.4", "@speed-highlight/core": "^1.2.7", "cookie": "^1.0.2", "youch-core": "^0.3.3" } }, "sha512-rLfVLB4FgQneDr0dv1oddCVZmKjcJ6yX6mS4pU82Mq/Dt9a3cLZQ62pDBL4AUO+uVrCvtWz3ZFUL2HFAFJ/BXQ=="],
 

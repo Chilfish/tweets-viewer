@@ -105,17 +105,17 @@ export function MediaGrid({
   }
 
   const handleMediaClick = (clickedMedia: MediaItem) => {
-    // const context = getMediaContext?.(clickedMedia)
-    // if (!context) return
-    // const startIndex = context.allMediaInTweet.findIndex(
-    //   (m) => m.id === clickedMedia.id,
-    // )
-    // openTweetMediaModal({
-    //   mediaItems: context.allMediaInTweet,
-    //   startIndex: Math.max(0, startIndex),
-    //   tweet: context.tweet,
-    //   user: context.user,
-    // })
+    const context = getMediaContext?.(clickedMedia)
+    if (!context) return
+    const startIndex = context.allMediaInTweet.findIndex(
+      (m) => m.id === clickedMedia.id,
+    )
+    openTweetMediaModal({
+      mediaItems: context.allMediaInTweet,
+      startIndex: Math.max(0, startIndex),
+      tweet: context.tweet,
+      user: context.user,
+    })
   }
 
   const { loadingRef } = useInfiniteScroll({
