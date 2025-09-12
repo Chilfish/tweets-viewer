@@ -158,10 +158,10 @@ export function MediaGrid({
       <div className='text-center py-12'>
         <ImageIcon className='h-12 w-12 mx-auto text-muted-foreground mb-4' />
         <h2 className='text-xl font-semibold mb-2 text-muted-foreground'>
-          No Media Found
+          找不到媒体
         </h2>
         <p className='text-muted-foreground'>
-          This user hasn't posted any photos or videos yet.
+          该用户还没有发布过任何照片或视频。
         </p>
       </div>
     )
@@ -204,7 +204,7 @@ export function MediaGrid({
 
         {!hasMore && mediaItems.length > 0 && (
           <div className='text-center text-sm text-muted-foreground'>
-            No more media to load
+            没有更多媒体了
           </div>
         )}
 

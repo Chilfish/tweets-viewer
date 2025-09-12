@@ -118,13 +118,13 @@ export default function TweetsPage({ params }: Route.ComponentProps) {
         <div className='border-b border-border px-4 transition-colors duration-200'>
           <div className='flex'>
             <div className='px-4 py-3 text-sm font-medium border-b-2 border-primary text-primary'>
-              Tweets
+              推文
             </div>
             <Link
               to={`/media/${curUser.screenName}`}
               className='px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-200'
             >
-              Media
+              媒体
             </Link>
           </div>
         </div>

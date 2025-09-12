@@ -65,7 +65,7 @@ export function TweetsSortControls({
     }
 
     const format = (date: Date) => {
-      return date.toLocaleDateString('en-US', {
+      return date.toLocaleDateString('zh-cn', {
         month: 'short',
         day: 'numeric',
         year: 'numeric',
@@ -122,12 +122,12 @@ export function TweetsSortControls({
                 <SortAsc className='h-3 w-3' />
               )}
               <span className='ml-1 hidden sm:inline'>
-                {filters.sortOrder === 'desc' ? 'Newest first' : 'Oldest first'}
+                {filters.sortOrder === 'desc' ? '倒序' : '顺序'}
               </span>
               <ChevronDown className='h-3 w-3 ml-1' />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align='start' className='w-[140px]'>
+          <DropdownMenuContent align='start' className='w-fit'>
             <DropdownMenuItem
               onClick={() => handleSortOrderChange('desc')}
               className={cn(
@@ -136,7 +136,7 @@ export function TweetsSortControls({
               )}
             >
               <SortDesc className='h-3 w-3 mr-2' />
-              Newest first
+              倒序
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => handleSortOrderChange('asc')}
@@ -146,7 +146,7 @@ export function TweetsSortControls({
               )}
             >
               <SortAsc className='h-3 w-3 mr-2' />
-              Oldest first
+              顺序
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -170,13 +170,13 @@ export function TweetsSortControls({
               <span className='hidden sm:inline'>
                 {formatDateRange(filters.dateRange)}
               </span>
-              <span className='sm:hidden'>Date</span>
+              <span className='sm:hidden'>日期</span>
             </Button>
           </PopoverTrigger>
           <PopoverContent className='w-auto p-0' align='start'>
             <div className='p-3 space-y-3'>
               <div className='space-y-2'>
-                <Label className='text-sm font-medium'>Start Date</Label>
+                <Label className='text-sm font-medium'>开始日期</Label>
                 <CalendarComponent
                   mode='single'
                   selected={tempDateRange.startDate || undefined}
@@ -192,7 +192,7 @@ export function TweetsSortControls({
               </div>
 
               <div className='space-y-2'>
-                <Label className='text-sm font-medium'>End Date</Label>
+                <Label className='text-sm font-medium'>结束日期</Label>
                 <CalendarComponent
                   mode='single'
                   selected={tempDateRange.endDate || undefined}
@@ -219,14 +219,14 @@ export function TweetsSortControls({
                   className='h-8'
                 >
                   <X className='h-3 w-3 mr-1' />
-                  Clear
+                  清空
                 </Button>
                 <Button
                   size='sm'
                   onClick={handleDateRangeApply}
                   className='h-8'
                 >
-                  Apply
+                  应用
                 </Button>
               </div>
             </div>

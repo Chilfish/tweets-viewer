@@ -65,7 +65,7 @@ export function MediaItemComponent({
             aspectRatio: `${item.width} / ${item.height}`,
           }}
         >
-          Failed to load media
+          媒体加载失败
         </div>
       )}
 

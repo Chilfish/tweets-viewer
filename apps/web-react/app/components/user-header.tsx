@@ -88,7 +88,7 @@ export function UserHeader({ user }: UserHeaderProps) {
 
           <div className='flex items-center gap-1'>
             <Calendar className='size-4' />
-            <span>Joined {formatDate(user.createdAt)}</span>
+            <span>加入于 {formatDate(user.createdAt)}</span>
           </div>
         </div>
 
@@ -98,13 +98,13 @@ export function UserHeader({ user }: UserHeaderProps) {
             <span className='font-semibold'>
               {formatCount(user.followingCount)}
             </span>
-            <span className='text-muted-foreground ml-1'>Following</span>
+            <span className='text-muted-foreground ml-1'>关注</span>
           </div>
           <div>
             <span className='font-semibold'>
               {formatCount(user.followersCount)}
             </span>
-            <span className='text-muted-foreground ml-1'>Followers</span>
+            <span className='text-muted-foreground ml-1'>粉丝</span>
           </div>
         </div>
       </div>

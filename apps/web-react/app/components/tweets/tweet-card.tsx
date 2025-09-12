@@ -154,7 +154,7 @@ export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
         <Repeat2 className='size-4' />
         <Link
           url={`https://twitter.com/${user.screenName}/status/${tweet.tweetId}`}
-          text={`@${user.name} retweeted at ${formatDate(tweet.createdAt)}`}
+          text={`@${user.name} 转推于 ${formatDate(tweet.createdAt)}`}
         />
       </div>
     )

@@ -15,7 +15,7 @@ export function getNavItems(currentUser?: string): NavItem[] {
 
   return [
     {
-      label: 'Home',
+      label: '主页',
       icon: Home,
       href: currentUser ? `/tweets/${currentUser}` : '/',
       isActive: currentUser
@@ -23,7 +23,7 @@ export function getNavItems(currentUser?: string): NavItem[] {
         : location.pathname === '/',
     },
     {
-      label: 'Media',
+      label: '媒体',
       icon: ImageIcon,
       href: currentUser ? `/media/${currentUser}` : '/',
       isActive: currentUser
@@ -32,7 +32,7 @@ export function getNavItems(currentUser?: string): NavItem[] {
       disabled: !currentUser,
     },
     {
-      label: 'Memory',
+      label: '那年今日',
       icon: Calendar,
       href: currentUser ? `/memo/${currentUser}` : '/',
       isActive: currentUser
@@ -41,7 +41,7 @@ export function getNavItems(currentUser?: string): NavItem[] {
       disabled: !currentUser,
     },
     {
-      label: 'Search',
+      label: '搜索',
       icon: Search,
       href: currentUser ? `/search/${currentUser}` : '/search',
       isActive: currentUser

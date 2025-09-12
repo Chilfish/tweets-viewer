@@ -55,7 +55,7 @@ export function TweetsList({
       <div className='flex items-center justify-center py-12'>
         <Loader2 className='size-6 animate-spin' />
         <span className='ml-2 text-sm text-muted-foreground'>
-          Loading tweets...
+          推文加载中...
         </span>
       </div>
     )
@@ -111,14 +111,14 @@ export function TweetsList({
           <div className='flex items-center justify-center'>
             <Loader2 className='size-5 animate-spin' />
             <span className='ml-2 text-sm text-muted-foreground'>
-              Loading more tweets...
+              加载更多推文...
             </span>
           </div>
         )}
 
         {!hasMore && tweets.length > 0 && (
           <div className='text-center text-sm text-muted-foreground'>
-            No more tweets to load
+            没有更多推文了
           </div>
         )}
 
@@ -145,11 +145,9 @@ export function TweetsList({
           <div className='text-center py-12'>
             <MessageSquareX className='h-12 w-12 mx-auto text-muted-foreground mb-4' />
             <h2 className='text-xl font-semibold mb-2 text-muted-foreground'>
-              No Tweets Found
+              找不到推文
             </h2>
-            <p className='text-muted-foreground'>
-              There are no tweets to display at the moment.
-            </p>
+            <p className='text-muted-foreground'>暂时没有推文可以显示。</p>
           </div>
         )}
       </div>

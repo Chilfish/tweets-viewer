@@ -90,7 +90,7 @@ export function TweetMediaModal() {
         showCloseButton={false}
       >
         <DialogHeader className='sr-only'>
-          <DialogTitle>Tweet Media Details</DialogTitle>
+          <DialogTitle>推文媒体详情</DialogTitle>
           <DialogDescription>View tweet with media details</DialogDescription>
         </DialogHeader>
 

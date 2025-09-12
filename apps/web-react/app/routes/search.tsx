@@ -131,7 +131,7 @@ export default function SearchPage() {
               <Input
                 name='search'
                 type='text'
-                placeholder='Search tweets...'
+                placeholder='搜索推文...'
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
                 className='pl-10 pr-10 bg-input border-border text-foreground placeholder:text-muted-foreground transition-colors duration-200'
@@ -153,7 +153,7 @@ export default function SearchPage() {
               disabled={!keyword.trim() || isSearching}
               className='bg-primary hover:bg-primary/90 text-primary-foreground transition-colors duration-200'
             >
-              {isSearching ? 'Searching...' : 'Search'}
+              {isSearching ? '搜索中...' : '搜索'}
             </Button>
           </form>
         </div>
@@ -164,11 +164,8 @@ export default function SearchPage() {
             <div className='text-center py-12'>
               <Search className='h-12 w-12 mx-auto text-gray-400 mb-4' />
               <h2 className='text-xl font-semibold mb-2 text-muted-foreground'>
-                Search Tweets
+                搜索推文
               </h2>
-              <p className='text-muted-foreground'>
-                Enter keywords to search through tweets
-              </p>
             </div>
           ) : isSearching && data.length === 0 ? (
             <div className='text-center py-12'>
@@ -179,10 +176,10 @@ export default function SearchPage() {
             <div className='text-center py-12'>
               <Search className='h-12 w-12 mx-auto text-gray-400 mb-4' />
               <h2 className='text-xl font-semibold mb-2 text-muted-foreground'>
-                No results found
+                找不到结果
               </h2>
               <p className='text-muted-foreground'>
-                Try different keywords or check your spelling
+                请尝试不同的关键词或检查拼写
               </p>
             </div>
           ) : null}

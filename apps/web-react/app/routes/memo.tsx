@@ -56,17 +56,15 @@ export default function MemoPage({ params }: Route.ComponentProps) {
           {isLoading && data.length === 0 ? (
             <div className='text-center py-12'>
               <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4'></div>
-              <p className='text-muted-foreground'>Loading memories...</p>
+              <p className='text-muted-foreground'>记忆加载中...</p>
             </div>
           ) : !isLoading && data.length === 0 ? (
             <div className='text-center py-12'>
               <Calendar className='h-12 w-12 mx-auto text-muted-foreground mb-4' />
               <h2 className='text-xl font-semibold mb-2 text-muted-foreground'>
-                No memories found
+                找不到记忆
               </h2>
-              <p className='text-muted-foreground'>
-                No historical tweets found for this day.
-              </p>
+              <p className='text-muted-foreground'>今天没有任何历史推文。</p>
             </div>
           ) : (
             <TweetsList

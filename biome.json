@@ -35,7 +35,8 @@
         "noEmptyPattern": "warn",
         "noNestedComponentDefinitions": "warn",
         "useExhaustiveDependencies": "warn",
-        "noUnreachable": "warn"
+        "noUnreachable": "warn",
+        "noUnusedVariables": "warn"
       },
       "a11y": {
         "useSemanticElements": "off",

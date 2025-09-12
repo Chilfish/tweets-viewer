@@ -37,7 +37,7 @@ export default function HomePage() {
     <div className='flex flex-col items-center justify-center min-h-full p-4'>
       <Card className='w-full max-w-2xl'>
         <CardHeader>
-          <CardTitle className='text-2xl font-bold'>Tweets Viewer</CardTitle>
+          <CardTitle className='text-2xl font-bold'>推文存档站</CardTitle>
           <CardDescription>
             一个移动优先的第三方 Twitter
             查看器，专注于阅读体验和用户友好的界面设计。

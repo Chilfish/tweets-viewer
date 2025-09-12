@@ -16,9 +16,16 @@ export function Sidebar({ currentUser }: SidebarProps) {
 
   return (
     <aside className='hidden md:flex sticky top-0 z-50 h-screen flex-col justify-between p-4 bg-sidebar border-r border-sidebar-border transition-colors duration-200'>
-      <header className='flex items-center justify-between border-b border-sidebar-border pb-4 mb-4'>
+      <header className='flex items-center justify-center gap-4 border-b border-sidebar-border pb-4 mb-4'>
+        <img
+          alt='logo'
+          src='/icon.jpg'
+          width={32}
+          height={32}
+          className='rounded-lg'
+        />
         <h2 className='text-lg font-semibold text-sidebar-foreground'>
-          Tweets Viewer
+          推文存档站
         </h2>
       </header>
 
@@ -49,8 +56,8 @@ export function Sidebar({ currentUser }: SidebarProps) {
             <Sun className='size-5 flex-shrink-0 dark:hidden' />
             <Moon className='size-5 flex-shrink-0 hidden dark:block' />
             <span className='font-medium'>
-              <span className='dark:hidden'>Dark Mode</span>
-              <span className='hidden dark:inline'>Light Mode</span>
+              <span className='dark:hidden'>夜间模式</span>
+              <span className='hidden dark:inline'>日间模式</span>
             </span>
           </Button>
         </nav>

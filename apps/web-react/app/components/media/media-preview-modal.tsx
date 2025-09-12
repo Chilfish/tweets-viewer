@@ -200,7 +200,7 @@ export function MediaPreviewModal() {
 
         {/* [新增] 加载指示器 */}
         {isLoading && (
-          <div className='absolute text-white'>Loading...</div>
+          <div className='absolute text-white'>加载中...</div>
           // 或者用一个更炫酷的 Spinner 组件
         )}
 

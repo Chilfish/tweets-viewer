@@ -43,7 +43,7 @@ export function UserSelector() {
               <div className='size-8 rounded-full bg-gray-200 flex items-center justify-center'>
                 <User className='size-4 text-gray-500' />
               </div>
-              <span className='font-medium text-sm'>Select User</span>
+              <span className='font-medium text-sm'>选择用户</span>
             </>
           )}
           <ChevronDown className='size-4 ml-auto' />
