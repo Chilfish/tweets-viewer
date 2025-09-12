@@ -65,7 +65,7 @@ export function UserTabs({ user }: UserTabsProps) {
   }
 
   return (
-    <div className='border-b border-border px-4 flex justify-between items-center'>
+    <div className='border-b border-border px-4 mb-2 flex justify-between items-center'>
       <div className='relative flex' ref={tabsContainerRef}>
         {tabs.map((tab) => (
           <Link

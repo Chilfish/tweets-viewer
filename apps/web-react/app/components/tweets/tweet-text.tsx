@@ -2,6 +2,8 @@ import type React from 'react'
 import type { JSX } from 'react'
 import { cn } from '~/lib/utils'
 
+// --- Components for parsed elements ---
+
 interface LinkProps {
   url: string
   text?: string | JSX.Element
@@ -18,6 +20,7 @@ export function Link({ url, text, className }: LinkProps) {
       )}
       target='_blank'
       rel='noreferrer'
+      onClick={(e) => e.stopPropagation()} // Avoid triggering card click
     >
       {text || url}
     </a>
@@ -40,59 +43,15 @@ export function HashTagLink({ tag }: HashTagLinkProps) {
   return <Link url={`https://x.com/hashtag/${tag}`} text={`#${tag}`} />
 }
 
-// --- Parsing Logic (这部分几乎无需改动) ---
-// 这些纯逻辑函数不依赖于特定的框架，可以原封不动地搬过来。
+// --- Text Parsing Logic ---
 
-function _retweetInfo(text: string) {
-  const regex = /^RT @(?<author>[^:]+):\s*(?<content>.+)/s
-  const [_, name, restText] = text.match(regex) || [null, null, text]
-  return {
-    name,
-    text: restText,
-  }
-}
-
-function replyInfo(text: string) {
-  const regex = /^@(?<author>\w+)\s(?<content>.+)/s
-  const [_, name, restText] = text.match(regex) || [null, null, text]
-  return {
-    name,
-    text: restText,
-  }
-}
-
-// 注意这里的类型定义，JSX.Element 来自 react 而不是 vue/jsx-runtime
 type ParsedText = string | JSX.Element
+type ParserFn = (text: ParsedText) => ParsedText | ParsedText[]
 
-function hashTags(text: ParsedText): ParsedText | ParsedText[] {
-  if (typeof text !== 'string') {
-    return text
-  }
-
-  // --- 这就是关键的修改 ---
-  // 使用 \S+ 来匹配所有非空白字符，直到遇到空格或字符串末尾。
-  // 这能正确处理 #hello_world, #dev_life, #2024 等各种情况。
-  const regex = /#(\S+)/gu
-
-  const parts = text.split(regex)
-
-  // 当使用带捕获组的 split 时，结果数组中：
-  // - 偶数索引 (0, 2, 4...) 是非匹配的文本部分。
-  // - 奇数索引 (1, 3, 5...) 是捕获组匹配到的内容（也就是我们的 tag，不含 #）。
-  // 这个逻辑非常清晰且可靠。
-  return parts
-    .map((part, idx) => {
-      if (idx % 2 === 1) {
-        // 这是一个被捕获的 tag
-        return <HashTagLink key={`${part}-${idx}`} tag={part} />
-      }
-      // 这是常规文本
-      return part
-    })
-    .filter(Boolean) // 过滤掉 text.split 可能产生的末尾空字符串
-}
-
-function links(text: ParsedText): ParsedText | ParsedText[] {
+/**
+ * Parses http/https links from a string and replaces them with Link components.
+ */
+function parseLinks(text: ParsedText): ParsedText | ParsedText[] {
   if (typeof text !== 'string') {
     return text
   }
@@ -100,22 +59,105 @@ function links(text: ParsedText): ParsedText | ParsedText[] {
   const regex = /(https?:\/\/\S+)/g
   const parts = text.split(regex)
 
-  return parts.map((part, idx) => {
-    if (regex.test(part)) {
-      // 同样的，可以用索引判断，但 test() 也行
-      return <Link key={`${part}-${idx}`} url={part} />
-    }
-    return part
-  })
+  return parts
+    .map((part, idx) => {
+      if (idx % 2 === 1) {
+        return <Link key={`${part}-${idx}`} url={part} />
+      }
+      return part
+    })
+    .filter(Boolean)
 }
 
-function parseText(text: string): ParsedText[] {
-  const tags = hashTags(text)
-  // flatMap 的使用非常漂亮，直接平移
-  const parsedLinks = (Array.isArray(tags) ? tags : [tags]).flatMap(
-    (tag: ParsedText) => links(tag),
-  )
-  return parsedLinks as ParsedText[]
+/**
+ * Parses hashtags from a string and replaces them with HashTagLink components.
+ */
+function parseHashtags(text: ParsedText): ParsedText | ParsedText[] {
+  if (typeof text !== 'string') {
+    return text
+  }
+
+  // Matches hashtags, including those with non-latin characters
+  const regex = /#(\p{L}+|\S+)/gu
+  const parts = text.split(regex)
+
+  return parts
+    .map((part, idx) => {
+      if (idx % 2 === 1) {
+        return <HashTagLink key={`${part}-${idx}`} tag={part} />
+      }
+      return part
+    })
+    .filter(Boolean)
+}
+
+/**
+ * Parses @mentions from a string and replaces them with PeopleLink components.
+ * Twitter usernames are 4-15 chars, letters, numbers, or underscores.
+ */
+function parseMentions(text: ParsedText): ParsedText | ParsedText[] {
+  if (typeof text !== 'string') {
+    return text
+  }
+
+  const regex = /@([a-zA-Z0-9_]{4,15})\b/g
+  const parts = text.split(regex)
+
+  return parts
+    .map((part, idx) => {
+      if (idx % 2 === 1) {
+        return <PeopleLink key={`${part}-${idx}`} name={part} />
+      }
+      return part
+    })
+    .filter(Boolean)
+}
+
+/**
+ * Creates a text parser function by chaining together individual parser functions.
+ * This allows for an extensible and maintainable parsing pipeline.
+ * @param parsers - A list of parser functions to apply in sequence.
+ * @returns A function that takes a string and returns an array of parsed text and elements.
+ */
+function createTextParser(...parsers: ParserFn[]) {
+  return function parse(text: string): ParsedText[] {
+    const initial: ParsedText[] = [text]
+
+    const result = parsers.reduce((parts, parser) => {
+      return parts.flatMap((part) => parser(part))
+    }, initial)
+
+    return result
+  }
+}
+
+// The order is important: links first, then mentions and hashtags.
+const parseTweetText = createTextParser(
+  parseLinks,
+  parseMentions,
+  parseHashtags,
+)
+
+/**
+ * Extracts reply information from the beginning of a tweet text.
+ * e.g., "@username some content" -> { name: "username", text: "some content" }
+ */
+function getReplyInfo(text: string) {
+  // Match reply-to format at the start of the tweet
+  const regex = /^@([a-zA-Z0-9_]{4,15})\s(.+)/s
+  const match = text.match(regex)
+
+  if (match) {
+    return {
+      name: match[1],
+      text: match[2],
+    }
+  }
+
+  return {
+    name: null,
+    text,
+  }
 }
 
 // --- Main Component ---
@@ -125,37 +167,18 @@ interface TweetTextProps {
 }
 
 export const TweetText: React.FC<TweetTextProps> = ({ text }) => {
-  // Vue 的 setup 函数里的逻辑，直接放在 React 函数组件的顶层作用域即可
+  const { name: replyToName, text: content } = getReplyInfo(text)
 
-  // const retweetTo = _retweetInfo(text) // 原代码中是 _retweetInfo，这里保持一致
-  // if (retweetTo.name) {
-  //   return (
-  //     <>
-  //       <p className="py-2">
-  //         从
-  //         <PeopleLink name={retweetTo.name!} />
-  //         转推:
-  //       </p>
-  //       <p>
-  //         {parseText(retweetTo.text)}
-  //       </p>
-  //     </>
-  //   )
-  // }
-
-  const replyTo = replyInfo(text)
-  if (replyTo.name) {
+  if (replyToName) {
     return (
       <>
-        <p className='py-2'>
-          回复
-          <PeopleLink name={replyTo.name || ''} />:
+        <p className='py-2 wrap-anywhere'>
+          回复 <PeopleLink name={replyToName} />:
         </p>
-        <p>{parseText(replyTo.text)}</p>
+        <p className='wrap-anywhere'>{parseTweetText(content)}</p>
       </>
     )
   }
 
-  // React 组件直接 return JSX，而不是像 Vue setup 那样返回一个渲染函数
-  return <p className='pt-2'>{parseText(text)}</p>
+  return <p className='pt-2 wrap-anywhere'>{parseTweetText(text)}</p>
 }

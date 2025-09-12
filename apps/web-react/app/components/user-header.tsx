@@ -2,6 +2,7 @@ import { Calendar, LinkIcon, MapPin } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import type { User } from '~/types'
 import { UserTabs } from './layout/user-tabs'
+import { TweetText } from './tweets/tweet-text'
 
 interface UserHeaderProps {
   user: User
@@ -26,7 +27,7 @@ export function UserHeader({ user }: UserHeaderProps) {
   }
 
   return (
-    <div>
+    <>
       {/* Banner */}
       <div className='h-48 bg-muted relative'>
         {user.profileBannerUrl && (
@@ -39,9 +40,9 @@ export function UserHeader({ user }: UserHeaderProps) {
       </div>
 
       {/* Profile Content */}
-      <div className='p-4 pb-0'>
+      <div className='p-4 pb-0 flex flex-col gap-2 justify-between'>
         <div className='flex justify-between items-end -mt-16 mb-4'>
-          <Avatar className='size-32 border-4 border-background bg-background'>
+          <Avatar className='size-26 border-4 border-background bg-background'>
             <AvatarImage src={user.avatarUrl} />
             <AvatarFallback className='text-2xl'>
               {user.name.charAt(0)}
@@ -49,16 +50,12 @@ export function UserHeader({ user }: UserHeaderProps) {
           </Avatar>
         </div>
 
-        <div className='mb-3'>
+        <div className=''>
           <h1 className='text-2xl font-bold text-foreground'>{user.name}</h1>
           <p className='text-muted-foreground'>@{user.screenName}</p>
         </div>
 
-        {user.bio && (
-          <p className='text-base leading-relaxed mb-4 text-foreground wrap-anywhere'>
-            {user.bio}
-          </p>
-        )}
+        {user.bio && <TweetText text={user.bio} />}
 
         <div className='flex flex-wrap items-center gap-x-4 gap-y-2 mb-4 text-muted-foreground'>
           {user.location && (
@@ -88,7 +85,7 @@ export function UserHeader({ user }: UserHeaderProps) {
           </div>
         </div>
 
-        <div className='flex gap-6 text-sm mb-4'>
+        <div className='flex gap-6 text-sm'>
           <div>
             <span className='font-bold text-foreground'>
               {formatCount(user.followingCount)}
@@ -106,6 +103,6 @@ export function UserHeader({ user }: UserHeaderProps) {
 
       {/* INTEGRATED TABS */}
       <UserTabs user={user} />
-    </div>
+    </>
   )
 }

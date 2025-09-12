@@ -62,12 +62,12 @@ export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
             onClick={(item) => handleMediaClick(item as TweetMedia, media)}
           />
         ) : media.length === 2 ? (
-          <div className='flex gap-0.5 h-50 sm:h-90'>
+          <div className='flex gap-0.5'>
             {media.map((item, index) => (
               <MediaItemComponent
                 key={index}
                 item={item}
-                className='flex-1'
+                className='flex-1 w-36 h-36 sm:w-60 sm:h-60'
                 onClick={(item) => handleMediaClick(item as TweetMedia, media)}
               />
             ))}
@@ -98,7 +98,7 @@ export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
               <MediaItemComponent
                 key={index}
                 item={item}
-                className='h-40 sm:h-60'
+                className='h-40 sm:h-60 w-full'
                 onClick={(item) => handleMediaClick(item as TweetMedia, media)}
               />
             ))}
@@ -119,21 +119,22 @@ export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
         className='mt-3 border border-border bg-card transition-colors duration-200 p-0'
       >
         <CardContent className='p-3'>
-          <div className='flex items-center gap-2'>
-            <Avatar className='size-8 flex-shrink-0'>
+          <div className='flex items-center gap-2 relative'>
+            <Avatar className='size-8 flex-shrink-0 '>
               <AvatarImage src={quotedUser.avatarUrl} />
               <AvatarFallback>{quotedUser.name.charAt(0)}</AvatarFallback>
             </Avatar>
-            <div className='flex items-baseline min-w-0 gap-1'>
-              <span className='font-semibold text-sm truncate text-card-foreground'>
+            <div className='flex justify-center min-w-0 gap-1'>
+              <div className='font-semibold text-sm truncate text-card-foreground'>
                 {quotedUser.name}
-              </span>
-              <span className='text-sm text-muted-foreground flex-shrink-0'>
+              </div>
+              <div className='text-sm text-muted-foreground flex-shrink-0'>
                 @{quotedUser.screenName}
-              </span>
+              </div>
             </div>
           </div>
-          <div className='text-sm text-muted-foreground flex-shrink-0 ml-10'>
+
+          <div className='text-sm text-muted-foreground flex-shrink-0 pl-10'>
             {formatDate(quotedTweet.createdAt)}
           </div>
           <TweetText text={quotedTweet.fullText} />
@@ -170,7 +171,7 @@ export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
       <CardContent className='px-3 sm:px-4'>
         {renderRetweetHeader()}
 
-        <div className='flex gap-3'>
+        <div className='flex gap-2'>
           <Avatar className='size-10 flex-shrink-0'>
             <AvatarImage src={actualUser.avatarUrl} />
             <AvatarFallback>{actualUser.name.charAt(0)}</AvatarFallback>
