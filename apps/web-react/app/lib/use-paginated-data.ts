@@ -83,7 +83,7 @@ export const createLoadDataAction = <T>(
     set(createPaginatedActions<T>().setLoading(true))
 
     try {
-      const currentPage = isFirstLoad ? 0 : state.page + 1
+      const currentPage = isFirstLoad ? state.page : state.page + 1
       const newData = await loadFn(currentPage, ...args)
 
       const hasMore = newData.length === pageSize
@@ -92,7 +92,7 @@ export const createLoadDataAction = <T>(
         set((state) => ({
           ...createPaginatedActions<T>().setData(newData)(state),
           hasMore,
-          page: 0,
+          page: currentPage,
           isLoading: false,
           error: null,
         }))
@@ -100,7 +100,7 @@ export const createLoadDataAction = <T>(
         set((state) => ({
           ...createPaginatedActions<T>().appendData(newData)(state),
           hasMore,
-          page: state.page + 1,
+          page: currentPage,
           isLoading: false,
           error: null,
         }))

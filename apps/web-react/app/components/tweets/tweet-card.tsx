@@ -62,7 +62,7 @@ export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
             onClick={(item) => handleMediaClick(item as TweetMedia, media)}
           />
         ) : media.length === 2 ? (
-          <div className='flex gap-0.5 h-60 sm:h-90'>
+          <div className='flex gap-0.5 h-50 sm:h-90'>
             {media.map((item, index) => (
               <MediaItemComponent
                 key={index}

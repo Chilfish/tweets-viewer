@@ -55,7 +55,7 @@ export function UserHeader({ user }: UserHeaderProps) {
         </div>
 
         {user.bio && (
-          <p className='text-base leading-relaxed mb-4 text-foreground whitespace-pre-wrap'>
+          <p className='text-base leading-relaxed mb-4 text-foreground wrap-anywhere'>
             {user.bio}
           </p>
         )}
