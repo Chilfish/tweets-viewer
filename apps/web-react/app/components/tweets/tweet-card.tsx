@@ -76,7 +76,7 @@ export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
           <div className='flex gap-0.5 h-60 sm:h-90'>
             <MediaItemComponent
               item={media[0]}
-              className='h-full flex-1'
+              className='h-full flex-1 w-60'
               onClick={(item) => handleMediaClick(item as TweetMedia, media)}
             />
             <div className='flex flex-col gap-0.5 flex-1'>
