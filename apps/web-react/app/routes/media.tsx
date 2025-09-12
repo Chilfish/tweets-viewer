@@ -39,16 +39,17 @@ export default function MediaPage({ params }: Route.ComponentProps) {
   const isInitialized = useRef(false)
 
   useEffect(() => {
-    if (!curUser) return
+    const targetUserName = params.name
+    if (!curUser || !targetUserName) return
 
-    const userChanged = storeUser?.screenName !== curUser.screenName
+    const userChanged = storeUser?.screenName !== targetUserName
     if (userChanged) {
       reset()
       setCurrentUser(curUser)
       isInitialized.current = false
     }
 
-    if (!isInitialized.current) {
+    if (!isInitialized.current && curUser.screenName === targetUserName) {
       const sortParam = (searchParams.get('sort') as SortOrder) || 'desc'
       const startDateParam = searchParams.get('startDate')
       const endDateParam = searchParams.get('endDate')
@@ -63,6 +64,7 @@ export default function MediaPage({ params }: Route.ComponentProps) {
       isInitialized.current = true
     }
   }, [
+    params.name, // Depend directly on the URL parameter
     curUser,
     storeUser,
     searchParams,
@@ -132,6 +134,9 @@ export default function MediaPage({ params }: Route.ComponentProps) {
     }
   }
 
+  const isDataStale =
+    storeUser && curUser && storeUser.screenName !== curUser.screenName
+
   return (
     <div className='min-h-svh bg-background transition-colors duration-200'>
       <div className='max-w-6xl mx-auto'>
@@ -163,7 +168,7 @@ export default function MediaPage({ params }: Route.ComponentProps) {
         />
 
         <MediaGrid
-          mediaItems={data}
+          mediaItems={isDataStale ? [] : data}
           paginationActions={{
             isLoading,
             hasMore,

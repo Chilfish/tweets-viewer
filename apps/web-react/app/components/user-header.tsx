@@ -19,7 +19,7 @@ export function UserHeader({ user }: UserHeaderProps) {
   }
 
   const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
+    return new Date(date).toLocaleDateString('zh-CN', {
       year: 'numeric',
       month: 'long',
     })

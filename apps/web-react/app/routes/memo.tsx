@@ -27,14 +27,19 @@ export default function MemoPage({ params }: Route.ComponentProps) {
     setDateRange,
     filters,
     reset,
+    currentUser: storeUser,
   } = useMemoryStore()
 
+  const { name: targetUserName } = params
   useEffect(() => {
-    if (curUser) {
-      reset()
-      loadMemoryTweets(curUser.screenName)
+    if (targetUserName) {
+      // Reset store only if user has changed
+      if (storeUser !== targetUserName) {
+        reset()
+        loadMemoryTweets(targetUserName)
+      }
     }
-  }, [curUser, reset, loadMemoryTweets])
+  }, [targetUserName, storeUser, reset, loadMemoryTweets])
 
   if (!curUser) {
     return (
@@ -43,6 +48,8 @@ export default function MemoPage({ params }: Route.ComponentProps) {
       </div>
     )
   }
+
+  const isDataStale = storeUser && curUser && storeUser !== curUser.screenName
 
   return (
     <div className='min-h-screen bg-background text-foreground transition-colors duration-200'>
@@ -68,7 +75,7 @@ export default function MemoPage({ params }: Route.ComponentProps) {
             </div>
           ) : (
             <TweetsList
-              tweets={data}
+              tweets={isDataStale ? [] : data}
               user={curUser}
               showDateFilter={false}
               showSortControls={false}

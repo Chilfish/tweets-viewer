@@ -1,12 +1,16 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import { getUsers } from '~/lib/users-api'
 import type { User } from '~/types'
+
+const TWENTY_FOUR_HOURS_IN_MS = 24 * 60 * 60 * 1000
 
 interface UserState {
   users: User[]
   curUser: User | null
   isLoading: boolean
   error: string | null
+  lastFetched: number | null
 }
 
 interface UserActions {
@@ -25,50 +29,78 @@ const initialState: UserState = {
   isLoading: false,
   error: null,
   curUser: null,
+  lastFetched: null,
 }
 
-export const useUserStore = create<UserStore>((set, get) => ({
-  ...initialState,
+export const useUserStore = create<UserStore>()(
+  persist(
+    (set, get) => ({
+      ...initialState,
 
-  fetchUsers: async () => {
-    set({ isLoading: true, error: null })
-    const users = await getUsers()
-    set({ users, isLoading: false, error: null })
-  },
+      fetchUsers: async () => {
+        const { users, lastFetched } = get()
+        if (
+          users.length > 0 &&
+          lastFetched &&
+          Date.now() - lastFetched < TWENTY_FOUR_HOURS_IN_MS
+        ) {
+          return
+        }
 
-  getUser: async (screenName) => {
-    const state = get()
-    const user =
-      state.users.find((user) => user.screenName === screenName) || null
+        set({ isLoading: true, error: null })
+        try {
+          const fetchedUsers = await getUsers()
+          set({
+            users: fetchedUsers,
+            isLoading: false,
+            error: null,
+            lastFetched: Date.now(),
+          })
+        } catch (e) {
+          set({ isLoading: false, error: 'Failed to fetch users.' })
+        }
+      },
 
-    if (user) {
-      set({ curUser: user })
-      return user
-    }
+      getUser: async (screenName) => {
+        const state = get()
+        const user =
+          state.users.find((user) => user.screenName === screenName) || null
 
-    return null
-  },
+        if (user) {
+          set({ curUser: user })
+          return user
+        }
 
-  setUser: (screenName, user) => {
-    set((state) => ({
-      users: { ...state.users, [screenName]: user },
-    }))
-  },
+        return null
+      },
 
-  setCurUser: (screenName) => {
-    set((state) => ({
-      curUser: state.users[screenName] || null,
-    }))
-  },
+      setUser: (screenName, user) => {
+        set((state) => ({
+          users: { ...state.users, [screenName]: user },
+        }))
+      },
 
-  findUserById: (userId) => {
-    const state = get()
-    return (
-      Object.values(state.users).find((user) => user.restId === userId) || null
-    )
-  },
+      setCurUser: (screenName) => {
+        set((state) => ({
+          curUser: state.users.find((u) => u.screenName === screenName) || null,
+        }))
+      },
 
-  clearError: () => {
-    set({ error: null })
-  },
-}))
+      findUserById: (userId) => {
+        const state = get()
+        return state.users.find((user) => user.restId === userId) || null
+      },
+
+      clearError: () => {
+        set({ error: null })
+      },
+    }),
+    {
+      name: 'tweets-viewer-user-storage',
+      partialize: (state) => ({
+        users: state.users,
+        lastFetched: state.lastFetched,
+      }),
+    },
+  ),
+)

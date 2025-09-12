@@ -117,30 +117,31 @@ export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
 
   const renderQuotedTweet = () => {
     if (!tweet.quotedStatus) return null
+    const quotedUser = tweet.quotedStatus.user
+    const quotedTweet = tweet.quotedStatus.tweet
 
     return (
       <Card
-        id={tweet.quotedStatus.tweet.tweetId}
+        id={quotedTweet.tweetId}
         className='mt-3 border border-border bg-card transition-colors duration-200'
       >
         <CardContent className='p-3'>
-          <div className='flex items-center gap-2 mb-2'>
-            <Avatar className='size-5'>
-              <AvatarImage src={tweet.quotedStatus.user.avatarUrl} />
-              <AvatarFallback>
-                {tweet.quotedStatus.user.name.charAt(0)}
-              </AvatarFallback>
+          <div className='flex items-center gap-2 mb-1'>
+            <Avatar className='size-8 flex-shrink-0'>
+              <AvatarImage src={quotedUser.avatarUrl} />
+              <AvatarFallback>{quotedUser.name.charAt(0)}</AvatarFallback>
             </Avatar>
-            <span className='text-sm font-semibold text-card-foreground'>
-              {tweet.quotedStatus.user.name}
-            </span>
-            <span className='text-sm text-muted-foreground'>
-              @{tweet.quotedStatus.user.screenName}
-            </span>
+            <div className='flex items-baseline min-w-0 gap-1'>
+              <span className='font-semibold text-sm truncate text-card-foreground'>
+                {quotedUser.name}
+              </span>
+              <span className='text-sm text-muted-foreground flex-shrink-0'>
+                @{quotedUser.screenName}
+              </span>
+            </div>
           </div>
-          <TweetText text={tweet.quotedStatus.tweet.fullText} />
-          {tweet.quotedStatus.tweet.media.length > 0 &&
-            renderMedia(tweet.quotedStatus.tweet.media)}
+          <TweetText text={quotedTweet.fullText} />
+          {quotedTweet.media.length > 0 && renderMedia(quotedTweet.media)}
         </CardContent>
       </Card>
     )
@@ -180,24 +181,21 @@ export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
           </Avatar>
 
           <div className='flex-1 min-w-0'>
-            <div className='flex items-center gap-1 mb-1'>
-              <span className='font-semibold text-sm truncate text-card-foreground'>
-                {actualUser.name}
+            <div className='flex items-center gap-2 mb-1'>
+              <div className='flex items-baseline min-w-0 gap-1'>
+                <span className='font-semibold text-sm truncate text-card-foreground'>
+                  {actualUser.name}
+                </span>
+                <span className='text-sm text-muted-foreground flex-shrink-0'>
+                  @{actualUser.screenName}
+                </span>
+              </div>
+              <span className='text-sm text-muted-foreground flex-shrink-0'>
+                ·
               </span>
-              <span className='text-sm text-muted-foreground'>
-                @{actualUser.screenName}
-              </span>
-              <span className='text-sm text-muted-foreground'>·</span>
-              <span className='text-sm text-muted-foreground'>
+              <span className='text-sm text-muted-foreground flex-shrink-0'>
                 {formatDate(actualTweet.createdAt)}
               </span>
-              <Button
-                variant='ghost'
-                size='icon'
-                className='size-5 ml-auto text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-200'
-              >
-                <MoreHorizontal className='size-4' />
-              </Button>
             </div>
 
             <TweetText text={actualTweet.fullText} />

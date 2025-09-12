@@ -38,16 +38,18 @@ export default function TweetsPage({ params }: Route.ComponentProps) {
   const isInitialized = useRef(false)
 
   useEffect(() => {
-    if (!curUser) return
+    const targetUserName = params.name
+    if (!curUser || !targetUserName) return
 
-    const userChanged = storeUser?.screenName !== curUser.screenName
+    // Use params.name as the source of truth to detect user change
+    const userChanged = storeUser?.screenName !== targetUserName
     if (userChanged) {
       reset()
       setCurrentUser(curUser)
       isInitialized.current = false
     }
 
-    if (!isInitialized.current) {
+    if (!isInitialized.current && curUser.screenName === targetUserName) {
       const pageParam = parseInt(searchParams.get('page') || '1', 10) - 1
       const sortParam = (searchParams.get('sort') as SortOrder) || 'desc'
       const startDateParam = searchParams.get('startDate')
@@ -64,7 +66,8 @@ export default function TweetsPage({ params }: Route.ComponentProps) {
       isInitialized.current = true
     }
   }, [
-    curUser,
+    params.name, // Depend directly on the URL parameter
+    curUser, // Also depend on curUser to trigger when it's loaded
     storeUser,
     searchParams,
     reset,
@@ -109,6 +112,9 @@ export default function TweetsPage({ params }: Route.ComponentProps) {
     )
   }
 
+  const isDataStale =
+    storeUser && curUser && storeUser.screenName !== curUser.screenName
+
   return (
     <div className='min-h-svh bg-background transition-colors duration-200'>
       <div className='max-w-2xl mx-auto'>
@@ -131,7 +137,7 @@ export default function TweetsPage({ params }: Route.ComponentProps) {
 
         <TweetsList
           user={curUser}
-          tweets={data}
+          tweets={isDataStale ? [] : data}
           paginationActions={{
             isLoading,
             hasMore,
