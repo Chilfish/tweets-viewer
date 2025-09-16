@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import type { AppType } from '../common'
-import { cachedData } from '../common'
+import { getData } from '../common'
 
 async function getInsData({
   page,
@@ -11,7 +11,7 @@ async function getInsData({
   reverse: boolean
   name: string
 }) {
-  const tweets = cachedData.get(name) || []
+  const tweets = await getData(name)
 
   let data = tweets
   if (!reverse) {

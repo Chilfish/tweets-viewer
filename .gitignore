@@ -31,3 +31,4 @@ wrangler.toml
 tmp
 
 .vercel
+/apps/scripts/data

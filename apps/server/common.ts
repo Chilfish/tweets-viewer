@@ -20,6 +20,10 @@ export interface AppType {
 export const cachedData = new Map<string, Tweet[]>()
 
 export async function getData(name: string) {
+  if (cachedData.has(name)) {
+    return cachedData.get(name) || []
+  }
+
   const rawData = await fetch(`https://p.chilfish.top/tweet/ins/${name}.json`)
     .then((res) => res.json())
     .catch((error) => {
