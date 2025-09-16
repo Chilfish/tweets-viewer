@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { getInsData, getInsDataByDateRange } from '~/lib/ins-api'
+import { getInsData } from '~/lib/ins-api'
 import {
   createInitialPaginatedState,
   type PaginatedStore,
@@ -76,7 +76,7 @@ const loadInsMediaData = async (
   startPage: number,
   screenName: string,
   filters: InsFilters,
-  minMediaCount = 6,
+  minMediaCount = 10,
 ): Promise<{
   mediaItems: InsMediaItem[]
   hasMore: boolean
@@ -89,27 +89,12 @@ const loadInsMediaData = async (
 
   // 持续加载直到有足够媒体或无更多数据
   while (allMediaItems.length < minMediaCount && hasMore) {
-    let insData: Tweet[]
-
     try {
-      // 如果有日期范围筛选，使用日期范围API
-      if (filters.dateRange.startDate || filters.dateRange.endDate) {
-        const start = filters.dateRange.startDate?.getTime() || 0
-        const end = filters.dateRange.endDate?.getTime() || Date.now()
-
-        insData = await getInsDataByDateRange(screenName, {
-          start,
-          end,
-          page: currentPage,
-          reverse,
-        })
-      } else {
-        // 使用普通的Instagram数据获取API
-        insData = await getInsData(screenName, {
-          page: currentPage,
-          reverse,
-        })
-      }
+      // 使用普通的Instagram数据获取API
+      const insData = await getInsData(screenName, {
+        page: currentPage,
+        reverse,
+      })
 
       // 如果没有获取到数据，说明没有更多数据
       if (insData.length === 0) {

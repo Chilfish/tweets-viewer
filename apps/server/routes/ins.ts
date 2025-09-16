@@ -1,6 +1,25 @@
 import { Hono } from 'hono'
 import type { AppType } from '../common'
-import { getInsData } from '../data'
+import { cachedData } from '../common'
+
+async function getInsData({
+  page,
+  reverse,
+  name,
+}: {
+  page: number
+  reverse: boolean
+  name: string
+}) {
+  const tweets = cachedData.get(name) || []
+
+  let data = tweets
+  if (!reverse) {
+    data = data.toReversed()
+  }
+
+  return data.slice(page * 10, (page + 1) * 15)
+}
 
 const app = new Hono<AppType>()
 
@@ -9,7 +28,7 @@ app.get('/get/:name', async (c) => {
   const page = Number(c.req.query('page') || 0)
   const reverse = c.req.query('reverse') === 'true'
 
-  const tweets = getInsData({ name, page, reverse })
+  const tweets = await getInsData({ name, page, reverse })
   return c.json(tweets)
 })
 

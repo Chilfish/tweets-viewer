@@ -1,10 +1,11 @@
 import { neon } from '@neondatabase/serverless'
-import { formatDate, getDate, now } from '@tweets-viewer/shared'
+import { getUsers } from '@tweets-viewer/database'
+import { now } from '@tweets-viewer/shared'
 import { drizzle } from 'drizzle-orm/neon-http'
 import { Hono } from 'hono'
-import { contextStorage } from 'hono/context-storage'
+import { contextStorage, getContext } from 'hono/context-storage'
 import { cors } from 'hono/cors'
-import type { AppType } from './common'
+import { type AppType, cachedData, setAllUsersInsData } from './common'
 import imageApp from './routes/image'
 import insApp from './routes/ins'
 import tweetsApp from './routes/tweets'
@@ -28,21 +29,22 @@ app
   })
 
 app
-  .get('/', (c) => {
+  .get('/', async (c) => {
+    const { db } = getContext<AppType>().var
+    const users = await getUsers(db)
+    await setAllUsersInsData(users)
+
     const today = now()
-
-    const date = getDate('2022-01-01 23:30:01:00')
-    date.setHours(date.getHours() + 1)
-
-    const dateStr = `${date.getMonth() + 1}-${date.getDate()}`
+    // name: size
+    const tweetsSize: Record<string, number> = {}
+    for (const [name, tweets] of cachedData.entries()) {
+      tweetsSize[name] = tweets.length
+    }
 
     return c.json({
-      date: dateStr,
       today,
-      tokyoTime: formatDate(now('tokyo')),
-      beijingTime: formatDate(now('beijing')),
-      serverTime: new Date().toLocaleString(),
       message: 'Hello, World!',
+      tweetsSize,
     })
   })
   .route('/v2/tweets', tweetsApp)
