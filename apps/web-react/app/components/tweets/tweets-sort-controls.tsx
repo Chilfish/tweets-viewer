@@ -6,7 +6,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
 import { Label } from '~/components/ui/label'
@@ -16,7 +15,8 @@ import {
   PopoverTrigger,
 } from '~/components/ui/popover'
 import { cn } from '~/lib/utils'
-import type { DateRange, SortOrder } from '~/stores'
+import { type DateRange, type SortOrder, useUserStore } from '~/stores'
+import { SearchInput } from '../search-input'
 
 interface TweetsSortControlsProps {
   className?: string
@@ -42,6 +42,8 @@ export function TweetsSortControls({
   const [tempDateRange, setTempDateRange] = useState<DateRange>(
     sortFilterActions?.filters.dateRange || { startDate: null, endDate: null },
   )
+
+  const { curUser } = useUserStore()
 
   const handleSortOrderChange = async (order: SortOrder) => {
     await sortFilterActions?.setSortOrder(order)
@@ -237,6 +239,8 @@ export function TweetsSortControls({
           <X className='h-3 w-3' />
         </Button>
       )}
+
+      {curUser && <SearchInput user={curUser} />}
     </div>
   )
 }

@@ -6,6 +6,7 @@ import { contextStorage } from 'hono/context-storage'
 import { cors } from 'hono/cors'
 import type { AppType } from './common'
 import imageApp from './routes/image'
+import insApp from './routes/ins'
 import tweetsApp from './routes/tweets'
 import usersApp from './routes/users'
 
@@ -47,6 +48,7 @@ app
   .route('/v2/tweets', tweetsApp)
   .route('/v2/users', usersApp)
   .route('/v2/image', imageApp)
+  .route('/v2/ins', insApp)
 
 app.onError((err, c) => {
   console.error(`${err}`)

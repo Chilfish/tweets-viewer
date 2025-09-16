@@ -4,7 +4,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { convertDate } from '../../src/utils/date'
+import { convertDate } from './date'
 
 export const root = path.resolve(fileURLToPath(import.meta.url), '../../')
 

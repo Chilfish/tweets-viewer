@@ -14,7 +14,7 @@ import { useUserStore } from '~/stores/user-store'
 
 export function UserSelector() {
   const location = useLocation()
-  const curPath = location.pathname.split('/')[1]
+  const curPath = location.pathname.split('/')[1] || '/tweets'
   const { users, curUser } = useUserStore()
 
   const userList = Object.values(users)
