@@ -185,14 +185,12 @@ export function InsMediaGrid({
 
   if (mediaItems.length === 0 && !isLoading) {
     return (
-      <div className='text-center py-12'>
+      <div className='text-center py-6 h-56'>
         <ImageIcon className='h-12 w-12 mx-auto text-muted-foreground mb-4' />
         <h2 className='text-xl font-semibold mb-2 text-muted-foreground'>
           找不到Instagram内容
         </h2>
-        <p className='text-muted-foreground'>
-          该用户还没有发布过任何Instagram照片或视频。
-        </p>
+        <p className='text-muted-foreground'>暂时还没存档 ta 的 Instagram</p>
       </div>
     )
   }
