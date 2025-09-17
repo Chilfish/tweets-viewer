@@ -1,6 +1,6 @@
 /** biome-ignore-all lint/a11y/useButtonType: <explanation> */
 import type { ReactNode } from 'react'
-import Lightbox from 'yet-another-react-lightbox'
+import Lightbox, { type Slide } from 'yet-another-react-lightbox'
 import Counter from 'yet-another-react-lightbox/plugins/counter'
 import Video from 'yet-another-react-lightbox/plugins/video'
 
@@ -26,7 +26,7 @@ export function MediaViewer({
   startIndex = 0,
   additionalToolbarContent,
 }: MediaViewerProps) {
-  const slides = mediaItems.map((item) => {
+  const slides = mediaItems.map((item: MediaItem | TweetMedia) => {
     if (item.type === 'video') {
       return {
         type: 'video',
@@ -38,13 +38,14 @@ export function MediaViewer({
             type: 'video/mp4',
           },
         ],
-      }
+      } as Slide
     }
     return {
+      type: 'image',
       src: item.url,
       width: item.width,
       height: item.height,
-    }
+    } as Slide
   })
 
   return (
@@ -54,14 +55,13 @@ export function MediaViewer({
       slides={slides}
       index={startIndex}
       plugins={[Counter, Video]}
-      closeOnBackdropClick
       animation={{
         fade: 250,
         swipe: 300,
       }}
       carousel={{
         padding: '40px',
-        spacing: '20vw',
+        spacing: '40px',
         imageFit: 'contain',
       }}
       gestures={{

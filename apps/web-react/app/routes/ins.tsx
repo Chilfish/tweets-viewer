@@ -111,7 +111,7 @@ export default function InsPage({ params }: Route.ComponentProps) {
       tweetId: item.postId,
       userId: curUser.screenName,
       createdAt: item.createdAt,
-      fullText: '', // Instagram帖子可能没有文本
+      fullText: item.fullText || '',
       media: [
         {
           url: item.url,

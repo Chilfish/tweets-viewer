@@ -5,10 +5,10 @@ import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert'
 import { Button } from '~/components/ui/button'
 import { useInfiniteScroll } from '~/hooks/use-infinite-scroll'
 import type { PaginatedListActions } from '~/stores'
-import { useAppStore } from '~/stores/app-store'
 import type { InsMediaItem } from '~/stores/ins-store'
 import type { Tweet, User } from '~/types'
 import { Skeleton } from '../ui/skeleton'
+import { InsMediaViewer } from './ins-media-viewer'
 import { MediaItemComponent } from './media-item'
 
 interface InsMediaGridProps {
@@ -91,7 +91,12 @@ export function InsMediaGrid({
   paginationActions,
   getMediaContext,
 }: InsMediaGridProps) {
-  const { openTweetMediaModal } = useAppStore()
+  const [selectedMedia, setSelectedMedia] = useState<{
+    mediaItems: InsMediaItem[]
+    startIndex: number
+    post: Tweet
+    user: User
+  } | null>(null)
 
   const isLoading = paginationActions?.isLoading || false
   const hasMore = paginationActions?.hasMore || false
@@ -106,26 +111,21 @@ export function InsMediaGrid({
 
   const handleMediaClick = (clickedMedia: InsMediaItem) => {
     const context = getMediaContext?.(clickedMedia)
+    console.log(context)
     if (!context) return
     const startIndex = context.allMediaInPost.findIndex(
       (m) => m.id === clickedMedia.id,
     )
-    // 转换InsMediaItem为MediaItem格式以兼容现有的模态框
-    const convertedMediaItems = context.allMediaInPost.map((item) => ({
-      id: item.id,
-      url: item.url,
-      type: item.type,
-      width: item.width,
-      height: item.height,
-      tweetId: item.postId,
-      createdAt: item.createdAt,
-    }))
-    openTweetMediaModal({
-      mediaItems: convertedMediaItems,
+    setSelectedMedia({
+      mediaItems: context.allMediaInPost,
       startIndex: Math.max(0, startIndex),
-      tweet: context.post,
+      post: context.post,
       user: context.user,
     })
+  }
+
+  const handleCloseViewer = () => {
+    setSelectedMedia(null)
   }
 
   const { loadingRef } = useInfiniteScroll({
@@ -237,32 +237,43 @@ export function InsMediaGrid({
             </span>
           </div>
         )}
-
-        {!hasMore && mediaItems.length > 0 && (
-          <div className='text-center text-sm text-muted-foreground'>
-            没有更多Instagram内容了
-          </div>
-        )}
-
-        {error && mediaItems.length > 0 && (
-          <div className='p-4'>
-            <Alert variant='destructive'>
-              <AlertCircle className='h-4 w-4' />
-              <AlertTitle>Error loading more content</AlertTitle>
-              <AlertDescription>
-                {error}
-                <Button
-                  onClick={handleLoadMore}
-                  variant='link'
-                  className='p-0 h-auto ml-2'
-                >
-                  Try again
-                </Button>
-              </AlertDescription>
-            </Alert>
-          </div>
-        )}
       </div>
+
+      {!hasMore && mediaItems.length > 0 && (
+        <div className='text-center text-sm text-muted-foreground'>
+          没有更多Instagram内容了
+        </div>
+      )}
+
+      {error && mediaItems.length > 0 && (
+        <div className='p-4'>
+          <Alert variant='destructive'>
+            <AlertCircle className='h-4 w-4' />
+            <AlertTitle>Error loading more content</AlertTitle>
+            <AlertDescription>
+              {error}
+              <Button
+                onClick={handleLoadMore}
+                variant='link'
+                className='p-0 h-auto ml-2'
+              >
+                Try again
+              </Button>
+            </AlertDescription>
+          </Alert>
+        </div>
+      )}
+      {/* Instagram 媒体查看器 */}
+      {selectedMedia && (
+        <InsMediaViewer
+          isOpen={true}
+          onClose={handleCloseViewer}
+          mediaItems={selectedMedia.mediaItems}
+          startIndex={selectedMedia.startIndex}
+          post={selectedMedia.post}
+          user={selectedMedia.user}
+        />
+      )}
     </div>
   )
 }
