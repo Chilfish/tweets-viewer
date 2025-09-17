@@ -29,6 +29,10 @@ export function MediaItemComponent({
 
   const isVideo = item.type === 'video' || item.url.includes('.mp4')
 
+  // 计算预期的高度比例
+  const aspectRatio =
+    item.width > 0 && item.height > 0 ? item.height / item.width : 1
+
   useEffect(() => {
     if (isIntersecting) {
       setShouldLoad(true)
@@ -48,6 +52,14 @@ export function MediaItemComponent({
     setIsLoaded(true) // Treat error as "loaded" to remove skeleton
   }
 
+  if (isError) {
+    return (
+      <div className='w-full bg-muted flex items-center justify-center text-center text-muted-foreground text-xs py-4'>
+        媒体可能已被删除或无法加载
+      </div>
+    )
+  }
+
   return (
     <div
       ref={ref}
@@ -56,19 +68,18 @@ export function MediaItemComponent({
       }`}
       onClick={handleClick}
       style={{
-        aspectRatio: `${item.width} / ${item.height}`,
+        minHeight: '120px', // 确保最小高度
       }}
     >
-      {/* Skeleton placeholder */}
+      {/* Skeleton placeholder - 使用相对定位确保占据正确空间 */}
       {!isLoaded && (
-        <Skeleton className='w-full h-full absolute top-0 left-0 rounded-md' />
-      )}
-
-      {/* Error message */}
-      {isError && (
-        <div className='w-full h-full bg-muted flex items-center justify-center text-center text-muted-foreground text-xs p-2'>
-          媒体可能已被删除或无法加载
-        </div>
+        <div
+          className='w-full bg-muted-foreground/10 animate-pulse rounded-md'
+          style={{
+            height: '100%',
+            aspectRatio,
+          }}
+        />
       )}
 
       {/* Media content */}
@@ -101,7 +112,6 @@ export function MediaItemComponent({
               `w-full h-full object-cover transition-opacity duration-300`,
               isLoaded ? 'opacity-100' : 'opacity-0',
             )}
-            style={{ aspectRatio: `${item.width} / ${item.height}` }}
             onLoad={handleLoad}
             onError={handleError}
           />

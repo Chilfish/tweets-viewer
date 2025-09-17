@@ -79,15 +79,22 @@ export default function InsPage({ params }: Route.ComponentProps) {
   // 自动加载更多内容确保页面有足够的媒体项
   useEffect(() => {
     const autoLoadMore = async () => {
-      // 如果初始加载完成，媒体数量少于15个，且还有更多数据，就自动加载更多
+      // 如果初始加载完成，媒体数量少于12个，且还有更多数据，就自动加载更多
+      // 添加防抖机制，避免频繁触发
       if (
         !isLoading &&
         data.length > 0 &&
-        data.length < 15 &&
+        data.length < 12 &&
         hasMore &&
-        curUser
+        curUser &&
+        isInitialized.current
       ) {
-        await loadMore()
+        // 添加延迟，避免与其他加载操作冲突
+        setTimeout(() => {
+          if (!isLoading) {
+            loadMore()
+          }
+        }, 500)
       }
     }
 

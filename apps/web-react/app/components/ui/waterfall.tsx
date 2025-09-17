@@ -88,7 +88,7 @@ function useResponsiveColumns(
   return columnCount
 }
 
-// 瀑布流布局 Hook
+// 瀑布流布局 Hook - 改进的排列算法
 function useMasonryLayout<T extends WaterfallItem>(
   items: T[],
   columnCount: number,
@@ -108,22 +108,39 @@ function useMasonryLayout<T extends WaterfallItem>(
     // 用于跟踪每列的估算高度
     const columnHeights = Array.from({ length: columnCount }, () => 0)
 
-    // 将每个项目分配到最短的列
-    items.forEach((item) => {
-      // 找到最短的列（优先左侧）
-      const minHeight = Math.min(...columnHeights)
-      const shortestColumnIndex = columnHeights.findIndex(
-        (height) => height === minHeight,
-      )
+    // 改进的分配算法：按顺序分配，但考虑列高度平衡
+    items.forEach((item, index) => {
+      let targetColumnIndex: number
 
-      // 将项目添加到最短的列
-      newColumns[shortestColumnIndex].push(item)
+      // 前几个项目按顺序分配到各列，确保初始分布均匀
+      if (index < columnCount) {
+        targetColumnIndex = index
+      } else {
+        // 后续项目分配到最短的列，但在高度相近时优先选择左侧列
+        const minHeight = Math.min(...columnHeights)
+        const heightThreshold = minHeight + 50 // 50px的容差范围
+
+        // 找到高度在容差范围内的最左侧列
+        targetColumnIndex = columnHeights.findIndex(
+          (height) => height <= heightThreshold,
+        )
+
+        // 如果没找到合适的列，则选择最短的列
+        if (targetColumnIndex === -1) {
+          targetColumnIndex = columnHeights.findIndex(
+            (height) => height === minHeight,
+          )
+        }
+      }
+
+      // 将项目添加到目标列
+      newColumns[targetColumnIndex].push(item)
 
       // 估算这个项目的高度并更新列高度
       const aspectRatio =
         item.width > 0 && item.height > 0 ? item.height / item.width : 1
       const estimatedHeight = aspectRatio * columnWidth + 16 // 列宽 + 间距
-      columnHeights[shortestColumnIndex] += estimatedHeight
+      columnHeights[targetColumnIndex] += estimatedHeight
     })
 
     setColumns(newColumns)
