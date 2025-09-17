@@ -64,15 +64,6 @@ export function MediaViewer({
         spacing: '40px',
         imageFit: 'contain',
       }}
-      gestures={{
-        swipeToClose: true,
-        panToZoom: true,
-        scrollToZoom: true,
-      }}
-      zoom={{
-        maxZoomPixelRatio: 3,
-        zoomInMultiplier: 1.5,
-      }}
       styles={{
         container: {
           backgroundColor: 'rgba(0, 0, 0, 0.85)',

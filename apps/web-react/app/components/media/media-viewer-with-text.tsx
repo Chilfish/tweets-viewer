@@ -9,7 +9,7 @@ import Video from 'yet-another-react-lightbox/plugins/video'
 import 'yet-another-react-lightbox/styles.css'
 import 'yet-another-react-lightbox/plugins/counter.css'
 
-import { formatDate, type User } from '@tweets-viewer/shared'
+import { formatDate, type UserInfo } from '@tweets-viewer/shared'
 import { useIsMobile } from '~/hooks/use-mobile'
 import type { InsMediaItem } from '~/stores/ins-store'
 import type { Tweet } from '~/types'
@@ -24,10 +24,10 @@ interface InsMediaViewerProps {
   mediaItems: InsMediaItem[]
   startIndex?: number
   post: Tweet
-  user: User
+  user: UserInfo
 }
 
-export function InsMediaViewer({
+export function MediaViewerWithText({
   isOpen,
   onClose,
   mediaItems,
@@ -134,7 +134,7 @@ export function InsMediaViewer({
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
         <SheetContent
           side={sheetSide}
-          className='sm:max-w-[36rem] max-w-[24rem]  z-[10000] h-fit p-4 px-2 rounded-md mt-20 gap-0'
+          className='sm:max-w-[36rem] z-[10000] h-fit p-4 px-2 rounded-md mt-20 gap-0'
         >
           <SheetHeader>
             <SheetTitle className='text-lg font-semibold'>推文详情</SheetTitle>

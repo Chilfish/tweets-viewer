@@ -8,8 +8,8 @@ import type { PaginatedListActions } from '~/stores'
 import type { InsMediaItem } from '~/stores/ins-store'
 import type { Tweet, User } from '~/types'
 import { Skeleton } from '../ui/skeleton'
-import { InsMediaViewer } from './ins-media-viewer'
 import { MediaItemComponent } from './media-item'
+import { MediaViewerWithText } from './media-viewer-with-text'
 
 interface InsMediaGridProps {
   mediaItems: InsMediaItem[]
@@ -265,7 +265,7 @@ export function InsMediaGrid({
       )}
       {/* Instagram 媒体查看器 */}
       {selectedMedia && (
-        <InsMediaViewer
+        <MediaViewerWithText
           isOpen={true}
           onClose={handleCloseViewer}
           mediaItems={selectedMedia.mediaItems}

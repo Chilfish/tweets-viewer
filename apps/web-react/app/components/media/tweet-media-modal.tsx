@@ -1,6 +1,5 @@
-import { ExternalLink } from 'lucide-react'
 import { useAppStore } from '~/stores/app-store'
-import { MediaViewer } from './media-viewer'
+import { MediaViewerWithText } from './media-viewer-with-text'
 
 export function TweetMediaModal() {
   const { tweetMediaModal, closeTweetMediaModal } = useAppStore()
@@ -21,27 +20,18 @@ export function TweetMediaModal() {
     return null
   }
 
-  const tweetUrl = `https://twitter.com/${currentUser.screenName}/status/${currentTweet.tweetId}`
-
-  const additionalToolbarContent = (
-    <a
-      href={tweetUrl}
-      target='_blank'
-      rel='noopener noreferrer'
-      title='View on Twitter'
-      className='w-fit'
-    >
-      <ExternalLink className='size-6' />
-    </a>
-  )
-
   return (
-    <MediaViewer
+    <MediaViewerWithText
       isOpen={isOpen}
       onClose={closeTweetMediaModal}
-      mediaItems={currentMediaItems}
+      mediaItems={currentMediaItems.map((item) => ({
+        ...item,
+        postId: currentTweet.tweetId,
+        fullText: currentTweet.fullText,
+      }))}
       startIndex={currentMediaIndex}
-      additionalToolbarContent={additionalToolbarContent}
+      post={currentTweet}
+      user={currentUser}
     />
   )
 }
