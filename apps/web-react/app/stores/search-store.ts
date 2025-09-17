@@ -5,7 +5,7 @@ import {
   createLoadDataAction,
   type PaginatedStore,
 } from '~/lib/use-paginated-data'
-import type { Tweet } from '~/types'
+import type { Tweet } from '@tweets-viewer/shared'
 import type {
   DateRange,
   PaginatedListActions,

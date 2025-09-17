@@ -4,7 +4,7 @@ import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert'
 import { Button } from '~/components/ui/button'
 import { useInfiniteScroll } from '~/hooks/use-infinite-scroll'
 import type { PaginatedListActions } from '~/stores'
-import type { Tweet, User } from '~/types'
+import type { Tweet, User } from '@tweets-viewer/shared'
 import { TweetCard } from './tweet-card'
 import { TweetsSortControls } from './tweets-sort-controls'
 

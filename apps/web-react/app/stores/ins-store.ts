@@ -4,7 +4,7 @@ import {
   createInitialPaginatedState,
   type PaginatedStore,
 } from '~/lib/use-paginated-data'
-import type { Tweet, User } from '~/types'
+import type { Tweet, User } from '@tweets-viewer/shared'
 import type {
   DateRange,
   PaginatedListActions,

@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { MediaItem } from '~/stores/media-store'
-import type { Tweet, TweetMedia, UserInfo } from '~/types'
+import type { Tweet, TweetMedia, UserInfo } from '@tweets-viewer/shared'
 
 // 推文媒体模态框状态 (用于 media-grid)
 interface TweetMediaModalState {

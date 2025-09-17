@@ -3,7 +3,7 @@ import { createRef, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router'
 import { Input } from '~/components/ui/input'
 import { cn } from '~/lib/utils'
-import type { User } from '~/types'
+import type { User } from '@tweets-viewer/shared'
 
 interface UserTabsProps {
   user: User

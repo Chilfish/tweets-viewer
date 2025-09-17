@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent } from '~/components/ui/card'
 import { useAppStore } from '~/stores/app-store'
-import type { Tweet, TweetMedia, UserInfo } from '~/types'
+import type { Tweet, TweetMedia, UserInfo } from '@tweets-viewer/shared'
 import { MediaItemComponent } from '../media/media-item'
 import { Link, TweetText } from './tweet-text'
 

@@ -1,6 +1,6 @@
 import { Calendar, LinkIcon, MapPin } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
-import type { User } from '~/types'
+import type { User } from '@tweets-viewer/shared'
 import { UserTabs } from './layout/user-tabs'
 import { TweetText } from './tweets/tweet-text'
 

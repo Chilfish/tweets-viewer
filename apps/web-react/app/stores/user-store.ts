@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { getUsers } from '~/lib/users-api'
-import type { User } from '~/types'
+import type { User } from '@tweets-viewer/shared'
 
 const TWENTY_FOUR_HOURS_IN_MS = 24 * 60 * 60 * 1000
 

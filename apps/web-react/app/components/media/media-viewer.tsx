@@ -9,7 +9,7 @@ import 'yet-another-react-lightbox/plugins/counter.css'
 
 import { X } from 'lucide-react'
 import type { MediaItem } from '~/stores/media-store'
-import type { TweetMedia } from '~/types'
+import type { TweetMedia } from '@tweets-viewer/shared'
 
 interface MediaViewerProps {
   isOpen: boolean

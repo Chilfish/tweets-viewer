@@ -5,7 +5,7 @@ import type {
   TweetMedia,
   User,
   UserInfo,
-} from '~/types'
+} from '@tweets-viewer/shared'
 
 // 模拟用户数据
 const mockUsers: Record<string, User> = {
