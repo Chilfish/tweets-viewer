@@ -1,5 +1,3 @@
-/** biome-ignore-all lint/a11y/useButtonType: <explanation> */
-
 import type { Tweet, User } from '@tweets-viewer/shared'
 import { ImageIcon } from 'lucide-react'
 import type { PaginatedListActions } from '~/stores'
