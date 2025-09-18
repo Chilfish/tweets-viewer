@@ -82,24 +82,21 @@ function ins2Tweet(data: InsData): TweetData {
   }
 }
 
-function replaceurl(data: TweetData) {
-  data.media.forEach((media) => {
-    const name = new URL(media.url).pathname.split('/').pop()
+function replaceMediaUrl(data: TweetData) {
+  const s3 = 'https://s3.chilfish.top/tweets'
 
-    media.url = `https://s3.chilfish.top/tweets/ins-${data.userId}/${name}`
+  data.media = data.media.map((media) => {
+    const url = new URL(media.url)
+    const name = url.pathname.split('/').pop()
+    media.url = `${s3}/ins-${data.userId}/${name}`
+    return media
   })
 
   return data
 }
 
-const data = (insData as any[])
-  .map(replaceurl)
-  .filter(
-    (item, index, arr) =>
-      arr.findIndex((t) => t.tweetId === item.tweetId) === index,
-  )
-  .toSorted(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-  )
+// const data = (insData as any[]).map(ins2Tweet)
+
+const data = (insData as any[]).map(replaceMediaUrl)
 
 writeJson(`${data[0].userId}.json`, data)
