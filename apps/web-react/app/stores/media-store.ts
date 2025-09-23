@@ -1,11 +1,10 @@
+import type { Tweet, User } from '@tweets-viewer/shared'
 import { create } from 'zustand'
 import { getTweets, getTweetsByDateRange } from '~/lib/tweets-api'
 import {
   createInitialPaginatedState,
-  createLoadDataAction,
   type PaginatedStore,
 } from '~/lib/use-paginated-data'
-import type { Tweet, TweetMedia, User } from '@tweets-viewer/shared'
 import {
   type DateRange,
   type PaginatedListActions,
@@ -21,7 +20,7 @@ export interface MediaItem {
   width: number
   height: number
   tweetId: string
-  createdAt: Date
+  createdAt: Date | string
 }
 
 export interface MediaFilters {
@@ -83,6 +82,7 @@ const loadMediaData = async (
   filters: MediaFilters,
   minMediaCount = 6,
   appendTweets: (newTweets: Tweet[]) => void,
+  appendMedias: (newMedias: MediaItem[]) => void,
 ): Promise<{ mediaItems: MediaItem[]; hasMore: boolean; nextPage: number }> => {
   const reverse = filters.sortOrder === 'desc'
   const allMediaItems: MediaItem[] = []
@@ -124,6 +124,7 @@ const loadMediaData = async (
       // 提取媒体并添加到结果中
       const mediaItems = extractMediaFromTweets(tweets)
       allMediaItems.push(...mediaItems)
+      appendMedias(mediaItems)
 
       // 准备获取下一页
       currentPage++
@@ -158,6 +159,7 @@ export const useMediaStore = create<MediaStore>((set, get) => ({
   loadMedia: async (screenName, isFirstLoad = true) => {
     const state = get()
     const { appendData } = useTweetsStore.getState()
+
     if (state.isLoading) return
 
     set({ isLoading: true, error: null })
@@ -172,6 +174,7 @@ export const useMediaStore = create<MediaStore>((set, get) => ({
         state.filters,
         minMediaCount,
         appendData,
+        state.appendData.bind(state),
       )
 
       if (isFirstLoad) {

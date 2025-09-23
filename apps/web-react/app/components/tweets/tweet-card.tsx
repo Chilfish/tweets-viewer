@@ -1,3 +1,4 @@
+import type { Tweet, TweetMedia, UserInfo } from '@tweets-viewer/shared'
 import { formatDate } from '@tweets-viewer/shared'
 import {
   Heart,
@@ -10,7 +11,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent } from '~/components/ui/card'
 import { useAppStore } from '~/stores/app-store'
-import type { Tweet, TweetMedia, UserInfo } from '@tweets-viewer/shared'
 import { MediaItemComponent } from '../media/media-item'
 import { Link, TweetText } from './tweet-text'
 
@@ -54,7 +54,7 @@ export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
     }
 
     return (
-      <div className='mt-3 rounded-md overflow-hidden w-fit'>
+      <div className='mt-3 rounded-sm overflow-hidden w-fit'>
         {media.length === 1 ? (
           <MediaItemComponent
             item={media[0]}

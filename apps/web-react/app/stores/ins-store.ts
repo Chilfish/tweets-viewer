@@ -1,10 +1,10 @@
+import type { Tweet, User } from '@tweets-viewer/shared'
 import { create } from 'zustand'
 import { getInsData } from '~/lib/ins-api'
 import {
   createInitialPaginatedState,
   type PaginatedStore,
 } from '~/lib/use-paginated-data'
-import type { Tweet, User } from '@tweets-viewer/shared'
 import type {
   DateRange,
   PaginatedListActions,
@@ -19,7 +19,7 @@ export interface InsMediaItem {
   width: number
   height: number
   postId: string
-  createdAt: Date
+  createdAt: Date | string
   fullText: string
 }
 

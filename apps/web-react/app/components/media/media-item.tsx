@@ -4,7 +4,6 @@
 import type { TweetMedia } from '@tweets-viewer/shared'
 import { Play } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Skeleton } from '~/components/ui/skeleton'
 import { useIntersectionObserver } from '~/hooks/use-intersection-observer'
 import { cn } from '~/lib/utils'
 import type { MediaItem } from '~/stores/media-store'
@@ -29,10 +28,6 @@ export function MediaItemComponent({
 
   const isVideo = item.type === 'video' || item.url.includes('.mp4')
 
-  // 计算预期的高度比例
-  const aspectRatio =
-    item.width > 0 && item.height > 0 ? item.height / item.width : 1
-
   useEffect(() => {
     if (isIntersecting) {
       setShouldLoad(true)
@@ -54,7 +49,12 @@ export function MediaItemComponent({
 
   if (isError) {
     return (
-      <div className='w-full bg-muted flex items-center justify-center text-center text-muted-foreground text-xs py-4'>
+      <div
+        className={cn(
+          'w-full bg-muted flex items-center justify-center text-center text-muted-foreground text-xs py-4 rounded',
+          className,
+        )}
+      >
         媒体可能已被删除或无法加载
       </div>
     )
@@ -63,58 +63,53 @@ export function MediaItemComponent({
   return (
     <div
       ref={ref}
-      className={`group relative overflow-hidden rounded bg-muted cursor-pointer ${
-        className || ''
-      }`}
+      className={cn(
+        'group relative overflow-hidden bg-muted cursor-pointer',
+        'w-full h-full flex items-center justify-center',
+        className,
+      )}
       onClick={handleClick}
-      style={{
-        minHeight: '120px', // 确保最小高度
-      }}
     >
       {!isLoaded && (
-        <div
-          className='w-full bg-muted-foreground/10 animate-pulse rounded-md'
-          style={{
-            height: '100%',
-            aspectRatio,
-          }}
-        />
+        <div className='absolute inset-0 bg-muted animate-pulse rounded' />
       )}
 
-      {/* Media content */}
-      {shouldLoad &&
-        !isError &&
-        (isVideo ? (
-          <div className='relative w-full h-full'>
-            <video
-              src={item.url}
-              className={`w-full h-full object-cover transition-opacity duration-300 ${
-                isLoaded ? 'block' : 'hidden'
-              }`}
-              onLoadedData={handleLoad}
-              onError={handleError}
-              playsInline
-              muted
-              autoPlay={false}
-            />
-            <div className='absolute inset-0 bg-black/20 flex items-center justify-center opacity-70 group-hover:opacity-100 transition-opacity duration-200'>
-              <div className='bg-black/60 rounded-full p-3'>
-                <Play className='size-6 text-white fill-white' />
+      {shouldLoad && !isError && (
+        <>
+          {isVideo ? (
+            <>
+              <video
+                src={item.url}
+                className={cn(
+                  'w-full h-full object-cover transition-opacity duration-300',
+                  isLoaded ? 'opacity-100' : 'opacity-0',
+                )}
+                onLoadedData={handleLoad}
+                onError={handleError}
+                playsInline
+                muted
+                autoPlay={false}
+              />
+              <div className='absolute inset-0 bg-black/20 flex items-center justify-center opacity-70 group-hover:opacity-100 transition-opacity duration-200 z-10'>
+                <div className='bg-black/60 rounded-full p-3'>
+                  <Play className='size-6 text-white fill-white' />
+                </div>
               </div>
-            </div>
-          </div>
-        ) : (
-          <img
-            src={item.url}
-            alt=''
-            className={cn(
-              `w-full h-full object-cover transition-opacity duration-300`,
-              isLoaded ? 'block' : 'hidden',
-            )}
-            onLoad={handleLoad}
-            onError={handleError}
-          />
-        ))}
+            </>
+          ) : (
+            <img
+              src={item.url}
+              alt=''
+              className={cn(
+                'w-full h-full object-cover transition-opacity duration-300',
+                isLoaded ? 'opacity-100' : 'opacity-0',
+              )}
+              onLoad={handleLoad}
+              onError={handleError}
+            />
+          )}
+        </>
+      )}
     </div>
   )
 }

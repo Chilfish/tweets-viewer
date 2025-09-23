@@ -88,13 +88,15 @@ function useResponsiveColumns(
   return columnCount
 }
 
-// 瀑布流布局 Hook - 改进的排列算法
+// 瀑布流布局 Hook - 稳定的排列算法，预先计算高度避免布局闪烁
 function useMasonryLayout<T extends WaterfallItem>(
   items: T[],
   columnCount: number,
-  columnWidth: number = 300,
+  containerWidth: number = 800,
 ) {
-  const [columns, setColumns] = useState<T[][]>([])
+  const [columns, setColumns] = useState<
+    (T & { calculatedHeight: number })[][]
+  >([])
 
   useEffect(() => {
     if (items.length === 0) {
@@ -102,49 +104,48 @@ function useMasonryLayout<T extends WaterfallItem>(
       return
     }
 
-    // 初始化列数组
-    const newColumns: T[][] = Array.from({ length: columnCount }, () => [])
+    // 计算每列的实际宽度（考虑间距）
+    const columnWidth = (containerWidth - (columnCount - 1) * 4) / columnCount
 
-    // 用于跟踪每列的估算高度
+    // 初始化列数组
+    const newColumns: (T & { calculatedHeight: number })[][] = Array.from(
+      { length: columnCount },
+      () => [],
+    )
+
+    // 用于跟踪每列的累计高度
     const columnHeights = Array.from({ length: columnCount }, () => 0)
 
-    // 改进的分配算法：按顺序分配，但考虑列高度平衡
+    // 为每个项目预先计算高度并分配到最短的列
     items.forEach((item, index) => {
+      // 计算基于宽高比的预期高度
+      const aspectRatio =
+        item.width > 0 && item.height > 0 ? item.height / item.width : 1
+      const calculatedHeight = Math.max(120, aspectRatio * columnWidth) // 最小高度120px
+
       let targetColumnIndex: number
 
-      // 前几个项目按顺序分配到各列，确保初始分布均匀
+      // 前几个项目按顺序分配，确保初始分布均匀
       if (index < columnCount) {
         targetColumnIndex = index
       } else {
-        // 后续项目分配到最短的列，但在高度相近时优先选择左侧列
+        // 选择当前最短的列
         const minHeight = Math.min(...columnHeights)
-        const heightThreshold = minHeight + 50 // 50px的容差范围
-
-        // 找到高度在容差范围内的最左侧列
         targetColumnIndex = columnHeights.findIndex(
-          (height) => height <= heightThreshold,
+          (height) => height === minHeight,
         )
-
-        // 如果没找到合适的列，则选择最短的列
-        if (targetColumnIndex === -1) {
-          targetColumnIndex = columnHeights.findIndex(
-            (height) => height === minHeight,
-          )
-        }
       }
 
-      // 将项目添加到目标列
-      newColumns[targetColumnIndex].push(item)
+      // 将项目添加到目标列，包含预计算的高度
+      const itemWithHeight = { ...item, calculatedHeight }
+      newColumns[targetColumnIndex].push(itemWithHeight)
 
-      // 估算这个项目的高度并更新列高度
-      const aspectRatio =
-        item.width > 0 && item.height > 0 ? item.height / item.width : 1
-      const estimatedHeight = aspectRatio * columnWidth + 16 // 列宽 + 间距
-      columnHeights[targetColumnIndex] += estimatedHeight
+      // 更新列高度（包含间距）
+      columnHeights[targetColumnIndex] += calculatedHeight + 4
     })
 
     setColumns(newColumns)
-  }, [items, columnCount, columnWidth])
+  }, [items, columnCount, containerWidth])
 
   return columns
 }
@@ -168,7 +169,9 @@ export function Waterfall<T extends WaterfallItem>({
   const error = paginationActions?.error || null
 
   const columnCount = useResponsiveColumns(cols)
-  const columns = useMasonryLayout(list, columnCount)
+  // 根据屏幕尺寸估算容器宽度
+  const containerWidth = columnCount === 2 ? 600 : 900
+  const columns = useMasonryLayout(list, columnCount, containerWidth)
 
   const handleLoadMore = () => {
     paginationActions?.loadMore?.()
@@ -286,6 +289,7 @@ export function Waterfall<T extends WaterfallItem>({
                   key={item.id}
                   className='animate-in fade-in-0 cursor-pointer'
                   style={{
+                    height: `${item.calculatedHeight}px`,
                     animationDelay: `${Math.min((columnIndex * 5 + itemIndex) * 50, 800)}ms`,
                     animationFillMode: 'backwards',
                   }}
