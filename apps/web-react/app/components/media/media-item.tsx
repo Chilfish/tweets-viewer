@@ -71,7 +71,6 @@ export function MediaItemComponent({
         minHeight: '120px', // 确保最小高度
       }}
     >
-      {/* Skeleton placeholder - 使用相对定位确保占据正确空间 */}
       {!isLoaded && (
         <div
           className='w-full bg-muted-foreground/10 animate-pulse rounded-md'
@@ -90,7 +89,7 @@ export function MediaItemComponent({
             <video
               src={item.url}
               className={`w-full h-full object-cover transition-opacity duration-300 ${
-                isLoaded ? 'opacity-100' : 'opacity-0'
+                isLoaded ? 'block' : 'hidden'
               }`}
               onLoadedData={handleLoad}
               onError={handleError}
@@ -110,7 +109,7 @@ export function MediaItemComponent({
             alt=''
             className={cn(
               `w-full h-full object-cover transition-opacity duration-300`,
-              isLoaded ? 'opacity-100' : 'opacity-0',
+              isLoaded ? 'block' : 'hidden',
             )}
             onLoad={handleLoad}
             onError={handleError}

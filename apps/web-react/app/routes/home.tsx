@@ -1,3 +1,4 @@
+import { formatDate } from '@tweets-viewer/shared'
 import type { JSX } from 'react'
 import { Link } from 'react-router'
 import { Button } from '~/components/ui/button'
@@ -77,6 +78,7 @@ export default function HomePage() {
           <div className='text-center'>
             <span>其他作品：</span>
             <span className='inline-flex gap-1'>
+              <Linker to='https://anon-tweet.chilfish.top'>烤推机</Linker>/
               <Linker to='https://nishio.chilfish.top/zh'>西尾文明暦</Linker>/
               <Linker to='https://replive.chilfish.top'>
                 西尾夕香 replive
@@ -85,6 +87,14 @@ export default function HomePage() {
               <Linker to='https://oshitabi.chilfish.top/'>
                 推し旅 AR 镜头
               </Linker>
+            </span>
+          </div>
+
+          <div className='mt-2 flex items-center justify-center gap-2 text-xs text-muted-foreground/70'>
+            <span>上次构建于：{formatDate(new Date(__GIT_DATE__))}</span>
+            <span className='inline-flex items-center gap-1 px-2 py-1 bg-muted/50 rounded-md border'>
+              <span className='w-2 h-2 bg-green-500 rounded-full animate-pulse'></span>
+              <span>{__GIT_HASH__}</span>
             </span>
           </div>
         </CardFooter>
