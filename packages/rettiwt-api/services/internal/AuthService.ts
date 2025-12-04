@@ -1,5 +1,4 @@
 import type { RettiwtConfig } from '../../models/RettiwtConfig'
-
 import axios from 'axios'
 import { ApiErrors } from '../../enums/Api'
 import { AuthCredential } from '../../models/auth/AuthCredential'
@@ -28,7 +27,10 @@ export class AuthService {
    */
   public static decodeCookie(encodedCookies: string): string {
     // Decoding the encoded cookie string
-    const decodedCookies: string = Buffer.from(encodedCookies, 'base64').toString('ascii')
+    const decodedCookies: string = Buffer.from(
+      encodedCookies,
+      'base64',
+    ).toString('ascii')
 
     return decodedCookies
   }

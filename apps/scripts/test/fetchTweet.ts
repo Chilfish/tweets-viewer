@@ -1,5 +1,5 @@
-import { FetcherService } from 'rettiwt-api'
 import { baseDir, cachedData, writeJson } from '@tweets-viewer/shared'
+import { FetcherService } from 'rettiwt-api'
 import { fetchTweet, fetchUser } from '../services'
 import 'dotenv/config'
 

@@ -1,9 +1,10 @@
 import type { Tweet, User } from '@tweets-viewer/shared'
-import { ImageIcon } from 'lucide-react'
-import { useState } from 'react'
+import type { WaterfallItem } from '../ui/waterfall'
 import type { PaginatedListActions } from '~/stores'
 import type { InsMediaItem } from '~/stores/ins-store'
-import { Waterfall, type WaterfallItem } from '../ui/waterfall'
+import { ImageIcon } from 'lucide-react'
+import { useState } from 'react'
+import { Waterfall } from '../ui/waterfall'
 import { MediaItemComponent } from './media-item'
 import { MediaViewerWithText } from './media-viewer-with-text'
 
@@ -36,9 +37,10 @@ export function InsMediaGrid({
   const handleMediaClick = (clickedMedia: InsMediaItem) => {
     const context = getMediaContext?.(clickedMedia)
     console.log(context)
-    if (!context) return
+    if (!context)
+      return
     const startIndex = context.allMediaInPost.findIndex(
-      (m) => m.id === clickedMedia.id,
+      m => m.id === clickedMedia.id,
     )
     setSelectedMedia({
       mediaItems: context.allMediaInPost,
@@ -58,7 +60,7 @@ export function InsMediaGrid({
         list={mediaItems as InsMediaWaterfallItem[]}
         cols={{ mobile: 2, desktop: 3 }}
         margin={4}
-        renderItem={(item) => (
+        renderItem={item => (
           <MediaItemComponent
             item={{
               id: item.id,
@@ -76,7 +78,7 @@ export function InsMediaGrid({
         paginationActions={paginationActions}
         emptyState={{
           icon: (
-            <ImageIcon className='h-12 w-12 mx-auto text-muted-foreground mb-4' />
+            <ImageIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
           ),
           title: '找不到Instagram内容',
           description: '暂时还没存档 ta 的 Instagram',

@@ -4,10 +4,8 @@
  * @internal
  */
 export interface IMediaVariable {
-
   media_entities: IMediaEntityVariable[]
   possibly_sensitive: boolean
-
 }
 
 /**
@@ -16,10 +14,8 @@ export interface IMediaVariable {
  * @internal
  */
 export interface IMediaEntityVariable {
-
   media_id: string
   tagged_users: string[]
-
 }
 
 /**
@@ -28,8 +24,6 @@ export interface IMediaEntityVariable {
  * @internal
  */
 export interface IReplyVariable {
-
   exclude_reply_user_ids: string[]
   in_reply_to_tweet_id: string
-
 }

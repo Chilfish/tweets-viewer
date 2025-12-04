@@ -1,12 +1,12 @@
+import type { Route } from './+types/media'
+import type { SortOrder } from '~/stores'
 import { useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router'
 import { InsMediaGrid } from '~/components/media/ins-media-grid'
 import { TweetsSortControls } from '~/components/tweets/tweets-sort-controls'
 import { UserHeader } from '~/components/user-header'
-import type { SortOrder } from '~/stores'
 import { useInsStore } from '~/stores/ins-store'
 import { useUserStore } from '~/stores/user-store'
-import type { Route } from './+types/media'
 
 export function meta({ params }: Route.MetaArgs) {
   const { name } = params
@@ -38,7 +38,8 @@ export default function InsPage({ params }: Route.ComponentProps) {
 
   useEffect(() => {
     const targetUserName = params.name
-    if (!curUser || !targetUserName) return
+    if (!curUser || !targetUserName)
+      return
 
     const userChanged = storeUser?.screenName !== targetUserName
     if (userChanged) {
@@ -66,7 +67,8 @@ export default function InsPage({ params }: Route.ComponentProps) {
   ])
 
   useEffect(() => {
-    if (!isInitialized.current) return
+    if (!isInitialized.current)
+      return
 
     const params = new URLSearchParams()
     if (filters.sortOrder !== 'desc') {
@@ -82,12 +84,12 @@ export default function InsPage({ params }: Route.ComponentProps) {
       // 如果初始加载完成，媒体数量少于12个，且还有更多数据，就自动加载更多
       // 添加防抖机制，避免频繁触发
       if (
-        !isLoading &&
-        data.length > 0 &&
-        data.length < 12 &&
-        hasMore &&
-        curUser &&
-        isInitialized.current
+        !isLoading
+        && data.length > 0
+        && data.length < 12
+        && hasMore
+        && curUser
+        && isInitialized.current
       ) {
         // 添加延迟，避免与其他加载操作冲突
         setTimeout(() => {
@@ -103,14 +105,15 @@ export default function InsPage({ params }: Route.ComponentProps) {
 
   if (userLoading || !curUser) {
     return (
-      <div className='flex min-h-svh items-center justify-center'>
-        <div className='text-muted-foreground'>Loading...</div>
+      <div className="flex min-h-svh items-center justify-center">
+        <div className="text-muted-foreground">Loading...</div>
       </div>
     )
   }
 
   function getMediaContext(item: (typeof data)[0]) {
-    if (!curUser) return null
+    if (!curUser)
+      return null
 
     // 创建一个模拟的Instagram帖子（使用Tweet结构）
     const post = {
@@ -138,7 +141,7 @@ export default function InsPage({ params }: Route.ComponentProps) {
 
     // 找到同一个帖子的所有媒体
     const allMediaInPost = data.filter(
-      (mediaItem) => mediaItem.postId === item.postId,
+      mediaItem => mediaItem.postId === item.postId,
     )
 
     return {
@@ -148,12 +151,12 @@ export default function InsPage({ params }: Route.ComponentProps) {
     }
   }
 
-  const isDataStale =
-    storeUser && curUser && storeUser.screenName !== curUser.screenName
+  const isDataStale
+    = storeUser && curUser && storeUser.screenName !== curUser.screenName
 
   return (
-    <div className='min-h-svh bg-background transition-colors duration-200'>
-      <div className='max-w-6xl mx-auto'>
+    <div className="min-h-svh bg-background transition-colors duration-200">
+      <div className="max-w-6xl mx-auto">
         <UserHeader user={curUser} />
 
         <TweetsSortControls

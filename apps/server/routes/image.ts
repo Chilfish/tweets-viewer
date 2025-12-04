@@ -6,16 +6,18 @@ const app = new Hono()
 let imgData = [] as any[]
 
 async function fetchImgData() {
-  if (imgData.length) return
+  if (imgData.length)
+    return
   imgData = await fetch(`${staticUrl}/tweet/imgs.json`)
-    .then((r) => r.json() as Promise<any[]>)
+    .then(r => r.json() as Promise<any[]>)
     .catch(() => [])
 }
 
 function randomImg() {
   const randomIndex = Math.floor(Math.random() * imgData.length)
   const data = imgData[randomIndex]
-  if (!data.urls) return randomImg()
+  if (!data.urls)
+    return randomImg()
 
   data.url = data.urls[Math.floor(Math.random() * data.urls.length)]
   data.urls = undefined

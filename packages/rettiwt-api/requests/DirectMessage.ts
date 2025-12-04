@@ -55,8 +55,13 @@ export class DMRequests {
    * @param conversationId - The conversation ID (e.g., "394028042-1712730991884689408")
    * @param maxId - Maximum ID for pagination (optional)
    */
-  public static conversation(conversationId: string, maxId?: string): AxiosRequestConfig {
-    const context = maxId ? 'FETCH_DM_CONVERSATION_HISTORY' : 'FETCH_DM_CONVERSATION'
+  public static conversation(
+    conversationId: string,
+    maxId?: string,
+  ): AxiosRequestConfig {
+    const context = maxId
+      ? 'FETCH_DM_CONVERSATION_HISTORY'
+      : 'FETCH_DM_CONVERSATION'
 
     return {
       method: 'get',

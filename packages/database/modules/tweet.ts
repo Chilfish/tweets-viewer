@@ -1,7 +1,7 @@
-import { now } from '@tweets-viewer/shared'
-import { and, asc, count, desc, eq, sql } from 'drizzle-orm'
 import type { DB } from '..'
 import type { InsertTweet } from '../schema'
+import { now } from '@tweets-viewer/shared'
+import { and, asc, count, desc, eq, sql } from 'drizzle-orm'
 import { tweetsTable, usersTable } from '../schema'
 
 interface GetTweet {
@@ -28,8 +28,9 @@ export async function createTweets(db: DB, tweets: InsertTweet[]) {
   return { rowCount: insertedCount }
 }
 
-const _order = (reverse: boolean) =>
-  reverse ? desc(tweetsTable.createdAt) : asc(tweetsTable.createdAt)
+function _order(reverse: boolean) {
+  return reverse ? desc(tweetsTable.createdAt) : asc(tweetsTable.createdAt)
+}
 
 export async function getTweets({ db, name, page, reverse }: GetTweet) {
   return db
@@ -64,7 +65,7 @@ export async function getTweetsByDateRange({
   end,
   reverse,
   page,
-}: GetTweet & { start: number; end: number }) {
+}: GetTweet & { start: number, end: number }) {
   return db
     .select()
     .from(tweetsTable)
@@ -111,7 +112,7 @@ export async function getTweetsCount(db: DB, name: string) {
 
 export async function getLatestTweets(db: DB) {
   const result = await db.execute(sql`
-    SELECT u.screen_name, u.rest_id, t.full_text, t.created_at
+    SELECT u.screen_name, u.rest_id, t.created_at
     FROM ${usersTable} u
     LEFT JOIN (
         SELECT DISTINCT ON (user_name) *
@@ -121,10 +122,10 @@ export async function getLatestTweets(db: DB) {
     ORDER BY t.created_at DESC NULLS LAST
 `)
 
-  return result.rows.map((row) => ({
+  return result.rows.map(row => ({
     restId: row.rest_id as string,
     screenName: row.screen_name as string,
-    fullText: row.full_text as string,
+    // fullText: row.full_text as string,
     createdAt: new Date(row.created_at as string),
   }))
 }

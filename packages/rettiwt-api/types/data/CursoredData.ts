@@ -12,7 +12,15 @@ import type { IUser } from './User'
  *
  * @public
  */
-export interface ICursoredData<T extends IDirectMessage | IConversation | INotification | ITweet | IUser | IList> {
+export interface ICursoredData<
+  T extends
+    | IDirectMessage
+    | IConversation
+    | INotification
+    | ITweet
+    | IUser
+    | IList,
+> {
   /** The batch of data of the given type. */
   list: T[]
 

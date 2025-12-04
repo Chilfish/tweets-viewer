@@ -18,7 +18,9 @@ interface ConversationTimeline {
   conversations: Conversations
 }
 
-type ConversationEntry = { message: ConversationMessage } | { trust_conversation: TrustConversation }
+type ConversationEntry
+  = | { message: ConversationMessage }
+    | { trust_conversation: TrustConversation }
 
 export interface ConversationMessage {
   id: string

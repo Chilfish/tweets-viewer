@@ -27,7 +27,8 @@ export function useIntersectionObserver<T extends HTMLElement>(
           if (once) {
             observer.unobserve(currentRef)
           }
-        } else if (!once) {
+        }
+        else if (!once) {
           setIntersecting(false)
         }
       },

@@ -1,9 +1,7 @@
-import { Search } from 'lucide-react'
-import { createRef, useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router'
-import { Input } from '~/components/ui/input'
-import { cn } from '~/lib/utils'
 import type { User } from '@tweets-viewer/shared'
+import { createRef, useEffect, useMemo, useRef, useState } from 'react'
+import { Link, useLocation } from 'react-router'
+import { cn } from '~/lib/utils'
 
 interface UserTabsProps {
   user: User
@@ -43,7 +41,7 @@ export function UserTabs({ user }: UserTabsProps) {
   )
 
   useEffect(() => {
-    const activeTab = tabs.find((tab) => pathname.startsWith(tab.href))
+    const activeTab = tabs.find(tab => pathname.startsWith(tab.href))
     const activeTabNode = activeTab?.ref.current
     const containerNode = tabsContainerRef.current
 
@@ -59,9 +57,9 @@ export function UserTabs({ user }: UserTabsProps) {
   }, [pathname, tabs])
 
   return (
-    <div className='border-b border-border px-4 mb-2 flex justify-between items-center'>
-      <div className='relative flex' ref={tabsContainerRef}>
-        {tabs.map((tab) => (
+    <div className="border-b border-border px-4 mb-2 flex justify-between items-center">
+      <div className="relative flex" ref={tabsContainerRef}>
+        {tabs.map(tab => (
           <Link
             key={tab.name}
             to={tab.href}
@@ -77,7 +75,7 @@ export function UserTabs({ user }: UserTabsProps) {
           </Link>
         ))}
         <div
-          className='absolute bottom-0 h-0.5 bg-primary rounded-full transition-all duration-300 ease-in-out'
+          className="absolute bottom-0 h-0.5 bg-primary rounded-full transition-all duration-300 ease-in-out"
           style={indicatorStyle}
         />
       </div>

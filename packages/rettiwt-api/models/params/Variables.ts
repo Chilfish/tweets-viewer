@@ -1,4 +1,8 @@
-import type { IMediaEntityVariable, IMediaVariable, IReplyVariable } from '../../types/params/Variables'
+import type {
+  IMediaEntityVariable,
+  IMediaVariable,
+  IReplyVariable,
+} from '../../types/params/Variables'
 import type { NewTweetMedia } from '../args/PostArgs'
 
 /**

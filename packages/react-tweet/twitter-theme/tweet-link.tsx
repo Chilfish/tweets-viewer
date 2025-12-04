@@ -8,7 +8,12 @@ interface Props {
 
 export function TweetLink({ href, children }: Props) {
   return (
-    <a href={href} className={s.root} target="_blank" rel="noopener noreferrer nofollow">
+    <a
+      href={href}
+      className={s.root}
+      target="_blank"
+      rel="noopener noreferrer nofollow"
+    >
       {children}
     </a>
   )

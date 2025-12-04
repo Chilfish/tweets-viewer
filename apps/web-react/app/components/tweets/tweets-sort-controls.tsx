@@ -1,3 +1,4 @@
+import type { DateRange, SortOrder } from '~/stores'
 import { Calendar, ChevronDown, SortAsc, SortDesc, X } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '~/components/ui/button'
@@ -15,7 +16,7 @@ import {
   PopoverTrigger,
 } from '~/components/ui/popover'
 import { cn } from '~/lib/utils'
-import { type DateRange, type SortOrder, useUserStore } from '~/stores'
+import { useUserStore } from '~/stores'
 import { SearchInput } from '../search-input'
 
 interface TweetsSortControlsProps {
@@ -94,8 +95,8 @@ export function TweetsSortControls({
     dateRange: { startDate: null, endDate: null },
   }
 
-  const hasActiveFilters =
-    filters.dateRange.startDate || filters.dateRange.endDate
+  const hasActiveFilters
+    = filters.dateRange.startDate || filters.dateRange.endDate
 
   const dontShowAnything = !showDateFilter && !showSortControls
   if (dontShowAnything) {
@@ -114,20 +115,20 @@ export function TweetsSortControls({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              variant='outline'
-              size='sm'
-              className='h-8 border-border bg-background hover:bg-accent'
+              variant="outline"
+              size="sm"
+              className="h-8 border-border bg-background hover:bg-accent"
             >
               {filters.sortOrder === 'desc' ? (
-                <SortDesc className='h-3 w-3' />
+                <SortDesc className="h-3 w-3" />
               ) : (
-                <SortAsc className='h-3 w-3' />
+                <SortAsc className="h-3 w-3" />
               )}
               <span>{filters.sortOrder === 'desc' ? '倒序' : '顺序'}</span>
-              <ChevronDown className='h-3 w-3' />
+              <ChevronDown className="h-3 w-3" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align='start' className='w-fit'>
+          <DropdownMenuContent align="start" className="w-fit">
             <DropdownMenuItem
               onClick={() => handleSortOrderChange('desc')}
               className={cn(
@@ -135,7 +136,7 @@ export function TweetsSortControls({
                 filters.sortOrder === 'desc' && 'bg-accent',
               )}
             >
-              <SortDesc className='h-3 w-3 mr-2' />
+              <SortDesc className="h-3 w-3 mr-2" />
               倒序
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -145,7 +146,7 @@ export function TweetsSortControls({
                 filters.sortOrder === 'asc' && 'bg-accent',
               )}
             >
-              <SortAsc className='h-3 w-3 mr-2' />
+              <SortAsc className="h-3 w-3 mr-2" />
               顺序
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -158,7 +159,7 @@ export function TweetsSortControls({
           <PopoverTrigger asChild>
             <Button
               variant={hasActiveFilters ? 'default' : 'outline'}
-              size='sm'
+              size="sm"
               className={cn(
                 'h-8 justify-start text-left font-normal',
                 hasActiveFilters
@@ -166,61 +167,58 @@ export function TweetsSortControls({
                   : 'border-border bg-background hover:bg-accent',
               )}
             >
-              <Calendar className='h-3 w-3 mr-1' />
+              <Calendar className="h-3 w-3 mr-1" />
               <span>{formatDateRange(filters.dateRange)}</span>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className='w-auto p-0' align='start'>
-            <div className='flex sm:flex-row flex-col gap-4 p-3'>
-              <div className='space-y-2'>
-                <Label className='text-sm font-medium'>开始日期</Label>
+          <PopoverContent className="w-auto p-0" align="start">
+            <div className="flex sm:flex-row flex-col gap-4 p-3">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">开始日期</Label>
                 <CalendarComponent
-                  mode='single'
-                  captionLayout='dropdown'
+                  mode="single"
+                  captionLayout="dropdown"
                   selected={tempDateRange.startDate || undefined}
-                  onSelect={(date) =>
-                    setTempDateRange((prev) => ({
+                  onSelect={date =>
+                    setTempDateRange(prev => ({
                       ...prev,
                       startDate: date || null,
-                    }))
-                  }
-                  className='rounded-md border border-border'
+                    }))}
+                  className="rounded-md border border-border"
                 />
               </div>
 
-              <div className='space-y-2'>
-                <Label className='text-sm font-medium'>结束日期</Label>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">结束日期</Label>
                 <CalendarComponent
-                  mode='single'
-                  captionLayout='dropdown'
+                  mode="single"
+                  captionLayout="dropdown"
                   selected={tempDateRange.endDate || undefined}
-                  onSelect={(date) =>
-                    setTempDateRange((prev) => ({
+                  onSelect={date =>
+                    setTempDateRange(prev => ({
                       ...prev,
                       endDate: date || null,
-                    }))
-                  }
-                  disabled={(date) =>
+                    }))}
+                  disabled={date =>
                     tempDateRange.startDate
                       ? date < tempDateRange.startDate
-                      : false
-                  }
-                  className='rounded-md border border-border'
+                      : false}
+                  className="rounded-md border border-border"
                 />
               </div>
             </div>
 
-            <div className='w-full flex gap-4 p-3 pt-0'>
+            <div className="w-full flex gap-4 p-3 pt-0">
               <Button
-                variant='outline'
-                size='sm'
+                variant="outline"
+                size="sm"
                 onClick={handleDateRangeClear}
-                className='h-8 ml-auto'
+                className="h-8 ml-auto"
               >
-                <X className='h-3 w-3 mr-1' />
+                <X className="h-3 w-3 mr-1" />
                 清空
               </Button>
-              <Button size='sm' onClick={handleDateRangeApply} className='h-8'>
+              <Button size="sm" onClick={handleDateRangeApply} className="h-8">
                 应用
               </Button>
             </div>
@@ -231,12 +229,12 @@ export function TweetsSortControls({
       {/* Active Filters Indicator */}
       {hasActiveFilters && (
         <Button
-          variant='ghost'
-          size='sm'
+          variant="ghost"
+          size="sm"
           onClick={handleDateRangeClear}
-          className='h-8 px-2 text-muted-foreground hover:text-foreground'
+          className="h-8 px-2 text-muted-foreground hover:text-foreground"
         >
-          <X className='h-3 w-3' />
+          <X className="h-3 w-3" />
         </Button>
       )}
 

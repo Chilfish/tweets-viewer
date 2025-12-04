@@ -15,23 +15,23 @@ export function Sidebar({ currentUser }: SidebarProps) {
   const navItems = getNavItems(currentUser)
 
   return (
-    <aside className='hidden md:flex sticky top-0 z-50 h-screen flex-col justify-between p-4 bg-sidebar border-r border-sidebar-border transition-colors duration-200'>
-      <header className='flex items-center justify-center gap-4 border-b border-sidebar-border pb-4 mb-4'>
+    <aside className="hidden md:flex sticky top-0 z-50 h-screen flex-col justify-between p-4 bg-sidebar border-r border-sidebar-border transition-colors duration-200">
+      <header className="flex items-center justify-center gap-4 border-b border-sidebar-border pb-4 mb-4">
         <img
-          alt='logo'
-          src='/icon.jpg'
+          alt="logo"
+          src="/icon.jpg"
           width={32}
           height={32}
-          className='rounded-lg'
+          className="rounded-lg"
         />
-        <h2 className='text-lg font-semibold text-sidebar-foreground'>
+        <h2 className="text-lg font-semibold text-sidebar-foreground">
           推文存档站
         </h2>
       </header>
 
-      <div className='flex-1'>
-        <nav className='space-y-2'>
-          {navItems.map((item) => (
+      <div className="flex-1">
+        <nav className="space-y-2">
+          {navItems.map(item => (
             <Link
               key={item.label}
               to={item.href}
@@ -43,27 +43,27 @@ export function Sidebar({ currentUser }: SidebarProps) {
                   : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
               )}
             >
-              <item.icon className='size-5 flex-shrink-0' />
-              <span className='font-medium'>{item.label}</span>
+              <item.icon className="size-5 flex-shrink-0" />
+              <span className="font-medium">{item.label}</span>
             </Link>
           ))}
 
           <Button
-            variant='ghost'
+            variant="ghost"
             onClick={toggleDarkMode}
-            className='w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors duration-200'
+            className="w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors duration-200"
           >
-            <Sun className='size-5 flex-shrink-0 dark:hidden' />
-            <Moon className='size-5 flex-shrink-0 hidden dark:block' />
-            <span className='font-medium'>
-              <span className='dark:hidden'>夜间模式</span>
-              <span className='hidden dark:inline'>日间模式</span>
+            <Sun className="size-5 flex-shrink-0 dark:hidden" />
+            <Moon className="size-5 flex-shrink-0 hidden dark:block" />
+            <span className="font-medium">
+              <span className="dark:hidden">夜间模式</span>
+              <span className="hidden dark:inline">日间模式</span>
             </span>
           </Button>
         </nav>
       </div>
 
-      <footer className='border-t border-sidebar-border pt-4 flex flex-col gap-4'>
+      <footer className="border-t border-sidebar-border pt-4 flex flex-col gap-4">
         <UserSelector />
       </footer>
     </aside>

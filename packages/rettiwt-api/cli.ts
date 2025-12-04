@@ -18,12 +18,18 @@ const Program = createCommand('rettiwt')
 Program.option('-k, --key <string>', 'The API key to use for authentication')
   .option('-l, --log', 'Enable logging to console')
   .option('-p, --proxy <string>', 'The URL to the proxy to use')
-  .option('-t, --timeout <number>', 'The timout (in milli-seconds) to use for requests')
+  .option(
+    '-t, --timeout <number>',
+    'The timout (in milli-seconds) to use for requests',
+  )
   .option(
     '-r, --retries <number>',
     'The maximum number of retries to use, a value of 5 combined with a delay of 1000 is recommended',
   )
-  .option('-d, --delay <number>', 'The delay in milliseconds to use in-between successive requests')
+  .option(
+    '-d, --delay <number>',
+    'The delay in milliseconds to use in-between successive requests',
+  )
 
 // Parsing the program to get supplied options
 Program.parse()

@@ -1,5 +1,5 @@
-import { Hono } from 'hono'
 import type { AppType } from '../common'
+import { Hono } from 'hono'
 import { getData } from '../common'
 
 async function getInsData({

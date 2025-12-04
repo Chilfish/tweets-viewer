@@ -47,7 +47,7 @@ export interface Tweet {
   /**
    *  Tweet creation date.
    */
-  createdAt: Date | string
+  createdAt: Date
   /**
    *  Tweet text content.
    */

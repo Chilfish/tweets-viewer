@@ -1,8 +1,10 @@
 import type { Command } from 'commander'
 import type { Rettiwt } from '../Rettiwt'
-
 import { createCommand } from 'commander'
-import { RawAnalyticsGranularity, RawAnalyticsMetric } from '../enums/raw/Analytics'
+import {
+  RawAnalyticsGranularity,
+  RawAnalyticsMetric,
+} from '../enums/raw/Analytics'
 import { output } from '../helper/CliUtils'
 
 /**
@@ -13,17 +15,24 @@ import { output } from '../helper/CliUtils'
  */
 function createUserCommand(rettiwt: Rettiwt): Command {
   // Creating the 'user' command
-  const user = createCommand('user').description('Access resources related to users')
+  const user = createCommand('user').description(
+    'Access resources related to users',
+  )
 
   // Affiliates
-  user.command('affiliates')
+  user
+    .command('affiliates')
     .description('Fetch the list of users who affiliated to the given user')
     .argument('<id>', 'The id of the user')
     .argument('[count]', 'The number of affiliates to fetch')
     .argument('[cursor]', 'The cursor to the batch of affiliates to fetch')
     .action(async (id: string, count?: string, cursor?: string) => {
       try {
-        const users = await rettiwt.user.affiliates(id, count ? Number.parseInt(count) : undefined, cursor)
+        const users = await rettiwt.user.affiliates(
+          id,
+          count ? Number.parseInt(count) : undefined,
+          cursor,
+        )
         output(users)
       }
       catch (error) {
@@ -32,8 +41,11 @@ function createUserCommand(rettiwt: Rettiwt): Command {
     })
 
   // Analytics
-  user.command('analytics')
-    .description('Fetch the analytics of the logged-in user (premium accounts only)')
+  user
+    .command('analytics')
+    .description(
+      'Fetch the analytics of the logged-in user (premium accounts only)',
+    )
     .option('-f, --from-time <string>', 'The start time for fetching analytics')
     .option('-t, --to-time <string>', 'The end time for fetching analytics')
     .option(
@@ -54,12 +66,17 @@ function createUserCommand(rettiwt: Rettiwt): Command {
           options?.fromTime ? new Date(options.fromTime) : undefined,
           options?.toTime ? new Date(options.toTime) : undefined,
           options?.granularity
-            ? RawAnalyticsGranularity[options.granularity as keyof typeof RawAnalyticsGranularity]
+            ? RawAnalyticsGranularity[
+              options.granularity as keyof typeof RawAnalyticsGranularity
+            ]
             : undefined,
           options?.metrics
             ? options.metrics
                 .split(',')
-                .map(item => RawAnalyticsMetric[item as keyof typeof RawAnalyticsMetric])
+                .map(
+                  item =>
+                    RawAnalyticsMetric[item as keyof typeof RawAnalyticsMetric],
+                )
             : undefined,
           options?.verifiedFollowers,
         )
@@ -70,13 +87,17 @@ function createUserCommand(rettiwt: Rettiwt): Command {
       }
     })
 
-  user.command('bookmarks')
+  user
+    .command('bookmarks')
     .description('Fetch your list of bookmarks')
     .argument('[count]', 'The number of bookmarks to fetch')
     .argument('[cursor]', 'The cursor to the batch of bookmarks to fetch')
     .action(async (count?: string, cursor?: string) => {
       try {
-        const bookmarks = await rettiwt.user.bookmarks(count ? Number.parseInt(count) : undefined, cursor)
+        const bookmarks = await rettiwt.user.bookmarks(
+          count ? Number.parseInt(count) : undefined,
+          cursor,
+        )
         output(bookmarks)
       }
       catch (error) {
@@ -85,9 +106,13 @@ function createUserCommand(rettiwt: Rettiwt): Command {
     })
 
   // Details
-  user.command('details')
+  user
+    .command('details')
     .description('Fetch the details of the user with the given id/username')
-    .argument('<id>', 'The username/id of the user whose details are to be fetched')
+    .argument(
+      '<id>',
+      'The username/id of the user whose details are to be fetched',
+    )
     .action(async (id: string) => {
       try {
         // Getting the different IDs
@@ -110,7 +135,8 @@ function createUserCommand(rettiwt: Rettiwt): Command {
     })
 
   // Follow
-  user.command('follow')
+  user
+    .command('follow')
     .description('Follow a user')
     .argument('<id>', 'The user to follow')
     .action(async (id: string) => {
@@ -124,7 +150,8 @@ function createUserCommand(rettiwt: Rettiwt): Command {
     })
 
   // Followed
-  user.command('followed')
+  user
+    .command('followed')
     .description('Fetch your followed feed')
     .argument('[cursor]', 'The cursor to the batch of feed items to fetch')
     .action(async (cursor?: string) => {
@@ -138,14 +165,19 @@ function createUserCommand(rettiwt: Rettiwt): Command {
     })
 
   // Followers
-  user.command('followers')
+  user
+    .command('followers')
     .description('Fetch the list of users who follow the given user')
     .argument('<id>', 'The id of the user')
     .argument('[count]', 'The number of followers to fetch')
     .argument('[cursor]', 'The cursor to the batch of followers to fetch')
     .action(async (id: string, count?: string, cursor?: string) => {
       try {
-        const users = await rettiwt.user.followers(id, count ? Number.parseInt(count) : undefined, cursor)
+        const users = await rettiwt.user.followers(
+          id,
+          count ? Number.parseInt(count) : undefined,
+          cursor,
+        )
         output(users)
       }
       catch (error) {
@@ -154,14 +186,19 @@ function createUserCommand(rettiwt: Rettiwt): Command {
     })
 
   // Following
-  user.command('following')
+  user
+    .command('following')
     .description('Fetch the list of users who are followed by the given user')
     .argument('<id>', 'The id of the user')
     .argument('[count]', 'The number of following to fetch')
     .argument('[cursor]', 'The cursor to the batch of following to fetch')
     .action(async (id: string, count?: string, cursor?: string) => {
       try {
-        const users = await rettiwt.user.following(id, count ? Number.parseInt(count) : undefined, cursor)
+        const users = await rettiwt.user.following(
+          id,
+          count ? Number.parseInt(count) : undefined,
+          cursor,
+        )
         output(users)
       }
       catch (error) {
@@ -170,14 +207,19 @@ function createUserCommand(rettiwt: Rettiwt): Command {
     })
 
   // Highlights
-  user.command('highlights')
+  user
+    .command('highlights')
     .description('Fetch the list of highlighted tweets of the given user')
     .argument('<id>', 'The id of the user')
     .argument('[count]', 'The number of highlighted tweets to fetch')
     .argument('[cursor]', 'The cursor to the batch of highlights to fetch')
     .action(async (id: string, count?: string, cursor?: string) => {
       try {
-        const tweets = await rettiwt.user.highlights(id, count ? Number.parseInt(count) : undefined, cursor)
+        const tweets = await rettiwt.user.highlights(
+          id,
+          count ? Number.parseInt(count) : undefined,
+          cursor,
+        )
         output(tweets)
       }
       catch (error) {
@@ -186,13 +228,17 @@ function createUserCommand(rettiwt: Rettiwt): Command {
     })
 
   // Likes
-  user.command('likes')
+  user
+    .command('likes')
     .description('Fetch your list of liked tweet')
     .argument('[count]', 'The number of liked tweets to fetch')
     .argument('[cursor]', 'The cursor to the batch of liked tweets to fetch')
     .action(async (count?: string, cursor?: string) => {
       try {
-        const tweets = await rettiwt.user.likes(count ? Number.parseInt(count) : undefined, cursor)
+        const tweets = await rettiwt.user.likes(
+          count ? Number.parseInt(count) : undefined,
+          cursor,
+        )
         output(tweets)
       }
       catch (error) {
@@ -201,13 +247,17 @@ function createUserCommand(rettiwt: Rettiwt): Command {
     })
 
   // Lists
-  user.command('lists')
+  user
+    .command('lists')
     .description('Fetch your lists')
     .argument('[count]', 'The number of lists to fetch')
     .argument('[cursor]', 'The cursor to the batch of lists to fetch')
     .action(async (count?: string, cursor?: string) => {
       try {
-        const lists = await rettiwt.user.lists(count ? Number.parseInt(count) : undefined, cursor)
+        const lists = await rettiwt.user.lists(
+          count ? Number.parseInt(count) : undefined,
+          cursor,
+        )
         output(lists)
       }
       catch (error) {
@@ -216,14 +266,19 @@ function createUserCommand(rettiwt: Rettiwt): Command {
     })
 
   // Media
-  user.command('media')
+  user
+    .command('media')
     .description('Fetch the media timeline the given user')
     .argument('<id>', 'The id of the user')
     .argument('[count]', 'The number of media to fetch')
     .argument('[cursor]', 'The cursor to the batch of media to fetch')
     .action(async (id: string, count?: string, cursor?: string) => {
       try {
-        const media = await rettiwt.user.media(id, count ? Number.parseInt(count) : undefined, cursor)
+        const media = await rettiwt.user.media(
+          id,
+          count ? Number.parseInt(count) : undefined,
+          cursor,
+        )
         output(media)
       }
       catch (error) {
@@ -232,7 +287,8 @@ function createUserCommand(rettiwt: Rettiwt): Command {
     })
 
   // Recommended
-  user.command('recommended')
+  user
+    .command('recommended')
     .description('Fetch your recommended feed')
     .argument('[cursor]', 'The cursor to the batch of feed items to fetch')
     .action(async (cursor?: string) => {
@@ -246,14 +302,19 @@ function createUserCommand(rettiwt: Rettiwt): Command {
     })
 
   // Replies
-  user.command('replies')
+  user
+    .command('replies')
     .description('Fetch the replies timeline the given user')
     .argument('<id>', 'The id of the user')
     .argument('[count]', 'The number of replies to fetch')
     .argument('[cursor]', 'The cursor to the batch of replies to fetch')
     .action(async (id: string, count?: string, cursor?: string) => {
       try {
-        const replies = await rettiwt.user.replies(id, count ? Number.parseInt(count) : undefined, cursor)
+        const replies = await rettiwt.user.replies(
+          id,
+          count ? Number.parseInt(count) : undefined,
+          cursor,
+        )
         output(replies)
       }
       catch (error) {
@@ -262,14 +323,19 @@ function createUserCommand(rettiwt: Rettiwt): Command {
     })
 
   // Timeline
-  user.command('timeline')
+  user
+    .command('timeline')
     .description('Fetch the tweets timeline the given user')
     .argument('<id>', 'The id of the user')
     .argument('[count]', 'The number of tweets to fetch')
     .argument('[cursor]', 'The cursor to the batch of tweets to fetch')
     .action(async (id: string, count?: string, cursor?: string) => {
       try {
-        const tweets = await rettiwt.user.timeline(id, count ? Number.parseInt(count) : undefined, cursor)
+        const tweets = await rettiwt.user.timeline(
+          id,
+          count ? Number.parseInt(count) : undefined,
+          cursor,
+        )
         output(tweets)
       }
       catch (error) {
@@ -278,7 +344,8 @@ function createUserCommand(rettiwt: Rettiwt): Command {
     })
 
   // Unfollow
-  user.command('unfollow')
+  user
+    .command('unfollow')
     .description('Unfollow a user')
     .argument('<id>', 'The user to unfollow')
     .action(async (id: string) => {

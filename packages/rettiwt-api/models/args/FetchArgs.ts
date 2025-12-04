@@ -1,4 +1,7 @@
-import type { RawAnalyticsGranularity, RawAnalyticsMetric } from '../../enums/raw/Analytics'
+import type {
+  RawAnalyticsGranularity,
+  RawAnalyticsMetric,
+} from '../../enums/raw/Analytics'
 import type { TweetRepliesSortType } from '../../enums/Tweet'
 
 import type { IFetchArgs, ITweetFilter } from '../../types/args/FetchArgs'
@@ -142,18 +145,32 @@ export class TweetFilter implements ITweetFilter {
         this.includeWords ? this.includeWords.join(' ') : '',
         this.includePhrase ? `"${this.includePhrase}"` : '',
         this.optionalWords ? `(${this.optionalWords.join(' OR ')})` : '',
-        this.excludeWords ? `${this.excludeWords.map(word => `-${word}`).join(' ')}` : '',
-        this.hashtags ? `(${this.hashtags.map(hashtag => `#${hashtag}`).join(' OR ')})` : '',
-        this.fromUsers ? `(${this.fromUsers.map(user => `from:${user}`).join(' OR ')})` : '',
-        this.toUsers ? `(${this.toUsers.map(user => `to:${user}`).join(' OR ')})` : '',
+        this.excludeWords
+          ? `${this.excludeWords.map(word => `-${word}`).join(' ')}`
+          : '',
+        this.hashtags
+          ? `(${this.hashtags.map(hashtag => `#${hashtag}`).join(' OR ')})`
+          : '',
+        this.fromUsers
+          ? `(${this.fromUsers.map(user => `from:${user}`).join(' OR ')})`
+          : '',
+        this.toUsers
+          ? `(${this.toUsers.map(user => `to:${user}`).join(' OR ')})`
+          : '',
         this.list ? `list:${this.list}` : '',
-        this.mentions ? `(${this.mentions.map(mention => `@${mention}`).join(' OR ')})` : '',
+        this.mentions
+          ? `(${this.mentions.map(mention => `@${mention}`).join(' OR ')})`
+          : '',
         this.minReplies ? `min_replies:${this.minReplies}` : '',
         this.minLikes ? `min_faves:${this.minLikes}` : '',
         this.minRetweets ? `min_retweets:${this.minRetweets}` : '',
         this.language ? `lang:${this.language}` : '',
-        this.startDate ? `since:${TweetFilter._dateToTwitterString(this.startDate)}` : '',
-        this.endDate ? `until:${TweetFilter._dateToTwitterString(this.endDate)}` : '',
+        this.startDate
+          ? `since:${TweetFilter._dateToTwitterString(this.startDate)}`
+          : '',
+        this.endDate
+          ? `until:${TweetFilter._dateToTwitterString(this.endDate)}`
+          : '',
         this.sinceId ? `since_id:${this.sinceId}` : '',
         this.maxId ? `max_id:${this.maxId}` : '',
         this.quoted ? `quoted_tweet_id:${this.quoted}` : '',

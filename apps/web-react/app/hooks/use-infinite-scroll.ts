@@ -32,10 +32,12 @@ export function useInfiniteScroll({
   )
 
   useEffect(() => {
-    if (!isMounted) return
+    if (!isMounted)
+      return
 
     const element = loadingRef.current
-    if (!element) return
+    if (!element)
+      return
 
     if (observerRef.current) {
       observerRef.current.disconnect()

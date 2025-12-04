@@ -54,14 +54,20 @@ export class DirectMessageService extends FetcherService {
    * });
    * ```
    */
-  public async conversation(conversationId: string, cursor?: string): Promise<Conversation | undefined> {
+  public async conversation(
+    conversationId: string,
+    cursor?: string,
+  ): Promise<Conversation | undefined> {
     const resource = ResourceType.DM_CONVERSATION
 
     // Fetching raw conversation timeline
-    const response = await this.request<IConversationTimelineResponse>(resource, {
-      conversationId,
-      maxId: cursor,
-    })
+    const response = await this.request<IConversationTimelineResponse>(
+      resource,
+      {
+        conversationId,
+        maxId: cursor,
+      },
+    )
 
     // Deserializing response
     const data = Extractors[resource](response)

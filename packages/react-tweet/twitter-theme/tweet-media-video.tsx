@@ -1,10 +1,12 @@
-import type { EnrichedQuotedTweet, EnrichedTweet, MediaAnimatedGif, MediaVideo } from '../api-v2'
+import type {
+  EnrichedQuotedTweet,
+  EnrichedTweet,
+  MediaAnimatedGif,
+  MediaVideo,
+} from '../api-v2'
 import clsx from 'clsx'
 import { useState } from 'react'
-import {
-  getMediaUrl,
-  getMp4Video,
-} from '../utils'
+import { getMediaUrl, getMp4Video } from '../utils'
 import { MediaImg } from './media-img'
 import s from './tweet-media-video.module.css'
 import mediaStyles from './tweet-media.module.css'
@@ -46,11 +48,7 @@ export function TweetMediaVideo({ tweet, media, showCoverOnly }: Props) {
           })
       }}
     >
-      <svg
-        viewBox="0 0 24 24"
-        className={s.videoButtonIcon}
-        aria-hidden="true"
-      >
+      <svg viewBox="0 0 24 24" className={s.videoButtonIcon} aria-hidden="true">
         <g>
           <path d="M21 12L4 2v20l17-10z"></path>
         </g>

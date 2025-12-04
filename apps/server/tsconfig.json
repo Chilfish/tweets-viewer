@@ -1,5 +1,4 @@
 {
-  "references": [{ "path": "../../tsconfig.base.json" }],
   "compilerOptions": {
     "composite": true,
     "target": "ESNext",
@@ -20,5 +19,6 @@
     "isolatedModules": true,
     "skipLibCheck": true
   },
+  "references": [{ "path": "../../tsconfig.base.json" }],
   "include": ["**/*.ts"]
 }

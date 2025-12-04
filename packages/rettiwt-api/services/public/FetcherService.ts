@@ -1,14 +1,17 @@
 import type { ResourceType } from '../../enums/Resource'
 import type { RettiwtConfig } from '../../models/RettiwtConfig'
 import type { IFetchArgs } from '../../types/args/FetchArgs'
-
 import type { IPostArgs } from '../../types/args/PostArgs'
 import type { ITransactionHeader } from '../../types/auth/TransactionHeader'
 import type { IErrorHandler } from '../../types/ErrorHandler'
 import axios, { isAxiosError } from 'axios'
 import { Cookie } from 'cookiejar'
 import { ClientTransaction, handleXMigration } from 'x-client-transaction-id'
-import { AllowGuestAuthenticationGroup, FetchResourcesGroup, PostResourcesGroup } from '../../collections/Groups'
+import {
+  AllowGuestAuthenticationGroup,
+  FetchResourcesGroup,
+  PostResourcesGroup,
+} from '../../collections/Groups'
 import { Requests } from '../../collections/Requests'
 import { ApiErrors } from '../../enums/Api'
 import { LogActions } from '../../enums/Logging'
@@ -62,10 +65,15 @@ export class FetcherService {
    */
   private _checkAuthorization(resource: ResourceType): void {
     // Logging
-    LogService.log(LogActions.AUTHORIZATION, { authenticated: this.config.userId !== undefined })
+    LogService.log(LogActions.AUTHORIZATION, {
+      authenticated: this.config.userId !== undefined,
+    })
 
     // Checking authorization status
-    if (!AllowGuestAuthenticationGroup.includes(resource) && this.config.userId === undefined) {
+    if (
+      !AllowGuestAuthenticationGroup.includes(resource)
+      && this.config.userId === undefined
+    ) {
       throw new Error(ApiErrors.RESOURCE_NOT_ALLOWED)
     }
   }
@@ -102,7 +110,10 @@ export class FetcherService {
    *
    * @returns The header containing the transaction ID.
    */
-  private async _getTransactionHeader(method: string, url: string): Promise<ITransactionHeader> {
+  private async _getTransactionHeader(
+    method: string,
+    url: string,
+  ): Promise<ITransactionHeader> {
     // Get the X homepage HTML document (using utility function)
     const document = await handleXMigration()
 
@@ -113,7 +124,10 @@ export class FetcherService {
     const path = new URL(url).pathname.split('?')[0]!.trim()
 
     // Generating the transaction ID
-    const tid = await transaction.generateTransactionId(method.toUpperCase(), path)
+    const tid = await transaction.generateTransactionId(
+      method.toUpperCase(),
+      path,
+    )
 
     return {
       'x-client-transaction-id': tid,
@@ -128,7 +142,10 @@ export class FetcherService {
    *
    * @returns The validated args.
    */
-  private _validateArgs(resource: ResourceType, args: IFetchArgs | IPostArgs): FetchArgs | PostArgs | undefined {
+  private _validateArgs(
+    resource: ResourceType,
+    args: IFetchArgs | IPostArgs,
+  ): FetchArgs | PostArgs | undefined {
     if (FetchResourcesGroup.includes(resource)) {
       // Logging
       LogService.log(LogActions.VALIDATE, { target: 'FETCH_ARGS' })
@@ -196,7 +213,10 @@ export class FetcherService {
    * });
    * ```
    */
-  public async request<T = unknown>(resource: ResourceType, args: IFetchArgs | IPostArgs): Promise<T> {
+  public async request<T = unknown>(
+    resource: ResourceType,
+    args: IFetchArgs | IPostArgs,
+  ): Promise<T> {
     /** The current retry number. */
     let retry = 0
 
@@ -235,7 +255,10 @@ export class FetcherService {
         // Getting and appending transaction information
         config.headers = {
           ...config.headers,
-          ...(await this._getTransactionHeader(config.method ?? '', config.url ?? '')),
+          ...(await this._getTransactionHeader(
+            config.method ?? '',
+            config.url ?? '',
+          )),
         }
 
         // Introducing a delay
@@ -248,7 +271,6 @@ export class FetcherService {
         // If it's an error 404, retry
         if (isAxiosError(err) && err.status === 404) {
           error = err
-          continue
         }
         // Else, delegate error handling
         else {

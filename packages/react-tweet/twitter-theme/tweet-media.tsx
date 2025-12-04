@@ -1,4 +1,8 @@
-import type { EnrichedQuotedTweet, EnrichedTweet, MediaDetails } from '../api-v2'
+import type {
+  EnrichedQuotedTweet,
+  EnrichedTweet,
+  MediaDetails,
+} from '../api-v2'
 import type { TwitterComponents } from './types'
 import clsx from 'clsx'
 import { Fragment } from 'react'
@@ -33,7 +37,12 @@ interface Props {
   showCoverOnly?: boolean
 }
 
-export function TweetMedia({ tweet, components, quoted, showCoverOnly }: Props) {
+export function TweetMedia({
+  tweet,
+  components,
+  quoted,
+  showCoverOnly,
+}: Props) {
   const length = tweet.mediaDetails?.length ?? 0
   const Img = components?.MediaImg ?? MediaImg
 
@@ -49,43 +58,38 @@ export function TweetMedia({ tweet, components, quoted, showCoverOnly }: Props) 
       >
         {tweet.mediaDetails?.map(media => (
           <Fragment key={media.media_url_https}>
-            {media.type === 'photo'
-              ? (
-                  <a
-                    key={media.media_url_https}
-                    href={tweet.url}
-                    className={clsx(s.mediaContainer, s.mediaLink)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <div
-                      className={s.skeleton}
-                      style={getSkeletonStyle(media, length)}
-                    />
-                    <Img
-                      src={getMediaUrl(media, 'medium')}
-                      alt={media.ext_alt_text || 'Image'}
-                      className={s.image}
-                      draggable
-                    />
-                  </a>
-                )
-              : (
-                  <div
-                    key={media.media_url_https}
-                    className={s.mediaContainer}
-                  >
-                    <div
-                      className={s.skeleton}
-                      style={getSkeletonStyle(media, length)}
-                    />
-                    <TweetMediaVideo
-                      tweet={tweet}
-                      media={media}
-                      showCoverOnly={showCoverOnly}
-                    />
-                  </div>
-                )}
+            {media.type === 'photo' ? (
+              <a
+                key={media.media_url_https}
+                href={tweet.url}
+                className={clsx(s.mediaContainer, s.mediaLink)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <div
+                  className={s.skeleton}
+                  style={getSkeletonStyle(media, length)}
+                />
+                <Img
+                  src={getMediaUrl(media, 'medium')}
+                  alt={media.ext_alt_text || 'Image'}
+                  className={s.image}
+                  draggable
+                />
+              </a>
+            ) : (
+              <div key={media.media_url_https} className={s.mediaContainer}>
+                <div
+                  className={s.skeleton}
+                  style={getSkeletonStyle(media, length)}
+                />
+                <TweetMediaVideo
+                  tweet={tweet}
+                  media={media}
+                  showCoverOnly={showCoverOnly}
+                />
+              </div>
+            )}
           </Fragment>
         ))}
       </div>

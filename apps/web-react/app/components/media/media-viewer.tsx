@@ -1,15 +1,16 @@
+import type { TweetMedia } from '@tweets-viewer/shared'
 /** biome-ignore-all lint/a11y/useButtonType: <explanation> */
 import type { ReactNode } from 'react'
-import Lightbox, { type Slide } from 'yet-another-react-lightbox'
-import Counter from 'yet-another-react-lightbox/plugins/counter'
-import Video from 'yet-another-react-lightbox/plugins/video'
-
-import 'yet-another-react-lightbox/styles.css'
-import 'yet-another-react-lightbox/plugins/counter.css'
+import type { Slide } from 'yet-another-react-lightbox'
+import type { MediaItem } from '~/stores/media-store'
 
 import { X } from 'lucide-react'
-import type { MediaItem } from '~/stores/media-store'
-import type { TweetMedia } from '@tweets-viewer/shared'
+import Lightbox from 'yet-another-react-lightbox'
+import Counter from 'yet-another-react-lightbox/plugins/counter'
+
+import Video from 'yet-another-react-lightbox/plugins/video'
+import 'yet-another-react-lightbox/styles.css'
+import 'yet-another-react-lightbox/plugins/counter.css'
 
 interface MediaViewerProps {
   isOpen: boolean
@@ -72,10 +73,10 @@ export function MediaViewer({
       }}
       toolbar={{
         buttons: [
-          <div className='flex gap-4 items-center text-gray-100 hover:text-gray-50 absolute right-6 top-5'>
+          <div className="flex gap-4 items-center text-gray-100 hover:text-gray-50 absolute right-6 top-5">
             {additionalToolbarContent}
             <button onClick={onClose}>
-              <X className='size-8' />
+              <X className="size-8" />
             </button>
           </div>,
         ],

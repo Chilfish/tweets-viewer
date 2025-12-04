@@ -15,7 +15,6 @@ export class ListRequests {
       method: 'post',
       url: 'https://x.com/i/api/graphql/uFQumgzNDR27zs0yK5J3Fw/ListAddMember',
       data: {
-
         variables: {
           listId,
           userId,
@@ -28,7 +27,6 @@ export class ListRequests {
           responsive_web_graphql_skip_user_profile_image_extensions_enabled: false,
           responsive_web_graphql_timeline_navigation_enabled: false,
         },
-
       },
     }
   }
@@ -59,7 +57,11 @@ export class ListRequests {
    * @param count - The number of members to fetch. Must be \<= 100.
    * @param cursor - The cursor to the batch of members to fetch.
    */
-  public static members(id: string, count?: number, cursor?: string): AxiosRequestConfig {
+  public static members(
+    id: string,
+    count?: number,
+    cursor?: string,
+  ): AxiosRequestConfig {
     return {
       method: 'get',
       url: 'https://x.com/i/api/graphql/T7VZsrWpCoi4jWxFdwyNcg/ListMembers',
@@ -110,12 +112,14 @@ export class ListRequests {
    * @param listId - The ID of the target list.
    * @param userId - The ID of the user to remove as a member.
    */
-  public static removeMember(listId: string, userId: string): AxiosRequestConfig {
+  public static removeMember(
+    listId: string,
+    userId: string,
+  ): AxiosRequestConfig {
     return {
       method: 'post',
       url: 'https://x.com/i/api/graphql/IzgPnK3wZpNgpcN31ry3Xg/ListRemoveMember',
       data: {
-
         variables: {
           listId,
           userId,
@@ -128,7 +132,6 @@ export class ListRequests {
           responsive_web_graphql_skip_user_profile_image_extensions_enabled: false,
           responsive_web_graphql_timeline_navigation_enabled: false,
         },
-
       },
     }
   }
@@ -138,7 +141,11 @@ export class ListRequests {
    * @param count - The number of tweets to fetch. Must be \<= 100.
    * @param cursor - The cursor to the batch of tweets to fetch.
    */
-  public static tweets(id: string, count?: number, cursor?: string): AxiosRequestConfig {
+  public static tweets(
+    id: string,
+    count?: number,
+    cursor?: string,
+  ): AxiosRequestConfig {
     return {
       method: 'get',
       url: 'https://x.com/i/api/graphql/BkauSnPUDQTeeJsxq17opA/ListLatestTweetsTimeline',

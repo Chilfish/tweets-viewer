@@ -51,7 +51,10 @@ const DATE_KEYS = [
   'end_date',
 ]
 
-export function convertDate(obj: Record<string, any>, keys: string[] = DATE_KEYS) {
+export function convertDate(
+  obj: Record<string, any>,
+  keys: string[] = DATE_KEYS,
+) {
   for (const [key, value] of Object.entries(obj)) {
     if (value === null) {
       continue

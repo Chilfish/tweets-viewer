@@ -1,11 +1,11 @@
+import type { Route } from './+types/tweets'
+import type { SortOrder } from '~/stores'
 import { useEffect, useRef } from 'react'
-import { Link, useSearchParams } from 'react-router'
+import { useSearchParams } from 'react-router'
 import { TweetsList } from '~/components/tweets/tweets-list'
 import { UserHeader } from '~/components/user-header'
-import type { SortOrder } from '~/stores'
 import { useTweetsStore } from '~/stores/tweets-store'
 import { useUserStore } from '~/stores/user-store'
-import type { Route } from './+types/tweets'
 
 export function meta({ params }: Route.MetaArgs) {
   const { name } = params
@@ -39,7 +39,8 @@ export default function TweetsPage({ params }: Route.ComponentProps) {
 
   useEffect(() => {
     const targetUserName = params.name
-    if (!curUser || !targetUserName) return
+    if (!curUser || !targetUserName)
+      return
 
     // Use params.name as the source of truth to detect user change
     const userChanged = storeUser?.screenName !== targetUserName
@@ -50,7 +51,7 @@ export default function TweetsPage({ params }: Route.ComponentProps) {
     }
 
     if (!isInitialized.current && curUser.screenName === targetUserName) {
-      const pageParam = parseInt(searchParams.get('page') || '1', 10) - 1
+      const pageParam = Number.parseInt(searchParams.get('page') || '1', 10) - 1
       const sortParam = (searchParams.get('sort') as SortOrder) || 'desc'
       const startDateParam = searchParams.get('startDate')
       const endDateParam = searchParams.get('endDate')
@@ -79,7 +80,8 @@ export default function TweetsPage({ params }: Route.ComponentProps) {
   ])
 
   useEffect(() => {
-    if (!isInitialized.current) return
+    if (!isInitialized.current)
+      return
 
     const params = new URLSearchParams()
     if (page > 0) {
@@ -106,18 +108,18 @@ export default function TweetsPage({ params }: Route.ComponentProps) {
 
   if (userLoading || !curUser) {
     return (
-      <div className='flex min-h-svh items-center justify-center'>
-        <div className='text-muted-foreground'>Loading...</div>
+      <div className="flex min-h-svh items-center justify-center">
+        <div className="text-muted-foreground">Loading...</div>
       </div>
     )
   }
 
-  const isDataStale =
-    storeUser && curUser && storeUser.screenName !== curUser.screenName
+  const isDataStale
+    = storeUser && curUser && storeUser.screenName !== curUser.screenName
 
   return (
-    <div className='min-h-svh bg-background transition-colors duration-200'>
-      <div className='max-w-2xl mx-auto'>
+    <div className="min-h-svh bg-background transition-colors duration-200">
+      <div className="max-w-2xl mx-auto">
         <UserHeader user={curUser} />
 
         <TweetsList

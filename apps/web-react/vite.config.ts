@@ -1,6 +1,6 @@
+import { execSync } from 'node:child_process'
 import { reactRouter } from '@react-router/dev/vite'
 import tailwindcss from '@tailwindcss/vite'
-import { execSync } from 'child_process'
 import { defineConfig } from 'vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
 
@@ -17,7 +17,8 @@ function getGitInfo() {
       hash: commitHash,
       date: commitDate,
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.warn('Failed to get git info:', error)
     return {
       hash: 'unknown',
@@ -35,12 +36,12 @@ export default defineConfig({
       '/static': {
         target: 'http://localhost:8080',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/static/, ''),
+        rewrite: path => path.replace(/^\/static/, ''),
       },
       '/api': {
         target: 'http://localhost:8787/v2',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        rewrite: path => path.replace(/^\/api/, ''),
       },
     },
   },

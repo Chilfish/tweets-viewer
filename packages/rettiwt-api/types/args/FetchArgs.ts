@@ -1,4 +1,7 @@
-import type { RawAnalyticsGranularity, RawAnalyticsMetric } from '../../enums/raw/Analytics'
+import type {
+  RawAnalyticsGranularity,
+  RawAnalyticsMetric,
+} from '../../enums/raw/Analytics'
 import type { TweetRepliesSortType } from '../../enums/Tweet'
 
 /**

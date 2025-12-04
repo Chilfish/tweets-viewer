@@ -1,10 +1,3 @@
-import { create } from 'zustand'
-import { searchTweets } from '~/lib/tweets-api'
-import {
-  createInitialPaginatedState,
-  createLoadDataAction,
-  type PaginatedStore,
-} from '~/lib/use-paginated-data'
 import type { Tweet } from '@tweets-viewer/shared'
 import type {
   DateRange,
@@ -12,6 +5,14 @@ import type {
   SortFilterActions,
   SortOrder,
 } from './index'
+import type { PaginatedStore } from '~/lib/use-paginated-data'
+import { create } from 'zustand'
+import { searchTweets } from '~/lib/tweets-api'
+import {
+  createInitialPaginatedState,
+  createLoadDataAction,
+
+} from '~/lib/use-paginated-data'
 
 interface SearchState extends PaginatedStore<Tweet> {
   keyword: string
@@ -44,12 +45,7 @@ const initialState: Omit<SearchState, keyof PaginatedStore<Tweet>> = {
 }
 
 // 创建搜索数据加载函数
-const loadSearchData = async (
-  page: number,
-  screenName: string,
-  keyword: string,
-  filters: { dateRange: DateRange; sortOrder: SortOrder },
-): Promise<Tweet[]> => {
+async function loadSearchData(page: number, screenName: string, keyword: string, filters: { dateRange: DateRange, sortOrder: SortOrder }): Promise<Tweet[]> {
   const start = filters.dateRange.startDate?.getTime()
   const end = filters.dateRange.endDate?.getTime()
   const reverse = filters.sortOrder === 'desc'
@@ -73,7 +69,7 @@ export const useSearchStore = create<SearchStore>((set, get) => ({
 
   setDateRange: async (range) => {
     const state = get()
-    set((prevState) => ({
+    set(prevState => ({
       filters: { ...prevState.filters, dateRange: range },
     }))
 
@@ -85,7 +81,7 @@ export const useSearchStore = create<SearchStore>((set, get) => ({
 
   setSortOrder: async (order) => {
     const state = get()
-    set((prevState) => ({
+    set(prevState => ({
       filters: { ...prevState.filters, sortOrder: order },
     }))
 
@@ -120,7 +116,8 @@ export const useSearchStore = create<SearchStore>((set, get) => ({
 
   loadMoreResults: async () => {
     const state = get()
-    if (!state.hasMore || state.isLoading) return
+    if (!state.hasMore || state.isLoading)
+      return
     await state.searchTweets(false)
   },
 
@@ -147,14 +144,14 @@ export const useSearchStore = create<SearchStore>((set, get) => ({
   },
 
   // 通用分页操作
-  setData: (data) => set({ data }),
-  appendData: (newData) =>
-    set((state) => ({ data: [...state.data, ...newData] })),
-  setLoading: (loading) => set({ isLoading: loading }),
-  setError: (error) => set({ error, isLoading: false }),
-  setHasMore: (hasMore) => set({ hasMore }),
-  nextPage: () => set((state) => ({ page: state.page + 1 })),
-  setPage: (page) => set({ page }),
+  setData: data => set({ data }),
+  appendData: newData =>
+    set(state => ({ data: [...state.data, ...newData] })),
+  setLoading: loading => set({ isLoading: loading }),
+  setError: error => set({ error, isLoading: false }),
+  setHasMore: hasMore => set({ hasMore }),
+  nextPage: () => set(state => ({ page: state.page + 1 })),
+  setPage: page => set({ page }),
   reset: () =>
     set({ ...createInitialPaginatedState<Tweet>(), ...initialState }),
 }))

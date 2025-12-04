@@ -50,7 +50,8 @@ export class Inbox implements IInbox {
       this.cursor = inboxState.cursor ?? ''
       this.lastSeenEventId = inboxState.last_seen_event_id ?? ''
       this.trustedLastSeenEventId = inboxState.trusted_last_seen_event_id ?? ''
-      this.untrustedLastSeenEventId = inboxState.untrusted_last_seen_event_id ?? ''
+      this.untrustedLastSeenEventId =
+        inboxState.untrusted_last_seen_event_id ?? ''
 
       // Parse conversations from inbox initial state
       this.conversations = Conversation.listFromInboxInitial(response)
@@ -66,8 +67,7 @@ export class Inbox implements IInbox {
 
       // Parse conversations from inbox timeline
       this.conversations = Conversation.listFromInboxTimeline(response)
-    }
-    else {
+    } else {
       // Fallback defaults (this should never happen with proper typing)
       this.cursor = ''
       this.lastSeenEventId = ''
@@ -86,7 +86,9 @@ export class Inbox implements IInbox {
    * Get the raw inbox initial state if this inbox was created from one
    */
   public getInitialState(): IInboxInitialResponse | undefined {
-    return this.isInitialState() ? (this._raw as IInboxInitialResponse) : undefined
+    return this.isInitialState()
+      ? (this._raw as IInboxInitialResponse)
+      : undefined
   }
 
   /**
@@ -115,7 +117,7 @@ export class Inbox implements IInbox {
    */
   public toJSON(): IInbox {
     return {
-      conversations: this.conversations.map(conv => conv.toJSON()),
+      conversations: this.conversations.map((conv) => conv.toJSON()),
       cursor: this.cursor,
       lastSeenEventId: this.lastSeenEventId,
       trustedLastSeenEventId: this.trustedLastSeenEventId,

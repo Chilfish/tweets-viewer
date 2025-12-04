@@ -2,11 +2,11 @@
 /** biome-ignore-all lint/a11y/useMediaCaption: <explanation> */
 /** biome-ignore-all lint/a11y/useKeyWithClickEvents: <explanation> */
 import type { TweetMedia } from '@tweets-viewer/shared'
+import type { MediaItem } from '~/stores/media-store'
 import { Play } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useIntersectionObserver } from '~/hooks/use-intersection-observer'
 import { cn } from '~/lib/utils'
-import type { MediaItem } from '~/stores/media-store'
 
 interface MediaItemProps {
   item: MediaItem | TweetMedia
@@ -71,7 +71,7 @@ export function MediaItemComponent({
       onClick={handleClick}
     >
       {!isLoaded && (
-        <div className='absolute inset-0 bg-muted animate-pulse rounded' />
+        <div className="absolute inset-0 bg-muted animate-pulse rounded" />
       )}
 
       {shouldLoad && !isError && (
@@ -90,16 +90,16 @@ export function MediaItemComponent({
                 muted
                 autoPlay={false}
               />
-              <div className='absolute inset-0 bg-black/20 flex items-center justify-center opacity-70 group-hover:opacity-100 transition-opacity duration-200 z-10'>
-                <div className='bg-black/60 rounded-full p-3'>
-                  <Play className='size-6 text-white fill-white' />
+              <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-70 group-hover:opacity-100 transition-opacity duration-200 z-10">
+                <div className="bg-black/60 rounded-full p-3">
+                  <Play className="size-6 text-white fill-white" />
                 </div>
               </div>
             </>
           ) : (
             <img
               src={item.url}
-              alt=''
+              alt=""
               className={cn(
                 'w-full h-full object-cover transition-opacity duration-300',
                 isLoaded ? 'opacity-100' : 'opacity-0',

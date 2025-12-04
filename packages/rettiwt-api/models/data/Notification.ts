@@ -1,9 +1,9 @@
-import type { INotification } from '../../types/data/Notification'
-import type { INotification as IRawNotification } from '../../types/raw/base/Notification'
-import type { IUserNotificationsResponse } from '../../types/raw/user/Notifications'
 import { NotificationType } from '../../enums/Notification'
 import { RawNotificationType } from '../../enums/raw/Notification'
 import { findKeyByValue } from '../../helper/JsonUtils'
+import type { INotification } from '../../types/data/Notification'
+import type { INotification as IRawNotification } from '../../types/raw/base/Notification'
+import type { IUserNotificationsResponse } from '../../types/raw/user/Notifications'
 
 /**
  * The details of a single notification.
@@ -28,16 +28,23 @@ export class Notification implements INotification {
     this._raw = { ...notification }
 
     // Getting the original notification type
-    const notificationType: string | undefined = findKeyByValue(RawNotificationType, notification.icon.id)
+    const notificationType: string | undefined = findKeyByValue(
+      RawNotificationType,
+      notification.icon.id,
+    )
 
     this.from = notification.template?.aggregateUserActionsV1?.fromUsers
-      ? notification.template.aggregateUserActionsV1.fromUsers.map(item => item.user.id)
+      ? notification.template.aggregateUserActionsV1.fromUsers.map(
+          (item) => item.user.id,
+        )
       : []
     this.id = notification.id
     this.message = notification.message.text
     this.receivedAt = new Date(Number(notification.timestampMs)).toISOString()
     this.target = notification.template?.aggregateUserActionsV1?.targetObjects
-      ? notification.template.aggregateUserActionsV1.targetObjects.map(item => item.tweet.id)
+      ? notification.template.aggregateUserActionsV1.targetObjects.map(
+          (item) => item.tweet.id,
+        )
       : []
     this.type = notificationType
       ? NotificationType[notificationType as keyof typeof NotificationType]

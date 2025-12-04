@@ -1,7 +1,7 @@
+import type { Tweet, TweetMedia, UserInfo } from '@tweets-viewer/shared'
+import type { MediaItem } from '~/stores/media-store'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { MediaItem } from '~/stores/media-store'
-import type { Tweet, TweetMedia, UserInfo } from '@tweets-viewer/shared'
 
 // 推文媒体模态框状态 (用于 media-grid)
 interface TweetMediaModalState {
@@ -76,12 +76,12 @@ const initialState: AppState = {
 
 export const useAppStore = create<AppStore>()(
   persist(
-    (set) => ({
+    set => ({
       ...initialState,
 
       // 通用应用状态管理
       toggleDarkMode: () => {
-        set((state) => ({ isDarkMode: !state.isDarkMode }))
+        set(state => ({ isDarkMode: !state.isDarkMode }))
       },
 
       setDarkMode: (isDark) => {
@@ -93,7 +93,7 @@ export const useAppStore = create<AppStore>()(
       },
 
       toggleSidebar: () => {
-        set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed }))
+        set(state => ({ sidebarCollapsed: !state.sidebarCollapsed }))
       },
 
       setSidebarCollapsed: (collapsed) => {
@@ -114,7 +114,7 @@ export const useAppStore = create<AppStore>()(
       },
 
       closeTweetMediaModal: () => {
-        set((state) => ({
+        set(state => ({
           tweetMediaModal: {
             ...state.tweetMediaModal,
             isOpen: false,
@@ -123,7 +123,7 @@ export const useAppStore = create<AppStore>()(
       },
 
       setTweetMediaIndex: (index) => {
-        set((state) => ({
+        set(state => ({
           tweetMediaModal: {
             ...state.tweetMediaModal,
             currentMediaIndex: index,
@@ -143,7 +143,7 @@ export const useAppStore = create<AppStore>()(
       },
 
       closeMediaPreviewModal: () => {
-        set((state) => ({
+        set(state => ({
           mediaPreviewModal: {
             ...state.mediaPreviewModal,
             isOpen: false,
@@ -152,7 +152,7 @@ export const useAppStore = create<AppStore>()(
       },
 
       setMediaPreviewIndex: (index) => {
-        set((state) => ({
+        set(state => ({
           mediaPreviewModal: {
             ...state.mediaPreviewModal,
             currentMediaIndex: index,
@@ -162,7 +162,7 @@ export const useAppStore = create<AppStore>()(
     }),
     {
       name: 'app-settings',
-      partialize: (state) => ({
+      partialize: state => ({
         isDarkMode: state.isDarkMode,
         sidebarCollapsed: state.sidebarCollapsed,
       }),

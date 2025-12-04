@@ -1,10 +1,3 @@
-import { create } from 'zustand'
-import { getLastYearsTodayTweets } from '~/lib/tweets-api'
-import {
-  createInitialPaginatedState,
-  createLoadDataAction,
-  type PaginatedStore,
-} from '~/lib/use-paginated-data'
 import type { Tweet } from '@tweets-viewer/shared'
 import type {
   DateRange,
@@ -12,6 +5,14 @@ import type {
   SortFilterActions,
   SortOrder,
 } from './index'
+import type { PaginatedStore } from '~/lib/use-paginated-data'
+import { create } from 'zustand'
+import { getLastYearsTodayTweets } from '~/lib/tweets-api'
+import {
+  createInitialPaginatedState,
+  createLoadDataAction,
+
+} from '~/lib/use-paginated-data'
 
 interface MemoryState extends PaginatedStore<Tweet> {
   currentUser: string | null
@@ -37,11 +38,7 @@ const initialState: Omit<MemoryState, keyof PaginatedStore<Tweet>> = {
 }
 
 // 创建那年今日数据加载函数
-const loadMemoryData = async (
-  page: number,
-  screenName: string,
-  sortOrder: SortOrder,
-): Promise<Tweet[]> => {
+async function loadMemoryData(page: number, screenName: string, sortOrder: SortOrder): Promise<Tweet[]> {
   const reverse = sortOrder === 'desc'
   // 注意：那年今日通常是一次性加载所有数据，不需要分页
   // 但这里保持接口一致性，如果API支持分页的话
@@ -66,7 +63,7 @@ export const useMemoryStore = create<MemoryStore>((set, get) => ({
       return
     }
 
-    const loadData = createLoadDataAction((page) =>
+    const loadData = createLoadDataAction(page =>
       loadMemoryData(page, screenName, state.filters.sortOrder),
     )
 
@@ -82,7 +79,7 @@ export const useMemoryStore = create<MemoryStore>((set, get) => ({
 
   setSortOrder: async (order) => {
     const state = get()
-    set((prevState) => ({
+    set(prevState => ({
       filters: { ...prevState.filters, sortOrder: order },
     }))
 
@@ -94,7 +91,7 @@ export const useMemoryStore = create<MemoryStore>((set, get) => ({
 
   setDateRange: async (range) => {
     const state = get()
-    set((prevState) => ({
+    set(prevState => ({
       filters: { ...prevState.filters, dateRange: range },
     }))
 
@@ -102,13 +99,13 @@ export const useMemoryStore = create<MemoryStore>((set, get) => ({
   },
 
   // 通用分页操作
-  setData: (data) => set({ data }),
-  appendData: (newData) =>
-    set((state) => ({ data: [...state.data, ...newData] })),
-  setLoading: (loading) => set({ isLoading: loading }),
-  setError: (error) => set({ error, isLoading: false }),
-  setHasMore: (hasMore) => set({ hasMore }),
-  nextPage: () => set((state) => ({ page: state.page + 1 })),
+  setData: data => set({ data }),
+  appendData: newData =>
+    set(state => ({ data: [...state.data, ...newData] })),
+  setLoading: loading => set({ isLoading: loading }),
+  setError: error => set({ error, isLoading: false }),
+  setHasMore: hasMore => set({ hasMore }),
+  nextPage: () => set(state => ({ page: state.page + 1 })),
   reset: () =>
     set({ ...createInitialPaginatedState<Tweet>(), ...initialState }),
 }))

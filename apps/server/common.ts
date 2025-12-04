@@ -1,9 +1,9 @@
 import type { DB, SelectUser } from '@tweets-viewer/database'
 import type { Tweet } from '@tweets-viewer/shared'
 
-export const staticUrl =
+export const staticUrl
   // = 'http://127.0.0.1:8080'
-  'https://p.chilfish.top'
+  = 'https://p.chilfish.top'
 
 export interface AppType {
   Variables: {
@@ -25,9 +25,9 @@ export async function getData(name: string) {
   }
 
   const rawData = await fetch(`https://p.chilfish.top/tweet/ins/${name}.json`)
-    .then((res) => res.json())
+    .then(res => res.json())
     .catch((error) => {
-      console.error('getInsData error ' + name, error.message)
+      console.error(`getInsData error ${name}`, error.message)
       return null
     })
   if (!rawData) {
@@ -45,5 +45,5 @@ export async function getData(name: string) {
 }
 
 export async function setAllUsersInsData(users: SelectUser[]) {
-  await Promise.all(users.map((user) => getData(user.screenName)))
+  await Promise.all(users.map(user => getData(user.screenName)))
 }

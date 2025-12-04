@@ -1,5 +1,6 @@
+import type { ReactNode } from 'react'
 import { AlertCircle, Loader2 } from 'lucide-react'
-import { type ReactNode, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert'
 import { Button } from '~/components/ui/button'
 import { useInfiniteScroll } from '~/hooks/use-infinite-scroll'
@@ -25,7 +26,7 @@ export interface WaterfallProps<T extends WaterfallItem> {
   // 数据列表
   list: T[]
   // 列数配置，可以是固定数字或响应式配置
-  cols?: number | { mobile: number; desktop: number }
+  cols?: number | { mobile: number, desktop: number }
   // 总宽度，默认为100%
   width?: string | number
   // 列间距，默认为4px (gap-1)
@@ -60,10 +61,11 @@ export interface WaterfallProps<T extends WaterfallItem> {
 
 // 响应式列数 Hook
 function useResponsiveColumns(
-  cols: number | { mobile: number; desktop: number },
+  cols: number | { mobile: number, desktop: number },
 ) {
   const [columnCount, setColumnCount] = useState(() => {
-    if (typeof cols === 'number') return cols
+    if (typeof cols === 'number')
+      return cols
     return typeof window !== 'undefined' && window.innerWidth >= 640
       ? cols.desktop
       : cols.mobile
@@ -119,8 +121,8 @@ function useMasonryLayout<T extends WaterfallItem>(
     // 为每个项目预先计算高度并分配到最短的列
     items.forEach((item, index) => {
       // 计算基于宽高比的预期高度
-      const aspectRatio =
-        item.width > 0 && item.height > 0 ? item.height / item.width : 1
+      const aspectRatio
+        = item.width > 0 && item.height > 0 ? item.height / item.width : 1
       const calculatedHeight = Math.max(120, aspectRatio * columnWidth) // 最小高度120px
 
       let targetColumnIndex: number
@@ -128,11 +130,12 @@ function useMasonryLayout<T extends WaterfallItem>(
       // 前几个项目按顺序分配，确保初始分布均匀
       if (index < columnCount) {
         targetColumnIndex = index
-      } else {
+      }
+      else {
         // 选择当前最短的列
         const minHeight = Math.min(...columnHeights)
         targetColumnIndex = columnHeights.findIndex(
-          (height) => height === minHeight,
+          height => height === minHeight,
         )
       }
 
@@ -178,9 +181,9 @@ export function Waterfall<T extends WaterfallItem>({
   }
 
   const handleItemClick = (item: T, columnIndex: number, itemIndex: number) => {
-    const globalIndex =
-      columns.slice(0, columnIndex).reduce((acc, col) => acc + col.length, 0) +
-      itemIndex
+    const globalIndex
+      = columns.slice(0, columnIndex).reduce((acc, col) => acc + col.length, 0)
+        + itemIndex
     onItemClick?.(item, globalIndex)
   }
 
@@ -193,7 +196,7 @@ export function Waterfall<T extends WaterfallItem>({
 
   // 骨架屏渲染
   const renderSkeleton = () => (
-    <div className='pb-8 pt-4'>
+    <div className="pb-8 pt-4">
       <div
         className={`flex ${containerPadding}`}
         style={{ gap: `${margin}px`, width }}
@@ -201,7 +204,7 @@ export function Waterfall<T extends WaterfallItem>({
         {Array.from({ length: columnCount }).map((_, columnIndex) => (
           <div
             key={columnIndex}
-            className='flex flex-col flex-1'
+            className="flex flex-col flex-1"
             style={{ gap: `${margin}px` }}
           >
             {Array.from({
@@ -209,7 +212,7 @@ export function Waterfall<T extends WaterfallItem>({
             }).map((_, itemIndex) => (
               <Skeleton
                 key={itemIndex}
-                className='w-full rounded-lg'
+                className="w-full rounded-lg"
                 style={{
                   height: `${skeletonConfig.minHeight! + Math.random() * (skeletonConfig.maxHeight! - skeletonConfig.minHeight!)}px`,
                   animationDelay: `${Math.min((columnIndex * 5 + itemIndex) * 60, 700)}ms`,
@@ -225,31 +228,31 @@ export function Waterfall<T extends WaterfallItem>({
 
   // 空状态渲染
   const renderEmptyState = () => (
-    <div className='text-center py-12'>
+    <div className="text-center py-12">
       {emptyState?.icon}
       {emptyState?.title && (
-        <h2 className='text-xl font-semibold mb-2 text-muted-foreground'>
+        <h2 className="text-xl font-semibold mb-2 text-muted-foreground">
           {emptyState.title}
         </h2>
       )}
       {emptyState?.description && (
-        <p className='text-muted-foreground'>{emptyState.description}</p>
+        <p className="text-muted-foreground">{emptyState.description}</p>
       )}
     </div>
   )
 
   // 错误状态渲染
   const renderError = () => (
-    <div className='p-4'>
-      <Alert variant='destructive'>
-        <AlertCircle className='h-4 w-4' />
+    <div className="p-4">
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
         <AlertTitle>Error</AlertTitle>
         <AlertDescription>
           {error}
           <Button
             onClick={handleLoadMore}
-            variant='link'
-            className='p-0 h-auto ml-2'
+            variant="link"
+            className="p-0 h-auto ml-2"
           >
             Try again
           </Button>
@@ -277,17 +280,17 @@ export function Waterfall<T extends WaterfallItem>({
     <div className={`pb-8 ${className}`}>
       {/* 瀑布流内容 */}
       <div className={containerPadding}>
-        <div className='flex' style={{ gap: `${margin}px`, width }}>
+        <div className="flex" style={{ gap: `${margin}px`, width }}>
           {columns.map((column, columnIndex) => (
             <div
               key={columnIndex}
-              className='flex flex-col flex-1'
+              className="flex flex-col flex-1"
               style={{ gap: `${margin}px` }}
             >
               {column.map((item, itemIndex) => (
                 <div
                   key={item.id}
-                  className='animate-in fade-in-0 cursor-pointer'
+                  className="animate-in fade-in-0 cursor-pointer"
                   style={{
                     height: `${item.calculatedHeight}px`,
                     animationDelay: `${Math.min((columnIndex * 5 + itemIndex) * 50, 800)}ms`,
@@ -304,33 +307,33 @@ export function Waterfall<T extends WaterfallItem>({
       </div>
 
       {/* 加载指示器 */}
-      <div ref={loadingRef} className='py-4'>
+      <div ref={loadingRef} className="py-4">
         {isLoading && (
-          <div className='flex items-center justify-center'>
-            <Loader2 className='size-5 animate-spin' />
-            <span className='ml-2 text-sm text-muted-foreground'>
+          <div className="flex items-center justify-center">
+            <Loader2 className="size-5 animate-spin" />
+            <span className="ml-2 text-sm text-muted-foreground">
               Loading more...
             </span>
           </div>
         )}
 
         {!hasMore && list.length > 0 && (
-          <div className='text-center text-sm text-muted-foreground'>
+          <div className="text-center text-sm text-muted-foreground">
             没有更多内容了
           </div>
         )}
 
         {error && list.length > 0 && (
-          <div className='p-4'>
-            <Alert variant='destructive'>
-              <AlertCircle className='h-4 w-4' />
+          <div className="p-4">
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
               <AlertTitle>Error loading more</AlertTitle>
               <AlertDescription>
                 {error}
                 <Button
                   onClick={handleLoadMore}
-                  variant='link'
-                  className='p-0 h-auto ml-2'
+                  variant="link"
+                  className="p-0 h-auto ml-2"
                 >
                   Try again
                 </Button>

@@ -1,9 +1,10 @@
 import type { Tweet, User } from '@tweets-viewer/shared'
-import { ImageIcon } from 'lucide-react'
+import type { WaterfallItem } from '../ui/waterfall'
 import type { PaginatedListActions } from '~/stores'
-import { useAppStore } from '~/stores/app-store'
 import type { MediaItem } from '~/stores/media-store'
-import { Waterfall, type WaterfallItem } from '../ui/waterfall'
+import { ImageIcon } from 'lucide-react'
+import { useAppStore } from '~/stores/app-store'
+import { Waterfall } from '../ui/waterfall'
 import { MediaItemComponent } from './media-item'
 
 interface MediaGridProps {
@@ -29,9 +30,10 @@ export function MediaGrid({
 
   const handleMediaClick = (clickedMedia: MediaItem) => {
     const context = getMediaContext?.(clickedMedia)
-    if (!context) return
+    if (!context)
+      return
     const startIndex = context.allMediaInTweet.findIndex(
-      (m) => m.id === clickedMedia.id,
+      m => m.id === clickedMedia.id,
     )
     openTweetMediaModal({
       mediaItems: context.allMediaInTweet,
@@ -46,7 +48,7 @@ export function MediaGrid({
       list={mediaItems as MediaWaterfallItem[]}
       cols={{ mobile: 2, desktop: 3 }}
       margin={4}
-      renderItem={(item) => (
+      renderItem={item => (
         <MediaItemComponent
           item={item}
           onClick={() => handleMediaClick(item)}
@@ -56,7 +58,7 @@ export function MediaGrid({
       paginationActions={paginationActions}
       emptyState={{
         icon: (
-          <ImageIcon className='h-12 w-12 mx-auto text-muted-foreground mb-4' />
+          <ImageIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
         ),
         title: '找不到媒体',
         description: '该用户还没有发布过任何照片或视频。',

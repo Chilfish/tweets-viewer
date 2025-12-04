@@ -1,15 +1,14 @@
 import type { Tweet, User } from '@tweets-viewer/shared'
+import type { DateRange, PaginatedListActions, SortFilterActions, SortOrder } from './index'
+import type { PaginatedStore } from '~/lib/use-paginated-data'
 import { create } from 'zustand'
 import { getTweets, getTweetsByDateRange } from '~/lib/tweets-api'
 import {
   createInitialPaginatedState,
-  type PaginatedStore,
+
 } from '~/lib/use-paginated-data'
 import {
-  type DateRange,
-  type PaginatedListActions,
-  type SortFilterActions,
-  type SortOrder,
+
   useTweetsStore,
 } from './index'
 
@@ -51,13 +50,14 @@ const initialState: Omit<MediaState, keyof PaginatedStore<MediaItem>> = {
 }
 
 // 从推文中提取媒体项
-const extractMediaFromTweets = (tweets: Tweet[]): MediaItem[] => {
+function extractMediaFromTweets(tweets: Tweet[]): MediaItem[] {
   const mediaItems: MediaItem[] = []
 
   tweets.forEach((tweet) => {
     // 只处理原创推文的媒体，不包括转推
     const targetTweet = tweet.retweetedStatus?.tweet || tweet
-    if (tweet.retweetedStatus) return // 跳过转推
+    if (tweet.retweetedStatus)
+      return // 跳过转推
 
     targetTweet.media.forEach((media, index) => {
       mediaItems.push({
@@ -76,14 +76,7 @@ const extractMediaFromTweets = (tweets: Tweet[]): MediaItem[] => {
 }
 
 // 智能加载媒体数据 - 持续获取直到有足够媒体或无更多数据
-const loadMediaData = async (
-  startPage: number,
-  screenName: string,
-  filters: MediaFilters,
-  minMediaCount = 6,
-  appendTweets: (newTweets: Tweet[]) => void,
-  appendMedias: (newMedias: MediaItem[]) => void,
-): Promise<{ mediaItems: MediaItem[]; hasMore: boolean; nextPage: number }> => {
+async function loadMediaData(startPage: number, screenName: string, filters: MediaFilters, minMediaCount = 6, appendTweets: (newTweets: Tweet[]) => void, appendMedias: (newMedias: MediaItem[]) => void): Promise<{ mediaItems: MediaItem[], hasMore: boolean, nextPage: number }> {
   const reverse = filters.sortOrder === 'desc'
   const allMediaItems: MediaItem[] = []
   let currentPage = startPage
@@ -105,7 +98,8 @@ const loadMediaData = async (
           page: currentPage,
           reverse,
         })
-      } else {
+      }
+      else {
         // 使用普通的推文获取API
         tweets = await getTweets(screenName, {
           page: currentPage,
@@ -134,7 +128,8 @@ const loadMediaData = async (
         hasMore = false
         break
       }
-    } catch (error) {
+    }
+    catch (error) {
       console.error('Error loading tweets for media:', error)
       hasMore = false
       break
@@ -160,7 +155,8 @@ export const useMediaStore = create<MediaStore>((set, get) => ({
     const state = get()
     const { appendData } = useTweetsStore.getState()
 
-    if (state.isLoading) return
+    if (state.isLoading)
+      return
 
     set({ isLoading: true, error: null })
 
@@ -185,8 +181,9 @@ export const useMediaStore = create<MediaStore>((set, get) => ({
           isLoading: false,
           error: null,
         })
-      } else {
-        set((prevState) => ({
+      }
+      else {
+        set(prevState => ({
           data: [...prevState.data, ...result.mediaItems],
           hasMore: result.hasMore,
           page: result.nextPage,
@@ -194,7 +191,8 @@ export const useMediaStore = create<MediaStore>((set, get) => ({
           error: null,
         }))
       }
-    } catch (error) {
+    }
+    catch (error) {
       set({
         error: 'Failed to load media. Please try again.',
         isLoading: false,
@@ -205,7 +203,8 @@ export const useMediaStore = create<MediaStore>((set, get) => ({
 
   loadMoreMedia: async (screenName) => {
     const state = get()
-    if (!state.hasMore || state.isLoading) return
+    if (!state.hasMore || state.isLoading)
+      return
     await state.loadMedia(screenName, false)
   },
 
@@ -217,14 +216,14 @@ export const useMediaStore = create<MediaStore>((set, get) => ({
   },
 
   updateFilters: (newFilters) => {
-    set((state) => ({
+    set(state => ({
       filters: { ...state.filters, ...newFilters },
     }))
   },
 
   setSortOrder: async (order) => {
     const state = get()
-    set((prevState) => ({
+    set(prevState => ({
       filters: { ...prevState.filters, sortOrder: order },
       page: 0, // 重置页码
     }))
@@ -237,7 +236,7 @@ export const useMediaStore = create<MediaStore>((set, get) => ({
 
   setDateRange: async (range) => {
     const state = get()
-    set((prevState) => ({
+    set(prevState => ({
       filters: { ...prevState.filters, dateRange: range },
       page: 0, // 重置页码
     }))
@@ -249,13 +248,13 @@ export const useMediaStore = create<MediaStore>((set, get) => ({
   },
 
   // 通用分页操作
-  setData: (data) => set({ data }),
-  appendData: (newData) =>
-    set((state) => ({ data: [...state.data, ...newData] })),
-  setLoading: (loading) => set({ isLoading: loading }),
-  setError: (error) => set({ error, isLoading: false }),
-  setHasMore: (hasMore) => set({ hasMore }),
-  nextPage: () => set((state) => ({ page: state.page + 1 })),
+  setData: data => set({ data }),
+  appendData: newData =>
+    set(state => ({ data: [...state.data, ...newData] })),
+  setLoading: loading => set({ isLoading: loading }),
+  setError: error => set({ error, isLoading: false }),
+  setHasMore: hasMore => set({ hasMore }),
+  nextPage: () => set(state => ({ page: state.page + 1 })),
   reset: () =>
     set({ ...createInitialPaginatedState<MediaItem>(), ...initialState }),
 }))

@@ -1,8 +1,8 @@
-export const placeholderSVG =
-  'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNTAgMTAwIiB3aWR0aD0iMTUwIiBoZWlnaHQ9IjEwMCI+CiAgPHJlY3Qgd2lkdGg9IjE1MCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNjY2NjY2MiPjwvcmVjdD4KPC9zdmc+'
+export const placeholderSVG
+  = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNTAgMTAwIiB3aWR0aD0iMTUwIiBoZWlnaHQ9IjEwMCI+CiAgPHJlY3Qgd2lkdGg9IjE1MCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNjY2NjY2MiPjwvcmVjdD4KPC9zdmc+'
 
-export const isDev =
-  import.meta.env?.DEV || process.env.NODE_ENV === 'development'
+export const isDev
+  = import.meta.env?.DEV || process.env.NODE_ENV === 'development'
 
 const isPreview = process.env.NODE_ENV === 'preview'
 

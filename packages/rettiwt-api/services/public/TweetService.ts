@@ -1,16 +1,13 @@
 import type { CursoredData } from '../../models/data/CursoredData'
-
 import type { Tweet } from '../../models/data/Tweet'
 import type { User } from '../../models/data/User'
 import type { RettiwtConfig } from '../../models/RettiwtConfig'
 import type { ITweetFilter } from '../../types/args/FetchArgs'
 import type { INewTweet } from '../../types/args/PostArgs'
-
 import type { ITweetBookmarkResponse } from '../../types/raw/tweet/Bookmark'
 import type { ITweetDetailsResponse } from '../../types/raw/tweet/Details'
 import type { ITweetDetailsBulkResponse } from '../../types/raw/tweet/DetailsBulk'
 import type { ITweetLikeResponse } from '../../types/raw/tweet/Like'
-
 import type { ITweetLikersResponse } from '../../types/raw/tweet/Likers'
 import type { ITweetPostResponse } from '../../types/raw/tweet/Post'
 import type { ITweetRepliesResponse } from '../../types/raw/tweet/Replies'
@@ -133,7 +130,9 @@ export class TweetService extends FetcherService {
    * });
    * ```
    */
-  public async details<T extends string | string[]>(id: T): Promise<T extends string ? Tweet | undefined : Tweet[]> {
+  public async details<T extends string | string[]>(
+    id: T,
+  ): Promise<T extends string ? Tweet | undefined : Tweet[]> {
     let resource: ResourceType
 
     // If user is authenticated and details of single tweet required
@@ -141,7 +140,9 @@ export class TweetService extends FetcherService {
       resource = ResourceType.TWEET_DETAILS_ALT
 
       // Fetching raw tweet details
-      const response = await this.request<ITweetRepliesResponse>(resource, { id })
+      const response = await this.request<ITweetRepliesResponse>(resource, {
+        id,
+      })
 
       // Deserializing response
       const data = Extractors[resource](response, id)
@@ -153,7 +154,9 @@ export class TweetService extends FetcherService {
       resource = ResourceType.TWEET_DETAILS_BULK
 
       // Fetching raw tweet details
-      const response = await this.request<ITweetDetailsBulkResponse>(resource, { ids: id })
+      const response = await this.request<ITweetDetailsBulkResponse>(resource, {
+        ids: id,
+      })
 
       // Deserializing response
       const data = Extractors[resource](response, id)
@@ -165,7 +168,9 @@ export class TweetService extends FetcherService {
       resource = ResourceType.TWEET_DETAILS
 
       // Fetching raw tweet details
-      const response = await this.request<ITweetDetailsResponse>(resource, { id: String(id) })
+      const response = await this.request<ITweetDetailsResponse>(resource, {
+        id: String(id),
+      })
 
       // Deserializing response
       const data = Extractors[resource](response, String(id))
@@ -240,7 +245,11 @@ export class TweetService extends FetcherService {
    * });
    * ```
    */
-  public async likers(id: string, count?: number, cursor?: string): Promise<CursoredData<User>> {
+  public async likers(
+    id: string,
+    count?: number,
+    cursor?: string,
+  ): Promise<CursoredData<User>> {
     const resource = ResourceType.TWEET_LIKERS
 
     // Fetching raw likers
@@ -343,7 +352,9 @@ export class TweetService extends FetcherService {
     const resource = ResourceType.TWEET_POST
 
     // Posting the tweet
-    const response = await this.request<ITweetPostResponse>(resource, { tweet: options })
+    const response = await this.request<ITweetPostResponse>(resource, {
+      tweet: options,
+    })
 
     // Deserializing response
     const data = Extractors[resource](response)
@@ -470,7 +481,11 @@ export class TweetService extends FetcherService {
    * });
    * ```
    */
-  public async retweeters(id: string, count?: number, cursor?: string): Promise<CursoredData<User>> {
+  public async retweeters(
+    id: string,
+    count?: number,
+    cursor?: string,
+  ): Promise<CursoredData<User>> {
     const resource = ResourceType.TWEET_RETWEETERS
 
     // Fetching raw list of retweeters
@@ -520,7 +535,9 @@ export class TweetService extends FetcherService {
     const resource = ResourceType.TWEET_SCHEDULE
 
     // Scheduling the tweet
-    const response = await this.request<ITweetScheduleResponse>(resource, { tweet: options })
+    const response = await this.request<ITweetScheduleResponse>(resource, {
+      tweet: options,
+    })
 
     // Deserializing response
     const data = Extractors[resource](response)
@@ -560,7 +577,11 @@ export class TweetService extends FetcherService {
    *
    * For details about available filters, refer to {@link TweetFilter}
    */
-  public async search(filter: ITweetFilter, count?: number, cursor?: string): Promise<CursoredData<Tweet>> {
+  public async search(
+    filter: ITweetFilter,
+    count?: number,
+    cursor?: string,
+  ): Promise<CursoredData<Tweet>> {
     const resource = ResourceType.TWEET_SEARCH
 
     // Fetching raw list of filtered tweets
@@ -574,7 +595,10 @@ export class TweetService extends FetcherService {
     const data = Extractors[resource](response)
 
     // Sorting the tweets by date, from recent to oldest
-    data.list.sort((a, b) => new Date(b.createdAt).valueOf() - new Date(a.createdAt).valueOf())
+    data.list.sort(
+      (a, b) =>
+        new Date(b.createdAt).valueOf() - new Date(a.createdAt).valueOf(),
+    )
 
     return data
   }
@@ -612,7 +636,10 @@ export class TweetService extends FetcherService {
    * streamTweets();
    * ```
    */
-  public async* stream(filter: ITweetFilter, pollingInterval = 60000): AsyncGenerator<Tweet> {
+  public async* stream(
+    filter: ITweetFilter,
+    pollingInterval = 60000,
+  ): AsyncGenerator<Tweet> {
     const startDate = new Date()
 
     let cursor: string | undefined
@@ -624,7 +651,11 @@ export class TweetService extends FetcherService {
       await new Promise(resolve => setTimeout(resolve, pollingInterval))
 
       // Search for tweets
-      const tweets = await this.search({ ...filter, startDate, sinceId }, undefined, cursor)
+      const tweets = await this.search(
+        { ...filter, startDate, sinceId },
+        undefined,
+        cursor,
+      )
 
       // Yield the matching tweets
       for (const tweet of tweets.list) {
@@ -677,7 +708,9 @@ export class TweetService extends FetcherService {
     const resource = ResourceType.TWEET_UNBOOKMARK
 
     // Unliking the tweet
-    const response = await this.request<ITweetUnbookmarkResponse>(resource, { id })
+    const response = await this.request<ITweetUnbookmarkResponse>(resource, {
+      id,
+    })
 
     // Deserializing the response
     const data = Extractors[resource](response) ?? false
@@ -788,7 +821,9 @@ export class TweetService extends FetcherService {
     const resource = ResourceType.TWEET_UNRETWEET
 
     // Unretweeting the tweet
-    const response = await this.request<ITweetUnretweetResponse>(resource, { id })
+    const response = await this.request<ITweetUnretweetResponse>(resource, {
+      id,
+    })
 
     // Deserializing the response
     const data = Extractors[resource](response) ?? false
@@ -825,7 +860,9 @@ export class TweetService extends FetcherService {
     const resource = ResourceType.TWEET_UNSCHEDULE
 
     // Unscheduling the tweet
-    const response = await this.request<ITweetUnscheduleResponse>(resource, { id })
+    const response = await this.request<ITweetUnscheduleResponse>(resource, {
+      id,
+    })
 
     // Deserializing the response
     const data = Extractors[resource](response) ?? false

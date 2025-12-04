@@ -49,7 +49,10 @@ export class ListService extends FetcherService {
    * });
    * ```
    */
-  public async addMember(listId: string, userId: string): Promise<number | undefined> {
+  public async addMember(
+    listId: string,
+    userId: string,
+  ): Promise<number | undefined> {
     const resource: ResourceType = ResourceType.LIST_MEMBER_ADD
 
     // Adding the user as a member
@@ -134,7 +137,11 @@ export class ListService extends FetcherService {
    *
    * @remarks Due a bug in Twitter API, the count is ignored when no cursor is provided and defaults to 100.
    */
-  public async members(id: string, count?: number, cursor?: string): Promise<CursoredData<User>> {
+  public async members(
+    id: string,
+    count?: number,
+    cursor?: string,
+  ): Promise<CursoredData<User>> {
     const resource: ResourceType = ResourceType.LIST_MEMBERS
 
     // Fetching the raw list of members
@@ -176,7 +183,10 @@ export class ListService extends FetcherService {
    * });
    * ```
    */
-  public async removeMember(listId: string, userId: string): Promise<number | undefined> {
+  public async removeMember(
+    listId: string,
+    userId: string,
+  ): Promise<number | undefined> {
     const resource: ResourceType = ResourceType.LIST_MEMBER_REMOVE
 
     // Removing the member
@@ -220,7 +230,11 @@ export class ListService extends FetcherService {
    *
    * @remarks Due a bug in Twitter API, the count is ignored when no cursor is provided and defaults to 100.
    */
-  public async tweets(id: string, count?: number, cursor?: string): Promise<CursoredData<Tweet>> {
+  public async tweets(
+    id: string,
+    count?: number,
+    cursor?: string,
+  ): Promise<CursoredData<Tweet>> {
     const resource = ResourceType.LIST_TWEETS
 
     // Fetching raw list tweets
@@ -234,7 +248,10 @@ export class ListService extends FetcherService {
     const data = Extractors[resource](response)
 
     // Sorting the tweets by date, from recent to oldest
-    data.list.sort((a, b) => new Date(b.createdAt).valueOf() - new Date(a.createdAt).valueOf())
+    data.list.sort(
+      (a, b) =>
+        new Date(b.createdAt).valueOf() - new Date(a.createdAt).valueOf(),
+    )
 
     return data
   }

@@ -1,4 +1,9 @@
-import type { INewTweet, INewTweetMedia, IPostArgs, IUploadArgs } from '../../types/args/PostArgs'
+import type {
+  INewTweet,
+  INewTweetMedia,
+  IPostArgs,
+  IUploadArgs,
+} from '../../types/args/PostArgs'
 
 /**
  * Options specifying the data that is to be posted.

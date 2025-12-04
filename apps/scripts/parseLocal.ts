@@ -1,6 +1,6 @@
 import type { TweetData } from '@tweets-viewer/database'
-import { filterTweet, filterUser } from '@tweets-viewer/database'
 import type { Tweet } from '@tweets-viewer/shared'
+import { filterTweet, filterUser } from '@tweets-viewer/database'
 import { readJson, writeJson } from '@tweets-viewer/shared/utils/files'
 import glob from 'fast-glob'
 
@@ -9,7 +9,7 @@ const uid = 'sonysmasme'
 const dir = `F:/Documents/Tweets/${uid}`
 const jsons = await glob(`${dir}/**/twitter-*.json`)
 
-const data = (await Promise.all<any[]>(jsons.map(readJson)).then((data) =>
+const data = (await Promise.all<any[]>(jsons.map(readJson)).then(data =>
   data.flat(),
 )) as TweetData[]
 
@@ -26,7 +26,8 @@ const filtered = data
   .map((tweet) => {
     try {
       return filterTweet(tweet)
-    } catch (_e) {
+    }
+    catch (_e) {
       return null
     }
   })

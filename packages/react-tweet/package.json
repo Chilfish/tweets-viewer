@@ -1,21 +1,16 @@
 {
   "name": "@tweets-viewer/react-tweet",
+  "type": "module",
   "version": "3.2.2",
-  "repository": "https://github.com/vercel/react-tweet.git",
   "author": "Luis Alvarez (https://twitter.com/luis_fades)",
-  "scripts": {
-    "build": "pnpm types",
-    "types": "tsc --emitDeclarationOnly",
-    "lint": "TIMING=1 eslint \"src/**/*.{ts,tsx,js,jsx}\" --fix"
-  },
   "license": "MIT",
+  "repository": "https://github.com/vercel/react-tweet.git",
   "bugs": {
     "url": "https://github.com/vercel/react-tweet/issues"
   },
   "sideEffects": [
     "./dist/twitter-theme/tweet-container.js"
   ],
-  "type": "module",
   "exports": {
     ".": {
       "react-server": "./dist/index.js",
@@ -24,9 +19,6 @@
     "./api": "./dist/api/index.js",
     "./theme.css": "./dist/twitter-theme/theme.css"
   },
-  "files": [
-    "dist/**/*.{js,d.ts,css}"
-  ],
   "typesVersions": {
     "*": {
       "index": [
@@ -40,6 +32,14 @@
       ],
       "*": []
     }
+  },
+  "files": [
+    "dist/**/*.{js,d.ts,css}"
+  ],
+  "scripts": {
+    "build": "pnpm types",
+    "types": "tsc --emitDeclarationOnly",
+    "lint": "TIMING=1 eslint \"src/**/*.{ts,tsx,js,jsx}\" --fix"
   },
   "publishConfig": {
     "access": "public",

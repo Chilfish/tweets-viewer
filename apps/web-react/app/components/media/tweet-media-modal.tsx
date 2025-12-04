@@ -12,10 +12,10 @@ export function TweetMediaModal() {
   } = tweetMediaModal
 
   if (
-    !isOpen ||
-    !currentTweet ||
-    !currentUser ||
-    currentMediaItems.length === 0
+    !isOpen
+    || !currentTweet
+    || !currentUser
+    || currentMediaItems.length === 0
   ) {
     return null
   }
@@ -24,7 +24,7 @@ export function TweetMediaModal() {
     <MediaViewerWithText
       isOpen={isOpen}
       onClose={closeTweetMediaModal}
-      mediaItems={currentMediaItems.map((item) => ({
+      mediaItems={currentMediaItems.map(item => ({
         ...item,
         postId: currentTweet.tweetId,
         fullText: currentTweet.fullText,

@@ -4,7 +4,6 @@
  * @public
  */
 export interface IAuthCookie {
-
   /** The bearer token from twitter.com. */
   auth_token: string
 
@@ -16,5 +15,4 @@ export interface IAuthCookie {
 
   /** Token used to authenticate a user using a Twitter ID. */
   twid: string
-
 }

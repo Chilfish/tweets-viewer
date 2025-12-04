@@ -1,6 +1,5 @@
 import type { Command } from 'commander'
 import type { Rettiwt } from '../Rettiwt'
-
 import { createCommand } from 'commander'
 import { output } from '../helper/CliUtils'
 
@@ -12,16 +11,29 @@ import { output } from '../helper/CliUtils'
  */
 function createDirectMessageCommand(rettiwt: Rettiwt): Command {
   // Creating the 'dm' command
-  const dm = createCommand('dm').description('Access resources related to direct messages')
+  const dm = createCommand('dm').description(
+    'Access resources related to direct messages',
+  )
 
   // Conversation
   dm.command('conversation')
-    .description('Get the full conversation history for a specific conversation')
-    .argument('<conversation-id>', 'The ID of the conversation (e.g., "394028042-1712730991884689408")')
-    .argument('[cursor]', 'The cursor for pagination (maxId from previous response)')
+    .description(
+      'Get the full conversation history for a specific conversation',
+    )
+    .argument(
+      '<conversation-id>',
+      'The ID of the conversation (e.g., "394028042-1712730991884689408")',
+    )
+    .argument(
+      '[cursor]',
+      'The cursor for pagination (maxId from previous response)',
+    )
     .action(async (conversationId: string, cursor?: string) => {
       try {
-        const conversation = await rettiwt.dm.conversation(conversationId, cursor)
+        const conversation = await rettiwt.dm.conversation(
+          conversationId,
+          cursor,
+        )
         output(conversation)
       }
       catch (error) {
@@ -31,7 +43,9 @@ function createDirectMessageCommand(rettiwt: Rettiwt): Command {
 
   // Delete conversation
   dm.command('delete-conversation')
-    .description('Delete a conversation (you will leave the conversation and it will be removed from your inbox)')
+    .description(
+      'Delete a conversation (you will leave the conversation and it will be removed from your inbox)',
+    )
     .argument('<conversation-id>', 'The ID of the conversation to delete')
     .action(async (conversationId: string) => {
       try {

@@ -1,6 +1,6 @@
 import type { Tweet } from '@tweets-viewer/shared'
-import { request } from '@tweets-viewer/shared'
 import type { CacheRequestConfig } from 'axios-cache-interceptor'
+import { request } from '@tweets-viewer/shared'
 
 interface TweetsApiParams {
   page: number
@@ -32,7 +32,8 @@ export async function getTweets(
   name: string,
   params: TweetsApiParams,
 ): Promise<Tweet[]> {
-  if (!name) return []
+  if (!name)
+    return []
 
   const config: CacheRequestConfig = {
     id: getCacheKey(name, params, 'get'),
@@ -51,7 +52,8 @@ export async function getTweetsByDateRange(
   name: string,
   params: DateRangeParams,
 ): Promise<Tweet[]> {
-  if (!name) return []
+  if (!name)
+    return []
 
   const config: CacheRequestConfig = {
     id: getCacheKey(name, params, 'range'),
@@ -70,7 +72,8 @@ export async function getLastYearsTodayTweets(
   name: string,
   reverse = true,
 ): Promise<Tweet[]> {
-  if (!name) return []
+  if (!name)
+    return []
 
   const params = { reverse }
   const config: CacheRequestConfig = {
@@ -93,7 +96,8 @@ export async function searchTweets(
   name: string,
   params: SearchParams,
 ): Promise<Tweet[]> {
-  if (!name) return []
+  if (!name)
+    return []
 
   const config: CacheRequestConfig = {
     id: getCacheKey(name, params, 'search'),

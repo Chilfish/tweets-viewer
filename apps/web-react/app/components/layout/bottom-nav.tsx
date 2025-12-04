@@ -10,9 +10,9 @@ export function BottomNav({ currentUser }: BottomNavProps) {
   const navItems = getNavItems(currentUser)
 
   return (
-    <div className='fixed bottom-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-lg border-t border-border transition-colors duration-200 md:hidden'>
-      <div className='flex items-center justify-around py-2 px-4'>
-        {navItems.map((item) => (
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-lg border-t border-border transition-colors duration-200 md:hidden">
+      <div className="flex items-center justify-around py-2 px-4">
+        {navItems.map(item => (
           <Link
             key={item.label}
             to={item.href}
@@ -24,7 +24,7 @@ export function BottomNav({ currentUser }: BottomNavProps) {
                 : 'text-muted-foreground hover:text-foreground hover:bg-accent',
             )}
           >
-            <item.icon className='size-5' />
+            <item.icon className="size-5" />
             {/* <span className="text-xs font-medium">{item.label}</span> */}
           </Link>
         ))}

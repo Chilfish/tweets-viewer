@@ -27,7 +27,8 @@ export default function Layout() {
     // Show FAB only when scrolling up and past a certain threshold
     if (currentScrollY < lastScrollY.current && currentScrollY > 400) {
       setShowFab(true)
-    } else {
+    }
+    else {
       setShowFab(false)
     }
     lastScrollY.current = currentScrollY
@@ -58,7 +59,7 @@ export default function Layout() {
   }, [isMobile, setCurrentLayout])
 
   const outletWrapper = (
-    <div key={location.pathname} className='animate-in fade-in-0 duration-300'>
+    <div key={location.pathname} className="animate-in fade-in-0 duration-300">
       <Outlet />
     </div>
   )
@@ -66,22 +67,23 @@ export default function Layout() {
   const fab = showFab ? (
     <Button
       onClick={scrollToTop}
-      variant='default'
-      size='icon'
-      className='fixed bottom-24 right-4 md:bottom-8 md:right-8 z-50 h-12 w-12 rounded-full shadow-lg animate-in fade-in-0 zoom-in-95 duration-300'
+      variant="default"
+      size="icon"
+      className="fixed bottom-24 right-4 md:bottom-8 md:right-8 z-50 h-12 w-12 rounded-full shadow-lg animate-in fade-in-0 zoom-in-95 duration-300"
     >
-      <ArrowUp className='h-6 w-6' />
+      <ArrowUp className="h-6 w-6" />
     </Button>
   ) : null
 
   if (isMobile) {
     return (
-      <div className='min-h-screen bg-background transition-colors duration-200'>
+      <div className="min-h-screen bg-background transition-colors duration-200">
         <TopNav
           title={curUserName ? `@${curUserName}` : 'Tweets Viewer'}
-        ></TopNav>
+        >
+        </TopNav>
 
-        <main className='min-h-full'>{outletWrapper}</main>
+        <main className="min-h-full">{outletWrapper}</main>
 
         <BottomNav currentUser={curUserName} />
         {fab}
@@ -90,11 +92,11 @@ export default function Layout() {
   }
 
   return (
-    <div className='min-h-screen flex bg-muted transition-colors duration-200'>
+    <div className="min-h-screen flex bg-muted transition-colors duration-200">
       <Sidebar currentUser={curUserName} />
 
-      <main className='flex-1 bg-background transition-colors duration-200'>
-        <div className='max-w-2xl mx-auto h-full'>{outletWrapper}</div>
+      <main className="flex-1 bg-background transition-colors duration-200">
+        <div className="max-w-2xl mx-auto h-full">{outletWrapper}</div>
       </main>
       {fab}
     </div>

@@ -16,7 +16,9 @@ import type {
  * Enriches a tweet with additional data used to more easily use the tweet in a UI.
  */
 export function enrichTweet(sourceData: RawTweet): EnrichedTweet {
-  const tweet = ('tweet' in sourceData ? sourceData.tweet : sourceData) as RawTweet
+  const tweet = (
+    'tweet' in sourceData ? sourceData.tweet : sourceData
+  ) as RawTweet
   const userBase = transformUserResponse(tweet)
   const userScreenName = userBase.screen_name
   const user = userBase
@@ -24,7 +26,8 @@ export function enrichTweet(sourceData: RawTweet): EnrichedTweet {
   const tweetId = tweet.rest_id
   const tweetUrl = `https://twitter.com/${userScreenName}/status/${tweetId}`
 
-  const text = tweet.note_tweet?.note_tweet_results?.result?.text || tweet.legacy.full_text
+  const text
+    = tweet.note_tweet?.note_tweet_results?.result?.text || tweet.legacy.full_text
 
   return {
     id_str: tweet.rest_id,
@@ -60,7 +63,8 @@ export function transformUserResponse(sourceData: RawTweet): TweetUser {
     name: legacy.name,
     screen_name: legacy.screen_name,
     is_blue_verified: RawTweet.is_blue_verified,
-    profile_image_shape: RawTweet.profile_image_shape as TweetUser['profile_image_shape'],
+    profile_image_shape:
+      RawTweet.profile_image_shape as TweetUser['profile_image_shape'],
     verified: legacy.verified,
     // @ts-expect-error: The verified_type is not always defined
     verified_type: legacy.verified_type,
@@ -75,14 +79,17 @@ function getEntities(tweet: RawTweet, text: string): Entity[] {
 
   // 获取实体数据源
   const entities = tweet.legacy.entities || []
-  const noteEntities = tweet.note_tweet?.note_tweet_results?.result.entity_set || []
+  const noteEntities
+    = tweet.note_tweet?.note_tweet_results?.result.entity_set || []
 
   // 收集所有实体
   const allEntities: EntityWithType[] = []
 
   // 检查文本开头是否有 mention，如果有则记录需要移除的范围
   const leadingMentionMatch = text.match(/^(@\w{1,15}\s*)+/)
-  const leadingMentionEndIndex = leadingMentionMatch ? leadingMentionMatch[0].length : 0
+  const leadingMentionEndIndex = leadingMentionMatch
+    ? leadingMentionMatch[0].length
+    : 0
 
   // 用于去重的 Set，基于 indices 位置
   const entityIndicesSet = new Set<string>()
@@ -104,7 +111,10 @@ function getEntities(tweet: RawTweet, text: string): Entity[] {
           ...hashtag,
           type: 'hashtag',
           // 调整索引位置
-          indices: [hashtag.indices[0] - leadingMentionEndIndex, hashtag.indices[1] - leadingMentionEndIndex] as [number, number],
+          indices: [
+            hashtag.indices[0] - leadingMentionEndIndex,
+            hashtag.indices[1] - leadingMentionEndIndex,
+          ] as [number, number],
         })
       }
     })
@@ -117,7 +127,10 @@ function getEntities(tweet: RawTweet, text: string): Entity[] {
       if (hashtag.indices[0] >= leadingMentionEndIndex) {
         addEntityIfUnique({
           text: hashtag.text,
-          indices: [hashtag.indices[0] - leadingMentionEndIndex, hashtag.indices[1] - leadingMentionEndIndex] as [number, number],
+          indices: [
+            hashtag.indices[0] - leadingMentionEndIndex,
+            hashtag.indices[1] - leadingMentionEndIndex,
+          ] as [number, number],
           type: 'hashtag',
         })
       }
@@ -133,7 +146,10 @@ function getEntities(tweet: RawTweet, text: string): Entity[] {
           ...mention,
           type: 'mention',
           // 调整索引位置
-          indices: [mention.indices[0] - leadingMentionEndIndex, mention.indices[1] - leadingMentionEndIndex] as [number, number],
+          indices: [
+            mention.indices[0] - leadingMentionEndIndex,
+            mention.indices[1] - leadingMentionEndIndex,
+          ] as [number, number],
         })
       }
     })
@@ -148,7 +164,10 @@ function getEntities(tweet: RawTweet, text: string): Entity[] {
           id_str: mention.id_str,
           name: mention.name,
           screen_name: mention.screen_name,
-          indices: [mention.indices[0] - leadingMentionEndIndex, mention.indices[1] - leadingMentionEndIndex] as [number, number],
+          indices: [
+            mention.indices[0] - leadingMentionEndIndex,
+            mention.indices[1] - leadingMentionEndIndex,
+          ] as [number, number],
           type: 'mention',
         })
       }
@@ -163,7 +182,10 @@ function getEntities(tweet: RawTweet, text: string): Entity[] {
           ...url,
           type: 'url',
           // 调整索引位置
-          indices: [url.indices[0] - leadingMentionEndIndex, url.indices[1] - leadingMentionEndIndex] as [number, number],
+          indices: [
+            url.indices[0] - leadingMentionEndIndex,
+            url.indices[1] - leadingMentionEndIndex,
+          ] as [number, number],
         })
       }
     })
@@ -177,7 +199,10 @@ function getEntities(tweet: RawTweet, text: string): Entity[] {
           display_url: url.display_url,
           expanded_url: url.expanded_url,
           url: url.url,
-          indices: [url.indices[0] - leadingMentionEndIndex, url.indices[1] - leadingMentionEndIndex] as [number, number],
+          indices: [
+            url.indices[0] - leadingMentionEndIndex,
+            url.indices[1] - leadingMentionEndIndex,
+          ] as [number, number],
           type: 'url',
         })
       }
@@ -208,7 +233,10 @@ function getEntities(tweet: RawTweet, text: string): Entity[] {
           ...symbol,
           type: 'symbol',
           // 调整索引位置
-          indices: [symbol.indices[0] - leadingMentionEndIndex, symbol.indices[1] - leadingMentionEndIndex] as [number, number],
+          indices: [
+            symbol.indices[0] - leadingMentionEndIndex,
+            symbol.indices[1] - leadingMentionEndIndex,
+          ] as [number, number],
         })
       }
     })
@@ -220,7 +248,10 @@ function getEntities(tweet: RawTweet, text: string): Entity[] {
       if (symbol.indices[0] >= leadingMentionEndIndex) {
         addEntityIfUnique({
           text: symbol.text,
-          indices: [symbol.indices[0] - leadingMentionEndIndex, symbol.indices[1] - leadingMentionEndIndex] as [number, number],
+          indices: [
+            symbol.indices[0] - leadingMentionEndIndex,
+            symbol.indices[1] - leadingMentionEndIndex,
+          ] as [number, number],
           type: 'symbol',
         })
       }
@@ -240,7 +271,8 @@ function getEntities(tweet: RawTweet, text: string): Entity[] {
   const displayTextRange = tweet.legacy.display_text_range as [number, number]
 
   // 如果使用的是 note_tweet 的文本，应该使用完整文本长度
-  const isUsingNoteText = tweet.note_tweet?.note_tweet_results?.result?.text === text
+  const isUsingNoteText
+    = tweet.note_tweet?.note_tweet_results?.result?.text === text
 
   const adjustedTextRange: [number, number] = isUsingNoteText
     ? [
@@ -289,7 +321,9 @@ function getEntities(tweet: RawTweet, text: string): Entity[] {
 
   // 转换为最终的 Entity 类型
   return result.map((entity, index) => {
-    const entityText = adjustedTextMap.slice(entity.indices[0], entity.indices[1]).join('')
+    const entityText = adjustedTextMap
+      .slice(entity.indices[0], entity.indices[1])
+      .join('')
 
     switch (entity.type) {
       case 'hashtag':
@@ -354,7 +388,9 @@ const IMAGE_KEYS_PRIORITY = [
 /**
  * 辅助函数：从 binding_values Map 中提取字符串值
  */
-const getStr = (map: Map<string, any>, key: string) => map.get(key)?.string_value
+function getStr(map: Map<string, any>, key: string) {
+  return map.get(key)?.string_value
+}
 
 /**
  * 辅助函数：从 binding_values Map 中按优先级提取最佳图片 URL
@@ -442,7 +478,8 @@ export function mapTwitterCard(cardData: any): LinkPreviewCard | undefined {
 }
 
 function mapPhotoEntities(tweet: RawTweet): TweetPhoto[] | undefined {
-  const mediaEntities = tweet.legacy.entities.media || tweet.legacy.extended_entities?.media
+  const mediaEntities
+    = tweet.legacy.entities.media || tweet.legacy.extended_entities?.media
 
   if (!mediaEntities) {
     return undefined
@@ -469,7 +506,8 @@ function mapPhotoEntities(tweet: RawTweet): TweetPhoto[] | undefined {
 }
 
 function mapVideoEntities(tweet: RawTweet): TweetVideo | undefined {
-  const mediaEntities = tweet.legacy.entities.media || tweet.legacy.extended_entities?.media
+  const mediaEntities
+    = tweet.legacy.entities.media || tweet.legacy.extended_entities?.media
 
   if (!mediaEntities) {
     return undefined

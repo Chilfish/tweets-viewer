@@ -14,10 +14,7 @@ export function TweetInfoCreatedAt({ tweet }: { tweet: EnrichedTweet }) {
       rel="noopener noreferrer"
       aria-label={formattedCreatedAtDate}
     >
-      <time
-        suppressHydrationWarning={true}
-        dateTime={createdAt.toISOString()}
-      >
+      <time suppressHydrationWarning={true} dateTime={createdAt.toISOString()}>
         {formattedCreatedAtDate}
       </time>
     </a>

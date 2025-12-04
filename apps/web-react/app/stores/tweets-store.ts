@@ -1,10 +1,3 @@
-import { create } from 'zustand'
-import { getTweets, getTweetsByDateRange } from '~/lib/tweets-api'
-import {
-  createInitialPaginatedState,
-  createLoadDataAction,
-  type PaginatedStore,
-} from '~/lib/use-paginated-data'
 import type { Tweet, User } from '@tweets-viewer/shared'
 import type {
   DateRange,
@@ -12,6 +5,14 @@ import type {
   SortFilterActions,
   SortOrder,
 } from './index'
+import type { PaginatedStore } from '~/lib/use-paginated-data'
+import { create } from 'zustand'
+import { getTweets, getTweetsByDateRange } from '~/lib/tweets-api'
+import {
+  createInitialPaginatedState,
+  createLoadDataAction,
+
+} from '~/lib/use-paginated-data'
 
 export interface TweetsFilters {
   dateRange: DateRange
@@ -43,11 +44,7 @@ const initialState: Omit<TweetsState, keyof PaginatedStore<Tweet>> = {
 }
 
 // 创建数据加载函数
-const loadTweetsData = async (
-  page: number,
-  screenName: string,
-  filters: TweetsFilters,
-): Promise<Tweet[]> => {
+async function loadTweetsData(page: number, screenName: string, filters: TweetsFilters): Promise<Tweet[]> {
   const reverse = filters.sortOrder === 'desc'
 
   // 如果有日期范围筛选，使用日期范围API
@@ -86,7 +83,8 @@ export const useTweetsStore = create<TweetsStore>((set, get) => ({
 
   loadMoreTweets: async (screenName) => {
     const state = get()
-    if (!state.hasMore || state.isLoading) return []
+    if (!state.hasMore || state.isLoading)
+      return []
     await state.loadTweets(screenName, false)
 
     return state.data
@@ -100,14 +98,14 @@ export const useTweetsStore = create<TweetsStore>((set, get) => ({
   },
 
   updateFilters: (newFilters) => {
-    set((state) => ({
+    set(state => ({
       filters: { ...state.filters, ...newFilters },
     }))
   },
 
   setSortOrder: async (order) => {
     const state = get()
-    set((prevState) => ({
+    set(prevState => ({
       filters: { ...prevState.filters, sortOrder: order },
     }))
 
@@ -119,7 +117,7 @@ export const useTweetsStore = create<TweetsStore>((set, get) => ({
 
   setDateRange: async (range) => {
     const state = get()
-    set((prevState) => ({
+    set(prevState => ({
       filters: { ...prevState.filters, dateRange: range },
     }))
 
@@ -131,18 +129,18 @@ export const useTweetsStore = create<TweetsStore>((set, get) => ({
 
   getTweetById: (id) => {
     const state = get()
-    return state.data.find((tweet) => tweet.tweetId === id)
+    return state.data.find(tweet => tweet.tweetId === id)
   },
 
   // 通用分页操作
-  setData: (data) => set({ data }),
-  appendData: (newData) =>
-    set((state) => ({ data: [...state.data, ...newData] })),
-  setLoading: (loading) => set({ isLoading: loading }),
-  setError: (error) => set({ error, isLoading: false }),
-  setHasMore: (hasMore) => set({ hasMore }),
-  nextPage: () => set((state) => ({ page: state.page + 1 })),
-  setPage: (page) => set({ page }),
+  setData: data => set({ data }),
+  appendData: newData =>
+    set(state => ({ data: [...state.data, ...newData] })),
+  setLoading: loading => set({ isLoading: loading }),
+  setError: error => set({ error, isLoading: false }),
+  setHasMore: hasMore => set({ hasMore }),
+  nextPage: () => set(state => ({ page: state.page + 1 })),
+  setPage: page => set({ page }),
   reset: () =>
     set({ ...createInitialPaginatedState<Tweet>(), ...initialState }),
 }))

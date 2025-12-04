@@ -1,7 +1,7 @@
+import type { User } from '@tweets-viewer/shared'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { getUsers } from '~/lib/users-api'
-import type { User } from '@tweets-viewer/shared'
 
 const TWENTY_FOUR_HOURS_IN_MS = 24 * 60 * 60 * 1000
 
@@ -40,9 +40,9 @@ export const useUserStore = create<UserStore>()(
       fetchUsers: async () => {
         const { users, lastFetched } = get()
         if (
-          users.length > 0 &&
-          lastFetched &&
-          Date.now() - lastFetched < TWENTY_FOUR_HOURS_IN_MS
+          users.length > 0
+          && lastFetched
+          && Date.now() - lastFetched < TWENTY_FOUR_HOURS_IN_MS
         ) {
           return
         }
@@ -56,15 +56,16 @@ export const useUserStore = create<UserStore>()(
             error: null,
             lastFetched: Date.now(),
           })
-        } catch (e) {
+        }
+        catch (e) {
           set({ isLoading: false, error: 'Failed to fetch users.' })
         }
       },
 
       getUser: async (screenName) => {
         const state = get()
-        const user =
-          state.users.find((user) => user.screenName === screenName) || null
+        const user
+          = state.users.find(user => user.screenName === screenName) || null
 
         if (user) {
           set({ curUser: user })
@@ -75,20 +76,20 @@ export const useUserStore = create<UserStore>()(
       },
 
       setUser: (screenName, user) => {
-        set((state) => ({
+        set(state => ({
           users: { ...state.users, [screenName]: user },
         }))
       },
 
       setCurUser: (screenName) => {
-        set((state) => ({
-          curUser: state.users.find((u) => u.screenName === screenName) || null,
+        set(state => ({
+          curUser: state.users.find(u => u.screenName === screenName) || null,
         }))
       },
 
       findUserById: (userId) => {
         const state = get()
-        return state.users.find((user) => user.restId === userId) || null
+        return state.users.find(user => user.restId === userId) || null
       },
 
       clearError: () => {
@@ -97,7 +98,7 @@ export const useUserStore = create<UserStore>()(
     }),
     {
       name: 'tweets-viewer-user-storage',
-      partialize: (state) => ({
+      partialize: state => ({
         users: state.users,
         lastFetched: state.lastFetched,
       }),

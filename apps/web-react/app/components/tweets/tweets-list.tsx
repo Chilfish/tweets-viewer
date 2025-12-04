@@ -1,10 +1,11 @@
 /** biome-ignore-all lint/a11y/useButtonType: <explanation> */
+
+import type { Tweet, User } from '@tweets-viewer/shared'
+import type { PaginatedListActions } from '~/stores'
 import { AlertCircle, Loader2, MessageSquareX } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert'
 import { Button } from '~/components/ui/button'
 import { useInfiniteScroll } from '~/hooks/use-infinite-scroll'
-import type { PaginatedListActions } from '~/stores'
-import type { Tweet, User } from '@tweets-viewer/shared'
 import { TweetCard } from './tweet-card'
 import { TweetsSortControls } from './tweets-sort-controls'
 
@@ -22,7 +23,7 @@ interface TweetsListProps {
     }) => Promise<void>
     filters: {
       sortOrder: 'asc' | 'desc'
-      dateRange: { startDate: Date | null; endDate: Date | null }
+      dateRange: { startDate: Date | null, endDate: Date | null }
     }
   }
 }
@@ -52,9 +53,9 @@ export function TweetsList({
 
   if (tweets.length === 0 && isLoading) {
     return (
-      <div className='flex items-center justify-center py-12'>
-        <Loader2 className='size-6 animate-spin' />
-        <span className='ml-2 text-sm text-muted-foreground'>
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="size-6 animate-spin" />
+        <span className="ml-2 text-sm text-muted-foreground">
           推文加载中...
         </span>
       </div>
@@ -63,16 +64,16 @@ export function TweetsList({
 
   if (error && tweets.length === 0) {
     return (
-      <div className='p-4'>
-        <Alert variant='destructive'>
-          <AlertCircle className='h-4 w-4' />
+      <div className="p-4">
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>
             {error}
             <Button
               onClick={handleLoadMore}
-              variant='link'
-              className='p-0 h-auto ml-2'
+              variant="link"
+              className="p-0 h-auto ml-2"
             >
               Try again
             </Button>
@@ -83,18 +84,18 @@ export function TweetsList({
   }
 
   return (
-    <div className='pb-8'>
+    <div className="pb-8">
       <TweetsSortControls
         showDateFilter={showDateFilter}
         showSortControls={showSortControls}
         sortFilterActions={sortControlsActions}
       />
 
-      <div className='space-y-1'>
+      <div className="space-y-1">
         {tweets.map((tweet, index) => (
           <div
             key={tweet.tweetId}
-            className='animate-in fade-in-0'
+            className="animate-in fade-in-0"
             style={{
               animationDelay: `${Math.min(index * 50, 500)}ms`,
               animationFillMode: 'backwards',
@@ -106,33 +107,33 @@ export function TweetsList({
       </div>
 
       {/* Loading indicator */}
-      <div ref={loadingRef} className='py-4'>
+      <div ref={loadingRef} className="py-4">
         {isLoading && (
-          <div className='flex items-center justify-center'>
-            <Loader2 className='size-5 animate-spin' />
-            <span className='ml-2 text-sm text-muted-foreground'>
+          <div className="flex items-center justify-center">
+            <Loader2 className="size-5 animate-spin" />
+            <span className="ml-2 text-sm text-muted-foreground">
               加载更多推文...
             </span>
           </div>
         )}
 
         {!hasMore && tweets.length > 0 && (
-          <div className='text-center text-sm text-muted-foreground'>
+          <div className="text-center text-sm text-muted-foreground">
             没有更多推文了
           </div>
         )}
 
         {error && tweets.length > 0 && (
-          <div className='p-4'>
-            <Alert variant='destructive'>
-              <AlertCircle className='h-4 w-4' />
+          <div className="p-4">
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
               <AlertTitle>Error loading more tweets</AlertTitle>
               <AlertDescription>
                 {error}
                 <Button
                   onClick={handleLoadMore}
-                  variant='link'
-                  className='p-0 h-auto ml-2'
+                  variant="link"
+                  className="p-0 h-auto ml-2"
                 >
                   Try again
                 </Button>
@@ -142,12 +143,12 @@ export function TweetsList({
         )}
 
         {tweets.length < 1 && !isLoading && (
-          <div className='text-center py-12'>
-            <MessageSquareX className='h-12 w-12 mx-auto text-muted-foreground mb-4' />
-            <h2 className='text-xl font-semibold mb-2 text-muted-foreground'>
+          <div className="text-center py-12">
+            <MessageSquareX className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <h2 className="text-xl font-semibold mb-2 text-muted-foreground">
               找不到推文
             </h2>
-            <p className='text-muted-foreground'>暂时没有推文可以显示。</p>
+            <p className="text-muted-foreground">暂时没有推文可以显示。</p>
           </div>
         )}
       </div>

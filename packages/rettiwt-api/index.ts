@@ -27,7 +27,6 @@ export * from './models/data/User'
 export * from './models/errors/TwitterError'
 // REQUESTS
 export * from './requests/DirectMessage'
-
 export * from './requests/List'
 export * from './requests/Media'
 export * from './requests/Tweet'
@@ -58,7 +57,10 @@ export * from './types/errors/TwitterError'
 export * from './types/params/Variables'
 export type { IAnalytics as IRawAnalytics } from './types/raw/base/Analytic'
 export type { ICursor as IRawCursor } from './types/raw/base/Cursor'
-export type { IErrorData as IRawErrorData, IErrorDetails as IRawErrorDetails } from './types/raw/base/Error'
+export type {
+  IErrorData as IRawErrorData,
+  IErrorDetails as IRawErrorDetails,
+} from './types/raw/base/Error'
 export type { ILimitedVisibilityTweet as IRawLimitedVisibilityTweet } from './types/raw/base/LimitedVisibilityTweet'
 export type { IList as IRawList } from './types/raw/base/List'
 export type { IMedia as IRawMedia } from './types/raw/base/Media'

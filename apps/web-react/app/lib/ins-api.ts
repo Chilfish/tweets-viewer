@@ -1,6 +1,6 @@
-import { request } from '@tweets-viewer/shared'
 import type { CacheRequestConfig } from 'axios-cache-interceptor'
 import type { Tweet } from '../types'
+import { request } from '@tweets-viewer/shared'
 
 interface InsApiParams {
   page: number
@@ -21,7 +21,8 @@ export async function getInsData(
   name: string,
   params: InsApiParams,
 ): Promise<Tweet[]> {
-  if (!name) return []
+  if (!name)
+    return []
 
   const config: CacheRequestConfig = {
     id: getCacheKey(name, params, 'ins-get'),

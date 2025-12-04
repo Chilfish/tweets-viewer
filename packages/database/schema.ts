@@ -51,7 +51,7 @@ export const tweetsTable = pgTable(
     retweetedStatus: json('retweeted_status').$type<ReTweet>(),
     quotedStatus: json('quoted_status').$type<QuotedTweet>(),
   },
-  (table) => ({
+  table => ({
     tweetIdIdx: index('tweet_id_idx').on(table.tweetId),
     createdAtIdx: index('created_at_idx').on(table.createdAt),
     textIdx: index('text_idx').on(table.fullText),

@@ -1,8 +1,6 @@
 import type { AxiosRequestHeaders } from 'axios'
 import type { Cookie } from 'cookiejar'
-
 import type { IAuthCredential } from '../../types/auth/AuthCredential'
-
 import { AxiosHeaders } from 'axios'
 import { AuthenticationType } from '../../enums/Authentication'
 

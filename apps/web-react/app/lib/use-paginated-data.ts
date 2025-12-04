@@ -22,55 +22,56 @@ export interface PaginatedActions<T> {
 export type PaginatedStore<T> = PaginatedState<T> & PaginatedActions<T>
 
 // 创建分页状态的初始值
-export const createInitialPaginatedState = <T>(): PaginatedState<T> => ({
-  data: [],
-  isLoading: false,
-  hasMore: true,
-  error: null,
-  page: 0,
-})
+export function createInitialPaginatedState<T>(): PaginatedState<T> {
+  return {
+    data: [],
+    isLoading: false,
+    hasMore: true,
+    error: null,
+    page: 0,
+  }
+}
 
 // 创建通用的分页操作
-export const createPaginatedActions = <T>() => ({
-  setData: (data: T[]) => (state: PaginatedState<T>) => ({
-    ...state,
-    data,
-  }),
+export function createPaginatedActions<T>() {
+  return {
+    setData: (data: T[]) => (state: PaginatedState<T>) => ({
+      ...state,
+      data,
+    }),
 
-  appendData: (newData: T[]) => (state: PaginatedState<T>) => ({
-    ...state,
-    data: [...state.data, ...newData],
-  }),
+    appendData: (newData: T[]) => (state: PaginatedState<T>) => ({
+      ...state,
+      data: [...state.data, ...newData],
+    }),
 
-  setLoading: (loading: boolean) => (state: PaginatedState<T>) => ({
-    ...state,
-    isLoading: loading,
-  }),
+    setLoading: (loading: boolean) => (state: PaginatedState<T>) => ({
+      ...state,
+      isLoading: loading,
+    }),
 
-  setError: (error: string | null) => (state: PaginatedState<T>) => ({
-    ...state,
-    error,
-    isLoading: false,
-  }),
+    setError: (error: string | null) => (state: PaginatedState<T>) => ({
+      ...state,
+      error,
+      isLoading: false,
+    }),
 
-  setHasMore: (hasMore: boolean) => (state: PaginatedState<T>) => ({
-    ...state,
-    hasMore,
-  }),
+    setHasMore: (hasMore: boolean) => (state: PaginatedState<T>) => ({
+      ...state,
+      hasMore,
+    }),
 
-  nextPage: () => (state: PaginatedState<T>) => ({
-    ...state,
-    page: state.page + 1,
-  }),
+    nextPage: () => (state: PaginatedState<T>) => ({
+      ...state,
+      page: state.page + 1,
+    }),
 
-  reset: () => createInitialPaginatedState<T>(),
-})
+    reset: () => createInitialPaginatedState<T>(),
+  }
+}
 
 // 通用的分页数据加载逻辑
-export const createLoadDataAction = <T>(
-  loadFn: (page: number, ...args: any[]) => Promise<T[]>,
-  pageSize = 10,
-) => {
+export function createLoadDataAction<T>(loadFn: (page: number, ...args: any[]) => Promise<T[]>, pageSize = 10) {
   return async (
     isFirstLoad: boolean,
     set: (fn: (state: PaginatedState<T>) => PaginatedState<T>) => void,
@@ -78,7 +79,8 @@ export const createLoadDataAction = <T>(
     ...args: any[]
   ) => {
     const state = get()
-    if (state.isLoading) return
+    if (state.isLoading)
+      return
 
     set(createPaginatedActions<T>().setLoading(true))
 
@@ -89,15 +91,16 @@ export const createLoadDataAction = <T>(
       const hasMore = newData.length === pageSize
 
       if (isFirstLoad) {
-        set((state) => ({
+        set(state => ({
           ...createPaginatedActions<T>().setData(newData)(state),
           hasMore,
           page: currentPage,
           isLoading: false,
           error: null,
         }))
-      } else {
-        set((state) => ({
+      }
+      else {
+        set(state => ({
           ...createPaginatedActions<T>().appendData(newData)(state),
           hasMore,
           page: currentPage,
@@ -105,7 +108,8 @@ export const createLoadDataAction = <T>(
           error: null,
         }))
       }
-    } catch (error) {
+    }
+    catch (error) {
       set(
         createPaginatedActions<T>().setError(
           'Failed to load data. Please try again.',

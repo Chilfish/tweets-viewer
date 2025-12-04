@@ -58,14 +58,17 @@ import { User } from '../models/data/User'
  * @internal
  */
 export const Extractors = {
-
-  LIST_DETAILS: (response: IListDetailsResponse, id: string): List | undefined => List.single(response, id),
+  LIST_DETAILS: (
+    response: IListDetailsResponse,
+    id: string,
+  ): List | undefined => List.single(response, id),
   LIST_MEMBERS: (response: IListMembersResponse): CursoredData<User> =>
     new CursoredData<User>(response, BaseType.USER),
   LIST_MEMBER_ADD: (response: IListMemberAddResponse): number | undefined =>
     response.data?.list?.member_count ?? undefined,
-  LIST_MEMBER_REMOVE: (response: IListMemberRemoveResponse): number | undefined =>
-    response.data?.list?.member_count ?? undefined,
+  LIST_MEMBER_REMOVE: (
+    response: IListMemberRemoveResponse,
+  ): number | undefined => response.data?.list?.member_count ?? undefined,
   LIST_TWEETS: (response: IListTweetsResponse): CursoredData<Tweet> =>
     new CursoredData<Tweet>(response, BaseType.TWEET),
 
@@ -74,34 +77,55 @@ export const Extractors = {
   MEDIA_UPLOAD_INITIALIZE: (response: IMediaInitializeUploadResponse): string =>
     response.media_id_string ?? undefined,
 
-  DM_CONVERSATION: (response: IConversationTimelineResponse): Conversation | undefined =>
+  DM_CONVERSATION: (
+    response: IConversationTimelineResponse,
+  ): Conversation | undefined =>
     Conversation.fromConversationTimeline(response),
-  DM_INBOX_INITIAL_STATE: (response: IInboxInitialResponse): Inbox => new Inbox(response),
-  DM_INBOX_TIMELINE: (response: IInboxTimelineResponse): Inbox => new Inbox(response),
+  DM_INBOX_INITIAL_STATE: (response: IInboxInitialResponse): Inbox =>
+    new Inbox(response),
+  DM_INBOX_TIMELINE: (response: IInboxTimelineResponse): Inbox =>
+    new Inbox(response),
 
-  TWEET_BOOKMARK: (response: ITweetBookmarkResponse): boolean => response?.data?.tweet_bookmark_put === 'Done',
-  TWEET_DETAILS: (response: ITweetDetailsResponse, id: string): Tweet | undefined => Tweet.single(response, id),
-  TWEET_DETAILS_ALT: (response: ITweetRepliesResponse, id: string): Tweet | undefined => Tweet.single(response, id),
-  TWEET_DETAILS_BULK: (response: ITweetDetailsBulkResponse, ids: string[]): Tweet[] => Tweet.multiple(response, ids),
-  TWEET_LIKE: (response: ITweetLikeResponse): boolean => (!!response?.data?.favorite_tweet),
+  TWEET_BOOKMARK: (response: ITweetBookmarkResponse): boolean =>
+    response?.data?.tweet_bookmark_put === 'Done',
+  TWEET_DETAILS: (
+    response: ITweetDetailsResponse,
+    id: string,
+  ): Tweet | undefined => Tweet.single(response, id),
+  TWEET_DETAILS_ALT: (
+    response: ITweetRepliesResponse,
+    id: string,
+  ): Tweet | undefined => Tweet.single(response, id),
+  TWEET_DETAILS_BULK: (
+    response: ITweetDetailsBulkResponse,
+    ids: string[],
+  ): Tweet[] => Tweet.multiple(response, ids),
+  TWEET_LIKE: (response: ITweetLikeResponse): boolean =>
+    !!response?.data?.favorite_tweet,
   TWEET_LIKERS: (response: ITweetLikersResponse): CursoredData<User> =>
     new CursoredData<User>(response, BaseType.USER),
   TWEET_POST: (response: ITweetPostResponse): string =>
     response?.data?.create_tweet?.tweet_results?.result?.rest_id ?? undefined,
   TWEET_REPLIES: (response: ITweetDetailsResponse): CursoredData<Tweet> =>
     new CursoredData<Tweet>(response, BaseType.TWEET),
-  TWEET_RETWEET: (response: ITweetRetweetResponse): boolean => (!!response?.data?.create_retweet),
+  TWEET_RETWEET: (response: ITweetRetweetResponse): boolean =>
+    !!response?.data?.create_retweet,
   TWEET_RETWEETERS: (response: ITweetRetweetersResponse): CursoredData<User> =>
     new CursoredData<User>(response, BaseType.USER),
-  TWEET_SCHEDULE: (response: ITweetScheduleResponse): string => response?.data?.tweet?.rest_id ?? undefined,
+  TWEET_SCHEDULE: (response: ITweetScheduleResponse): string =>
+    response?.data?.tweet?.rest_id ?? undefined,
   TWEET_SEARCH: (response: ITweetSearchResponse): CursoredData<Tweet> =>
     new CursoredData<Tweet>(response, BaseType.TWEET),
-  TWEET_UNBOOKMARK: (response: ITweetUnbookmarkResponse): boolean => response?.data?.tweet_bookmark_delete === 'Done',
-  TWEET_UNLIKE: (response: ITweetUnlikeResponse): boolean => (!!response?.data?.unfavorite_tweet),
-  TWEET_UNPOST: (response: ITweetUnpostResponse): boolean => (!!response?.data?.delete_tweet),
+  TWEET_UNBOOKMARK: (response: ITweetUnbookmarkResponse): boolean =>
+    response?.data?.tweet_bookmark_delete === 'Done',
+  TWEET_UNLIKE: (response: ITweetUnlikeResponse): boolean =>
+    !!response?.data?.unfavorite_tweet,
+  TWEET_UNPOST: (response: ITweetUnpostResponse): boolean =>
+    !!response?.data?.delete_tweet,
   TWEET_UNRETWEET: (response: ITweetUnretweetResponse): boolean =>
     !!response?.data?.unretweet?.source_tweet_results?.result,
-  TWEET_UNSCHEDULE: (response: ITweetUnscheduleResponse): boolean => response?.data?.scheduledtweet_delete === 'Done',
+  TWEET_UNSCHEDULE: (response: ITweetUnscheduleResponse): boolean =>
+    response?.data?.scheduledtweet_delete === 'Done',
 
   USER_AFFILIATES: (response: IUserAffiliatesResponse): CursoredData<User> =>
     new CursoredData<User>(response, BaseType.USER),
@@ -109,34 +133,44 @@ export const Extractors = {
     new Analytics(response.data.viewer_v2.user_results.result),
   USER_BOOKMARKS: (response: IUserBookmarksResponse): CursoredData<Tweet> =>
     new CursoredData<Tweet>(response, BaseType.TWEET),
-  USER_DETAILS_BY_USERNAME: (response: IUserDetailsResponse): User | undefined => User.single(response),
-  USER_DETAILS_BY_ID: (response: IUserDetailsResponse): User | undefined => User.single(response),
-  USER_DETAILS_BY_IDS_BULK: (response: IUserDetailsBulkResponse, ids: string[]): User[] =>
-    User.multiple(response, ids),
+  USER_DETAILS_BY_USERNAME: (
+    response: IUserDetailsResponse,
+  ): User | undefined => User.single(response),
+  USER_DETAILS_BY_ID: (response: IUserDetailsResponse): User | undefined =>
+    User.single(response),
+  USER_DETAILS_BY_IDS_BULK: (
+    response: IUserDetailsBulkResponse,
+    ids: string[],
+  ): User[] => User.multiple(response, ids),
   USER_FEED_FOLLOWED: (response: IUserFollowedResponse): CursoredData<Tweet> =>
     new CursoredData<Tweet>(response, BaseType.TWEET),
-  USER_FEED_RECOMMENDED: (response: IUserRecommendedResponse): CursoredData<Tweet> =>
-    new CursoredData<Tweet>(response, BaseType.TWEET),
-  USER_FOLLOW: (response: IUserFollowResponse): boolean => (!!response?.id),
+  USER_FEED_RECOMMENDED: (
+    response: IUserRecommendedResponse,
+  ): CursoredData<Tweet> => new CursoredData<Tweet>(response, BaseType.TWEET),
+  USER_FOLLOW: (response: IUserFollowResponse): boolean => !!response?.id,
   USER_FOLLOWING: (response: IUserFollowingResponse): CursoredData<User> =>
     new CursoredData<User>(response, BaseType.USER),
   USER_FOLLOWERS: (response: IUserFollowersResponse): CursoredData<User> =>
     new CursoredData<User>(response, BaseType.USER),
   USER_HIGHLIGHTS: (response: IUserHighlightsResponse): CursoredData<Tweet> =>
     new CursoredData<Tweet>(response, BaseType.TWEET),
-  USER_LISTS: (response: IUserListsResponse): CursoredData<List> => new CursoredData<List>(response, BaseType.LIST),
+  USER_LISTS: (response: IUserListsResponse): CursoredData<List> =>
+    new CursoredData<List>(response, BaseType.LIST),
   USER_LIKES: (response: IUserLikesResponse): CursoredData<Tweet> =>
     new CursoredData<Tweet>(response, BaseType.TWEET),
   USER_MEDIA: (response: IUserMediaResponse): CursoredData<Tweet> =>
     new CursoredData<Tweet>(response, BaseType.TWEET),
-  USER_NOTIFICATIONS: (response: IUserNotificationsResponse): CursoredData<Notification> =>
+  USER_NOTIFICATIONS: (
+    response: IUserNotificationsResponse,
+  ): CursoredData<Notification> =>
     new CursoredData<Notification>(response, BaseType.NOTIFICATION),
-  USER_SUBSCRIPTIONS: (response: IUserSubscriptionsResponse): CursoredData<User> =>
-    new CursoredData<User>(response, BaseType.USER),
+  USER_SUBSCRIPTIONS: (
+    response: IUserSubscriptionsResponse,
+  ): CursoredData<User> => new CursoredData<User>(response, BaseType.USER),
   USER_TIMELINE: (response: IUserTweetsResponse): CursoredData<Tweet> =>
     new CursoredData<Tweet>(response, BaseType.TWEET),
-  USER_TIMELINE_AND_REPLIES: (response: IUserTweetsAndRepliesResponse): CursoredData<Tweet> =>
-    new CursoredData<Tweet>(response, BaseType.TWEET),
-  USER_UNFOLLOW: (response: IUserUnfollowResponse): boolean => (!!response?.id),
-
+  USER_TIMELINE_AND_REPLIES: (
+    response: IUserTweetsAndRepliesResponse,
+  ): CursoredData<Tweet> => new CursoredData<Tweet>(response, BaseType.TWEET),
+  USER_UNFOLLOW: (response: IUserUnfollowResponse): boolean => !!response?.id,
 }

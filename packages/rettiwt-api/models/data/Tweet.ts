@@ -1,15 +1,20 @@
-import type { ITweet, ITweetEntities, ITweetMedia } from '../../types/data/Tweet'
-import type { ILimitedVisibilityTweet } from '../../types/raw/base/LimitedVisibilityTweet'
-import type { IExtendedMedia as IRawExtendedMedia } from '../../types/raw/base/Media'
-import type { ITweet as IRawTweet, IEntities as IRawTweetEntities } from '../../types/raw/base/Tweet'
-
-import type { ITimelineTweet } from '../../types/raw/composite/TimelineTweet'
-
 import { LogActions } from '../../enums/Logging'
 import { MediaType } from '../../enums/Media'
 import { RawMediaType } from '../../enums/raw/Media'
 import { findByFilter } from '../../helper/JsonUtils'
 import { LogService } from '../../services/internal/LogService'
+import type {
+  ITweet,
+  ITweetEntities,
+  ITweetMedia,
+} from '../../types/data/Tweet'
+import type { ILimitedVisibilityTweet } from '../../types/raw/base/LimitedVisibilityTweet'
+import type { IExtendedMedia as IRawExtendedMedia } from '../../types/raw/base/Media'
+import type {
+  ITweet as IRawTweet,
+  IEntities as IRawTweetEntities,
+} from '../../types/raw/base/Tweet'
+import type { ITimelineTweet } from '../../types/raw/composite/TimelineTweet'
 
 import { User } from './User'
 
@@ -51,9 +56,13 @@ export class Tweet implements ITweet {
     this.createdAt = new Date(tweet.legacy.created_at).toISOString()
     this.tweetBy = new User(tweet.core.user_results.result)
     this.entities = new TweetEntities(tweet.legacy.entities)
-    this.media = tweet.legacy.extended_entities?.media?.map(media => new TweetMedia(media))
+    this.media = tweet.legacy.extended_entities?.media?.map(
+      (media) => new TweetMedia(media),
+    )
     this.quoted = this._getQuotedTweet(tweet)
-    this.fullText = tweet.note_tweet ? tweet.note_tweet.note_tweet_results.result.text : tweet.legacy.full_text
+    this.fullText = tweet.note_tweet
+      ? tweet.note_tweet.note_tweet_results.result.text
+      : tweet.legacy.full_text
     this.replyTo = tweet.legacy.in_reply_to_status_id_str
     this.lang = tweet.legacy.lang
     this.quoteCount = tweet.legacy.quote_count
@@ -81,11 +90,15 @@ export class Tweet implements ITweet {
   private _getQuotedTweet(tweet: IRawTweet): Tweet | undefined {
     // If tweet with limited visibility
     if (
-      tweet.quoted_status_result
-      && tweet.quoted_status_result?.result?.__typename === 'TweetWithVisibilityResults'
-      && (tweet.quoted_status_result.result as ILimitedVisibilityTweet)?.tweet?.legacy
+      tweet.quoted_status_result &&
+      tweet.quoted_status_result?.result?.__typename ===
+        'TweetWithVisibilityResults' &&
+      (tweet.quoted_status_result.result as ILimitedVisibilityTweet)?.tweet
+        ?.legacy
     ) {
-      return new Tweet((tweet.quoted_status_result.result as ILimitedVisibilityTweet).tweet)
+      return new Tweet(
+        (tweet.quoted_status_result.result as ILimitedVisibilityTweet).tweet,
+      )
     }
     // If normal tweet
     else if ((tweet.quoted_status_result?.result as IRawTweet)?.rest_id) {
@@ -107,14 +120,21 @@ export class Tweet implements ITweet {
   private _getRetweetedTweet(tweet: IRawTweet): Tweet | undefined {
     // If retweet with limited visibility
     if (
-      tweet.legacy?.retweeted_status_result
-      && tweet.legacy?.retweeted_status_result?.result?.__typename === 'TweetWithVisibilityResults'
-      && (tweet.legacy?.retweeted_status_result?.result as ILimitedVisibilityTweet)?.tweet?.legacy
+      tweet.legacy?.retweeted_status_result &&
+      tweet.legacy?.retweeted_status_result?.result?.__typename ===
+        'TweetWithVisibilityResults' &&
+      (tweet.legacy?.retweeted_status_result?.result as ILimitedVisibilityTweet)
+        ?.tweet?.legacy
     ) {
-      return new Tweet((tweet.legacy.retweeted_status_result.result as ILimitedVisibilityTweet).tweet)
+      return new Tweet(
+        (tweet.legacy.retweeted_status_result.result as ILimitedVisibilityTweet)
+          .tweet,
+      )
     }
     // If normal tweet
-    else if ((tweet.legacy?.retweeted_status_result?.result as IRawTweet)?.rest_id) {
+    else if (
+      (tweet.legacy?.retweeted_status_result?.result as IRawTweet)?.rest_id
+    ) {
       return new Tweet(tweet.legacy.retweeted_status_result.result as IRawTweet)
     }
     // Else, skip
@@ -131,7 +151,10 @@ export class Tweet implements ITweet {
    *
    * @returns The target deserialized tweets.
    */
-  public static multiple(response: NonNullable<unknown>, ids: string[]): Tweet[] {
+  public static multiple(
+    response: NonNullable<unknown>,
+    ids: string[],
+  ): Tweet[] {
     let tweets: Tweet[] = []
 
     // Extracting the matching data
@@ -144,8 +167,7 @@ export class Tweet implements ITweet {
         LogService.log(LogActions.DESERIALIZE, { id: item.rest_id })
 
         tweets.push(new Tweet(item))
-      }
-      else {
+      } else {
         // Logging
         LogService.log(LogActions.WARNING, {
           action: LogActions.DESERIALIZE,
@@ -156,7 +178,7 @@ export class Tweet implements ITweet {
 
     // Filtering only required tweets, if required
     if (ids && ids.length) {
-      tweets = tweets.filter(tweet => ids.includes(tweet.id))
+      tweets = tweets.filter((tweet) => ids.includes(tweet.id))
     }
 
     return tweets
@@ -170,7 +192,10 @@ export class Tweet implements ITweet {
    *
    * @returns The target deserialized tweet.
    */
-  public static single(response: NonNullable<unknown>, id: string): Tweet | undefined {
+  public static single(
+    response: NonNullable<unknown>,
+    id: string,
+  ): Tweet | undefined {
     const tweets: Tweet[] = []
 
     // Extracting the matching data
@@ -183,8 +208,7 @@ export class Tweet implements ITweet {
         LogService.log(LogActions.DESERIALIZE, { id: item.rest_id })
 
         tweets.push(new Tweet(item))
-      }
-      else {
+      } else {
         // Logging
         LogService.log(LogActions.WARNING, {
           action: LogActions.DESERIALIZE,
@@ -208,22 +232,33 @@ export class Tweet implements ITweet {
     const tweets: Tweet[] = []
 
     // Extracting the matching data
-    const extract = findByFilter<ITimelineTweet>(response, '__typename', 'TimelineTweet')
+    const extract = findByFilter<ITimelineTweet>(
+      response,
+      '__typename',
+      'TimelineTweet',
+    )
 
     // Deserializing valid data
     for (const item of extract) {
       // If tweet with limited visibility
       if (
-        item.tweet_results?.result
-        && item.tweet_results?.result?.__typename === 'TweetWithVisibilityResults'
-        && (item.tweet_results?.result as ILimitedVisibilityTweet)?.tweet?.legacy
+        item.tweet_results?.result &&
+        item.tweet_results?.result?.__typename ===
+          'TweetWithVisibilityResults' &&
+        (item.tweet_results?.result as ILimitedVisibilityTweet)?.tweet?.legacy
       ) {
-        tweets.push(new Tweet((item.tweet_results.result as ILimitedVisibilityTweet).tweet))
+        tweets.push(
+          new Tweet(
+            (item.tweet_results.result as ILimitedVisibilityTweet).tweet,
+          ),
+        )
       }
       // If normal tweet
       else if ((item.tweet_results?.result as IRawTweet)?.legacy) {
         // Logging
-        LogService.log(LogActions.DESERIALIZE, { id: (item.tweet_results.result as IRawTweet).rest_id })
+        LogService.log(LogActions.DESERIALIZE, {
+          id: (item.tweet_results.result as IRawTweet).rest_id,
+        })
 
         tweets.push(new Tweet(item.tweet_results.result as IRawTweet))
       }
@@ -253,7 +288,7 @@ export class Tweet implements ITweet {
       id: this.id,
       lang: this.lang,
       likeCount: this.likeCount,
-      media: this.media?.map(item => item.toJSON()),
+      media: this.media?.map((item) => item.toJSON()),
       quoteCount: this.quoteCount,
       quoted: this.quoted?.toJSON(),
       replyCount: this.replyCount,

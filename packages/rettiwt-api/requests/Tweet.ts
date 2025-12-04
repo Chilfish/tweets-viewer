@@ -1,8 +1,10 @@
 import type { AxiosRequestConfig } from 'axios'
-
 import type { ITweetFilter } from '../types/args/FetchArgs'
 import type { INewTweet } from '../types/args/PostArgs'
-import { RawTweetRepliesSortType, RawTweetSearchResultType } from '../enums/raw/Tweet'
+import {
+  RawTweetRepliesSortType,
+  RawTweetSearchResultType,
+} from '../enums/raw/Tweet'
 import { TweetFilter } from '../models/args/FetchArgs'
 import { NewTweet } from '../models/args/PostArgs'
 import { MediaVariable, ReplyVariable } from '../models/params/Variables'
@@ -162,7 +164,11 @@ export class TweetRequests {
    * @param count - The number of likers to fetch. Only works as a lower limit when used with a cursor.
    * @param cursor - The cursor to the batch of likers to fetch.
    */
-  public static likers(id: string, count?: number, cursor?: string): AxiosRequestConfig {
+  public static likers(
+    id: string,
+    count?: number,
+    cursor?: string,
+  ): AxiosRequestConfig {
     return {
       method: 'get',
       url: 'https://x.com/i/api/graphql/4AzoFlLkEcs2bx5pO1mvsQ/Favoriters',
@@ -225,9 +231,15 @@ export class TweetRequests {
         variables: {
           tweet_text: parsedArgs.text,
           dark_request: false,
-          attachment_url: parsedArgs.quote ? `https://x.com/i/status/${parsedArgs.quote}` : undefined,
-          media: parsedArgs.media ? new MediaVariable(parsedArgs.media) : undefined,
-          reply: parsedArgs.replyTo ? new ReplyVariable(parsedArgs.replyTo) : undefined,
+          attachment_url: parsedArgs.quote
+            ? `https://x.com/i/status/${parsedArgs.quote}`
+            : undefined,
+          media: parsedArgs.media
+            ? new MediaVariable(parsedArgs.media)
+            : undefined,
+          reply: parsedArgs.replyTo
+            ? new ReplyVariable(parsedArgs.replyTo)
+            : undefined,
           semantic_annotation_ids: [],
         },
         features: {
@@ -269,7 +281,11 @@ export class TweetRequests {
    * @param id - The id of the tweet whose replies are to be fetched.
    * @param cursor - The cursor to the batch of replies to fetch.
    */
-  public static replies(id: string, cursor?: string, sortBy?: RawTweetRepliesSortType): AxiosRequestConfig {
+  public static replies(
+    id: string,
+    cursor?: string,
+    sortBy?: RawTweetRepliesSortType,
+  ): AxiosRequestConfig {
     return {
       method: 'get',
       url: 'https://x.com/i/api/graphql/_8aYOgEDz35BrBcBal1-_w/TweetDetail',
@@ -351,7 +367,11 @@ export class TweetRequests {
    * @param count - The number of retweeters to fetch. Only works as a lower limit when used with a cursor.
    * @param cursor - The cursor to the batch of retweeters to fetch.
    */
-  public static retweeters(id: string, count?: number, cursor?: string): AxiosRequestConfig {
+  public static retweeters(
+    id: string,
+    count?: number,
+    cursor?: string,
+  ): AxiosRequestConfig {
     return {
       method: 'get',
       url: 'https://x.com/i/api/graphql/i-CI8t2pJD15euZJErEDrg/Retweeters',
@@ -421,7 +441,9 @@ export class TweetRequests {
             exclude_reply_user_ids: [],
             media_ids: parsedArgs.media?.map(item => item.id) ?? [],
           },
-          execute_at: Math.floor((parsedArgs.scheduleFor ?? new Date()).getTime() / 1000),
+          execute_at: Math.floor(
+            (parsedArgs.scheduleFor ?? new Date()).getTime() / 1000,
+          ),
         },
       },
     }
@@ -432,7 +454,11 @@ export class TweetRequests {
    * @param count - The number of tweets to fetch. Only works as a lower limit when used with a cursor.
    * @param cursor - The cursor to the batch of tweets to fetch.
    */
-  public static search(filter: ITweetFilter, count?: number, cursor?: string): AxiosRequestConfig {
+  public static search(
+    filter: ITweetFilter,
+    count?: number,
+    cursor?: string,
+  ): AxiosRequestConfig {
     // Parsing the filter
     const parsedFilter = new TweetFilter(filter)
 
@@ -445,7 +471,9 @@ export class TweetRequests {
           count,
           cursor,
           querySource: 'typed_query',
-          product: parsedFilter.top ? RawTweetSearchResultType.TOP : RawTweetSearchResultType.LATEST,
+          product: parsedFilter.top
+            ? RawTweetSearchResultType.TOP
+            : RawTweetSearchResultType.LATEST,
           withAuxiliaryUserLabels: false,
           withArticleRichContentState: false,
           withArticlePlainText: false,

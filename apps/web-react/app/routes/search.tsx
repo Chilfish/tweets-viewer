@@ -1,10 +1,10 @@
+import type { SortOrder } from '~/stores'
 import { Search, X } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router'
 import { TweetsList } from '~/components/tweets/tweets-list'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
-import type { SortOrder } from '~/stores'
 import { useSearchStore } from '~/stores'
 import { useUserStore } from '~/stores/user-store'
 
@@ -41,7 +41,8 @@ export default function SearchPage() {
   const isInitialized = useRef(false)
 
   useEffect(() => {
-    if (!curUser) return
+    if (!curUser)
+      return
 
     const userChanged = storeUser !== curUser.screenName
     if (userChanged) {
@@ -52,7 +53,7 @@ export default function SearchPage() {
 
     if (!isInitialized.current) {
       const q = searchParams.get('q') || ''
-      const pageParam = parseInt(searchParams.get('page') || '1', 10) - 1
+      const pageParam = Number.parseInt(searchParams.get('page') || '1', 10) - 1
       const sortParam = (searchParams.get('sort') as SortOrder) || 'desc'
       const startDateParam = searchParams.get('startDate')
       const endDateParam = searchParams.get('endDate')
@@ -84,7 +85,8 @@ export default function SearchPage() {
   ])
 
   useEffect(() => {
-    if (!isInitialized.current) return
+    if (!isInitialized.current)
+      return
 
     const params = new URLSearchParams()
     if (keyword) {
@@ -112,46 +114,47 @@ export default function SearchPage() {
     setSearchParams(params, { replace: true })
   }, [keyword, page, filters, setSearchParams])
 
-  if (!curUser) return null
+  if (!curUser)
+    return null
 
   return (
-    <div className='min-h-screen bg-background text-foreground transition-colors duration-200'>
-      <div className='max-w-2xl mx-auto'>
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-200">
+      <div className="max-w-2xl mx-auto">
         {/* Search Header */}
-        <div className='sticky top-0 z-10 bg-background/60 backdrop-blur-lg border-b border-border transition-colors duration-200'>
+        <div className="sticky top-0 z-10 bg-background/60 backdrop-blur-lg border-b border-border transition-colors duration-200">
           <form
             onSubmit={(e) => {
               e.preventDefault()
               searchTweets(true)
             }}
-            className='p-4 flex items-center gap-2'
+            className="p-4 flex items-center gap-2"
           >
-            <div className='relative flex-1'>
-              <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400' />
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
-                name='search'
-                type='text'
-                placeholder='搜索推文...'
+                name="search"
+                type="text"
+                placeholder="搜索推文..."
                 value={keyword}
-                onChange={(e) => setKeyword(e.target.value)}
-                className='pl-10 pr-10 bg-input border-border text-foreground placeholder:text-muted-foreground transition-colors duration-200'
+                onChange={e => setKeyword(e.target.value)}
+                className="pl-10 pr-10 bg-input border-border text-foreground placeholder:text-muted-foreground transition-colors duration-200"
               />
               {keyword && (
                 <Button
-                  variant='ghost'
-                  size='sm'
+                  variant="ghost"
+                  size="sm"
                   onClick={clearSearch}
-                  type='reset'
-                  className='absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0'
+                  type="reset"
+                  className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
                 >
-                  <X className='h-3 w-3' />
+                  <X className="h-3 w-3" />
                 </Button>
               )}
             </div>
             <Button
-              type='submit'
+              type="submit"
               disabled={!keyword.trim() || isSearching}
-              className='bg-primary hover:bg-primary/90 text-primary-foreground transition-colors duration-200'
+              className="bg-primary hover:bg-primary/90 text-primary-foreground transition-colors duration-200"
             >
               {isSearching ? '搜索中...' : '搜索'}
             </Button>
@@ -160,24 +163,24 @@ export default function SearchPage() {
 
         {/* Search Results */}
         {!keyword?.trim() ? (
-          <div className='text-center py-12'>
-            <Search className='h-12 w-12 mx-auto text-gray-400 mb-4' />
-            <h2 className='text-xl font-semibold mb-2 text-muted-foreground'>
+          <div className="text-center py-12">
+            <Search className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+            <h2 className="text-xl font-semibold mb-2 text-muted-foreground">
               搜索推文
             </h2>
           </div>
         ) : isSearching && data.length === 0 ? (
-          <div className='text-center py-12'>
-            <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4'></div>
-            <p className='text-muted-foreground'>Searching...</p>
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Searching...</p>
           </div>
         ) : !isSearching && data.length === 0 ? (
-          <div className='text-center py-12'>
-            <Search className='h-12 w-12 mx-auto text-gray-400 mb-4' />
-            <h2 className='text-xl font-semibold mb-2 text-muted-foreground'>
+          <div className="text-center py-12">
+            <Search className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+            <h2 className="text-xl font-semibold mb-2 text-muted-foreground">
               找不到结果
             </h2>
-            <p className='text-muted-foreground'>
+            <p className="text-muted-foreground">
               请尝试不同的关键词或检查拼写
             </p>
           </div>

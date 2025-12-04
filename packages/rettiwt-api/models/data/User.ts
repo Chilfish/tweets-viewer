@@ -1,9 +1,9 @@
-import type { IUser } from '../../types/data/User'
-import type { IUser as IRawUser } from '../../types/raw/base/User'
-import type { ITimelineUser as IRawTimelineUser } from '../../types/raw/composite/TimelineUser'
 import { LogActions } from '../../enums/Logging'
 import { findByFilter } from '../../helper/JsonUtils'
 import { LogService } from '../../services/internal/LogService'
+import type { IUser } from '../../types/data/User'
+import type { IUser as IRawUser } from '../../types/raw/base/User'
+import type { ITimelineUser as IRawTimelineUser } from '../../types/raw/composite/TimelineUser'
 
 /**
  * The details of a single user.
@@ -40,7 +40,9 @@ export class User implements IUser {
     this.userName = user.legacy.screen_name
     this.fullName = user.legacy.name
     this.createdAt = new Date(user.legacy.created_at).toISOString()
-    this.description = user.legacy.description.length ? user.legacy.description : undefined
+    this.description = user.legacy.description.length
+      ? user.legacy.description
+      : undefined
     this.isFollowed = user.legacy.following ?? false
     this.isFollowing = user.legacy.followed_by ?? false
     this.isVerified = user.is_blue_verified
@@ -48,7 +50,9 @@ export class User implements IUser {
     this.followersCount = user.legacy.followers_count
     this.followingsCount = user.legacy.friends_count
     this.statusesCount = user.legacy.statuses_count
-    this.location = user.legacy.location.length ? user.legacy.location : undefined
+    this.location = user.legacy.location.length
+      ? user.legacy.location
+      : undefined
     this.pinnedTweet = user.legacy.pinned_tweet_ids_str[0]
     this.profileBanner = user.legacy.profile_banner_url
     this.profileImage = user.legacy.profile_image_url_https
@@ -67,7 +71,10 @@ export class User implements IUser {
    *
    * @returns The target deserialized users.
    */
-  public static multiple(response: NonNullable<unknown>, ids: string[]): User[] {
+  public static multiple(
+    response: NonNullable<unknown>,
+    ids: string[],
+  ): User[] {
     let users: User[] = []
 
     // Extracting the matching data
@@ -80,8 +87,7 @@ export class User implements IUser {
         LogService.log(LogActions.DESERIALIZE, { id: item.rest_id })
 
         users.push(new User(item))
-      }
-      else {
+      } else {
         // Logging
         LogService.log(LogActions.WARNING, {
           action: LogActions.DESERIALIZE,
@@ -92,7 +98,7 @@ export class User implements IUser {
 
     // Filtering only required user, if required
     if (ids && ids.length) {
-      users = users.filter(user => ids.includes(user.id))
+      users = users.filter((user) => ids.includes(user.id))
     }
 
     return users
@@ -118,8 +124,7 @@ export class User implements IUser {
         LogService.log(LogActions.DESERIALIZE, { id: item.rest_id })
 
         users.push(new User(item))
-      }
-      else {
+      } else {
         // Logging
         LogService.log(LogActions.WARNING, {
           action: LogActions.DESERIALIZE,
@@ -142,17 +147,22 @@ export class User implements IUser {
     const users: User[] = []
 
     // Extracting the matching data
-    const extract = findByFilter<IRawTimelineUser>(response, '__typename', 'TimelineUser')
+    const extract = findByFilter<IRawTimelineUser>(
+      response,
+      '__typename',
+      'TimelineUser',
+    )
 
     // Deserializing valid data
     for (const item of extract) {
       if (item.user_results?.result?.legacy) {
         // Logging
-        LogService.log(LogActions.DESERIALIZE, { id: item.user_results.result.rest_id })
+        LogService.log(LogActions.DESERIALIZE, {
+          id: item.user_results.result.rest_id,
+        })
 
         users.push(new User(item.user_results.result))
-      }
-      else {
+      } else {
         // Logging
         LogService.log(LogActions.WARNING, {
           action: LogActions.DESERIALIZE,

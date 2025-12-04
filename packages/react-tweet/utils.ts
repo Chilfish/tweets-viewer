@@ -6,7 +6,10 @@ export interface TweetCoreProps {
   onError?: (error: any) => any
 }
 
-export function getMediaUrl(media: MediaDetails, size: 'small' | 'medium' | 'large'): string {
+export function getMediaUrl(
+  media: MediaDetails,
+  size: 'small' | 'medium' | 'large',
+): string {
   const url = new URL(media.media_url_https)
   const extension = url.pathname.split('.').pop()
 

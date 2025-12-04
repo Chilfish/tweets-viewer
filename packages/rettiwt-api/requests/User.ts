@@ -1,7 +1,8 @@
 import type { AxiosRequestConfig } from 'axios'
-
-import type { RawAnalyticsGranularity, RawAnalyticsMetric } from '../enums/raw/Analytics'
-
+import type {
+  RawAnalyticsGranularity,
+  RawAnalyticsMetric,
+} from '../enums/raw/Analytics'
 import qs from 'node:querystring'
 
 /**
@@ -15,7 +16,11 @@ export class UserRequests {
    * @param count - The number of affiliates to fetch. Only works as a lower limit when used with a cursor.
    * @param cursor - The cursor to the batch of affiliates to fetch.
    */
-  public static affiliates(id: string, count?: number, cursor?: string): AxiosRequestConfig {
+  public static affiliates(
+    id: string,
+    count?: number,
+    cursor?: string,
+  ): AxiosRequestConfig {
     return {
       method: 'get',
       url: 'https://x.com/i/api/graphql/OVFfg1hExk_AygiMVSJd-Q/UserBusinessProfileTeamTimeline',
@@ -186,7 +191,10 @@ export class UserRequests {
       method: 'get',
       url: 'https://x.com/i/api/graphql/WJ7rCtezBVT6nk6VM5R8Bw/UserByRestId',
       params: {
-        variables: JSON.stringify({ userId: id, withSafetyModeUserFields: true }),
+        variables: JSON.stringify({
+          userId: id,
+          withSafetyModeUserFields: true,
+        }),
         features: JSON.stringify({
           hidden_profile_subscriptions_enabled: true,
           profile_label_improvements_pcf_label_in_post_enabled: true,
@@ -212,7 +220,10 @@ export class UserRequests {
       method: 'get',
       url: 'https://x.com/i/api/graphql/1VOOyvKkiI3FMmkeDNxM9A/UserByScreenName',
       params: {
-        variables: JSON.stringify({ screen_name: userName, withSafetyModeUserFields: true }),
+        variables: JSON.stringify({
+          screen_name: userName,
+          withSafetyModeUserFields: true,
+        }),
         features: JSON.stringify({
           hidden_profile_subscriptions_enabled: true,
           profile_label_improvements_pcf_label_in_post_enabled: true,
@@ -305,7 +316,11 @@ export class UserRequests {
    * @param count - The number of followers to fetch. Only works as a lower limit when used with a cursor.
    * @param cursor - The cursor to the batch of followers to fetch.
    */
-  public static followers(id: string, count?: number, cursor?: string): AxiosRequestConfig {
+  public static followers(
+    id: string,
+    count?: number,
+    cursor?: string,
+  ): AxiosRequestConfig {
     return {
       method: 'get',
       url: 'https://x.com/i/api/graphql/Elc_-qTARceHpztqhI9PQA/Followers',
@@ -359,7 +374,11 @@ export class UserRequests {
    * @param count - The number of followings to fetch. Only works as a lower limit when used with a cursor.
    * @param cursor - The cursor to the batch of followings to fetch.
    */
-  public static following(id: string, count?: number, cursor?: string): AxiosRequestConfig {
+  public static following(
+    id: string,
+    count?: number,
+    cursor?: string,
+  ): AxiosRequestConfig {
     return {
       method: 'get',
       url: 'https://x.com/i/api/graphql/C1qZ6bs-L3oc_TKSZyxkXQ/Following',
@@ -413,7 +432,11 @@ export class UserRequests {
    * @param count - The number of highlights to fetch. Only works as a lower limit when used with a cursor.
    * @param cursor - The cursor to the batch of highlights to fetch.
    */
-  public static highlights(id: string, count?: number, cursor?: string): AxiosRequestConfig {
+  public static highlights(
+    id: string,
+    count?: number,
+    cursor?: string,
+  ): AxiosRequestConfig {
     return {
       method: 'get',
       url: 'https://x.com/i/api/graphql/cr8FsaThDCa9LKeD9CNZ4w/UserHighlightsTweets',
@@ -469,7 +492,11 @@ export class UserRequests {
    * @param count - The number of likes to fetch. Only works as a lower limit when used with a cursor.
    * @param cursor - The cursor to the batch of likes to fetch.
    */
-  public static likes(id: string, count?: number, cursor?: string): AxiosRequestConfig {
+  public static likes(
+    id: string,
+    count?: number,
+    cursor?: string,
+  ): AxiosRequestConfig {
     return {
       method: 'get',
       url: 'https://x.com/i/api/graphql/eQl7iWsCr2fChppuJdAeRw/Likes',
@@ -528,7 +555,11 @@ export class UserRequests {
    * @param count - The number of lists to fetch. Only works as a lower limit when used with a cursor.
    * @param cursor - The cursor to the batch of lists to fetch.
    */
-  public static lists(id: string, count?: number, cursor?: string): AxiosRequestConfig {
+  public static lists(
+    id: string,
+    count?: number,
+    cursor?: string,
+  ): AxiosRequestConfig {
     return {
       method: 'get',
       url: 'https://x.com/i/api/graphql/tZg2CHWw-NAL0nKO2Q-P4Q/ListsManagementPageTimeline',
@@ -581,7 +612,11 @@ export class UserRequests {
    * @param count - The number of media to fetch. Only works as a lower limit when used with a cursor.
    * @param cursor - The cursor to the batch of media to fetch.
    */
-  public static media(id: string, count?: number, cursor?: string): AxiosRequestConfig {
+  public static media(
+    id: string,
+    count?: number,
+    cursor?: string,
+  ): AxiosRequestConfig {
     return {
       method: 'get',
       url: 'https://x.com/i/api/graphql/vFPc2LVIu7so2uA_gHQAdg/UserMedia',
@@ -639,7 +674,10 @@ export class UserRequests {
    * @param count - The number of notifications to fetch.
    * @param cursor - The cursor to the batch of notifications to fetch.
    */
-  public static notifications(count?: number, cursor?: string): AxiosRequestConfig {
+  public static notifications(
+    count?: number,
+    cursor?: string,
+  ): AxiosRequestConfig {
     return {
       method: 'get',
       url: 'https://x.com/i/api/graphql/gaBVLalXDBRDJz6maKgdWg/NotificationsTimeline',
@@ -690,7 +728,10 @@ export class UserRequests {
    * @param count - The number of timeline items to fetch. Only works as a lower limit when used with a cursor.
    * @param cursor - The cursor to the batch of recommended timeline items to fetch.
    */
-  public static recommended(count?: number, cursor?: string): AxiosRequestConfig {
+  public static recommended(
+    count?: number,
+    cursor?: string,
+  ): AxiosRequestConfig {
     return {
       method: 'get',
       url: 'https://x.com/i/api/graphql/Q_P3YVnmHunGFkZ8ISM-7w/HomeTimeline',
@@ -757,7 +798,11 @@ export class UserRequests {
    * @param count - The number of subscriptions to fetch. Only works as a lower limit when used with a cursor.
    * @param cursor - The cursor to the batch of subscriptions to fetch.
    */
-  public static subscriptions(id: string, count?: number, cursor?: string): AxiosRequestConfig {
+  public static subscriptions(
+    id: string,
+    count?: number,
+    cursor?: string,
+  ): AxiosRequestConfig {
     return {
       method: 'get',
       url: 'https://x.com/i/api/graphql/UWlxAhUnBNK0BYmeqNPqAw/UserCreatorSubscriptions',
@@ -800,7 +845,11 @@ export class UserRequests {
    * @param count - The number of timeline tweets to fetch. Only works as a lower limit when used with a cursor.
    * @param cursor - The cursor to the batch of timeline tweets to fetch.
    */
-  public static tweets(id: string, count?: number, cursor?: string): AxiosRequestConfig {
+  public static tweets(
+    id: string,
+    count?: number,
+    cursor?: string,
+  ): AxiosRequestConfig {
     return {
       method: 'get',
       url: 'https://x.com/i/api/graphql/HeWHY26ItCfUmm1e6ITjeA/UserTweets',
@@ -858,7 +907,11 @@ export class UserRequests {
    * @param count - The number of timeline tweets and replies to fetch. Only works as a lower limit when used with a cursor.
    * @param cursor - The cursor to the batch of timeline tweets and replies to fetch.
    */
-  public static tweetsAndReplies(id: string, count?: number, cursor?: string): AxiosRequestConfig {
+  public static tweetsAndReplies(
+    id: string,
+    count?: number,
+    cursor?: string,
+  ): AxiosRequestConfig {
     return {
       method: 'get',
       url: 'https://x.com/i/api/graphql/OAx9yEcW3JA9bPo63pcYlA/UserTweetsAndReplies',

@@ -78,7 +78,7 @@ const sampleMedia: TweetMedia[] = [
 // 模拟推文内容
 const sampleTweets = [
   'Just shipped a new feature that will change everything! 🚀',
-  "Working on something exciting. Can't wait to share it with you all!",
+  'Working on something exciting. Can\'t wait to share it with you all!',
   'The future is looking bright ☀️',
   'Sometimes the best solution is the simplest one.',
   'Coffee ☕ + Code 💻 = Magic ✨',
@@ -95,14 +95,16 @@ const sampleTweets = [
 ]
 
 // 生成随机数
-const randomInt = (min: number, max: number) =>
-  Math.floor(Math.random() * (max - min + 1)) + min
-const randomChoice = <T>(array: T[]): T =>
-  array[Math.floor(Math.random() * array.length)]
+function randomInt(min: number, max: number) {
+  return Math.floor(Math.random() * (max - min + 1)) + min
+}
+function randomChoice<T>(array: T[]): T {
+  return array[Math.floor(Math.random() * array.length)]
+}
 
 // 生成用户信息
-const generateUserInfo = (screenName: string): UserInfo => {
-  const user = mockUsers[screenName] || mockUsers['elonmusk']
+function generateUserInfo(screenName: string): UserInfo {
+  const user = mockUsers[screenName] || mockUsers.elonmusk
   return {
     name: user.name,
     screenName: user.screenName,
@@ -111,7 +113,7 @@ const generateUserInfo = (screenName: string): UserInfo => {
 }
 
 // 生成推文媒体
-const generateMedia = (): TweetMedia[] => {
+function generateMedia(): TweetMedia[] {
   const mediaCount = randomInt(0, 10) > 7 ? randomInt(1, 4) : 0
   return Array.from({ length: mediaCount }, (_, index) => ({
     ...sampleMedia[index % sampleMedia.length],
@@ -120,9 +122,10 @@ const generateMedia = (): TweetMedia[] => {
 }
 
 // 生成引用推文
-const generateQuotedTweet = (depth = 0): QuotedTweet | null => {
+function generateQuotedTweet(depth = 0): QuotedTweet | null {
   // 只有20%的概率有引用推文，且不超过1层深度
-  if (depth > 0 || randomInt(1, 10) > 2) return null
+  if (depth > 0 || randomInt(1, 10) > 2)
+    return null
 
   const userNames = Object.keys(mockUsers)
   const randomUserName = randomChoice(userNames)
@@ -134,16 +137,14 @@ const generateQuotedTweet = (depth = 0): QuotedTweet | null => {
 }
 
 // 生成转推
-const generateRetweet = (
-  originalScreenName: string,
-  depth = 0,
-): ReTweet | null => {
+function generateRetweet(originalScreenName: string, depth = 0): ReTweet | null {
   // 只有15%的概率是转推，且不超过1层深度
-  if (depth > 0 || randomInt(1, 10) > 1.5) return null
+  if (depth > 0 || randomInt(1, 10) > 1.5)
+    return null
 
   const userNames = Object.keys(mockUsers)
-  const randomUserName =
-    userNames.find((name) => name !== originalScreenName) || 'vercel'
+  const randomUserName
+    = userNames.find(name => name !== originalScreenName) || 'vercel'
 
   return {
     user: generateUserInfo(randomUserName),
@@ -152,11 +153,7 @@ const generateRetweet = (
 }
 
 // 生成单条推文
-export const generateTweet = (
-  screenName: string,
-  depth = 0,
-  canRetweet = true,
-): Tweet => {
+export function generateTweet(screenName: string, depth = 0, canRetweet = true): Tweet {
   const tweetId = Math.random().toString(36).substring(2, 15)
   const userId = mockUsers[screenName]?.restId || '44196397'
 
@@ -164,15 +161,15 @@ export const generateTweet = (
   const now = new Date()
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
   const createdAt = new Date(
-    thirtyDaysAgo.getTime() +
-      Math.random() * (now.getTime() - thirtyDaysAgo.getTime()),
+    thirtyDaysAgo.getTime()
+    + Math.random() * (now.getTime() - thirtyDaysAgo.getTime()),
   )
 
   return {
     id: tweetId,
-    tweetId: tweetId,
-    userId: userId,
-    createdAt: createdAt,
+    tweetId,
+    userId,
+    createdAt,
     fullText: randomChoice(sampleTweets),
     media: generateMedia(),
     retweetCount: randomInt(0, 10000),
@@ -186,20 +183,21 @@ export const generateTweet = (
 }
 
 // 获取用户信息
-export const getUser = (screenName: string): User => {
-  return mockUsers[screenName] || mockUsers['elonmusk']
+export function getUser(screenName: string): User {
+  return mockUsers[screenName] || mockUsers.elonmusk
 }
 
 export const fetchUsers = () => mockUsers
 
 // 生成推文列表
-export const generateTweets = (screenName: string, count: number): Tweet[] => {
+export function generateTweets(screenName: string, count: number): Tweet[] {
   return Array.from({ length: count }, () => generateTweet(screenName))
 }
 
 // 模拟API延迟
-export const delay = (ms: number) =>
-  new Promise((resolve) => setTimeout(resolve, ms))
+export function delay(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
 
 // API查询参数接口（为未来API对接准备）
 export interface TweetsQueryParams {
@@ -210,12 +208,7 @@ export interface TweetsQueryParams {
 }
 
 // 分页获取推文
-export const getTweets = async (
-  screenName: string,
-  page: number = 1,
-  pageSize: number = 10,
-  params?: TweetsQueryParams,
-): Promise<{ tweets: Tweet[]; hasMore: boolean }> => {
+export async function getTweets(screenName: string, page: number = 1, pageSize: number = 10, params?: TweetsQueryParams): Promise<{ tweets: Tweet[], hasMore: boolean }> {
   await delay(randomInt(300, 800)) // 模拟网络延迟
 
   let tweets = generateTweets(screenName, pageSize)
@@ -224,8 +217,10 @@ export const getTweets = async (
   if (params?.startDate || params?.endDate) {
     tweets = tweets.filter((tweet) => {
       const tweetDate = new Date(tweet.createdAt)
-      if (params.startDate && tweetDate < params.startDate) return false
-      if (params.endDate && tweetDate > params.endDate) return false
+      if (params.startDate && tweetDate < params.startDate)
+        return false
+      if (params.endDate && tweetDate > params.endDate)
+        return false
       return true
     })
   }

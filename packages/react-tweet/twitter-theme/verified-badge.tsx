@@ -1,10 +1,6 @@
 import type { TweetUser } from '~/lib/react-tweet'
 import clsx from 'clsx'
-import {
-  Verified,
-  VerifiedBusiness,
-  VerifiedGovernment,
-} from './icons/index'
+import { Verified, VerifiedBusiness, VerifiedGovernment } from './icons/index'
 import s from './verified-badge.module.css'
 
 interface Props {
@@ -33,9 +29,7 @@ export function VerifiedBadge({ user, className }: Props) {
     }
   }
 
-  return verified
-    ? (
-        <div className={clsx(className, iconClassName)}>{icon}</div>
-      )
-    : null
+  return verified ? (
+    <div className={clsx(className, iconClassName)}>{icon}</div>
+  ) : null
 }

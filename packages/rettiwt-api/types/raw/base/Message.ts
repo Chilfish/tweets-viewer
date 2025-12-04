@@ -8,7 +8,9 @@ type InboxMessageData = Message['message_data']
 type TimelineMessageData = TimelineMessage['message_data']
 
 // Create unified message_data type that includes all possible fields
-type UnifiedMessageData = InboxMessageData & Partial<ConversationMessageData> & Partial<TimelineMessageData>
+type UnifiedMessageData = InboxMessageData
+  & Partial<ConversationMessageData>
+  & Partial<TimelineMessageData>
 
 export interface IMessage {
   id: string

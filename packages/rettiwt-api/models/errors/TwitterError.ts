@@ -1,7 +1,13 @@
 import type { AxiosError } from 'axios'
 
-import type { ITwitterError, ITwitterErrorDetails } from '../../types/errors/TwitterError'
-import type { IErrorData as IRawErrorData, IErrorDetails as IRawErrorDetails } from '../../types/raw/base/Error'
+import type {
+  ITwitterError,
+  ITwitterErrorDetails,
+} from '../../types/errors/TwitterError'
+import type {
+  IErrorData as IRawErrorData,
+  IErrorDetails as IRawErrorDetails,
+} from '../../types/raw/base/Error'
 
 /**
  * The error thrown by Twitter API.
@@ -21,7 +27,9 @@ export class TwitterError extends Error implements ITwitterError {
     super(error.message)
     this.details = (
       (error.response?.data as IRawErrorData)?.errors
-        ? (error.response?.data as IRawErrorData).errors.map(item => new TwitterErrorDetails(item))
+        ? (error.response?.data as IRawErrorData).errors.map(
+            item => new TwitterErrorDetails(item),
+          )
         : [new TwitterErrorDetails(error.response?.data as IRawErrorDetails)]
     ).map(item => item.toJSON())
     this.message = error.message

@@ -1,5 +1,4 @@
 import type { IErrorHandler } from '../types/ErrorHandler'
-
 import type { IRettiwtConfig } from '../types/RettiwtConfig'
 import { AuthService } from '../services/internal/AuthService'
 
@@ -9,7 +8,6 @@ import { AuthService } from '../services/internal/AuthService'
  * @public
  */
 const DefaultHeaders = {
-
   'Authority': 'x.com',
   'Accept-Language': 'en-US,en;q=0.9',
   'Cache-Control': 'no-cache',
@@ -18,7 +16,6 @@ const DefaultHeaders = {
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36',
   'X-Twitter-Active-User': 'yes',
   'X-Twitter-Client-Language': 'en',
-
 }
 
 /**
@@ -44,7 +41,9 @@ export class RettiwtConfig implements IRettiwtConfig {
    */
   public constructor(config?: IRettiwtConfig) {
     this._apiKey = config?.apiKey
-    this._userId = config?.apiKey ? AuthService.getUserId(config?.apiKey) : undefined
+    this._userId = config?.apiKey
+      ? AuthService.getUserId(config?.apiKey)
+      : undefined
     this.delay = config?.delay ?? 0
     this.maxRetries = config?.maxRetries ?? 0
     this.errorHandler = config?.errorHandler
