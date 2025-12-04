@@ -5,11 +5,11 @@
   "private": true,
   "scripts": {},
   "dependencies": {
-    "drizzle-kit": "^0.31.5",
-    "drizzle-orm": "^0.44.6"
+    "drizzle-kit": "^0.31.7",
+    "drizzle-orm": "^0.44.7"
   },
   "devDependencies": {
-    "rettiwt-api": "^6.0.6"
+    "rettiwt-api": "^6.1.2"
   },
-  "packageManager": "bun@1.3.0"
+  "packageManager": "bun@1.3.3"
 }
