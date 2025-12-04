@@ -1,6 +1,6 @@
 import { FetcherService } from 'rettiwt-api'
-import { baseDir, cachedData, writeJson } from '../../../packages/shared/utils'
-import { fetchTweet, fetchUser } from '../../database/services'
+import { baseDir, cachedData, writeJson } from '@tweets-viewer/shared'
+import { fetchTweet, fetchUser } from '../services'
 import 'dotenv/config'
 
 const username = process.argv[2] || 'elonmusk'

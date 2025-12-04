@@ -1,8 +1,8 @@
 import pMap from 'p-map'
 import type { FetcherService } from 'rettiwt-api'
-import type { DB } from '../index'
-import { getLatestTweets, updateUserTweets } from '../modules/tweet'
-import type { InsertTweet } from '../schema'
+import type { DB } from '@tweets-viewer/database'
+import { getLatestTweets, updateUserTweets } from '@tweets-viewer/database'
+import type { InsertTweet } from '@tweets-viewer/database'
 import { fetchTweet } from './fetchTweet'
 
 async function updateTweet({

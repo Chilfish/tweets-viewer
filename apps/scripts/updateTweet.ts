@@ -1,5 +1,5 @@
 import { neon } from '@neondatabase/serverless'
-import { updateAllTweets } from '@tweets-viewer/database'
+import { updateAllTweets } from './services'
 import { drizzle } from 'drizzle-orm/neon-http'
 import { FetcherService } from 'rettiwt-api'
 import 'dotenv/config'
