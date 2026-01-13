@@ -126,7 +126,7 @@ export function TweetsSortControls({
             ) : (
               <SortAsc className="h-3 w-3" />
             )}
-            <span>{filters.sortOrder === 'desc' ? '倒序' : '顺序'}</span>
+            <span className="text-sm">{filters.sortOrder === 'desc' ? '倒序' : '顺序'}</span>
             <ChevronDown className="h-3 w-3" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-fit">

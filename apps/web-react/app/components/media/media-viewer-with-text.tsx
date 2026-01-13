@@ -1,6 +1,7 @@
-import type { formatDate, Tweet, type UserInfo } from '@tweets-viewer/shared'
+import type { Tweet, UserInfo } from '@tweets-viewer/shared'
 import type { Slide } from 'yet-another-react-lightbox'
 import type { InsMediaItem } from '~/stores/ins-store'
+import { formatDate } from '@tweets-viewer/shared'
 /** biome-ignore-all lint/a11y/useButtonType: <explanation> */
 import { Info, X } from 'lucide-react'
 
@@ -87,6 +88,9 @@ export function MediaViewerWithText({
             backgroundColor: 'rgba(0, 0, 0, 0.85)',
             backdropFilter: 'blur(8px)',
           },
+          root: {
+            zIndex: 10,
+          },
         }}
         toolbar={{
           buttons: [
@@ -133,7 +137,7 @@ export function MediaViewerWithText({
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
         <SheetContent
           side={sheetSide}
-          className="sm:max-w-[36rem] z-[10000] h-fit p-4 px-2 rounded-md mt-20 gap-0"
+          className="sm:max-w-[36rem] h-fit p-4 px-2 rounded-md mt-20 gap-0"
         >
           <SheetHeader>
             <SheetTitle className="text-lg font-semibold">推文详情</SheetTitle>
