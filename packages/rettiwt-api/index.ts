@@ -35,11 +35,8 @@ export * from './requests/User'
 export * from './Rettiwt'
 
 // SERVICES
-export * from './services/public/DirectMessageService'
 export * from './services/public/FetcherService'
-export * from './services/public/ListService'
 export * from './services/public/TweetService'
-export * from './services/public/UserService'
 
 // TYPES
 export * from './types/args/FetchArgs'

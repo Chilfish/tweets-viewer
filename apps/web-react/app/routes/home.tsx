@@ -66,8 +66,11 @@ export default function HomePage() {
             </ul>
           </div>
           <div className="flex flex-col items-center gap-4">
-            <Button asChild size="lg">
-              <Link to="/tweets/240y_k">开始查看</Link>
+            <Button
+              render={<Link to="/tweets/240y_k" />}
+              size="lg"
+            >
+              开始查看
             </Button>
           </div>
         </CardContent>

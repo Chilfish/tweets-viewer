@@ -238,17 +238,17 @@ export function TweetCard({ tweet, user, showMedia = true }: TweetCardProps) {
               </Button>
 
               <Button
-                asChild
+                render={(
+                  <Link
+                    text={<Share2Icon className="size-4" />}
+                    url={`https://twitter.com/${user.screenName}/status/${tweet.tweetId}`}
+                    className="text-muted-foreground! hover:text-blue-500"
+                  />
+                )}
                 variant="ghost"
                 size="icon"
                 className="h-auto p-1"
-              >
-                <Link
-                  text={<Share2Icon className="size-4" />}
-                  url={`https://twitter.com/${user.screenName}/status/${tweet.tweetId}`}
-                  className="text-muted-foreground! hover:text-blue-500"
-                />
-              </Button>
+              />
             </div>
           </div>
         </div>

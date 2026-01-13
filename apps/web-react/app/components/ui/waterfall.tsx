@@ -244,7 +244,7 @@ export function Waterfall<T extends WaterfallItem>({
   // 错误状态渲染
   const renderError = () => (
     <div className="p-4">
-      <Alert variant="destructive">
+      <Alert variant="error">
         <AlertCircle className="h-4 w-4" />
         <AlertTitle>Error</AlertTitle>
         <AlertDescription>
@@ -325,7 +325,7 @@ export function Waterfall<T extends WaterfallItem>({
 
         {error && list.length > 0 && (
           <div className="p-4">
-            <Alert variant="destructive">
+            <Alert variant="error">
               <AlertCircle className="h-4 w-4" />
               <AlertTitle>Error loading more</AlertTitle>
               <AlertDescription>

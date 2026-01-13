@@ -42,7 +42,7 @@ export function UserHeader({ user }: UserHeaderProps) {
       {/* Profile Content */}
       <div className="p-4 pb-0 flex flex-col gap-2 justify-between">
         <div className="flex justify-between items-end -mt-16 mb-4">
-          <Avatar className="size-26 border-4 border-background bg-background">
+          <Avatar className="size-26 border-4 z-10 border-background bg-background">
             <AvatarImage src={user.avatarUrl} />
             <AvatarFallback className="text-2xl">
               {user.name.charAt(0)}

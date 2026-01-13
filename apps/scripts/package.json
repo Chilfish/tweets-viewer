@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.0.0",
   "private": true,
-  "packageManager": "bun@1.3.3",
+  "packageManager": "bun@1.3.6",
   "scripts": {},
   "dependencies": {
     "@tweets-viewer/database": "workspace:*",
@@ -11,6 +11,6 @@
     "@tweets-viewer/shared": "workspace:*",
     "fast-glob": "^3.3.3",
     "p-map": "^7.0.4",
-    "rettiwt-api": "^6.1.2"
+    "rettiwt-api": "^6.2.0"
   }
 }

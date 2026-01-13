@@ -21,36 +21,37 @@ export function UserSelector() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger render={(
         <Button
           variant="ghost"
           className={cn(
             'flex items-center gap-3 h-auto py-2 px-3 justify-start',
           )}
-        >
-          {curUser ? (
-            <>
-              <Avatar className="size-8">
-                <AvatarImage src={curUser.avatarUrl} />
-                <AvatarFallback>{curUser.name.charAt(0)}</AvatarFallback>
-              </Avatar>
-              <div className="flex flex-col items-start">
-                <span className="font-medium text-sm">
-                  @
-                  {curUser.name}
-                </span>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="size-8 rounded-full bg-gray-200 flex items-center justify-center">
-                <User className="size-4 text-gray-500" />
-              </div>
-              <span className="font-medium text-sm">选择用户</span>
-            </>
-          )}
-          <ChevronDown className="size-4 ml-auto" />
-        </Button>
+        />
+      )}
+      >
+        {curUser ? (
+          <>
+            <Avatar className="size-8">
+              <AvatarImage src={curUser.avatarUrl} />
+              <AvatarFallback>{curUser.name.charAt(0)}</AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col items-start">
+              <span className="font-medium text-sm">
+                @
+                {curUser.name}
+              </span>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="size-8 rounded-full bg-gray-200 flex items-center justify-center">
+              <User className="size-4 text-gray-500" />
+            </div>
+            <span className="font-medium text-sm">选择用户</span>
+          </>
+        )}
+        <ChevronDown className="size-4 ml-auto" />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="start" className="w-fit px-4">
@@ -60,23 +61,21 @@ export function UserSelector() {
               <DropdownMenuItem
                 key={user.screenName}
                 className="flex items-center gap-3 p-2"
-                asChild
+                render={<NavLink to={`/${curPath}/${user.screenName}`} />}
               >
-                <NavLink to={`/${curPath}/${user.screenName}`}>
-                  <Avatar className="size-6">
-                    <AvatarImage src={user.avatarUrl} />
-                    <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col flex-1">
-                    <span className="font-medium text-sm">
-                      @
-                      {user.name}
-                    </span>
-                  </div>
-                  {curUser?.screenName === user.screenName && (
-                    <Check className="size-4 text-blue-600" />
-                  )}
-                </NavLink>
+                <Avatar className="size-6">
+                  <AvatarImage src={user.avatarUrl} />
+                  <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col flex-1">
+                  <span className="font-medium text-sm">
+                    @
+                    {user.name}
+                  </span>
+                </div>
+                {curUser?.screenName === user.screenName && (
+                  <Check className="size-4 text-blue-600" />
+                )}
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />

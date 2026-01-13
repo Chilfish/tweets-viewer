@@ -113,20 +113,21 @@ export function TweetsSortControls({
       {/* Sort Order Control */}
       {showSortControls && (
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger render={(
             <Button
               variant="outline"
               size="sm"
               className="h-8 border-border bg-background hover:bg-accent"
-            >
-              {filters.sortOrder === 'desc' ? (
-                <SortDesc className="h-3 w-3" />
-              ) : (
-                <SortAsc className="h-3 w-3" />
-              )}
-              <span>{filters.sortOrder === 'desc' ? '倒序' : '顺序'}</span>
-              <ChevronDown className="h-3 w-3" />
-            </Button>
+            />
+          )}
+          >
+            {filters.sortOrder === 'desc' ? (
+              <SortDesc className="h-3 w-3" />
+            ) : (
+              <SortAsc className="h-3 w-3" />
+            )}
+            <span>{filters.sortOrder === 'desc' ? '倒序' : '顺序'}</span>
+            <ChevronDown className="h-3 w-3" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-fit">
             <DropdownMenuItem
@@ -156,7 +157,7 @@ export function TweetsSortControls({
       {/* Date Range Filter */}
       {showDateFilter && (
         <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
-          <PopoverTrigger asChild>
+          <PopoverTrigger render={(
             <Button
               variant={hasActiveFilters ? 'default' : 'outline'}
               size="sm"
@@ -166,10 +167,11 @@ export function TweetsSortControls({
                   ? 'bg-primary text-primary-foreground hover:bg-primary/90'
                   : 'border-border bg-background hover:bg-accent',
               )}
-            >
-              <Calendar className="h-3 w-3 mr-1" />
-              <span>{formatDateRange(filters.dateRange)}</span>
-            </Button>
+            />
+          )}
+          >
+            <Calendar className="h-3 w-3 mr-1" />
+            <span>{formatDateRange(filters.dateRange)}</span>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
             <div className="flex sm:flex-row flex-col gap-4 p-3">

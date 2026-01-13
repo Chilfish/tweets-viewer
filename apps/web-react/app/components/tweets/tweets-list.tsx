@@ -65,7 +65,7 @@ export function TweetsList({
   if (error && tweets.length === 0) {
     return (
       <div className="p-4">
-        <Alert variant="destructive">
+        <Alert variant="error">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>
@@ -125,7 +125,7 @@ export function TweetsList({
 
         {error && tweets.length > 0 && (
           <div className="p-4">
-            <Alert variant="destructive">
+            <Alert variant="error">
               <AlertCircle className="h-4 w-4" />
               <AlertTitle>Error loading more tweets</AlertTitle>
               <AlertDescription>

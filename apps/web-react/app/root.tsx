@@ -92,8 +92,8 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
               <code>{stack}</code>
             </pre>
           )}
-          <Button asChild>
-            <a href="/">Go back to Home</a>
+          <Button render={<a href="/" />}>
+            Go back to Home
           </Button>
         </div>
       </div>

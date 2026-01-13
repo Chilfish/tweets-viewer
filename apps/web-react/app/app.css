@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
+@import '@fontsource-variable/noto-sans';
 
 @custom-variant dark (&:is(.dark *));
 
