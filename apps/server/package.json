@@ -1,0 +1,21 @@
+{
+  "name": "@tweets-viewer/server",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "packageManager": "bun@1.3.6",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy --minify"
+  },
+  "dependencies": {
+    "@hono-rate-limiter/cloudflare": "^0.2.2",
+    "@neondatabase/serverless": "^1.0.2",
+    "@tweets-viewer/database": "workspace:*",
+    "@tweets-viewer/shared": "workspace:*",
+    "hono": "^4.11.4"
+  },
+  "devDependencies": {
+    "wrangler": "^4.58.0"
+  }
+}

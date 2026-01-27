@@ -1,0 +1,26 @@
+name: Get Tweets
+
+on:
+  schedule:
+    - cron: '0 16 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Run fetch script
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          TWEET_KEY: ${{ secrets.TWEET_KEY }}
+        run: bun run apps/scripts/updateTweet.ts

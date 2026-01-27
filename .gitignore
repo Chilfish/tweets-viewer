@@ -28,3 +28,11 @@ auto-*.d.ts
 wrangler.toml
 
 .vercel
+tmp
+
+.vercel
+/apps/scripts/data
+
+data/
+
+apps/web-react/.react-router/

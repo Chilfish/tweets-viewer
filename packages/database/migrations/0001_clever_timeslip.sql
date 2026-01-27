@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "rest_id" text DEFAULT '' NOT NULL;

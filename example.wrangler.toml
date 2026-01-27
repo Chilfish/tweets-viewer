@@ -2,7 +2,7 @@ name = "tweet-api"
 # name = "tweet-api-dev"
 compatibility_flags = [ "nodejs_compat_v2" ]
 compatibility_date = "2024-09-23"
-main = "server/index.ts"
+main = "apps/server/index.ts"
 
 [[kv_namespaces]]
 binding = "tweet-hono-rate-limiter"
