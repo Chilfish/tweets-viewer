@@ -4,3 +4,12 @@
 # React Router
 /.react-router/
 /build/
+.env
+./data/
+tmp/
+
+*storybook.log
+storybook-static
+
+.vercel/
+cache/

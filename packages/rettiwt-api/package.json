@@ -1,0 +1,47 @@
+{
+  "name": "@tweets-viewer/rettiwt-api",
+  "version": "6.2.0",
+  "description": "An API for fetching data from TwitterAPI, without any rate limits!",
+  "author": {
+    "email": "rishikantsahu181@gmail.com",
+    "name": "Rishikant Sahu"
+  },
+  "license": "ISC",
+  "homepage": "https://rishikant181.github.io/Rettiwt-API/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Rishikant181/twitter-api.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Rishikant181/Rettiwt-API/issues"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "rettiwt": "dist/cli.js"
+  },
+  "engines": {
+    "node": "^22.21.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepare": "tsc",
+    "lint": "eslint --max-warnings 0 --fix .",
+    "lint:check": "eslint --max-warnings 0 ."
+  },
+  "dependencies": {
+    "axios": "^1.13.3",
+    "chalk": "^5.6.2",
+    "commander": "^14.0.2",
+    "cookiejar": "^2.1.4",
+    "happy-dom": "^20.3.9",
+    "https-proxy-agent": "^7.0.6",
+    "node-html-parser": "^7.0.2",
+    "x-client-transaction-id": "^0.1.9"
+  },
+  "devDependencies": {
+    "@types/cookiejar": "^2.1.5",
+    "@types/node": "^25.0.10",
+    "typescript": "^5.9.3"
+  }
+}

@@ -31,8 +31,21 @@ wrangler.toml
 tmp
 
 .vercel
-/apps/scripts/data
 
-data/
+cache/
 
-apps/web-react/.react-router/
+.DS_Store
+/node_modules/
+
+# React Router
+/.react-router/
+/build/
+.env
+./data/
+tmp/
+
+*storybook.log
+storybook-static
+
+.vercel/
+cache/
