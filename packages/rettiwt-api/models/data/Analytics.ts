@@ -1,9 +1,7 @@
-import { RawAnalyticsMetric } from '../../enums/raw/Analytics'
 import type { IAnalytics } from '../../types/data/Analytics'
-import type {
-  IAnalyticsMetric,
-  IAnalytics as IRawAnalytics,
-} from '../../types/raw/base/Analytic'
+import type { IAnalyticsMetric, IAnalytics as IRawAnalytics } from '../../types/raw/base/Analytic'
+
+import { RawAnalyticsMetric } from '../../enums/raw/Analytics'
 
 /**
  * The details of the analytic result of the connected User.
@@ -37,10 +35,7 @@ export class Analytics implements IAnalytics {
     this.organicMetricsTimeSeries = analytics.organic_metrics_time_series
     this.createdAt = new Date().toISOString()
     this.followers = analytics.relationship_counts.followers
-    this.verifiedFollowers = Number.parseInt(
-      analytics.verified_follower_count,
-      10,
-    )
+    this.verifiedFollowers = Number.parseInt(analytics.verified_follower_count, 10)
     this.impressions = this._reduceMetrics(RawAnalyticsMetric.IMPRESSIONS)
     this.profileVisits = this._reduceMetrics(RawAnalyticsMetric.PROFILE_VISITS)
     this.engagements = this._reduceMetrics(RawAnalyticsMetric.ENGAGEMENTS)
@@ -69,9 +64,7 @@ export class Analytics implements IAnalytics {
    */
   private _reduceMetrics(metricType: RawAnalyticsMetric): number {
     return this.organicMetricsTimeSeries.reduce((acc, metric) => {
-      const metricValue = metric.metric_values.find(
-        (m) => m.metric_type === (metricType as string),
-      )
+      const metricValue = metric.metric_values.find(m => m.metric_type === (metricType as string))
       return acc + (metricValue ? metricValue.metric_value : 0)
     }, 0)
   }

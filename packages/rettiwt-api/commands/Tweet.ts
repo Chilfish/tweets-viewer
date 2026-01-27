@@ -1,5 +1,6 @@
 import type { Command } from 'commander'
 import type { Rettiwt } from '../Rettiwt'
+
 import type { ITweetFilter } from '../types/args/FetchArgs'
 import { createCommand } from 'commander'
 import { TweetRepliesSortType } from '../enums/Tweet'
@@ -14,9 +15,7 @@ import { TweetFilter } from '../models/args/FetchArgs'
  */
 function createTweetCommand(rettiwt: Rettiwt): Command {
   // Creating the 'tweet' command
-  const tweet = createCommand('tweet').description(
-    'Access resources related to tweets',
-  )
+  const tweet = createCommand('tweet').description('Access resources related to tweets')
 
   // Bookmark
   tweet
@@ -37,10 +36,7 @@ function createTweetCommand(rettiwt: Rettiwt): Command {
   tweet
     .command('details')
     .description('Fetch the details of tweet/tweets with the given id/ids')
-    .argument(
-      '<id>',
-      'The comma-separated list of IDs of tweets whose details are to be fetched',
-    )
+    .argument('<id>', 'The comma-separated list of IDs of tweets whose details are to be fetched')
     .action(async (id: string) => {
       try {
         // Getting the different IDs
@@ -80,19 +76,13 @@ function createTweetCommand(rettiwt: Rettiwt): Command {
   // Likers
   tweet
     .command('likers')
-    .description(
-      'Fetch the list of users who liked the given tweet. Only works for your own tweets',
-    )
+    .description('Fetch the list of users who liked the given tweet. Only works for your own tweets')
     .argument('<id>', 'The id of the tweet')
     .argument('[count]', 'The number of likers to fetch')
     .argument('[cursor]', 'The cursor to the batch of likers to fetch')
     .action(async (id: string, count?: string, cursor?: string) => {
       try {
-        const users = await rettiwt.tweet.likers(
-          id,
-          count ? Number.parseInt(count) : undefined,
-          cursor,
-        )
+        const users = await rettiwt.tweet.likers(id, count ? Number.parseInt(count) : undefined, cursor)
         output(users)
       }
       catch (error) {
@@ -105,39 +95,26 @@ function createTweetCommand(rettiwt: Rettiwt): Command {
     .command('post')
     .description('Post a tweet (text only)')
     .argument('<text>', 'The text to post as a tweet')
-    .option(
-      '-m, --media [string]',
-      'Comma-separated list of ids of the media item(s) to be posted',
-    )
-    .option(
-      '-q, --quote [string]',
-      'The id of the tweet to quote in the tweet to be posted',
-    )
+    .option('-m, --media [string]', 'Comma-separated list of ids of the media item(s) to be posted')
+    .option('-q, --quote [string]', 'The id of the tweet to quote in the tweet to be posted')
     .option(
       '-r, --reply [string]',
       'The id of the tweet to which the reply is to be made, if the tweet is to be a reply',
     )
-    .action(
-      async (
-        text: string,
-        options?: { media?: string, quote?: string, reply?: string },
-      ) => {
-        try {
-          const result = await rettiwt.tweet.post({
-            text,
-            media: options?.media
-              ? options?.media.split(',').map(item => ({ id: item }))
-              : undefined,
-            quote: options?.quote,
-            replyTo: options?.reply,
-          })
-          output(result)
-        }
-        catch (error) {
-          output(error)
-        }
-      },
-    )
+    .action(async (text: string, options?: { media?: string, quote?: string, reply?: string }) => {
+      try {
+        const result = await rettiwt.tweet.post({
+          text,
+          media: options?.media ? options?.media.split(',').map(item => ({ id: item })) : undefined,
+          quote: options?.quote,
+          replyTo: options?.reply,
+        })
+        output(result)
+      }
+      catch (error) {
+        output(error)
+      }
+    })
 
   // Replies
   tweet
@@ -147,33 +124,28 @@ function createTweetCommand(rettiwt: Rettiwt): Command {
     )
     .argument('<id>', 'The id of the tweet')
     .argument('[cursor]', 'The cursor to the batch of replies to fetch')
-    .option(
-      '-s, --sort-by <string>',
-      'Sort the tweets by likes, latest or relevance, default is latest',
-    )
-    .action(
-      async (id: string, cursor?: string, options?: { sortBy: string }) => {
-        try {
-          // Determining the sort type
-          let sortType: TweetRepliesSortType | undefined
-          if (options?.sortBy === 'likes') {
-            sortType = TweetRepliesSortType.LIKES
-          }
-          else if (options?.sortBy === 'latest') {
-            sortType = TweetRepliesSortType.LATEST
-          }
-          else if (options?.sortBy === 'relevance') {
-            sortType = TweetRepliesSortType.RELEVANCE
-          }
+    .option('-s, --sort-by <string>', 'Sort the tweets by likes, latest or relevance, default is latest')
+    .action(async (id: string, cursor?: string, options?: { sortBy: string }) => {
+      try {
+        // Determining the sort type
+        let sortType: TweetRepliesSortType | undefined
+        if (options?.sortBy === 'likes') {
+          sortType = TweetRepliesSortType.LIKES
+        }
+        else if (options?.sortBy === 'latest') {
+          sortType = TweetRepliesSortType.LATEST
+        }
+        else if (options?.sortBy === 'relevance') {
+          sortType = TweetRepliesSortType.RELEVANCE
+        }
 
-          const tweets = await rettiwt.tweet.replies(id, cursor, sortType)
-          output(tweets)
-        }
-        catch (error) {
-          output(error)
-        }
-      },
-    )
+        const tweets = await rettiwt.tweet.replies(id, cursor, sortType)
+        output(tweets)
+      }
+      catch (error) {
+        output(error)
+      }
+    })
 
   // Retweet
   tweet
@@ -199,11 +171,7 @@ function createTweetCommand(rettiwt: Rettiwt): Command {
     .argument('[cursor]', 'The cursor to the batch of retweeters to fetch')
     .action(async (id: string, count?: string, cursor?: string) => {
       try {
-        const users = await rettiwt.tweet.retweeters(
-          id,
-          count ? Number.parseInt(count) : undefined,
-          cursor,
-        )
+        const users = await rettiwt.tweet.retweeters(id, count ? Number.parseInt(count) : undefined, cursor)
         output(users)
       }
       catch (error) {
@@ -216,45 +184,28 @@ function createTweetCommand(rettiwt: Rettiwt): Command {
     .command('schedule')
     .description('Schedule a tweet to be posted at a given date/time')
     .argument('<text>', 'The text to post as a tweet')
-    .argument(
-      '<time>',
-      'The date/time at which the tweet is to be scheduled (valid date/time string)',
-    )
-    .option(
-      '-m, --media [string]',
-      'Comma-separated list of ids of the media item(s) to be posted',
-    )
-    .option(
-      '-q, --quote [string]',
-      'The id of the tweet to quote in the tweet to be posted',
-    )
+    .argument('<time>', 'The date/time at which the tweet is to be scheduled (valid date/time string)')
+    .option('-m, --media [string]', 'Comma-separated list of ids of the media item(s) to be posted')
+    .option('-q, --quote [string]', 'The id of the tweet to quote in the tweet to be posted')
     .option(
       '-r, --reply [string]',
       'The id of the tweet to which the reply is to be made, if the tweet is to be a reply',
     )
-    .action(
-      async (
-        text: string,
-        time: string,
-        options?: { media?: string, quote?: string, reply?: string },
-      ) => {
-        try {
-          const result = await rettiwt.tweet.schedule({
-            text,
-            media: options?.media
-              ? options?.media.split(',').map(item => ({ id: item }))
-              : undefined,
-            quote: options?.quote,
-            replyTo: options?.reply,
-            scheduleFor: new Date(time),
-          })
-          output(result)
-        }
-        catch (error) {
-          output(error)
-        }
-      },
-    )
+    .action(async (text: string, time: string, options?: { media?: string, quote?: string, reply?: string }) => {
+      try {
+        const result = await rettiwt.tweet.schedule({
+          text,
+          media: options?.media ? options?.media.split(',').map(item => ({ id: item })) : undefined,
+          quote: options?.quote,
+          replyTo: options?.reply,
+          scheduleFor: new Date(time),
+        })
+        output(result)
+      }
+      catch (error) {
+        output(error)
+      }
+    })
 
   // Search
   tweet
@@ -262,22 +213,10 @@ function createTweetCommand(rettiwt: Rettiwt): Command {
     .description('Fetch the list of tweets that match the given filter options')
     .argument('[count]', 'The number of tweets to fetch')
     .argument('[cursor]', 'The cursor to the batch of tweets to fetch')
-    .option(
-      '-f, --from <string>',
-      'Matches the tweets made by the comma-separated list of given users',
-    )
-    .option(
-      '-t, --to <string>',
-      'Matches the tweets made to the comma-separated list of given users',
-    )
-    .option(
-      '-w, --words <string>',
-      'Matches the tweets containing the given comma-separated list of words',
-    )
-    .option(
-      '-p, --phrase <string>',
-      'Matches the tweets containing the exact phrase',
-    )
+    .option('-f, --from <string>', 'Matches the tweets made by the comma-separated list of given users')
+    .option('-t, --to <string>', 'Matches the tweets made to the comma-separated list of given users')
+    .option('-w, --words <string>', 'Matches the tweets containing the given comma-separated list of words')
+    .option('-p, --phrase <string>', 'Matches the tweets containing the exact phrase')
     .option(
       '--optional-words <string>',
       'Matches the tweets containing any of the given comma-separated list of words',
@@ -286,82 +225,50 @@ function createTweetCommand(rettiwt: Rettiwt): Command {
       '--exclude-words <string>',
       'Matches the tweets that do not contain any of the give comma-separated list of words',
     )
-    .option(
-      '-h, --hashtags <string>',
-      'Matches the tweets containing the given comma-separated list of hashtags',
-    )
-    .option(
-      '--list <string>',
-      'Matches the tweets from the list with the given id',
-    )
+    .option('-h, --hashtags <string>', 'Matches the tweets containing the given comma-separated list of hashtags')
+    .option('--list <string>', 'Matches the tweets from the list with the given id')
     .option(
       '-m, --mentions <string>',
       'Matches the tweets that mention the given comma-separated list of usernames',
     )
-    .option(
-      '-r, --min-replies <number>',
-      'Matches the tweets that have a minimum of given number of replies',
-    )
-    .option(
-      '-l, --min-likes <number>',
-      'Matches the tweets that have a minimum of given number of likes',
-    )
-    .option(
-      '-x, --min-retweets <number>',
-      'Matches the tweets that have a minimum of given number of retweets',
-    )
-    .option(
-      '-q, --quoted <string>',
-      'Matches the tweets that quote the tweet with the given id',
-    )
+    .option('-r, --min-replies <number>', 'Matches the tweets that have a minimum of given number of replies')
+    .option('-l, --min-likes <number>', 'Matches the tweets that have a minimum of given number of likes')
+    .option('-x, --min-retweets <number>', 'Matches the tweets that have a minimum of given number of retweets')
+    .option('-q, --quoted <string>', 'Matches the tweets that quote the tweet with the given id')
     .option('--only-original', 'Matches tweets are original posts')
     .option('--only-replies', 'Matches tweets that are replies')
     .option('--only-text', 'Matches tweets that are only text')
-    .option(
-      '--only-links',
-      'Matches tweets that only contain links like media, quotes, etc',
-    )
-    .option(
-      '-s, --start <string>',
-      'Matches the tweets made since the given date (valid date/time string)',
-    )
-    .option(
-      '-e, --end <string>',
-      'Matches the tweets made upto the given date (valid date/time string)',
-    )
+    .option('--only-links', 'Matches tweets that only contain links like media, quotes, etc')
+    .option('-s, --start <string>', 'Matches the tweets made since the given date (valid date/time string)')
+    .option('-e, --end <string>', 'Matches the tweets made upto the given date (valid date/time string)')
     .option('--top', 'Matches top tweets instead of latest')
     .option('--stream', 'Stream the filtered tweets in pseudo-realtime')
-    .option(
-      '-i, --interval <number>',
-      'The polling interval (in ms) to use for streaming. Default is 60000',
-    )
-    .action(
-      async (count?: string, cursor?: string, options?: TweetSearchOptions) => {
-        try {
-          // If search results are to be streamed
-          if (options?.stream) {
-            for await (const tweet of rettiwt.tweet.stream(
-              new TweetSearchOptions(options).toTweetFilter(),
-              options?.interval,
-            )) {
-              output(tweet)
-            }
-          }
-          // If a normal search is to be done
-          else {
-            const tweets = await rettiwt.tweet.search(
-              new TweetSearchOptions(options).toTweetFilter(),
-              count ? Number.parseInt(count) : undefined,
-              cursor,
-            )
-            output(tweets)
+    .option('-i, --interval <number>', 'The polling interval (in ms) to use for streaming. Default is 60000')
+    .action(async (count?: string, cursor?: string, options?: TweetSearchOptions) => {
+      try {
+        // If search results are to be streamed
+        if (options?.stream) {
+          for await (const tweet of rettiwt.tweet.stream(
+            new TweetSearchOptions(options).toTweetFilter(),
+            options?.interval,
+          )) {
+            output(tweet)
           }
         }
-        catch (error) {
-          output(error)
+        // If a normal search is to be done
+        else {
+          const tweets = await rettiwt.tweet.search(
+            new TweetSearchOptions(options).toTweetFilter(),
+            count ? Number.parseInt(count) : undefined,
+            cursor,
+          )
+          output(tweets)
         }
-      },
-    )
+      }
+      catch (error) {
+        output(error)
+      }
+    })
 
   // Unbookmark
   tweet
@@ -441,9 +348,7 @@ function createTweetCommand(rettiwt: Rettiwt): Command {
   // Upload
   tweet
     .command('upload')
-    .description(
-      'Upload a media file and returns the alloted id (valid for 24 hrs)',
-    )
+    .description('Upload a media file and returns the alloted id (valid for 24 hrs)')
     .argument('<path>', 'The path to the media to upload')
     .action(async (path: string) => {
       try {
@@ -528,12 +433,8 @@ class TweetSearchOptions {
       toUsers: this.to ? this.to.split(',') : undefined,
       includeWords: this.words ? this.words.split(',') : undefined,
       includePhrase: this.phrase,
-      optionalWords: this.optionalWords
-        ? this.optionalWords.split(',')
-        : undefined,
-      excludeWords: this.excludeWords
-        ? this.excludeWords.split(',')
-        : undefined,
+      optionalWords: this.optionalWords ? this.optionalWords.split(',') : undefined,
+      excludeWords: this.excludeWords ? this.excludeWords.split(',') : undefined,
       hashtags: this.hashtags ? this.hashtags.split(',') : undefined,
       list: this.list,
       mentions: this.mentions ? this.mentions.split(',') : undefined,

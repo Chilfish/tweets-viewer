@@ -18,7 +18,7 @@ export class LogService {
    */
   public static log(action: LogActions, data: NonNullable<unknown>): void {
     // Proceed to log only if logging is enabled
-    if (LogService.enabled) {
+    if (this.enabled) {
       // Preparing the log message
       const logPrefix = 'Rettiwt-API'
       const logTime: string = new Date().toISOString()

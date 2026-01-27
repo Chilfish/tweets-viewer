@@ -1,13 +1,7 @@
 import type { AxiosError } from 'axios'
 
-import type {
-  ITwitterError,
-  ITwitterErrorDetails,
-} from '../../types/errors/TwitterError'
-import type {
-  IErrorData as IRawErrorData,
-  IErrorDetails as IRawErrorDetails,
-} from '../../types/raw/base/Error'
+import type { ITwitterError, ITwitterErrorDetails } from '../../types/errors/TwitterError'
+import type { IErrorData as IRawErrorData, IErrorDetails as IRawErrorDetails } from '../../types/raw/base/Error'
 
 /**
  * The error thrown by Twitter API.
@@ -25,13 +19,12 @@ export class TwitterError extends Error implements ITwitterError {
    */
   public constructor(error: AxiosError<IRawErrorData | IRawErrorDetails>) {
     super(error.message)
-    this.details = (
-      (error.response?.data as IRawErrorData)?.errors
-        ? (error.response?.data as IRawErrorData).errors.map(
-            item => new TwitterErrorDetails(item),
-          )
-        : [new TwitterErrorDetails(error.response?.data as IRawErrorDetails)]
-    ).map(item => item.toJSON())
+    this.details = []
+    // this.details = (
+    //   (error.response?.data as IRawErrorData)?.errors
+    //     ? (error.response?.data as IRawErrorData).errors.map(item => new TwitterErrorDetails(item))
+    //     : [new TwitterErrorDetails(error.response?.data as IRawErrorDetails)]
+    // ).map(item => item.toJSON())
     this.message = error.message
     this.name = 'TWITTER_ERROR'
     this.status = error.status ?? 500
@@ -53,16 +46,10 @@ export class TwitterErrorDetails implements ITwitterErrorDetails {
    * @param details - The details of the error.
    */
   public constructor(details: IRawErrorDetails) {
-    if (details) {
-      this.code = details.code
-      this.message = details.message
-      this.name = details.name
-      this.type = details.kind
-    }
-    else {
-      this.code = 0
-      this.message = 'Unknown error'
-    }
+    this.code = details.code
+    this.message = details.message
+    this.name = details.name
+    this.type = details.kind
   }
 
   /**

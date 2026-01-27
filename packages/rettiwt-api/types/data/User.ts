@@ -22,11 +22,11 @@ export interface IUser {
   /** The rest id of the user. */
   id: string
 
-  /** Whether the user is being followed by the logged-in user. */
-  isFollowed: boolean
+  /** Whether the user is being followed by the logged-in user. Available only when logged in. */
+  isFollowed?: boolean
 
-  /** Whether the user is following the logged-in user. */
-  isFollowing: boolean
+  /** Whether the user is following the logged-in user. Available only when logged in. */
+  isFollowing?: boolean
 
   /** Whether the account is verified or not. */
   isVerified: boolean
@@ -51,4 +51,10 @@ export interface IUser {
 
   /** The username/screenname of the user. */
   userName: string
+
+  /** The birthday of the user. */
+  birthdayString?: string
+
+  /** The link of user displayed */
+  url: string
 }

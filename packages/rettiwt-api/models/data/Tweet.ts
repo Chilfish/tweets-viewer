@@ -1,20 +1,15 @@
+import type { ITweet, ITweetEntities, ITweetMedia } from '../../types/data/Tweet'
+import type { ILimitedVisibilityTweet } from '../../types/raw/base/LimitedVisibilityTweet'
+import type { IExtendedMedia as IRawExtendedMedia } from '../../types/raw/base/Media'
+import type { ITweet as IRawTweet, IEntities as IRawTweetEntities } from '../../types/raw/base/Tweet'
+
+import type { ITimelineTweet } from '../../types/raw/composite/TimelineTweet'
+
 import { LogActions } from '../../enums/Logging'
 import { MediaType } from '../../enums/Media'
 import { RawMediaType } from '../../enums/raw/Media'
 import { findByFilter } from '../../helper/JsonUtils'
 import { LogService } from '../../services/internal/LogService'
-import type {
-  ITweet,
-  ITweetEntities,
-  ITweetMedia,
-} from '../../types/data/Tweet'
-import type { ILimitedVisibilityTweet } from '../../types/raw/base/LimitedVisibilityTweet'
-import type { IExtendedMedia as IRawExtendedMedia } from '../../types/raw/base/Media'
-import type {
-  ITweet as IRawTweet,
-  IEntities as IRawTweetEntities,
-} from '../../types/raw/base/Tweet'
-import type { ITimelineTweet } from '../../types/raw/composite/TimelineTweet'
 
 import { User } from './User'
 
@@ -27,24 +22,24 @@ export class Tweet implements ITweet {
   /** The raw tweet details. */
   private readonly _raw: IRawTweet
 
-  public bookmarkCount: number
+  public bookmarkCount?: number
   public conversationId: string
   public createdAt: string
   public entities: TweetEntities
   public fullText: string
   public id: string
   public lang: string
-  public likeCount: number
+  public likeCount?: number
   public media?: TweetMedia[]
-  public quoteCount: number
+  public quoteCount?: number
   public quoted?: Tweet
-  public replyCount: number
+  public replyCount?: number
   public replyTo?: string
-  public retweetCount: number
+  public retweetCount?: number
   public retweetedTweet?: Tweet
   public tweetBy: User
   public url: string
-  public viewCount: number
+  public viewCount?: number
 
   /**
    * @param tweet - The raw tweet details.
@@ -56,11 +51,9 @@ export class Tweet implements ITweet {
     this.createdAt = new Date(tweet.legacy.created_at).toISOString()
     this.tweetBy = new User(tweet.core.user_results.result)
     this.entities = new TweetEntities(tweet.legacy.entities)
-    this.media = tweet.legacy.extended_entities?.media?.map(
-      (media) => new TweetMedia(media),
-    )
+    this.media = tweet.legacy.extended_entities?.media?.map(media => new TweetMedia(media))
     this.quoted = this._getQuotedTweet(tweet)
-    this.fullText = tweet.note_tweet
+    this.fullText = tweet.note_tweet?.note_tweet_results?.result?.text
       ? tweet.note_tweet.note_tweet_results.result.text
       : tweet.legacy.full_text
     this.replyTo = tweet.legacy.in_reply_to_status_id_str
@@ -69,7 +62,7 @@ export class Tweet implements ITweet {
     this.replyCount = tweet.legacy.reply_count
     this.retweetCount = tweet.legacy.retweet_count
     this.likeCount = tweet.legacy.favorite_count
-    this.viewCount = tweet.views.count ? Number.parseInt(tweet.views.count) : 0
+    this.viewCount = tweet.views?.count ? Number.parseInt(tweet.views.count) : undefined
     this.bookmarkCount = tweet.legacy.bookmark_count
     this.retweetedTweet = this._getRetweetedTweet(tweet)
     this.url = `https://x.com/${this.tweetBy.userName}/status/${this.id}`
@@ -90,15 +83,11 @@ export class Tweet implements ITweet {
   private _getQuotedTweet(tweet: IRawTweet): Tweet | undefined {
     // If tweet with limited visibility
     if (
-      tweet.quoted_status_result &&
-      tweet.quoted_status_result?.result?.__typename ===
-        'TweetWithVisibilityResults' &&
-      (tweet.quoted_status_result.result as ILimitedVisibilityTweet)?.tweet
-        ?.legacy
+      tweet.quoted_status_result
+      && tweet.quoted_status_result?.result?.__typename === 'TweetWithVisibilityResults'
+      && (tweet.quoted_status_result.result as ILimitedVisibilityTweet)?.tweet?.legacy
     ) {
-      return new Tweet(
-        (tweet.quoted_status_result.result as ILimitedVisibilityTweet).tweet,
-      )
+      return new Tweet((tweet.quoted_status_result.result as ILimitedVisibilityTweet).tweet)
     }
     // If normal tweet
     else if ((tweet.quoted_status_result?.result as IRawTweet)?.rest_id) {
@@ -120,21 +109,14 @@ export class Tweet implements ITweet {
   private _getRetweetedTweet(tweet: IRawTweet): Tweet | undefined {
     // If retweet with limited visibility
     if (
-      tweet.legacy?.retweeted_status_result &&
-      tweet.legacy?.retweeted_status_result?.result?.__typename ===
-        'TweetWithVisibilityResults' &&
-      (tweet.legacy?.retweeted_status_result?.result as ILimitedVisibilityTweet)
-        ?.tweet?.legacy
+      tweet.legacy?.retweeted_status_result
+      && tweet.legacy?.retweeted_status_result?.result?.__typename === 'TweetWithVisibilityResults'
+      && (tweet.legacy?.retweeted_status_result?.result as ILimitedVisibilityTweet)?.tweet?.legacy
     ) {
-      return new Tweet(
-        (tweet.legacy.retweeted_status_result.result as ILimitedVisibilityTweet)
-          .tweet,
-      )
+      return new Tweet((tweet.legacy.retweeted_status_result.result as ILimitedVisibilityTweet).tweet)
     }
     // If normal tweet
-    else if (
-      (tweet.legacy?.retweeted_status_result?.result as IRawTweet)?.rest_id
-    ) {
+    else if ((tweet.legacy?.retweeted_status_result?.result as IRawTweet)?.rest_id) {
       return new Tweet(tweet.legacy.retweeted_status_result.result as IRawTweet)
     }
     // Else, skip
@@ -151,10 +133,7 @@ export class Tweet implements ITweet {
    *
    * @returns The target deserialized tweets.
    */
-  public static multiple(
-    response: NonNullable<unknown>,
-    ids: string[],
-  ): Tweet[] {
+  public static multiple(response: NonNullable<unknown>, ids: string[]): Tweet[] {
     let tweets: Tweet[] = []
 
     // Extracting the matching data
@@ -167,7 +146,8 @@ export class Tweet implements ITweet {
         LogService.log(LogActions.DESERIALIZE, { id: item.rest_id })
 
         tweets.push(new Tweet(item))
-      } else {
+      }
+      else {
         // Logging
         LogService.log(LogActions.WARNING, {
           action: LogActions.DESERIALIZE,
@@ -178,7 +158,7 @@ export class Tweet implements ITweet {
 
     // Filtering only required tweets, if required
     if (ids && ids.length) {
-      tweets = tweets.filter((tweet) => ids.includes(tweet.id))
+      tweets = tweets.filter(tweet => ids.includes(tweet.id))
     }
 
     return tweets
@@ -192,10 +172,7 @@ export class Tweet implements ITweet {
    *
    * @returns The target deserialized tweet.
    */
-  public static single(
-    response: NonNullable<unknown>,
-    id: string,
-  ): Tweet | undefined {
+  public static single(response: NonNullable<unknown>, id: string): Tweet | undefined {
     const tweets: Tweet[] = []
 
     // Extracting the matching data
@@ -208,7 +185,8 @@ export class Tweet implements ITweet {
         LogService.log(LogActions.DESERIALIZE, { id: item.rest_id })
 
         tweets.push(new Tweet(item))
-      } else {
+      }
+      else {
         // Logging
         LogService.log(LogActions.WARNING, {
           action: LogActions.DESERIALIZE,
@@ -232,33 +210,22 @@ export class Tweet implements ITweet {
     const tweets: Tweet[] = []
 
     // Extracting the matching data
-    const extract = findByFilter<ITimelineTweet>(
-      response,
-      '__typename',
-      'TimelineTweet',
-    )
+    const extract = findByFilter<ITimelineTweet>(response, '__typename', 'TimelineTweet')
 
     // Deserializing valid data
     for (const item of extract) {
       // If tweet with limited visibility
       if (
-        item.tweet_results?.result &&
-        item.tweet_results?.result?.__typename ===
-          'TweetWithVisibilityResults' &&
-        (item.tweet_results?.result as ILimitedVisibilityTweet)?.tweet?.legacy
+        item.tweet_results?.result
+        && item.tweet_results?.result?.__typename === 'TweetWithVisibilityResults'
+        && (item.tweet_results?.result as ILimitedVisibilityTweet)?.tweet?.legacy
       ) {
-        tweets.push(
-          new Tweet(
-            (item.tweet_results.result as ILimitedVisibilityTweet).tweet,
-          ),
-        )
+        tweets.push(new Tweet((item.tweet_results.result as ILimitedVisibilityTweet).tweet))
       }
       // If normal tweet
       else if ((item.tweet_results?.result as IRawTweet)?.legacy) {
         // Logging
-        LogService.log(LogActions.DESERIALIZE, {
-          id: (item.tweet_results.result as IRawTweet).rest_id,
-        })
+        LogService.log(LogActions.DESERIALIZE, { id: (item.tweet_results.result as IRawTweet).rest_id })
 
         tweets.push(new Tweet(item.tweet_results.result as IRawTweet))
       }
@@ -288,7 +255,7 @@ export class Tweet implements ITweet {
       id: this.id,
       lang: this.lang,
       likeCount: this.likeCount,
-      media: this.media?.map((item) => item.toJSON()),
+      media: this.media?.map(item => item.toJSON()),
       quoteCount: this.quoteCount,
       quoted: this.quoted?.toJSON(),
       replyCount: this.replyCount,
@@ -307,7 +274,7 @@ export class Tweet implements ITweet {
  *
  * @public
  */
-export class TweetEntities {
+export class TweetEntities implements ITweetEntities {
   /** The list of hashtags mentioned in the tweet. */
   public hashtags: string[] = []
 
@@ -360,7 +327,10 @@ export class TweetEntities {
  *
  * @public
  */
-export class TweetMedia {
+export class TweetMedia implements ITweetMedia {
+  /** The ID of the media. */
+  public id: string
+
   /** The thumbnail URL for the video content of the tweet. */
   public thumbnailUrl?: string
 
@@ -374,6 +344,8 @@ export class TweetMedia {
    * @param media - The raw media details.
    */
   public constructor(media: IRawExtendedMedia) {
+    this.id = media.id_str
+
     // If the media is a photo
     if (media.type === RawMediaType.PHOTO) {
       this.type = MediaType.PHOTO
@@ -382,7 +354,7 @@ export class TweetMedia {
     // If the media is a gif
     else if (media.type === RawMediaType.GIF) {
       this.type = MediaType.GIF
-      this.url = media.video_info?.variants[0]?.url as string
+      this.url = media.video_info?.variants[0]?.url ?? ''
     }
     // If the media is a video
     else {
@@ -409,6 +381,7 @@ export class TweetMedia {
    */
   public toJSON(): ITweetMedia {
     return {
+      id: this.id,
       thumbnailUrl: this.thumbnailUrl,
       type: this.type,
       url: this.url,

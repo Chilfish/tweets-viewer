@@ -1,4 +1,5 @@
 import type { RettiwtConfig } from '../../models/RettiwtConfig'
+
 import axios from 'axios'
 import { ApiErrors } from '../../enums/Api'
 import { AuthCredential } from '../../models/auth/AuthCredential'
@@ -27,10 +28,7 @@ export class AuthService {
    */
   public static decodeCookie(encodedCookies: string): string {
     // Decoding the encoded cookie string
-    const decodedCookies: string = Buffer.from(
-      encodedCookies,
-      'base64',
-    ).toString('ascii')
+    const decodedCookies: string = Buffer.from(encodedCookies, 'base64').toString('ascii')
 
     return decodedCookies
   }
@@ -65,7 +63,7 @@ export class AuthService {
 
     // If user id was found
     if (searchResults) {
-      return searchResults[0]!
+      return searchResults[0] as string
     }
     // If user id was not found
     else {
@@ -88,11 +86,11 @@ export class AuthService {
    * // Logging in an getting a new guest key
    * rettiwt.auth.guest()
    * .then(guestKey => {
-   *   // Use the guest key
-   *   ...
+   *  // Use the guest key
+   *  ...
    * })
    * .catch(err => {
-   *   console.log(err);
+   *  console.log(err);
    * });
    * ```
    */
@@ -103,10 +101,12 @@ export class AuthService {
     // Getting the guest token
     await axios
       .post<{
+
       guest_token: string
+
     }>('https://api.twitter.com/1.1/guest/activate.json', undefined, {
         headers: cred.toHeader(),
-        // httpsAgent: this._config.httpsAgent,
+        httpsAgent: this._config.httpsAgent,
       })
       .then((res) => {
         cred.guestToken = res.data.guest_token

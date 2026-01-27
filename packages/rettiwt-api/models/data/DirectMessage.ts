@@ -8,10 +8,7 @@ import type { IInboxTimelineResponse } from '../../types/raw/dm/InboxTimeline'
  * Type guard to check if the response is an IInboxInitialResponse
  */
 function isInboxInitialResponse(
-  response:
-    | IInboxInitialResponse
-    | IConversationTimelineResponse
-    | IInboxTimelineResponse,
+  response: IInboxInitialResponse | IConversationTimelineResponse | IInboxTimelineResponse,
 ): response is IInboxInitialResponse {
   return 'inbox_initial_state' in response
 }
@@ -20,10 +17,7 @@ function isInboxInitialResponse(
  * Type guard to check if the response is an IConversationTimelineResponse
  */
 function isConversationTimelineResponse(
-  response:
-    | IInboxInitialResponse
-    | IConversationTimelineResponse
-    | IInboxTimelineResponse,
+  response: IInboxInitialResponse | IConversationTimelineResponse | IInboxTimelineResponse,
 ): response is IConversationTimelineResponse {
   return 'conversation_timeline' in response
 }
@@ -32,10 +26,7 @@ function isConversationTimelineResponse(
  * Type guard to check if the response is an IInboxTimelineResponse
  */
 function isInboxTimelineResponse(
-  response:
-    | IInboxInitialResponse
-    | IConversationTimelineResponse
-    | IInboxTimelineResponse,
+  response: IInboxInitialResponse | IConversationTimelineResponse | IInboxTimelineResponse,
 ): response is IInboxTimelineResponse {
   return 'inbox_timeline' in response
 }
@@ -86,9 +77,7 @@ export class DirectMessage implements IDirectMessage {
   /**
    * Extract messages from conversation timeline response
    */
-  private static _extractFromConversationTimeline(
-    response: IConversationTimelineResponse,
-  ): DirectMessage[] {
+  private static _extractFromConversationTimeline(response: IConversationTimelineResponse): DirectMessage[] {
     const messages: DirectMessage[] = []
     const entries = response.conversation_timeline?.entries ?? []
 
@@ -104,9 +93,7 @@ export class DirectMessage implements IDirectMessage {
   /**
    * Extract messages from inbox initial response
    */
-  private static _extractFromInboxInitial(
-    response: IInboxInitialResponse,
-  ): DirectMessage[] {
+  private static _extractFromInboxInitial(response: IInboxInitialResponse): DirectMessage[] {
     const messages: DirectMessage[] = []
     const entries = response.inbox_initial_state?.entries ?? []
 
@@ -122,9 +109,7 @@ export class DirectMessage implements IDirectMessage {
   /**
    * Extract messages from inbox timeline response
    */
-  private static _extractFromInboxTimeline(
-    response: IInboxTimelineResponse,
-  ): DirectMessage[] {
+  private static _extractFromInboxTimeline(response: IInboxTimelineResponse): DirectMessage[] {
     const messages: DirectMessage[] = []
     const entries = response.inbox_timeline?.entries ?? []
 
@@ -146,13 +131,9 @@ export class DirectMessage implements IDirectMessage {
     const messageData = msg.message_data as Record<string, unknown> | undefined
 
     // Check for card attachments with images
-    const attachment = messageData?.attachment as
-      | Record<string, unknown>
-      | undefined
+    const attachment = messageData?.attachment as Record<string, unknown> | undefined
     const card = attachment?.card as Record<string, unknown> | undefined
-    const bindingValues = card?.binding_values as
-      | Record<string, unknown>
-      | undefined
+    const bindingValues = card?.binding_values as Record<string, unknown> | undefined
 
     if (bindingValues) {
       // Extract URLs from various image binding values
@@ -166,12 +147,8 @@ export class DirectMessage implements IDirectMessage {
       ]
 
       for (const bindingKey of imageBindings) {
-        const imageBinding = bindingValues[bindingKey] as
-          | Record<string, unknown>
-          | undefined
-        const imageValue = imageBinding?.image_value as
-          | Record<string, unknown>
-          | undefined
+        const imageBinding = bindingValues[bindingKey] as Record<string, unknown> | undefined
+        const imageValue = imageBinding?.image_value as Record<string, unknown> | undefined
 
         if (imageValue?.url && typeof imageValue.url === 'string') {
           urls.push(imageValue.url)
@@ -222,21 +199,11 @@ export class DirectMessage implements IDirectMessage {
     const messageData = msg.message_data as Record<string, unknown> | undefined
 
     const id = this._extractStringValue(messageData?.id, msg.id) ?? ''
-    const conversationId =
-      this._extractStringValue(
-        msg.conversation_id,
-        messageData?.conversation_id,
-      ) ?? ''
-    const senderId =
-      this._extractStringValue(messageData?.sender_id, msg.sender_id) ?? ''
-    const recipientId = this._extractStringValue(
-      messageData?.recipient_id,
-      msg.recipient_id,
-    )
+    const conversationId = this._extractStringValue(msg.conversation_id, messageData?.conversation_id) ?? ''
+    const senderId = this._extractStringValue(messageData?.sender_id, msg.sender_id) ?? ''
+    const recipientId = this._extractStringValue(messageData?.recipient_id, msg.recipient_id)
     const text = this._extractStringValue(messageData?.text, msg.text) ?? ''
-    const createdAt = this._parseTimestamp(
-      this._extractStringValue(messageData?.time, msg.time) ?? '',
-    )
+    const createdAt = this._parseTimestamp(this._extractStringValue(messageData?.time, msg.time) ?? '')
     const editCount = this._extractNumberValue(messageData?.edit_count)
 
     return {
@@ -267,23 +234,15 @@ export class DirectMessage implements IDirectMessage {
   /**
    * Filter messages by conversation ID
    */
-  public static filterByConversation(
-    messages: DirectMessage[],
-    conversationId: string,
-  ): DirectMessage[] {
-    return messages.filter(
-      (message) => message.conversationId === conversationId,
-    )
+  public static filterByConversation(messages: DirectMessage[], conversationId: string): DirectMessage[] {
+    return messages.filter(message => message.conversationId === conversationId)
   }
 
   /**
    * Filter messages by sender ID
    */
-  public static filterBySender(
-    messages: DirectMessage[],
-    senderId: string,
-  ): DirectMessage[] {
-    return messages.filter((message) => message.isFromSender(senderId))
+  public static filterBySender(messages: DirectMessage[], senderId: string): DirectMessage[] {
+    return messages.filter(message => message.isFromSender(senderId))
   }
 
   /**
@@ -294,18 +253,17 @@ export class DirectMessage implements IDirectMessage {
    * @returns The deserialized list of direct messages.
    */
   public static list(
-    response:
-      | IInboxInitialResponse
-      | IConversationTimelineResponse
-      | IInboxTimelineResponse,
+    response: IInboxInitialResponse | IConversationTimelineResponse | IInboxTimelineResponse,
   ): DirectMessage[] {
     const messages: DirectMessage[] = []
 
     if (isInboxInitialResponse(response)) {
       return DirectMessage._extractFromInboxInitial(response)
-    } else if (isConversationTimelineResponse(response)) {
+    }
+    else if (isConversationTimelineResponse(response)) {
       return DirectMessage._extractFromConversationTimeline(response)
-    } else if (isInboxTimelineResponse(response)) {
+    }
+    else if (isInboxTimelineResponse(response)) {
       return DirectMessage._extractFromInboxTimeline(response)
     }
 
@@ -316,10 +274,7 @@ export class DirectMessage implements IDirectMessage {
    * Generic method to extract messages from any supported response type
    */
   public static listFromResponse(
-    response:
-      | IInboxInitialResponse
-      | IConversationTimelineResponse
-      | IInboxTimelineResponse,
+    response: IInboxInitialResponse | IConversationTimelineResponse | IInboxTimelineResponse,
   ): DirectMessage[] {
     return DirectMessage.list(response)
   }
@@ -327,10 +282,7 @@ export class DirectMessage implements IDirectMessage {
   /**
    * Sort messages by creation time (oldest to newest)
    */
-  public static sortByTime(
-    messages: DirectMessage[],
-    ascending = true,
-  ): DirectMessage[] {
+  public static sortByTime(messages: DirectMessage[], ascending = true): DirectMessage[] {
     return [...messages].sort((a, b) => {
       const timeA = new Date(a.createdAt).getTime()
       const timeB = new Date(b.createdAt).getTime()
