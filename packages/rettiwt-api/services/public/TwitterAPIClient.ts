@@ -14,6 +14,8 @@ import { TweetRepliesSortType } from '../../enums/Tweet'
  * 职责：封装所有与 Twitter API 的原始请求，返回未处理的原始数据
  */
 export class TwitterAPIClient {
+  public onFetchedresponse: (key: string, data: any) => Promise<void> = async () => {}
+
   constructor(private readonly pool: RettiwtPool) {}
 
   /**
@@ -93,6 +95,7 @@ export class TwitterAPIClient {
         ResourceType.USER_TIMELINE_AND_REPLIES,
         { id: userId },
       )
+      await this.onFetchedresponse(`${ResourceType.USER_TIMELINE_AND_REPLIES}-${userId}`, response)
       return this.extractTimelineTweets(response)
     })
   }
