@@ -21,6 +21,14 @@ export function callAll<Args extends Array<unknown>>(
   }
 }
 
+export function snowId2millis(id: string) {
+  return (BigInt(id) >> BigInt(22)) + BigInt(1288834974657)
+}
+
+export function pubTime(id: string) {
+  return new Date(Number(snowId2millis(id)))
+}
+
 export function formatDate(
   date: Date | string,
   formatString = 'yyyy-MM-dd',

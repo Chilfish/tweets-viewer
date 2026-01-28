@@ -1,0 +1,78 @@
+import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
+import { MediaImage } from '~/components/ui/media'
+import { cn } from '~/lib/utils'
+import { TweetInfoCreatedAt } from '.'
+import s from './tweet-header.module.css'
+import { VerifiedBadge } from './verified-badge'
+
+interface Props {
+  tweet: EnrichedTweet
+  avatarSize?: 'small' | 'medium'
+  className?: string
+  createdAtInline?: boolean
+}
+
+export function TweetHeader({ tweet, avatarSize, className }: Props) {
+  const { user } = tweet
+
+  return (
+    <div className={cn(s.header, className, avatarSize === 'small' && s.inQuote)}>
+      <a
+        href={`https://x.com/${user.screen_name}`}
+        className={s.avatar}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <div
+          className={cn(
+            s.avatarOverflow,
+            user.profile_image_shape === 'Square' && s.avatarSquare,
+            'z-10',
+          )}
+        >
+          <MediaImage
+            src={(user.profile_image_url_https)}
+            alt={user.name}
+            className={s.avatarImg}
+          />
+        </div>
+        <div className={s.avatarOverflow}>
+          <div className={s.avatarShadow}></div>
+        </div>
+      </a>
+
+      <div className={cn(s.author)}>
+        <div className={s.authorInline}>
+          <a
+            href={`https://x.com/${user.screen_name}`}
+            className={s.authorLink}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <div className={s.authorLinkText}>
+              <span title={user.name}>{user.name}</span>
+            </div>
+            <VerifiedBadge user={user} className={s.authorVerified} />
+          </a>
+          <div className={s.authorMeta}>
+            <a
+              href={`https://x.com/${user.screen_name}`}
+              className={s.username}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span title={`@${user.screen_name}`}>
+                @
+                {user.screen_name}
+              </span>
+            </a>
+          </div>
+        </div>
+
+        <div className={s.createdAt}>
+          <TweetInfoCreatedAt tweet={tweet} />
+        </div>
+      </div>
+    </div>
+  )
+}
