@@ -4,6 +4,7 @@ import { RettiwtPool, TweetEnrichmentService, TwitterAPIClient } from '@tweets-v
 import { getLocalCache } from '../src/localCache'
 import { cacheDir, writeJson } from '../src/utils'
 
+const userId = 'ttisrn_0710'
 const KEYS = (process.env.TWEET_KEYS || '').split(',').filter(Boolean)
 
 const twitterPool = new RettiwtPool(KEYS)
@@ -13,10 +14,8 @@ const enrichmentService = new TweetEnrichmentService()
 
 apiClient.onFetchedresponse = async (key: string, data: any) => {
   console.log(`Fetched ${key} data`)
-  await writeJson(data, `${key}.json`)
+  await writeJson(data, `raw-${userId}/${key}-${Date.now()}.json`)
 }
-
-const userId = 'ttisrn_0710'
 
 const dataPath = path.join(cacheDir, `data-${userId}`)
 const cursorPath = path.join(dataPath, 'cursor.txt')

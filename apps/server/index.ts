@@ -1,16 +1,16 @@
 import type { AppType } from './common'
-import { neon } from '@neondatabase/serverless'
-import { getUsers } from '@tweets-viewer/database'
 import { now } from '@tweets-viewer/shared'
-import { drizzle } from 'drizzle-orm/neon-http'
 import { Hono } from 'hono'
-import { contextStorage, getContext } from 'hono/context-storage'
+import { contextStorage } from 'hono/context-storage'
 import { cors } from 'hono/cors'
-import { cachedData, setAllUsersInsData } from './common'
+import { cachedData } from './common'
 import imageApp from './routes/image'
 import insApp from './routes/ins'
 import tweetsApp from './routes/tweets'
 import usersApp from './routes/users'
+import tweetsAppV3 from './routes/v3/tweets'
+
+import 'dotenv'
 
 const app = new Hono<AppType>()
 
@@ -23,17 +23,17 @@ app
   // }))
   .use(async (c, next) => {
     const { DATABASE_URL } = c.env
-    const sql = neon(DATABASE_URL)
-    const db = drizzle({ client: sql })
-    c.set('db', db)
+    // const sql = neon(DATABASE_URL)
+    // const db = drizzle({ client: sql })
+    // c.set('db', db)
     return next()
   })
 
 app
   .get('/', async (c) => {
-    const { db } = getContext<AppType>().var
-    const users = await getUsers(db)
-    await setAllUsersInsData(users)
+    // const { db } = getContext<AppType>().var
+    // const users = await getUsers(db)
+    // await setAllUsersInsData(users)
 
     const today = now()
     // name: size
@@ -49,9 +49,10 @@ app
     })
   })
   .route('/v2/tweets', tweetsApp)
-  .route('/v2/users', usersApp)
+  .route('/v3/users', usersApp)
   .route('/v2/image', imageApp)
   .route('/v2/ins', insApp)
+  .route('/v3/tweets', tweetsAppV3)
 
 app.onError((err, c) => {
   console.error(`${err}`)
