@@ -6,8 +6,15 @@ import type { ITweetRepliesResponse } from '../../types/raw/tweet/Replies'
 import type { IUserDetailsResponse } from '../../types/raw/user/Details'
 import type { IUserTweetsResponse } from '../../types/raw/user/Tweets'
 import { Extractors } from '../../collections/Extractors'
+import { BaseType } from '../../enums/Data'
 import { ResourceType } from '../../enums/Resource'
 import { TweetRepliesSortType } from '../../enums/Tweet'
+import { CursoredData } from '../../models/data/CursoredData'
+
+interface CursoredTweets {
+  tweets: RawTweet[]
+  cursor: string
+}
 
 /**
  * Twitter API 底层交互客户端
@@ -68,6 +75,8 @@ export class TwitterAPIClient {
         : ResourceType.USER_DETAILS_BY_ID
 
       const response = await fetcher.request<IUserDetailsResponse>(resource, { id })
+
+      await this.onFetchedresponse(`${ResourceType.USER_DETAILS_BY_ID}-${id}`, response)
       const data = Extractors[resource](response)
       return data || null
     })
@@ -89,14 +98,26 @@ export class TwitterAPIClient {
   /**
    * 获取用户时间线（含回复）原始数据
    */
-  async fetchUserTimelineWithRepliesRaw(userId: string): Promise<RawTweet[]> {
+  async fetchUserTimelineWithRepliesRaw(userId: string, cursor?: string): Promise<CursoredTweets> {
     return this.pool.run(async (fetcher) => {
       const response = await fetcher.request<IUserTweetsResponse>(
         ResourceType.USER_TIMELINE_AND_REPLIES,
-        { id: userId },
+        {
+          id: userId,
+          cursor,
+        },
       )
-      await this.onFetchedresponse(`${ResourceType.USER_TIMELINE_AND_REPLIES}-${userId}`, response)
-      return this.extractTimelineTweets(response)
+      const cursoredData = new CursoredData(response, BaseType.TWEET)
+      await this.onFetchedresponse(`${ResourceType.USER_TIMELINE_AND_REPLIES}-${userId}`, {
+        response,
+        cursor: cursoredData.next,
+      })
+      const tweets = this.extractTimelineTweets(response)
+
+      return {
+        tweets,
+        cursor: cursoredData.next,
+      }
     })
   }
 

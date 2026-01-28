@@ -1,6 +1,8 @@
+import { mkdir, readFile, stat, writeFile } from 'node:fs/promises'
+import path from 'node:path'
 import { RettiwtPool, TweetEnrichmentService, TwitterAPIClient } from '@tweets-viewer/rettiwt-api'
 import { getLocalCache } from '../src/localCache'
-import { writeJson } from '../src/utils'
+import { cacheDir, writeJson } from '../src/utils'
 
 const KEYS = (process.env.TWEET_KEYS || '').split(',').filter(Boolean)
 
@@ -11,11 +13,18 @@ const enrichmentService = new TweetEnrichmentService()
 
 apiClient.onFetchedresponse = async (key: string, data: any) => {
   console.log(`Fetched ${key} data`)
-  // await writeJson(data, `${key}.json`)
+  await writeJson(data, `${key}.json`)
 }
 
-const tweetId = '2016140320707334202'
-const userId = '240y_k'
+const userId = 'ttisrn_0710'
+
+const dataPath = path.join(cacheDir, `data-${userId}`)
+const cursorPath = path.join(dataPath, 'cursor.txt')
+const cursor = await readFile(cursorPath, 'utf8').catch(() => undefined)
+
+if (!await stat(dataPath).then(() => true).catch(() => false)) {
+  await mkdir(dataPath, { recursive: true })
+}
 
 const user = await getLocalCache({
   type: 'user',
@@ -28,12 +37,17 @@ if (!user?.id) {
   process.exit(1)
 }
 
-const rawTweets = await getLocalCache({
-  type: 'timeline',
-  id: user.id,
-  getter: () => apiClient.fetchUserTimelineWithRepliesRaw(user.id),
-})
+const rawTweets = await apiClient.fetchUserTimelineWithRepliesRaw(user.id, cursor)
+if (!rawTweets.tweets.length) {
+  console.error('No tweets found')
+  process.exit(1)
+}
 
-const enrichedTweets = enrichmentService.enrichUserTimelineTweets(rawTweets, user.id)
+const enrichedTweets = enrichmentService.enrichUserTimelineTweets(rawTweets.tweets, user.id)
 
-await writeJson(enrichedTweets, `timeline-${user.userName}.json`)
+await writeJson({
+  tweets: enrichedTweets,
+  cursor: rawTweets.cursor,
+}, `data-${userId}/timeline-${user.userName}-${Date.now()}.json`)
+
+await writeFile(cursorPath, rawTweets.cursor, 'utf8')

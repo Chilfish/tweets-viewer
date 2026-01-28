@@ -54,9 +54,9 @@ export class User implements IUser {
     this.pinnedTweet = user.legacy.pinned_tweet_ids_str[0]
     this.profileBanner = user.legacy.profile_banner_url
     this.profileImage = (user.avatar?.image_url ?? user.legacy.profile_image_url_https ?? '').replace('_normal', '_400x400')
-    this.url = user.legacy.entities.url.urls[0]?.expanded_url ?? ''
+    this.url = user.legacy.entities?.url?.urls[0]?.expanded_url ?? ''
 
-    const birthday = user.legacy_extended_profile.birthdate
+    const birthday = user?.legacy_extended_profile?.birthdate
     if (birthday) {
       this.birthdayString = `${birthday.month}/${birthday.day}`
     }
