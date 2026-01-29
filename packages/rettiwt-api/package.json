@@ -26,6 +26,7 @@
   "scripts": {
     "build": "tsc",
     "prepare": "tsc",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint --max-warnings 0 --fix .",
     "lint:check": "eslint --max-warnings 0 ."
   },

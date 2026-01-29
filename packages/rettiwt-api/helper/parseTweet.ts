@@ -29,23 +29,23 @@ export function enrichTweet(sourceData: RawTweet, retweetedOrignalId?: string): 
   const text = tweet.note_tweet?.note_tweet_results?.result?.text || tweet.legacy.full_text
 
   return {
-    id_str: tweet.rest_id,
+    id: tweet.rest_id,
     lang: tweet.legacy.lang,
     url: tweetUrl,
     created_at: tweet.legacy.created_at,
-    __typename: 'Tweet',
-    text,
     user,
-    in_reply_to_status_id_str: tweet.legacy.in_reply_to_status_id_str,
+    text,
+    parent_id: tweet.legacy.in_reply_to_status_id_str,
     entities: getEntities(tweet, text),
     quoted_tweet_id: tweet.quoted_status_result?.result?.rest_id,
     card: mapTwitterCard(tweet.card),
-    mediaDetails: mapMediaDetails(tweet),
-    retweetedOrignalId,
-    isInlineMeida: !!tweet.note_tweet?.note_tweet_results?.result?.media?.inline_media?.length,
-    // photos: mapPhotoEntities(tweet),
-    // video: mapVideoEntities(tweet),
-    // parent: parentTweet(tweet),
+    media_details: mapMediaDetails(tweet),
+    retweeted_original_id: retweetedOrignalId,
+    is_inline_media: !!tweet.note_tweet?.note_tweet_results?.result?.media?.inline_media?.length,
+    reply_count: tweet.legacy.reply_count || 0,
+    like_count: tweet.legacy.favorite_count || 0,
+    quote_count: tweet.legacy.quote_count || 0,
+    view_count: Number(tweet.views.count) || 0,
   }
 }
 

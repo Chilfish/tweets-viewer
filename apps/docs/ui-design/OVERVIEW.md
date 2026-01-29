@@ -79,7 +79,6 @@ Base UI 会自动在根元素上挂载状态属性（如 `data-hover`, `data-act
 </Card>
 ```
 
-
 ## 4. 组件分类索引 (Component Index)
 
 具体的组件实现范式请参考以下文档：

@@ -20,7 +20,7 @@ export class TweetEnrichmentService {
     if (rawTweet.quoted_status_result?.result) {
       const quotedTweet = enrichTweet(rawTweet.quoted_status_result.result)
       if (quotedTweet) {
-        enrichedTweet.quotedTweet = quotedTweet
+        enrichedTweet.quoted_tweet = quotedTweet
       }
     }
 
@@ -51,6 +51,6 @@ export class TweetEnrichmentService {
    * @private
    */
   private isAdvertisement(tweet: EnrichedTweet, userId: string): boolean {
-    return tweet.user.id_str !== userId && !tweet.retweetedOrignalId
+    return tweet.user.id_str !== userId && !tweet.retweeted_original_id
   }
 }

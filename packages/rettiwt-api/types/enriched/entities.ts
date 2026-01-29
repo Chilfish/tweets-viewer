@@ -3,7 +3,7 @@ export interface HashtagEntity {
 }
 
 export interface UserMentionEntity {
-  id_str: string
+  id: string
   name: string
   screen_name: string
 }
@@ -26,7 +26,7 @@ export interface SymbolEntity {
 
 export interface MediaAltEntity {
   text: string
-  // media_url: string
+  // mediaUrl: string
 }
 
 export interface SeparatorEntity {
