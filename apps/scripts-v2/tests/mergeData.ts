@@ -3,9 +3,9 @@ import { readdir } from 'node:fs/promises'
 import path from 'node:path'
 import { cacheDir, readJson, writeJson } from '../src/utils'
 
-const userId = 'ttisrn_0710'
+const userId = '240y_k'
 
-const dataPath = path.join(cacheDir, `data-${userId}`)
+const dataPath = path.join(cacheDir, `data/${userId}`)
 
 const jsons = await readdir(dataPath).then(files => files
   .filter(file => file.endsWith('.json'))

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import type { RawUser } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedUser } from '@tweets-viewer/rettiwt-api'
 import { ProfileHeader } from '~/components/profile/ProfileHeader'
 
 const meta = {
@@ -14,7 +14,7 @@ export default meta
 
 type Story = StoryObj<typeof meta>
 
-const user: RawUser = {
+const user: EnrichedUser = {
   createdAt: '2019-04-01T11:16:02.000Z',
   description: '声優。歌とゲーセンと競馬とパチスロとポーカーとTCGが好き。DJもします。#Divinez :員弁ナオ/ #D4DJ :愛本りんく/ #Reバース :東山有/ #バンドリ :広町七深(Morfonica)/ #中野区 :ナカノさん/ #川崎市 :てるみ～にゃ/ #進化の実 :エリス/PokerFate/B-idol/DC5FL',
   followersCount: 132718,

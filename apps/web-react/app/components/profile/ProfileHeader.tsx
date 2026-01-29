@@ -1,4 +1,4 @@
-import type { RawUser } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedUser } from '@tweets-viewer/rettiwt-api'
 import { format } from 'date-fns'
 import { zhCN } from 'date-fns/locale'
 import { BalloonIcon, CalendarDays, LinkIcon, MapPin } from 'lucide-react'
@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import { TweetText } from '../tweet/TweetText'
 
 interface ProfileHeaderProps {
-  user: RawUser
+  user: EnrichedUser
   children?: React.ReactNode
 }
 

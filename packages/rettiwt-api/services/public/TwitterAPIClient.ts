@@ -1,5 +1,5 @@
 import type { RettiwtPool } from '../../helper/RettiwtPool'
-import type { RawTweet, RawUser } from '../../types/enriched'
+import type { EnrichedUser, RawTweet } from '../../types/enriched'
 import type { IListTweetsResponse } from '../../types/raw/list/Tweets'
 import type { ITweetDetailsResponse } from '../../types/raw/tweet/Details'
 import type { ITweetRepliesResponse } from '../../types/raw/tweet/Replies'
@@ -64,7 +64,7 @@ export class TwitterAPIClient {
    * 获取用户详情
    * @param id - 用户 ID 或用户名
    */
-  async fetchUserDetailsRaw(id: string): Promise<RawUser | null> {
+  async fetchUserDetailsRaw(id: string): Promise<EnrichedUser | null> {
     if (!id) {
       return null
     }

@@ -13,7 +13,7 @@ export function Sidebar({ currentUser }: SidebarProps) {
   const navItems = getNavItems(currentUser)
 
   return (
-    <aside className="hidden md:flex sticky top-0 z-40 h-screen  flex-col justify-between p-3 xl:p-4 bg-background/80 backdrop-blur-xl border-r border-border/40 transition-all duration-200">
+    <aside className="hidden md:flex sticky top-0 z-40 h-screen  flex-col justify-between p-3 xl:p-4 bg-background/90 backdrop-blur-xl border-r border-border/40 transition-all duration-200">
       {/* Logo & Title */}
       <header className="flex items-center justify-center xl:justify-start gap-3 pb-4 mb-2">
         <img
@@ -36,7 +36,7 @@ export function Sidebar({ currentUser }: SidebarProps) {
               key={item.label}
               to={item.href}
               className={cn(
-                'group flex items-center justify-center xl:justify-start gap-4 px-4 py-3 rounded-full transition-all duration-200',
+                'group flex items-center justify-start xl:justify-start gap-4 px-4 py-3 rounded-full transition-all duration-200',
                 item.disabled && 'pointer-events-none opacity-40',
                 item.isActive
                   ? 'bg-accent/80 text-accent-foreground font-semibold'
@@ -61,7 +61,7 @@ export function Sidebar({ currentUser }: SidebarProps) {
           >
             <Sun className="size-4 shrink-0 dark:hidden" />
             <Moon className="size-4 shrink-0 hidden dark:block" />
-            <span className="text-md hidden xl:block">
+            <span className="text-md hidden md:block">
               <span className="dark:hidden">夜间模式</span>
               <span className="hidden dark:inline">日间模式</span>
             </span>

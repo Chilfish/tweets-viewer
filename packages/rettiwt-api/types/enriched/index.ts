@@ -9,4 +9,4 @@ export type * from './user'
 
 export type RawTweet = ITweetDetailsResponse['data']['tweetResult']['result']
 
-export type RawUser = IUser
+export type EnrichedUser = IUser

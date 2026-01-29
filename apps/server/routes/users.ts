@@ -1,8 +1,8 @@
-import type { RawUser } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedUser } from '@tweets-viewer/rettiwt-api'
 import { Hono } from 'hono'
 
 const app = new Hono()
-const users: RawUser[] = [
+const users: EnrichedUser[] = [
   {
     createdAt: '2019-04-01T11:16:02.000Z',
     description: '声優。歌とゲーセンと競馬とパチスロとポーカーとTCGが好き。DJもします。Divinez:員弁ナオ/D4DJ:愛本りんく/Reバース:東山有/バンドリ:広町七深(Morfonica)/中野区:ナカノさん/川崎市:てるみ～にゃ/進化の実:エリス/PokerFate/B-idol/DC5FL',
@@ -22,6 +22,10 @@ const users: RawUser[] = [
     url: 'https://youtube.com/channel/UCfHUq_6X97dpBrJAw4xbrEA',
   },
 ]
+
+app.get('/all', async (c) => {
+  return c.json(users)
+})
 
 app.get('/get/:name', async (c) => {
   const name = c.req.param('name')

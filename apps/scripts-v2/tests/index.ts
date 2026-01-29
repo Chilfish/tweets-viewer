@@ -4,7 +4,7 @@ import { RettiwtPool, TweetEnrichmentService, TwitterAPIClient } from '@tweets-v
 import { getLocalCache } from '../src/localCache'
 import { cacheDir, writeJson } from '../src/utils'
 
-const userId = 'bang_dream_info'
+const userId = '240y_k'
 const KEYS = (process.env.TWEET_KEYS || '').split(',').filter(Boolean)
 
 const twitterPool = new RettiwtPool(KEYS)
