@@ -1,5 +1,4 @@
 import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
-import s from './tweet-info-created-at.module.css'
 import { formatDate } from './utils'
 
 export function TweetInfoCreatedAt({ tweet }: { tweet: EnrichedTweet }) {
@@ -8,7 +7,7 @@ export function TweetInfoCreatedAt({ tweet }: { tweet: EnrichedTweet }) {
 
   return (
     <a
-      className={s.root}
+      className="text-inherit no-underline hover:underline decoration-1"
       href={tweet.url}
       target="_blank"
       rel="noopener noreferrer"

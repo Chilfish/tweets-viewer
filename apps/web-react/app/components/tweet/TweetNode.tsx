@@ -2,20 +2,22 @@ import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
 import { Repeat2Icon } from 'lucide-react'
 import { forwardRef, useMemo } from 'react'
 import { cn, pubTime } from '~/lib/utils'
-import { formatDate, TweetBody, TweetHeader, TweetMedia } from '../react-tweet'
+import { formatDate, TweetBody, TweetContainer, TweetHeader, TweetMedia } from '../react-tweet'
 import { TweetLinkCard } from './TweetCard'
 import { TweetMediaAlt } from './TweetMediaAlt'
 
 export type TweetVariant = 'quoted' | 'main'
 
 interface TweetNodeProps {
+  id: string
   tweet: EnrichedTweet
   variant: TweetVariant
   hasParent?: boolean
+  className?: string
 }
 
 function TweetMediaSection({ tweet }: { tweet: EnrichedTweet }) {
-  if (!(tweet.mediaDetails || []).length)
+  if (!(tweet.media_details || []).length)
     return null
 
   return (
@@ -26,8 +28,10 @@ function TweetMediaSection({ tweet }: { tweet: EnrichedTweet }) {
 }
 
 export const TweetNode = forwardRef<HTMLDivElement, TweetNodeProps>(({
+  id,
   tweet,
   variant,
+  className,
 }, ref) => {
   const isQuoted = variant === 'quoted'
   const avatarSize = isQuoted ? 'small' : 'medium'
@@ -35,14 +39,18 @@ export const TweetNode = forwardRef<HTMLDivElement, TweetNodeProps>(({
   // 样式映射表，替代混乱的 cn
   const styles = useMemo(() => ({
     container: cn('relative', {
-      'p-3 border-2 rounded-2xl mt-2': isQuoted,
+      'p-3 rounded-2xl mt-2': isQuoted,
     }),
   }), [isQuoted, variant])
 
-  const retweetedId = tweet.retweetedOrignalId
+  const retweetedId = tweet.retweeted_original_id
 
   return (
-    <div ref={ref} className={styles.container}>
+    <TweetContainer
+      ref={ref}
+      id={id}
+      className={cn(styles.container, className)}
+    >
       {
         retweetedId && (
           <a
@@ -73,15 +81,16 @@ export const TweetNode = forwardRef<HTMLDivElement, TweetNodeProps>(({
         <TweetMediaAlt tweet={tweet} />
         {tweet.card && <TweetLinkCard tweet={tweet} />}
 
-        {tweet.quotedTweet && (
+        {tweet.quoted_tweet && (
           <TweetNode
-            tweet={tweet.quotedTweet}
+            tweet={tweet.quoted_tweet}
             variant="quoted"
             hasParent={false}
+            id={tweet.quoted_tweet.id}
           />
         )}
       </div>
-    </div>
+    </TweetContainer>
   )
 })
 

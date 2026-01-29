@@ -1,6 +1,5 @@
 import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
 import { cn } from '~/lib/utils'
-import { TweetContainer } from '../react-tweet'
 import { TweetNode } from './TweetNode'
 
 interface MyTweetProps {
@@ -13,16 +12,13 @@ export function MyTweet({
   containerClassName,
 }: MyTweetProps) {
   return (
-    <TweetContainer
-      id={tweet.id_str}
+    <TweetNode
+      tweet={tweet}
+      variant="main"
+      hasParent={false}
+      id={tweet.id}
       className={cn('tweet-loaded', containerClassName)}
-    >
-      <TweetNode
-        tweet={tweet}
-        variant="main"
-        hasParent={false}
-      />
-    </TweetContainer>
+    />
   )
 }
 

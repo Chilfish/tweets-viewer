@@ -34,7 +34,7 @@
   --destructive-foreground: oklch(0.98 0 0); /* Fixed contrast */
 
   /* --- Borders & Inputs --- */
-  --border: oklch(0 0 0 / 0.08);
+  --border: #ffffff;
   --input: oklch(0 0 0 / 0.08);
   --ring: oklch(0.59 0.14 242 / 0.5); /* Primary with opacity */
 
@@ -180,43 +180,75 @@
   }
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
+@layer components {
+  .tweet-container {
+    @apply w-full min-w-[250px] max-w-[600px] overflow-hidden;
+    @apply text-[rgb(15,20,25)] dark:text-[rgb(247,249,249)];
+    @apply font-sans font-normal border rounded-xl box-border;
+    @apply border-[rgb(207,217,222)] dark:border-[rgb(66,83,100)];
+    @apply bg-white dark:bg-[#080808];
+    @apply transition-[background-color,box-shadow] duration-200 p-[0.7rem];
   }
 
-  html {
-    @apply font-sans;
-    -webkit-text-size-adjust: 100%;
-    touch-action: manipulation;
+  .tweet-header {
+    @apply flex pb-2 items-center leading-5 text-[0.9375rem] whitespace-nowrap overflow-hidden break-words;
   }
 
-  body {
-    @apply bg-background text-foreground antialiased;
-    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11', 'kern';
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  .tweet-header-in-quote {
+    @apply text-[0.85rem] leading-[1.2rem];
   }
 
-  a,
-  button,
-  input,
-  textarea,
-  select {
-    -webkit-tap-highlight-color: transparent;
+  .tweet-body {
+    @apply text-[15px] max-sm:text-sm font-normal leading-6 m-0 whitespace-pre-wrap font-sans;
   }
 
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+  .tweet-author-name {
+    @apply font-bold truncate whitespace-nowrap hover:underline decoration-1;
   }
-  ::-webkit-scrollbar-track {
-    background: transparent;
+
+  .tweet-author-handle {
+    @apply text-[rgb(83,100,113)] dark:text-[#71767b] text-sm truncate;
   }
-  ::-webkit-scrollbar-thumb {
-    @apply bg-muted-foreground/20 rounded-full;
+
+  .tweet-verified-badge {
+    @apply inline-flex items-center ml-1;
   }
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-muted-foreground/40;
+
+  .tweet-icon-verified {
+    @apply ml-0.5 max-w-[20px] max-h-[20px] h-[1.25em] select-none align-text-bottom fill-current;
   }
+
+  .tweet-link {
+    @apply text-[#1d9bf0] no-underline hover:underline;
+  }
+
+  .tweet-info {
+    @apply text-[rgb(83,100,113)] dark:text-[#71767b] flex items-center gap-1 text-[0.85rem];
+  }
+
+  .tweet-skeleton {
+    @apply animate-pulse bg-gray-200 dark:bg-gray-800 rounded;
+  }
+}
+
+a,
+button,
+input,
+textarea,
+select {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-muted-foreground/20 rounded-full;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted-foreground/40;
 }

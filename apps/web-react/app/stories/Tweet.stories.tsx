@@ -15,11 +15,10 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 const tweet1: EnrichedTweet = {
-  id_str: '2016474714647240908',
+  id: '2016474714647240908',
   lang: 'ja',
   url: 'https://twitter.com/ttisrn_0710/status/2016474714647240908',
   created_at: 'Wed Jan 28 11:33:30 +0000 2026',
-  __typename: 'Tweet',
   text: 'MyGO!!!!!×Ave Mujica 合同ライブ\n「わかれ道の、その先へ」 LIVE FILM\n\n2/7はひなりんで登壇致します！\n何度観ても楽しいライブなので是非🙂‍↕️\n\n#わかれ道のその先へLIVEFILM',
   user: {
     id_str: '1353543505432301569',
@@ -44,13 +43,12 @@ const tweet1: EnrichedTweet = {
     },
   ],
   quoted_tweet_id: '2016458857263091800',
-  isInlineMeida: false,
-  quotedTweet: {
-    id_str: '2016458857263091800',
+  is_inline_media: false,
+  quoted_tweet: {
+    id: '2016458857263091800',
     lang: 'ja',
     url: 'https://twitter.com/bang_dream_info/status/2016458857263091800',
     created_at: 'Wed Jan 28 10:30:30 +0000 2026',
-    __typename: 'Tweet',
     text: '＼新情報📢／\n\nMyGO!!!!!×Ave Mujica 合同ライブ\n「わかれ道の、その先へ」 LIVE FILM📽️\n\n2/7(土)・8(日)に上映会が再び開催決定💡\nキャスト登壇のトークショーも✨\n\nチケット先着受付\n⏰1/30(金) 12:00 ～\n\n▼詳細はこちら\nhttps://t.co/WkjtKxUFdD\n\n#わかれ道のその先へLIVEFILM\n#バンドリ https://t.co/7o7DsEtyp0',
     user: {
       id_str: '3009772568',
@@ -58,6 +56,7 @@ const tweet1: EnrichedTweet = {
       screen_name: 'bang_dream_info',
       is_blue_verified: false,
       verified: true,
+      verified_type: 'Business',
       profile_image_shape: 'Square',
       profile_image_url_https: 'https://pbs.twimg.com/profile_images/1973738194454872064/MRvlZY2A_normal.jpg',
     },
@@ -99,7 +98,7 @@ const tweet1: EnrichedTweet = {
         href: 'https://twitter.com/hashtag/バンドリ',
       },
     ],
-    mediaDetails: [
+    media_details: [
       {
         index: 0,
         media_url_https: 'https://pbs.twimg.com/media/G_uxxHBX0AAEIi1.jpg',
@@ -110,7 +109,7 @@ const tweet1: EnrichedTweet = {
         type: 'photo',
       },
     ],
-    isInlineMeida: false,
+    is_inline_media: false,
   },
 }
 

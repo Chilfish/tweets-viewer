@@ -1,6 +1,11 @@
 import type { HTMLAttributes } from 'react'
-import styles from './skeleton.module.css'
+import { cn } from '~/lib/utils'
 
-export function Skeleton({ style }: HTMLAttributes<HTMLSpanElement>) {
-  return <span className={styles.skeleton} style={style} />
+export function Skeleton({ style, className }: HTMLAttributes<HTMLSpanElement>) {
+  return (
+    <span
+      className={cn('tweet-skeleton block w-full', className)}
+      style={style}
+    />
+  )
 }

@@ -1,8 +1,6 @@
 import type { EnrichedTweet, MediaAnimatedGif, MediaVideo as TMediaVideo } from '@tweets-viewer/rettiwt-api'
 import { useRef, useState } from 'react'
 import { MediaImage, MediaVideo } from '~/components/ui/media'
-import s from './tweet-media-video.module.css'
-import mediaStyles from './tweet-media.module.css'
 import {
   getMediaUrl,
   getMp4Video,
@@ -34,23 +32,26 @@ export function TweetMediaVideo({ tweet, media, showCoverOnly }: Props) {
     setShowPlayButton(false)
   }
 
+  const videoButtonClasses = 'absolute flex w-12 h-12 items-center justify-center bg-[#1d9bf0] hover:bg-[#1a8cd8] focus-visible:bg-[#1a8cd8] transition-colors duration-200 border-4 border-white rounded-full cursor-pointer'
+  const imageClasses = 'absolute inset-0 m-0 object-cover object-center w-full h-full'
+
   if (showCoverOnly) {
     return (
       <>
         <MediaImage
           src={getMediaUrl(media, 'large')}
           alt="Video"
-          className={mediaStyles.image}
+          className={imageClasses}
           draggable
         />
         <button
           type="button"
-          className={s.videoButton}
+          className={videoButtonClasses}
           aria-label="View video on X"
         >
           <svg
             viewBox="0 0 24 24"
-            className={s.videoButtonIcon}
+            className="ml-[3px] w-[calc(50%+4px)] h-[calc(50%+4px)] max-w-full text-white fill-current select-none"
             aria-hidden="true"
           >
             <g>
@@ -66,7 +67,7 @@ export function TweetMediaVideo({ tweet, media, showCoverOnly }: Props) {
     <>
       <MediaVideo
         ref={videoRef}
-        className={mediaStyles.image}
+        className={imageClasses}
         poster={getMediaUrl(media, 'small')}
         src={mp4Video.url}
         controls={!showPlayButton}
@@ -79,13 +80,13 @@ export function TweetMediaVideo({ tweet, media, showCoverOnly }: Props) {
       {showPlayButton && (
         <button
           type="button"
-          className={s.videoButton}
+          className={videoButtonClasses}
           aria-label="View video on X"
           onClick={handlePlayClick}
         >
           <svg
             viewBox="0 0 24 24"
-            className={s.videoButtonIcon}
+            className="ml-[3px] w-[calc(50%+4px)] h-[calc(50%+4px)] max-w-full text-white fill-current select-none"
             aria-hidden="true"
           >
             <g>
