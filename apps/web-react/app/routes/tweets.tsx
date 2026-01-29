@@ -5,12 +5,14 @@ import axios from 'axios'
 import { useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router'
 import useSWR from 'swr/immutable'
+import { ProfileHeaderSkeleton } from '~/components/profile/profile-header-skeleton'
 import { ProfileHeader } from '~/components/profile/ProfileHeader'
 import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
 import { MyTweet } from '~/components/tweet/Tweet'
+import { TweetSkeleton } from '~/components/tweet/tweet-skeleton'
 import { TweetFeedStatus } from '~/components/tweet/TweetFeedStatus'
-import { TweetNavigation } from '~/components/tweet/TweetNavigation' // Updated import
-import { TweetsToolbarActions } from '~/components/tweets/tweets-toolbar-actions' // Updated import
+import { TweetNavigation } from '~/components/tweet/TweetNavigation'
+import { TweetsToolbarActions } from '~/components/tweets/tweets-toolbar-actions'
 import { useTweetStore } from '~/store/use-tweet-store'
 import { useUserStore } from '~/store/use-user-store'
 
@@ -59,7 +61,7 @@ export default function TweetsPage({ params }: Route.ComponentProps) {
   const setActiveUser = useUserStore(state => state.setActiveUser)
   const prevNameRef = useRef<string>(params.name)
 
-  const { data: user } = useSWR(
+  const { data: user, isLoading: userIsLoading } = useSWR(
     [params.name, 'user'],
     ([name]) => getUser(name),
   )
@@ -116,21 +118,35 @@ export default function TweetsPage({ params }: Route.ComponentProps) {
     }, { replace: true })
   }
 
-  return (
-    <main className="min-h-svh bg-background flex flex-col items-center">
-      {user && (
-        <ProfileHeader user={user} />
-      )}
-
-      <div className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-xl border-b border-border/40 transition-all">
-        <div className="w-full max-w-2xl mx-auto px-4 h-11 flex items-center justify-between gap-4">
-          <TweetNavigation totalPages={totalPages} />
-
-          <TweetsToolbarActions />
+  // 渲染逻辑分支：优先处理加载状态
+  const renderProfile = () => {
+    if (userIsLoading && !user) {
+      return (
+        <div className="w-full flex justify-center py-6">
+          <ProfileHeaderSkeleton />
         </div>
-      </div>
+      )
+    }
+    if (user) {
+      return (
+        <div className="w-full flex flex-col items-center gap-2 py-6">
+          <ProfileHeader user={user} />
+        </div>
+      )
+    }
+    return null
+  }
 
-      <div className="w-full max-w-2xl flex flex-col gap-4 px-4 mt-4 mb-20">
+  const renderTweets = () => {
+    // 初始加载或 Hard Reload 时的骨架屏
+    if (isLoading && tweets.length === 0) {
+      return Array.from({ length: 5 }).map((_, i) => (
+        <TweetSkeleton key={i} />
+      ))
+    }
+
+    return (
+      <>
         <div className="flex flex-col gap-3">
           {tweets.map(tweet => (
             <MyTweet tweet={tweet} key={tweet.id} />
@@ -147,6 +163,23 @@ export default function TweetsPage({ params }: Route.ComponentProps) {
           onIntersect={handleLoadMore}
           disabled={status === 'fetching' || status === 'exhausted' || status === 'error'}
         />
+      </>
+    )
+  }
+
+  return (
+    <main className="min-h-svh bg-background flex flex-col items-center">
+      {renderProfile()}
+
+      <div className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-xl border-b border-border/40 transition-all">
+        <div className="w-full max-w-2xl mx-auto px-4 h-11 flex items-center justify-between gap-4">
+          <TweetNavigation totalPages={totalPages} />
+          <TweetsToolbarActions />
+        </div>
+      </div>
+
+      <div className="w-full max-w-3xl flex flex-col gap-4 px-4 mt-4 mb-20">
+        {renderTweets()}
       </div>
     </main>
   )
