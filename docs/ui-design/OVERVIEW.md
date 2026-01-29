@@ -83,6 +83,8 @@ Base UI 会自动在根元素上挂载状态属性（如 `data-hover`, `data-act
 
 具体的组件实现范式请参考以下文档：
 
+- **[FEED_CONTROLS.md](./components/FEED_CONTROLS.md):** 信息流控制栏。包含分页器、排序筛选、骨架屏加载模式。
+  - _适用于：主时间线、搜索结果页等长列表场景。_
 - **[SETTINGS.md](./components/SETTINGS.md):** 设置页面布局、分组、开关行、选择器等。
   - _适用于：用户设置、配置面板、表单列表。_
 - **[GENERAL.md](./components/GENERAL.md):** 按钮、输入框、卡片、分隔符等通用原子组件。
