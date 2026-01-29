@@ -29,7 +29,7 @@ metadata:
 
 ### 必须使用的技术
 
-- **包管理器**: `bun` 
+- **包管理器**: `bun`
 - **UI 框架**: React 18+
 - **类型系统**: TypeScript (严格模式)
 - **样式方案**: Tailwind CSS + shadcn/ui 组件
@@ -58,25 +58,27 @@ metadata:
 - [ ] 工具函数是否只执行一个明确的转换？
 
 **反例**：
+
 ```tsx
 // ❌ 违反 SRP - 组件同时处理数据获取、渲染、状态管理
 function TweetCard({ id }) {
-  const [data, setData] = useState(null);
-  useEffect(() => { fetchTweet(id).then(setData) }, [id]);
-  const handleLike = () => { /* ... */ };
-  return <div>{/* 复杂渲染逻辑 */}</div>;
+  const [data, setData] = useState(null)
+  useEffect(() => { fetchTweet(id).then(setData) }, [id])
+  const handleLike = () => { /* ... */ }
+  return <div>{/* 复杂渲染逻辑 */}</div>
 }
 ```
 
 **正例**：
+
 ```tsx
 // ✅ 符合 SRP - 职责分离
 function useTweet(id: string) {
-  return useQuery(['tweet', id], () => fetchTweet(id));
+  return useQuery(['tweet', id], () => fetchTweet(id))
 }
 
 function TweetCard({ tweet }: { tweet: Tweet }) {
-  return <div>{/* 纯渲染逻辑 */}</div>;
+  return <div>{/* 纯渲染逻辑 */}</div>
 }
 ```
 
@@ -89,6 +91,7 @@ function TweetCard({ tweet }: { tweet: Tweet }) {
 - [ ] 是否可以提取独立的 Hook 或工具函数？
 
 **流程**：
+
 1. 评估现有文件复杂度
 2. 识别可拆分的逻辑单元
 3. 提取为独立模块
@@ -98,17 +101,18 @@ function TweetCard({ tweet }: { tweet: Tweet }) {
 
 **状态管理必须遵循最小作用域原则**
 
-| 状态类型 | 使用方案 | 示例 |
-|---------|---------|------|
-| 全局共享状态 | Zustand | 用户认证、主题配置、全局 UI 状态 |
-| 原子化状态 | Jotai | 表单状态、临时筛选条件 |
-| 本地状态 | useState | 单组件内的展开/折叠状态 |
+| 状态类型     | 使用方案 | 示例                             |
+| ------------ | -------- | -------------------------------- |
+| 全局共享状态 | Zustand  | 用户认证、主题配置、全局 UI 状态 |
+| 原子化状态   | Jotai    | 表单状态、临时筛选条件           |
+| 本地状态     | useState | 单组件内的展开/折叠状态          |
 
 - [ ] 是否避免了 Prop Drilling (超过 2 层)?
 - [ ] 是否使用了最小作用域的状态方案?
 - [ ] 全局状态是否真的需要全局访问?
 
 **反例**：
+
 ```tsx
 // ❌ 通过 props 层层传递
 <Parent>
@@ -121,15 +125,16 @@ function TweetCard({ tweet }: { tweet: Tweet }) {
 ```
 
 **正例**：
+
 ```tsx
 // ✅ 使用 Zustand 全局状态
-const useUserStore = create<UserState>((set) => ({
+const useUserStore = create<UserState>(set => ({
   user: null,
-  setUser: (user) => set({ user }),
-}));
+  setUser: user => set({ user }),
+}))
 
 function GrandChild() {
-  const user = useUserStore((s) => s.user);
+  const user = useUserStore(s => s.user)
   // 直接访问,无需 props 传递
 }
 ```
@@ -143,27 +148,30 @@ function GrandChild() {
 - [ ] 是否为"可能的未来需求"添加了代码？
 
 **禁止的模式**：
+
 ```tsx
 // ❌ 过度泛型化
 interface BaseProps<T extends Record<string, any>> {
-  data: T;
-  render: (item: T) => ReactNode;
+  data: T
+  render: (item: T) => ReactNode
 }
 
 // ❌ 不必要的 HOC
-const withLoading = <P extends object>(Component: React.FC<P>) => {
+function withLoading<P extends object>(Component: React.FC<P>) {
   return (props: P & { loading: boolean }) => {
     // ...
-  };
-};
+  }
+}
 ```
 
 **推荐的模式**：
+
 ```tsx
 // ✅ 直接实现,无不必要抽象
 function TweetList({ tweets }: { tweets: Tweet[] }) {
-  if (!tweets.length) return <Empty />;
-  return tweets.map(tweet => <TweetCard key={tweet.id} tweet={tweet} />);
+  if (!tweets.length)
+    return <Empty />
+  return tweets.map(tweet => <TweetCard key={tweet.id} tweet={tweet} />)
 }
 ```
 
@@ -177,11 +185,11 @@ function TweetList({ tweets }: { tweets: Tweet[] }) {
 
 ```tsx
 // ❌ 隐式、难以理解
-const x = data.filter(d => d.s === 1).map(d => d.v);
+const x = data.filter(d => d.s === 1).map(d => d.v)
 
 // ✅ 显式、清晰
-const activeTweets = tweets.filter(tweet => tweet.status === TweetStatus.Active);
-const tweetContents = activeTweets.map(tweet => tweet.content);
+const activeTweets = tweets.filter(tweet => tweet.status === TweetStatus.Active)
+const tweetContents = activeTweets.map(tweet => tweet.content)
 ```
 
 ### 第六条：组件组合原则 (Composition Over Inheritance)
@@ -197,13 +205,13 @@ function TweetCard({ tweet, actions }: TweetCardProps) {
       <TweetContent text={tweet.content} />
       <TweetFooter actions={actions} />
     </Card>
-  );
+  )
 }
 
 // 使用时灵活组合
-<TweetCard 
-  tweet={tweet} 
-  actions={<LikeButton />} 
+<TweetCard
+  tweet={tweet}
+  actions={<LikeButton />}
 />
 ```
 
@@ -218,12 +226,12 @@ function TweetCard({ tweet, actions }: TweetCardProps) {
 ```tsx
 // ✅ 可测试的纯函数
 export function formatTweetTime(timestamp: number): string {
-  return new Date(timestamp).toLocaleString();
+  return new Date(timestamp).toLocaleString()
 }
 
 // ✅ 可测试的组件
 export function TweetTime({ timestamp }: { timestamp: number }) {
-  return <time>{formatTweetTime(timestamp)}</time>;
+  return <time>{formatTweetTime(timestamp)}</time>
 }
 ```
 
@@ -237,10 +245,10 @@ export function TweetTime({ timestamp }: { timestamp: number }) {
 
 ```tsx
 // ✅ 精确的 Zustand selector
-const username = useUserStore((s) => s.user?.name); // 只订阅 name
+const username = useUserStore(s => s.user?.name) // 只订阅 name
 
 // ❌ 过度订阅
-const { user } = useUserStore(); // user 任何字段变化都会重渲染
+const { user } = useUserStore() // user 任何字段变化都会重渲染
 ```
 
 ### 第九条：错误处理强制 (Mandatory Error Handling)
@@ -253,11 +261,13 @@ function useTweets() {
   const { data, error, isLoading } = useQuery({
     queryKey: ['tweets'],
     queryFn: fetchTweets,
-  });
+  })
 
-  if (error) return { tweets: [], error };
-  if (isLoading) return { tweets: [], isLoading: true };
-  return { tweets: data, error: null };
+  if (error)
+    return { tweets: [], error }
+  if (isLoading)
+    return { tweets: [], isLoading: true }
+  return { tweets: data, error: null }
 }
 ```
 
@@ -266,22 +276,24 @@ function useTweets() {
 在生成任何代码前,必须确认：
 
 ### 架构合规性
+
 - [ ] 通过所有九条宪法关卡
 - [ ] 符合技术栈约束
 - [ ] 无禁止的模式
 
 ### 代码质量
+
 - [ ] 每个文件 ≤ 150 行
 - [ ] 每个函数 ≤ 30 行
 - [ ] TypeScript 无 `any` 类型
 - [ ] 所有导出函数有 JSDoc 注释
 
 ### 可维护性
+
 - [ ] 文件命名遵循 kebab-case
 - [ ] 组件名遵循 PascalCase
 - [ ] Hook 名以 `use` 开头
 - [ ] 目录结构清晰 (components/, hooks/, stores/, utils/)
-
 
 ## 优先参考文档
 
@@ -304,14 +316,15 @@ function useTweets() {
 // ✅ API 调用错误处理
 async function fetchTweets(): Promise<Tweet[]> {
   try {
-    const response = await fetch('/api/tweets');
+    const response = await fetch('/api/tweets')
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(`HTTP error! status: ${response.status}`)
     }
-    return await response.json();
-  } catch (error) {
-    console.error('Failed to fetch tweets:', error);
-    throw error; // 重新抛出供上层处理
+    return await response.json()
+  }
+  catch (error) {
+    console.error('Failed to fetch tweets:', error)
+    throw error // 重新抛出供上层处理
   }
 }
 
@@ -322,9 +335,9 @@ function useTweets() {
     queryFn: fetchTweets,
     retry: 3,
     onError: (error) => {
-      toast.error('Failed to load tweets');
+      toast.error('Failed to load tweets')
     },
-  });
+  })
 }
 ```
 

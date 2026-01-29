@@ -2,7 +2,7 @@
 /** biome-ignore-all lint/a11y/useMediaCaption: <explanation> */
 /** biome-ignore-all lint/a11y/useKeyWithClickEvents: <explanation> */
 import type { TweetMedia } from '@tweets-viewer/shared'
-import type { MediaItem } from '~/stores-old/media-store'
+import type { MediaItem } from '~/stores/media-store'
 import { Play } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useIntersectionObserver } from '~/hooks/use-intersection-observer'

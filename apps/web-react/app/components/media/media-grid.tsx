@@ -1,48 +1,20 @@
-import type { Tweet, User } from '@tweets-viewer/shared'
-import type { WaterfallItem } from '../ui/waterfall'
-import type { PaginatedListActions } from '~/stores-old'
-import type { MediaItem } from '~/stores-old/media-store'
+import type { MediaDetails } from '@tweets-viewer/rettiwt-api'
 import { ImageIcon } from 'lucide-react'
-import { useAppStore } from '~/stores-old/app-store'
 import { Waterfall } from '../ui/waterfall'
 import { MediaItemComponent } from './media-item'
 
 interface MediaGridProps {
-  mediaItems: MediaItem[]
+  mediaItems: MediaDetails[]
   paginationActions?: PaginatedListActions
-  // 为每个媒体项提供关联的推文和用户信息
-  getMediaContext?: (mediaItem: MediaItem) => {
-    tweet: Tweet
-    user: User
-    allMediaInTweet: MediaItem[]
-  } | null
 }
 
 // 确保 MediaItem 符合 WaterfallItem 接口
-interface MediaWaterfallItem extends MediaItem, WaterfallItem {}
+interface MediaWaterfallItem extends MediaDetails {}
 
 export function MediaGrid({
   mediaItems,
   paginationActions,
-  getMediaContext,
 }: MediaGridProps) {
-  const { openTweetMediaModal } = useAppStore()
-
-  const handleMediaClick = (clickedMedia: MediaItem) => {
-    const context = getMediaContext?.(clickedMedia)
-    if (!context)
-      return
-    const startIndex = context.allMediaInTweet.findIndex(
-      m => m.id === clickedMedia.id,
-    )
-    openTweetMediaModal({
-      mediaItems: context.allMediaInTweet,
-      startIndex: Math.max(0, startIndex),
-      tweet: context.tweet,
-      user: context.user,
-    })
-  }
-
   return (
     <Waterfall<MediaWaterfallItem>
       list={mediaItems as MediaWaterfallItem[]}
@@ -51,10 +23,8 @@ export function MediaGrid({
       renderItem={item => (
         <MediaItemComponent
           item={item}
-          onClick={() => handleMediaClick(item)}
         />
       )}
-      onItemClick={handleMediaClick}
       paginationActions={paginationActions}
       emptyState={{
         icon: (

@@ -5,16 +5,16 @@ import axios from 'axios'
 import { useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router'
 import useSWR from 'swr/immutable'
-import { UserTabs } from '~/components/layout/user-tabs'
 import { ProfileHeader } from '~/components/profile/ProfileHeader'
 import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
 import { MyTweet } from '~/components/tweet/Tweet'
 import { TweetFeedStatus } from '~/components/tweet/TweetFeedStatus'
-import { TweetPagination } from '~/components/tweet/TweetPagination'
+import { TweetNavigation } from '~/components/tweet/TweetNavigation' // Updated import
+import { TweetsToolbarActions } from '~/components/tweets/tweets-toolbar-actions' // Updated import
 import { useTweetStore } from '~/store/use-tweet-store'
 import { useUserStore } from '~/store/use-user-store'
 
-const PAGE_SIZE = 10
+const PAGE_SIZE = 20
 
 export function meta({ params }: Route.MetaArgs) {
   const { name } = params
@@ -24,9 +24,6 @@ export function meta({ params }: Route.MetaArgs) {
   ]
 }
 
-/**
- * 通用分页响应接口
- */
 export interface PaginatedResponse<T> {
   data: T[]
   meta: {
@@ -38,9 +35,9 @@ export interface PaginatedResponse<T> {
   }
 }
 
-async function getTweets(username: string, page: number, reverse: boolean) {
+async function getTweets(username: string, page: number, reverse: boolean, start?: string, end?: string) {
   const { data } = await axios.get<PaginatedResponse<EnrichedTweet>>(`${apiUrl}/tweets/get/${username}`, {
-    params: { page, reverse, pageSize: PAGE_SIZE },
+    params: { page, reverse, pageSize: PAGE_SIZE, start, end },
   })
   return data
 }
@@ -55,25 +52,24 @@ export default function TweetsPage({ params }: Route.ComponentProps) {
 
   const page = Number(searchParams.get('page')) || 1
   const reverse = searchParams.get('reverse') === 'true'
+  const start = searchParams.get('start') || undefined
+  const end = searchParams.get('end') || undefined
 
   const { tweets, status, setStatus, appendTweets, resetStream } = useTweetStore()
   const setActiveUser = useUserStore(state => state.setActiveUser)
   const prevNameRef = useRef<string>(params.name)
 
-  // 1. 获取用户信息
   const { data: user } = useSWR(
     [params.name, 'user'],
     ([name]) => getUser(name),
   )
 
-  // 2. 获取当前页推文数据
   const { data: paginatedResponse, isLoading, error } = useSWR(
-    [params.name, 'tweets', page, reverse],
-    ([name, _, p, rev]) => getTweets(name, p, rev),
+    [params.name, 'tweets', page, reverse, start, end],
+    ([name, _, p, rev, s, e]) => getTweets(name, p, rev, s, e),
     { revalidateOnFocus: false },
   )
 
-  // 数据层解析
   const newData = paginatedResponse?.data
   const meta = paginatedResponse?.meta
 
@@ -83,17 +79,8 @@ export default function TweetsPage({ params }: Route.ComponentProps) {
   }, [user, setActiveUser])
 
   useEffect(() => {
-    if (prevNameRef.current !== params.name) {
-      resetStream()
-      if (searchParams.get('page')) {
-        setSearchParams((prev) => {
-          prev.delete('page')
-          return prev
-        }, { replace: true })
-      }
-      prevNameRef.current = params.name
-    }
-  }, [params.name, resetStream, setSearchParams])
+    resetStream()
+  }, [params.name, reverse, start, end, resetStream])
 
   useEffect(() => {
     if (isLoading) {
@@ -112,22 +99,16 @@ export default function TweetsPage({ params }: Route.ComponentProps) {
     }
   }, [isLoading, error, newData, setStatus, appendTweets, tweets.length])
 
-  // 优先使用后端返回的数据总量，如果没有则回退到用户信息中的计数
   const totalCount = meta?.total ?? user?.statusesCount ?? 0
   const totalPages = Math.ceil(totalCount / PAGE_SIZE)
 
-  // 这里的交互逻辑：
-  // 1. 无限滚动负责“向下探索”
-  // 2. 分页器负责“跨时空传送”和显示当前进度
   const handleLoadMore = () => {
     if (status === 'fetching' || status === 'exhausted' || status === 'error')
       return
-    // 只有在还有更多数据时才触发下一页
     if (meta && !meta.hasMore) {
       setStatus('exhausted')
       return
     }
-
     setSearchParams((prev) => {
       const currentP = Number(prev.get('page')) || 1
       prev.set('page', (currentP + 1).toString())
@@ -138,22 +119,24 @@ export default function TweetsPage({ params }: Route.ComponentProps) {
   return (
     <main className="min-h-svh bg-background flex flex-col items-center">
       {user && (
-        <div className="w-full flex flex-col items-center gap-2 ">
-          <ProfileHeader user={user} />
-          <UserTabs user={user} />
-        </div>
+        <ProfileHeader user={user} />
       )}
 
-      <TweetPagination totalPages={totalPages} />
+      <div className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-xl border-b border-border/40 transition-all">
+        <div className="w-full max-w-2xl mx-auto px-4 h-11 flex items-center justify-between gap-4">
+          <TweetNavigation totalPages={totalPages} />
 
-      <div className="w-full max-w-2xl flex flex-col gap-4 px-4 mb-20">
-        <div className="flex flex-col gap-2">
+          <TweetsToolbarActions />
+        </div>
+      </div>
+
+      <div className="w-full max-w-2xl flex flex-col gap-4 px-4 mt-4 mb-20">
+        <div className="flex flex-col gap-3">
           {tweets.map(tweet => (
             <MyTweet tweet={tweet} key={tweet.id} />
           ))}
         </div>
 
-        {/* 状态展示：仅展示，不负责触发逻辑 */}
         <TweetFeedStatus
           status={status}
           hasTweets={tweets.length > 0}
