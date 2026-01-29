@@ -36,9 +36,11 @@ async function getTweets(username: string, page: number, reverse: boolean, start
 }
 
 export default function MediaPage({ params }: Route.ComponentProps) {
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams] = useSearchParams()
 
-  const page = Number(searchParams.get('page')) || 1
+  // Use local state for pagination instead of URL persistence
+  const [page, setPage] = useState(1)
+
   const reverse = searchParams.get('reverse') === 'true'
   const start = searchParams.get('start') || undefined
   const end = searchParams.get('end') || undefined
@@ -60,9 +62,9 @@ export default function MediaPage({ params }: Route.ComponentProps) {
   // 2. 监听核心筛选参数变化，重置列表
   useEffect(() => {
     // 当筛选条件变化时，清空列表并重置状态
-    // 注意：如果是切换用户(name变化)，也会触发
     setMediaItems([])
     setStatus('fetching')
+    setPage(1)
   }, [params.name, reverse, start, end])
 
   // 3. 数据处理：提取、打平并追加媒体
@@ -75,10 +77,6 @@ export default function MediaPage({ params }: Route.ComponentProps) {
     }
     else if (rawTweets) {
       const newMedia = extractMediaFromTweets(rawTweets)
-
-      // 判断是否耗尽
-      // 这里的逻辑：如果当前返回数据为空，或者小于 PageSize (且不是第一页?)，通常意味着结束
-      // 简单起见，如果 newMedia 为空，就是 exhausted (或者 empty)
 
       const isExhausted = newMedia.length === 0 || (meta && !meta.hasMore)
 
@@ -93,33 +91,7 @@ export default function MediaPage({ params }: Route.ComponentProps) {
       })
 
       if (isExhausted) {
-        // 如果列表是空的，说明是 Empty 状态（ready but empty），TweetFeedStatus 会处理
-        // 如果列表不为空，说明是 Exhausted
-        // 为了配合 TweetFeedStatus: if (!hasTweets && status === 'ready') -> Empty
-        // if (status === 'exhausted') -> "Archived"
-
-        // 我们需要检查最终的 mediaItems 长度来决定是 Empty 还是 Exhausted，但这里拿不到最新的 mediaItems
-        // 所以我们设置状态，而在渲染时判断 hasTweets
-
-        // 如果 newMedia 是空的，且原本也没数据 -> Ready (Empty)
-        // 如果 newMedia 是空的，但原本有数据 -> Exhausted
-        // 这里的逻辑稍微复杂，因为 setMediaItems 是异步的。
-        // 我们依赖下一次渲染的 status 决定
-
         setStatus((prevStatus) => {
-          // 这里也很难拿到最新的 mediaItems length
-          // 简化逻辑：
-          // 如果 rawTweets 也是空的，暂且设为 ready (让 TweetFeedStatus 判断 !hasTweets)
-          // 如果 rawTweets 不空但 newMedia 空 (都在 filtered)，设为 exhausted
-          // 或者直接设为 exhausted，TweetFeedStatus 优先判断 !hasTweets
-
-          // TweetFeedStatus logic:
-          // if exhausted -> show "Exhausted" text
-          // if ready and !hasTweets -> show "Empty" text
-
-          // 如果是第一页且没数据 -> 应该显示 Empty -> Status: Ready, hasTweets: false
-          // 如果是第 N 页且没数据 -> 应该显示 Exhausted -> Status: Exhausted
-
           if (page === 1 && newMedia.length === 0)
             return 'ready'
           if (newMedia.length === 0)
@@ -153,9 +125,11 @@ export default function MediaPage({ params }: Route.ComponentProps) {
 
   const user = activeUser && activeUser.userName === params.name ? activeUser : userData
 
+  // Calculate total pages logic similar to original
   const totalTweets = meta?.total ?? user?.statusesCount ?? 0
   const totalPages = Math.ceil(totalTweets / PAGE_SIZE)
 
+  // Use local state for pagination
   const handleLoadMore = () => {
     if (status === 'fetching' || status === 'exhausted' || status === 'error')
       return
@@ -165,11 +139,18 @@ export default function MediaPage({ params }: Route.ComponentProps) {
       return
     }
 
-    setSearchParams((prev) => {
-      const currentP = Number(prev.get('page')) || 1
-      prev.set('page', (currentP + 1).toString())
-      return prev
-    }, { replace: true })
+    setPage(prev => prev + 1)
+  }
+
+  const handlePageChange = (newPage: number) => {
+    // If the user jumps to a new page, we might want to clear existing items
+    // to strictly simulate "going to that page" rather than infinite scroll gap.
+    // However, existing logic is purely append-based relying on SWR.
+    // To be safe and visually consistent:
+    if (newPage === 1) {
+      setMediaItems([])
+    }
+    setPage(newPage)
   }
 
   return (
@@ -185,7 +166,11 @@ export default function MediaPage({ params }: Route.ComponentProps) {
       {/* Toolbar */}
       <div className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-xl border-b border-border/40 transition-all">
         <div className="w-full max-w-6xl mx-auto px-4 h-11 flex items-center justify-between gap-4">
-          <TweetNavigation totalPages={totalPages} />
+          <TweetNavigation
+            totalPages={totalPages}
+            currentPage={page}
+            onPageChange={handlePageChange}
+          />
           <TweetsToolbarActions />
         </div>
       </div>
@@ -197,16 +182,16 @@ export default function MediaPage({ params }: Route.ComponentProps) {
           isEmpty={status === 'ready' && mediaItems.length === 0}
         />
 
-        <TweetFeedStatus
-          status={status}
-          hasTweets={mediaItems.length > 0}
-          onRetry={() => window.location.reload()}
-        />
-
-        <InfiniteScrollTrigger
-          onIntersect={handleLoadMore}
-          disabled={status === 'fetching' || status === 'exhausted' || status === 'error'}
-        />
+        <div className="mt-8 mb-10">
+          <TweetFeedStatus
+            status={status}
+            hasTweets={mediaItems.length > 0}
+          />
+          <InfiniteScrollTrigger
+            onIntersect={handleLoadMore}
+            status={status}
+          />
+        </div>
       </div>
     </main>
   )

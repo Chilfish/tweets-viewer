@@ -13,6 +13,8 @@ import { cn } from '~/lib/utils'
 interface TweetNavigationProps {
   totalPages: number
   className?: string
+  currentPage?: number
+  onPageChange?: (page: number) => void
 }
 
 /**
@@ -20,9 +22,11 @@ interface TweetNavigationProps {
  * 仅包含：[上一页] [页码下拉] [下一页]
  * 适合嵌入统一的 Toolbar
  */
-export const TweetNavigation = memo(({ totalPages, className }: TweetNavigationProps) => {
+export const TweetNavigation = memo(({ totalPages, className, currentPage: propPage, onPageChange }: TweetNavigationProps) => {
   const [searchParams, setSearchParams] = useSearchParams()
-  const currentPage = Number(searchParams.get('page')) || 1
+  const urlPage = Number(searchParams.get('page')) || 1
+
+  const currentPage = propPage !== undefined ? propPage : urlPage
 
   // 即使总页数为 1，也应渲染组件以保持 Header 结构稳定
   // 只是在这种情况下，前后翻页按钮会被禁用
@@ -31,13 +35,19 @@ export const TweetNavigation = memo(({ totalPages, className }: TweetNavigationP
   const navigateToPage = (p: number) => {
     if (p === currentPage || p < 1 || p > totalPages)
       return
-    setSearchParams(
-      (prev) => {
-        prev.set('page', p.toString())
-        return prev
-      },
-      { replace: false },
-    )
+
+    if (onPageChange) {
+      onPageChange(p)
+    }
+    else {
+      setSearchParams(
+        (prev) => {
+          prev.set('page', p.toString())
+          return prev
+        },
+        { replace: false },
+      )
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
@@ -58,7 +68,6 @@ export const TweetNavigation = memo(({ totalPages, className }: TweetNavigationP
         <DropdownMenuTrigger
           disabled={!showDropdown}
           render={(
-
             <Button
               variant="ghost"
               size="sm"
