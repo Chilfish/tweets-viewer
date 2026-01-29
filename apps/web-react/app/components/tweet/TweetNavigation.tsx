@@ -54,22 +54,26 @@ export function TweetNavigation({ totalPages, className }: TweetNavigationProps)
       </Button>
 
       <DropdownMenu>
-        <DropdownMenuTrigger asChild disabled={!showDropdown}>
-          <Button
-            variant="ghost"
-            size="sm"
-            className={cn(
-              'h-8 gap-1.5 font-semibold rounded-full px-3 text-sm hover:bg-accent',
-              !showDropdown && 'opacity-100 cursor-default hover:bg-transparent',
-            )}
-          >
+        <DropdownMenuTrigger
+          disabled={!showDropdown}
+          render={(
+
+            <Button
+              variant="ghost"
+              size="sm"
+              className={cn(
+                'h-8 gap-1.5 font-semibold rounded-full px-3 text-sm hover:bg-accent',
+                !showDropdown && 'opacity-100 cursor-default hover:bg-transparent',
+              )}
+              />
+          )}
+        >
             <span>{currentPage}</span>
             <span className="text-muted-foreground font-normal">
               /
               {totalPages > 0 ? totalPages : 1}
             </span>
             {showDropdown && <ChevronDown className="size-3.5 opacity-50 ml-0.5" />}
-          </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="center" className="max-h-80 overflow-y-auto min-w-[100px]">
           {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (

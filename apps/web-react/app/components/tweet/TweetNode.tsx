@@ -22,10 +22,11 @@ interface TweetNodeProps {
   variant: TweetVariant
   hasParent?: boolean
   className?: string
+  hideMedia?: boolean
 }
 
-function TweetMediaSection({ tweet }: { tweet: EnrichedTweet }) {
-  if (!(tweet.media_details || []).length)
+function TweetMediaSection({ tweet, hideMedia }: { tweet: EnrichedTweet, hideMedia?: boolean }) {
+  if (hideMedia || !(tweet.media_details || []).length)
     return null
 
   return (
@@ -40,6 +41,7 @@ export const TweetNode = forwardRef<HTMLDivElement, TweetNodeProps>(({
   tweet,
   variant,
   className,
+  hideMedia = false,
 }, ref) => {
   const isQuoted = variant === 'quoted'
   const avatarSize = isQuoted ? 'small' : 'medium'
@@ -85,7 +87,7 @@ export const TweetNode = forwardRef<HTMLDivElement, TweetNodeProps>(({
         <TweetInReplyTo tweet={tweet} />
         <TweetBody tweet={tweet} />
 
-        <TweetMediaSection tweet={tweet} />
+        <TweetMediaSection tweet={tweet} hideMedia={hideMedia} />
 
         <TweetMediaAlt tweet={tweet} />
         {tweet.card && <TweetLinkCard tweet={tweet} />}
