@@ -49,7 +49,7 @@ export function MediaWall({ items, isLoading, isEmpty }: MediaWallProps) {
   return (
     <>
       {/* 纯瀑布流网格 - 使用原生 CSS Columns */}
-      <div className="columns-2 md:columns-3 lg:columns-4 gap-2 space-y-2">
+      <div className="columns-2 md:columns-3 lg:columns-4 gap-1 space-y-1">
         {items.map((item, index) => (
           <div key={item.id} className="break-inside-avoid">
             <MediaCard
