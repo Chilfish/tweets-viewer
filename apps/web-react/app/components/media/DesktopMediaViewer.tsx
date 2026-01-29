@@ -64,7 +64,7 @@ export function DesktopMediaViewer({
                       variant="ghost"
                       className="absolute left-4 top-1/2 -translate-y-1/2 size-12 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 hover:scale-110 transition-all"
                       onClick={(e) => {
-                        e.stopPropagation();
+                        e.stopPropagation()
                         onNavigateMedia('prev')
                       }}
                       aria-label="Previous image"
@@ -80,7 +80,7 @@ export function DesktopMediaViewer({
                       variant="ghost"
                       className="absolute right-4 top-1/2 -translate-y-1/2 size-12 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 hover:scale-110 transition-all"
                       onClick={(e) => {
-                        e.stopPropagation();
+                        e.stopPropagation()
                         onNavigateMedia('next')
                       }}
                       aria-label="Next image"

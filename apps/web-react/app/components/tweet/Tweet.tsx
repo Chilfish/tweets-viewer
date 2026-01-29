@@ -18,7 +18,7 @@ export function MyTweet({
       tweet={tweet}
       variant="main"
       hasParent={false}
-      id={tweet.id}
+      id={tweet.retweeted_original_id || tweet.id}
       className={cn('tweet-loaded', containerClassName)}
       hideMedia={hideMedia}
     />

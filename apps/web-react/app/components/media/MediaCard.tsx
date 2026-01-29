@@ -1,6 +1,6 @@
 import type { FlatMediaItem } from '~/routes/media'
 import { VideoIcon } from 'lucide-react'
-import { useState } from 'react'
+import { memo, useState } from 'react'
 import { cn } from '~/lib/utils'
 
 interface MediaCardProps {
@@ -8,7 +8,7 @@ interface MediaCardProps {
   onClick: () => void
 }
 
-export function MediaCard({ item, onClick }: MediaCardProps) {
+export const MediaCard = memo(({ item, onClick }: MediaCardProps) => {
   const [isLoaded, setIsLoaded] = useState(false)
   const isVideo = item.type === 'video' || item.type === 'animated_gif'
 
@@ -27,6 +27,8 @@ export function MediaCard({ item, onClick }: MediaCardProps) {
         )}
         onLoad={() => setIsLoaded(true)}
         loading="lazy"
+        // Key prop isn't needed here, but decoding="async" helps with main thread
+        decoding="async"
       />
 
       {/* 视频指示器 */}
@@ -40,4 +42,5 @@ export function MediaCard({ item, onClick }: MediaCardProps) {
       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-200" />
     </div>
   )
-}
+})
+MediaCard.displayName = 'MediaCard'

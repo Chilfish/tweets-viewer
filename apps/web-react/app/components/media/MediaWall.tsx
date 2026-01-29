@@ -1,6 +1,6 @@
 import type { FlatMediaItem } from '~/routes/media'
 import { VideoIcon } from 'lucide-react'
-import { useState } from 'react'
+import { memo, useCallback, useState } from 'react'
 import { Skeleton } from '~/components/ui/skeleton'
 import { MediaCard } from './MediaCard'
 import { MediaPreviewModal } from './MediaPreviewModal'
@@ -11,22 +11,25 @@ interface MediaWallProps {
   isEmpty: boolean
 }
 
+const MediaWallItem = memo(({ item, index, onSelect }: { item: FlatMediaItem, index: number, onSelect: (index: number) => void }) => {
+  const handleClick = useCallback(() => {
+    onSelect(index)
+  }, [index, onSelect])
+
+  return (
+    <div className="break-inside-avoid mb-2 transition-transform duration-200">
+      <MediaCard
+        item={item}
+        onClick={handleClick}
+      />
+    </div>
+  )
+})
+MediaWallItem.displayName = 'MediaWallItem'
+
 export function MediaWall({ items, isLoading, isEmpty }: MediaWallProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
   const [open, setOpen] = useState(false)
-
-  // 瀑布流渲染项
-  const renderItem = (item: FlatMediaItem, index: number) => {
-    return (
-      <MediaCard
-        item={item}
-        onClick={() => {
-          setSelectedIndex(index)
-          setOpen(true)
-        }}
-      />
-    )
-  }
 
   if (isLoading) {
     return <MediaWallSkeleton />
@@ -49,7 +52,13 @@ export function MediaWall({ items, isLoading, isEmpty }: MediaWallProps) {
       <div className="columns-2 md:columns-3 lg:columns-4 gap-2 space-y-2">
         {items.map((item, index) => (
           <div key={item.id} className="break-inside-avoid">
-            {renderItem(item, index)}
+            <MediaCard
+              item={item}
+              onClick={() => {
+                setSelectedIndex(index)
+                setOpen(true)
+              }}
+            />
           </div>
         ))}
       </div>
@@ -69,14 +78,30 @@ export function MediaWall({ items, isLoading, isEmpty }: MediaWallProps) {
 }
 
 function MediaWallSkeleton() {
+  // 使用确定的高度数组，避免 SSR Hydration Mismatch (Math.random 不一致)
+  const skeletonHeights = [
+    220,
+    380,
+    280,
+    200,
+    320,
+    240,
+    180,
+    300,
+    260,
+    340,
+    210,
+    290,
+  ]
+
   return (
     <div className="columns-2 md:columns-3 lg:columns-4 gap-2 space-y-2">
-      {Array.from({ length: 12 }).map((_, i) => (
+      {skeletonHeights.map((height, i) => (
         <Skeleton
           key={i}
           className="w-full rounded-lg"
           style={{
-            height: `${Math.floor(Math.random() * 200) + 150}px`,
+            height: `${height}px`,
             // 避免骨架屏在列尾断裂
             breakInside: 'avoid',
           }}
