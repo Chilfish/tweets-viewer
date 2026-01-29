@@ -10,14 +10,17 @@ import {
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
 import { cn } from '~/lib/utils'
-import { useUserStore } from '~/stores/user-store'
 
 export function UserSelector() {
   const location = useLocation()
   const curPath = location.pathname.split('/')[1] || '/tweets'
-  const { users, curUser } = useUserStore()
 
-  const userList = Object.values(users)
+  const userList = Object.values([])
+  const curUser = {
+    id: '1',
+    name: 'John Doe',
+    avatarUrl: 'https://example.com/avatar.jpg',
+  }
 
   return (
     <DropdownMenu>

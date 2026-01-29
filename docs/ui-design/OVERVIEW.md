@@ -89,9 +89,5 @@ Base UI 会自动在根元素上挂载状态属性（如 `data-hover`, `data-act
   - _适用于：全局通用的基础 UI 元素。_
 - **[LAYOUT.md](./components/LAYOUT.md):** 布局容器、网格、分栏等。
   - _适用于：页面布局、内容分组、导航栏。_
-- **[MEDIA_INTERACTION.md](./components/MEDIA_INTERACTION.md):** 图片、视频、音频等媒体元素的交互组件。
-  - _适用于：媒体的预览查看。_
-- **[MODAL_SHEETS.md](./components/MODAL_SHEETS.md):** 模态框、抽屉等。
-  - _适用于：弹出式内容展示。_
 
 _(更多组件规范将随项目发展陆续添加)_

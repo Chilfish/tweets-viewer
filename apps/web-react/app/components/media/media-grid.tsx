@@ -1,9 +1,9 @@
 import type { Tweet, User } from '@tweets-viewer/shared'
 import type { WaterfallItem } from '../ui/waterfall'
-import type { PaginatedListActions } from '~/stores'
-import type { MediaItem } from '~/stores/media-store'
+import type { PaginatedListActions } from '~/stores-old'
+import type { MediaItem } from '~/stores-old/media-store'
 import { ImageIcon } from 'lucide-react'
-import { useAppStore } from '~/stores/app-store'
+import { useAppStore } from '~/stores-old/app-store'
 import { Waterfall } from '../ui/waterfall'
 import { MediaItemComponent } from './media-item'
 

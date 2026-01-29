@@ -1,5 +1,5 @@
 import type { Tweet, UserInfo } from '@tweets-viewer/shared'
-import type { InsMediaItem } from '~/stores/ins-store'
+import type { InsMediaItem } from '~/stores-old/ins-store'
 import {
   Dialog as DialogPrimitive,
   Dialog as SheetPrimitive,

@@ -8,9 +8,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from 'react-router'
-import { GlobalMediaModal } from './components/media/global-media-modal'
 import { Button } from './components/ui/button'
-import { useAppStore } from './stores/app-store'
 import './app.css'
 
 export const links: Route.LinksFunction = () => [
@@ -27,9 +25,8 @@ export const links: Route.LinksFunction = () => [
 ]
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  const { isDarkMode } = useAppStore()
   return (
-    <html lang="en" className={isDarkMode ? 'dark' : ''}>
+    <html lang="en">
       <head>
         <meta charSet="utf-8" />
         <link rel="icon" type="image/jpeg" href="/icon.jpg" />
@@ -39,7 +36,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         {children}
-        <GlobalMediaModal />
         <ScrollRestoration getKey={location => location.pathname} />
         <Scripts />
       </body>

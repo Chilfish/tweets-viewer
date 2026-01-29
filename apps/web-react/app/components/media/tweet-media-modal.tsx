@@ -1,4 +1,4 @@
-import { useAppStore } from '~/stores/app-store'
+import { useAppStore } from '~/stores-old/app-store'
 import { MediaViewerWithText } from './media-viewer-with-text'
 
 export function TweetMediaModal() {

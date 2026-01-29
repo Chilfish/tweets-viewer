@@ -1,4 +1,4 @@
-import type { DateRange, SortOrder } from '~/stores'
+import type { DateRange, SortOrder } from '~/stores-old'
 import { Calendar, ChevronDown, SortAsc, SortDesc, X } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '~/components/ui/button'
@@ -16,7 +16,7 @@ import {
   PopoverTrigger,
 } from '~/components/ui/popover'
 import { cn } from '~/lib/utils'
-import { useUserStore } from '~/stores'
+import { useUserStore } from '~/stores-old'
 import { SearchInput } from '../search-input'
 
 interface TweetsSortControlsProps {

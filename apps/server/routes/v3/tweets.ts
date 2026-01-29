@@ -15,8 +15,8 @@ app.get('/get/:name', async (c) => {
   const reverse = c.req.query('reverse') === 'true'
 
   const tweets = allTweets
-    .filter(tweet => tweet.user.screen_name === name)
-    .sort((a, b) => reverse ? a.id_str.localeCompare(b.id_str) : b.id_str.localeCompare(a.id_str))
+    // .filter(tweet => tweet.user.screen_name === name)
+    .sort((a, b) => reverse ? a.id.localeCompare(b.id) : b.id.localeCompare(a.id))
     .slice(page * 10, (page + 1) * 10)
 
   return c.json(tweets)

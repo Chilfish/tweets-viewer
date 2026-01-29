@@ -1,7 +1,7 @@
 /** biome-ignore-all lint/a11y/useButtonType: <explanation> */
 
 import type { Tweet, User } from '@tweets-viewer/shared'
-import type { PaginatedListActions } from '~/stores'
+import type { PaginatedListActions } from '~/stores-old'
 import { AlertCircle, Loader2, MessageSquareX } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert'
 import { Button } from '~/components/ui/button'

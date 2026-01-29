@@ -1,4 +1,4 @@
-import { useAppStore } from '~/stores/app-store'
+import { useAppStore } from '~/stores-old/app-store'
 import { MediaViewer } from './media-viewer'
 
 export function MediaPreviewModal() {
