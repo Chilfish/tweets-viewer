@@ -176,7 +176,8 @@ export class TwitterAPIClient {
       .filter((tweet): tweet is RawTweet => tweet !== null && tweet !== undefined)
 
     return [...directTweets, ...moduleTweets]
-      .sort((a, b) => b.rest_id.localeCompare(a.rest_id))
+      .filter(Boolean)
+      .sort((a, b) => b.rest_id?.localeCompare(a.rest_id))
   }
 
   /**

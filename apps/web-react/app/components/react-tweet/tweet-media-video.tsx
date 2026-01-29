@@ -69,12 +69,14 @@ export function TweetMediaVideo({ tweet, media, showCoverOnly }: Props) {
         ref={videoRef}
         className={imageClasses}
         poster={getMediaUrl(media, 'small')}
-        src={mp4Video.url}
         controls={!showPlayButton}
         playsInline
         tabIndex={showPlayButton ? -1 : 0}
       >
-        <source src={mp4Video.url} type={mp4Video.content_type} />
+        <source
+          src={`https://proxy.chilfish.top/${mp4Video.url}`}
+          type={mp4Video.content_type}
+        />
       </MediaVideo>
 
       {showPlayButton && (

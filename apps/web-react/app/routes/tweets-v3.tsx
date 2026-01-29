@@ -35,7 +35,7 @@ export default function TweetsPage({ params }: Route.ComponentProps) {
       >
 
         {tweets.map(tweet => (
-          <MyTweet tweet={tweet} key={tweet.id_str} />
+          <MyTweet tweet={tweet} key={tweet.id} />
         ))}
       </main>
     </div>

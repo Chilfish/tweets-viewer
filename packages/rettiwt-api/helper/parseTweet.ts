@@ -36,6 +36,7 @@ export function enrichTweet(sourceData: RawTweet, retweetedOrignalId?: string): 
     user,
     text,
     parent_id: tweet.legacy.in_reply_to_status_id_str,
+    in_reply_to_screen_name: tweet.legacy.in_reply_to_screen_name,
     entities: getEntities(tweet, text),
     quoted_tweet_id: tweet.quoted_status_result?.result?.rest_id,
     card: mapTwitterCard(tweet.card),
@@ -44,7 +45,7 @@ export function enrichTweet(sourceData: RawTweet, retweetedOrignalId?: string): 
     is_inline_media: !!tweet.note_tweet?.note_tweet_results?.result?.media?.inline_media?.length,
     reply_count: tweet.legacy.reply_count || 0,
     like_count: tweet.legacy.favorite_count || 0,
-    quote_count: tweet.legacy.quote_count || 0,
+    retweet_count: tweet.legacy.quote_count || 0,
     view_count: Number(tweet.views.count) || 0,
   }
 }

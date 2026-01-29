@@ -23,11 +23,12 @@ export interface EnrichedTweet {
   reply_count: number
   view_count: number
   like_count: number
-  quote_count?: number
+  retweet_count?: number
 
   // --- 关联关系与状态 ---
   /** 如果是回复，记录父推文 ID */
   parent_id?: string
+  in_reply_to_screen_name?: string
   /** 如果是转发，记录原始推文 ID */
   retweeted_original_id?: string
 

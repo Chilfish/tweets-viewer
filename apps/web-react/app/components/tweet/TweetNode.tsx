@@ -2,7 +2,15 @@ import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
 import { Repeat2Icon } from 'lucide-react'
 import { forwardRef, useMemo } from 'react'
 import { cn, pubTime } from '~/lib/utils'
-import { formatDate, TweetBody, TweetContainer, TweetHeader, TweetMedia } from '../react-tweet'
+import {
+  formatDate,
+  TweetAction,
+  TweetBody,
+  TweetContainer,
+  TweetHeader,
+  TweetInReplyTo,
+  TweetMedia,
+} from '../react-tweet'
 import { TweetLinkCard } from './TweetCard'
 import { TweetMediaAlt } from './TweetMediaAlt'
 
@@ -54,7 +62,7 @@ export const TweetNode = forwardRef<HTMLDivElement, TweetNodeProps>(({
       {
         retweetedId && (
           <a
-            className="pl-1 pb-2 flex items-center text-muted-foreground font-semibold hover:text-primary/80"
+            className="pl-1 pb-2 flex text-sm items-center text-muted-foreground font-semibold hover:text-primary/80"
             href={`https://x.com/${tweet.user.screen_name}/status/${retweetedId}`}
             target="_blank"
             rel="noopener noreferrer"
@@ -74,6 +82,7 @@ export const TweetNode = forwardRef<HTMLDivElement, TweetNodeProps>(({
       />
 
       <div>
+        <TweetInReplyTo tweet={tweet} />
         <TweetBody tweet={tweet} />
 
         <TweetMediaSection tweet={tweet} />
@@ -89,6 +98,8 @@ export const TweetNode = forwardRef<HTMLDivElement, TweetNodeProps>(({
             id={tweet.quoted_tweet.id}
           />
         )}
+
+        {!isQuoted && <TweetAction tweet={tweet} />}
       </div>
     </TweetContainer>
   )
