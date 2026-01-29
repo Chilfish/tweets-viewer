@@ -122,14 +122,14 @@ export default function TweetsPage({ params }: Route.ComponentProps) {
   const renderProfile = () => {
     if (userIsLoading && !user) {
       return (
-        <div className="w-full flex justify-center py-6">
+        <div className="w-full flex justify-center">
           <ProfileHeaderSkeleton />
         </div>
       )
     }
     if (user) {
       return (
-        <div className="w-full flex flex-col items-center gap-2 py-6">
+        <div className="w-full flex flex-col items-center gap-2 py-2">
           <ProfileHeader user={user} />
         </div>
       )
@@ -172,7 +172,7 @@ export default function TweetsPage({ params }: Route.ComponentProps) {
       {renderProfile()}
 
       <div className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-xl border-b border-border/40 transition-all">
-        <div className="w-full max-w-2xl mx-auto px-4 h-11 flex items-center justify-between gap-4">
+        <div className="w-full max-w-2xl mx-auto px-4 flex items-center justify-between gap-4">
           <TweetNavigation totalPages={totalPages} />
           <TweetsToolbarActions />
         </div>

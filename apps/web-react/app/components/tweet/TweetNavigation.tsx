@@ -1,4 +1,5 @@
 import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
+import { memo } from 'react'
 import { useSearchParams } from 'react-router'
 import { Button } from '~/components/ui/button'
 import {
@@ -19,7 +20,7 @@ interface TweetNavigationProps {
  * 仅包含：[上一页] [页码下拉] [下一页]
  * 适合嵌入统一的 Toolbar
  */
-export function TweetNavigation({ totalPages, className }: TweetNavigationProps) {
+export const TweetNavigation = memo(({ totalPages, className }: TweetNavigationProps) => {
   const [searchParams, setSearchParams] = useSearchParams()
   const currentPage = Number(searchParams.get('page')) || 1
 
@@ -104,4 +105,4 @@ export function TweetNavigation({ totalPages, className }: TweetNavigationProps)
       </Button>
     </div>
   )
-}
+})

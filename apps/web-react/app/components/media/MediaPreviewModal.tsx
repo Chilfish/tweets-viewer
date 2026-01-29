@@ -1,4 +1,4 @@
-import type { FlatMediaItem } from '~/routes/media'
+import type { FlatMediaItem } from '~/lib/media'
 import { useEffect } from 'react'
 import { useIsMobile } from '~/hooks/use-mobile'
 import { DesktopMediaViewer } from './DesktopMediaViewer'

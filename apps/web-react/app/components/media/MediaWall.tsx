@@ -1,4 +1,4 @@
-import type { FlatMediaItem } from '~/routes/media'
+import type { FlatMediaItem } from '~/lib/media'
 import { VideoIcon } from 'lucide-react'
 import { memo, useCallback, useState } from 'react'
 import { Skeleton } from '~/components/ui/skeleton'
