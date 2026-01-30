@@ -16,13 +16,16 @@ export const MediaCard = memo(({ item, onClick }: MediaCardProps) => {
     <div
       onClick={onClick}
       className="relative group cursor-pointer overflow-hidden rounded-lg bg-muted/30 border border-border/30 transition-all hover:shadow-lg hover:border-primary/30 hover:scale-[1.02]"
+      style={{
+        aspectRatio: `${item.width} / ${item.height}`,
+      }}
     >
       {/* 图片/封面 */}
       <img
         src={item.url}
         alt="media"
         className={cn(
-          'w-full h-auto object-cover transition-opacity duration-300',
+          'w-full h-full object-cover transition-opacity duration-300',
           isLoaded ? 'opacity-100' : 'opacity-0',
         )}
         onLoad={() => setIsLoaded(true)}

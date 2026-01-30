@@ -1,6 +1,6 @@
 import type { FlatMediaItem } from '~/lib/media'
 import { VideoIcon } from 'lucide-react'
-import { memo, useCallback, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Skeleton } from '~/components/ui/skeleton'
 import { useMediaColumns } from '~/hooks/use-media-columns'
 import { MediaCard } from './MediaCard'
@@ -11,22 +11,6 @@ interface MediaWallProps {
   isLoading: boolean
   isEmpty: boolean
 }
-
-const MediaWallItem = memo(({ item, index, onSelect }: { item: FlatMediaItem, index: number, onSelect: (index: number) => void }) => {
-  const handleClick = useCallback(() => {
-    onSelect(index)
-  }, [index, onSelect])
-
-  return (
-    <div className="mb-2 transition-transform duration-200">
-      <MediaCard
-        item={item}
-        onClick={handleClick}
-      />
-    </div>
-  )
-})
-MediaWallItem.displayName = 'MediaWallItem'
 
 export function MediaWall({ items, isLoading, isEmpty }: MediaWallProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
