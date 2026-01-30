@@ -48,6 +48,7 @@
     "zustand": "^5.0.10"
   },
   "devDependencies": {
+    "@babel/preset-typescript": "^7.28.5",
     "@chromatic-com/storybook": "^5.0.0",
     "@react-router/dev": "^7.13.0",
     "@storybook/addon-a11y": "^10.2.3",
