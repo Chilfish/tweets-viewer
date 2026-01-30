@@ -10,7 +10,7 @@ import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
 import { MyTweet } from '~/components/tweet/Tweet'
 import { TweetFeedStatus } from '~/components/tweet/TweetFeedStatus'
 import { TweetNavigation } from '~/components/tweet/TweetNavigation'
-import { TweetsToolbarActions } from '~/components/tweets/tweets-toolbar-actions'
+import { TweetsToolbarActions } from '~/components/tweet/tweets-toolbar-actions'
 import { apiClient } from '~/lib/utils'
 import { useTweetStore } from '~/store/use-tweet-store'
 

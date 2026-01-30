@@ -8,12 +8,12 @@ export const proxyUrl = 'https://proxy.chilfish.top/?url='
 //   ? 'http://localhost:8787/?url='
 //   : 'https://proxy.chilfish.top/?url='
 
-// export const apiUrl = 'https://tweet-api.chilfish.top/v2'
-export const apiUrl = isPreview
-  ? 'https://tweet-api-dev.chill4fish.workers.dev'
-  : isDev
-    ? 'http://localhost:3000'
-    : 'https://tweet-api.chilfish.top'
+export const apiUrl = 'https://tweet-api-dev.chill4fish.workers.dev'
+// export const apiUrl = isPreview
+//   ? 'https://tweet-api-dev.chill4fish.workers.dev'
+//   : isDev
+//     ? 'http://localhost:3000'
+//     : 'https://tweet-api.chilfish.top'
 
 export const staticUrl = isDev ? '/static' : 'https://p.chilfish.top'
 

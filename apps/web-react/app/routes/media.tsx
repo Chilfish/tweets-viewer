@@ -11,7 +11,7 @@ import { MediaWall } from '~/components/media/MediaWall'
 import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
 import { TweetFeedStatus } from '~/components/tweet/TweetFeedStatus'
 import { TweetNavigation } from '~/components/tweet/TweetNavigation'
-import { TweetsToolbarActions } from '~/components/tweets/tweets-toolbar-actions'
+import { TweetsToolbarActions } from '~/components/tweet/tweets-toolbar-actions'
 import { extractMediaFromTweets } from '~/lib/media'
 import { apiClient } from '~/lib/utils'
 

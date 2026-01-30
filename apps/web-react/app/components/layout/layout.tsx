@@ -30,6 +30,7 @@ export default function Layout() {
 
   const matches = useMatches()
   const isWide = matches.some((m: any) => m.handle?.isWide)
+  const isHome = matches.some((m: any) => m.handle?.isHome)
 
   const { setUsers, setActiveUser } = useUserStore()
 
@@ -57,7 +58,7 @@ export default function Layout() {
 
         <main className="flex-1 flex flex-col items-center justify-start gap-4 pt-2 mx-auto min-w-0 border-r border-border/40">
 
-          <ProfileHeader user={activeUser} isWide={isWide} />
+          {!isHome && <ProfileHeader user={activeUser} isWide={isWide} />}
           {outletWrapper}
         </main>
 
@@ -77,7 +78,7 @@ export default function Layout() {
         isWide ? 'sm:max-w-6xl' : 'sm:max-w-[600px]',
       )}
       >
-        <ProfileHeader user={activeUser} isWide={isWide} />
+        {!isHome && <ProfileHeader user={activeUser} isWide={isWide} />}
         {outletWrapper}
       </main>
     </div>

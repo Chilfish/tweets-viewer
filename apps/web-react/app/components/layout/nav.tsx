@@ -37,7 +37,8 @@ export function useNavItems(currentUser?: string): NavItem[] {
       isActive: currentUser
         ? location.pathname === `/ins/${currentUser}`
         : false,
-      disabled: !currentUser,
+      disabled: true,
+      // disabled: !currentUser,
     },
     {
       label: '那年今日',
