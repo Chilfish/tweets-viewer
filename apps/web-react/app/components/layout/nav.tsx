@@ -9,9 +9,8 @@ export interface NavItem {
   disabled?: boolean
 }
 
-export function getNavItems(currentUser?: string): NavItem[] {
+export function useNavItems(currentUser?: string): NavItem[] {
   const location = useLocation()
-  const curPath = location.pathname.split('/')[1]
 
   return [
     {

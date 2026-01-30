@@ -2,7 +2,7 @@ import { Moon, Sun } from 'lucide-react'
 import { Link } from 'react-router'
 import { Button } from '~/components/ui/button'
 import { cn } from '~/lib/utils'
-import { getNavItems } from './nav'
+import { useNavItems } from './nav'
 import { UserSelector } from './user-selector'
 
 interface SidebarProps {
@@ -10,12 +10,12 @@ interface SidebarProps {
 }
 
 export function Sidebar({ currentUser }: SidebarProps) {
-  const navItems = getNavItems(currentUser)
+  const navItems = useNavItems(currentUser)
 
   return (
-    <aside className="hidden md:flex sticky top-0 z-40 h-screen  flex-col justify-between p-3 xl:p-4 bg-background/90 backdrop-blur-xl border-r border-border/40 transition-all duration-200">
+    <aside className="hidden md:flex sticky top-0 z-40 h-screen w-auto xl:w-[260px] flex-col justify-between p-2 xl:p-4 bg-background/90 backdrop-blur-xl border-r border-border/40 transition-all duration-200">
       {/* Logo & Title */}
-      <header className="flex items-center justify-center xl:justify-start gap-3 pb-4 mb-2">
+      <header className="flex items-center justify-center xl:justify-start gap-3 px-2 py-4 mb-2">
         <img
           alt="logo"
           src="/icon.jpg"
@@ -23,20 +23,20 @@ export function Sidebar({ currentUser }: SidebarProps) {
           height={32}
           className="rounded-lg flex-shrink-0"
         />
-        <h2 className="text-lg font-semibold hidden xl:block">
+        <h2 className="text-xl font-bold hidden xl:block">
           推文存档站
         </h2>
       </header>
 
       {/* Navigation */}
-      <div className="flex-1">
+      <div className="flex-1 px-1">
         <nav className="flex flex-col gap-1">
           {navItems.map(item => (
             <Link
               key={item.label}
               to={item.href}
               className={cn(
-                'group flex items-center justify-start xl:justify-start gap-4 px-4 py-3 rounded-full transition-all duration-200',
+                'group flex items-center justify-start gap-4 p-3 xl:px-4 rounded-full transition-all duration-200',
                 item.disabled && 'pointer-events-none opacity-40',
                 item.isActive
                   ? 'bg-accent/80 text-accent-foreground font-semibold'
@@ -48,7 +48,7 @@ export function Sidebar({ currentUser }: SidebarProps) {
                 item.isActive && 'fill-current',
               )}
               />
-              <span className="text-md xl:block">
+              <span className="text-md hidden md:block">
                 {item.label}
               </span>
             </Link>
@@ -57,7 +57,7 @@ export function Sidebar({ currentUser }: SidebarProps) {
           {/* Theme Toggle */}
           <Button
             variant="ghost"
-            className="justify-center xl:justify-start gap-4 px-4 py-3 h-auto rounded-full text-foreground/80 hover:bg-accent/50 hover:text-foreground transition-all duration-200"
+            className="justify-start gap-4 p-3 xl:px-4 h-auto rounded-full text-foreground/80 hover:bg-accent/50 hover:text-foreground transition-all duration-200"
           >
             <Sun className="size-4 shrink-0 dark:hidden" />
             <Moon className="size-4 shrink-0 hidden dark:block" />
