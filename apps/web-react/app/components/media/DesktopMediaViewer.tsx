@@ -1,11 +1,13 @@
 import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
-import type { FlatMediaItem } from '~/routes/media'
+import type { FlatMediaItem } from '~/lib/media'
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog'
 import { ChevronLeft, ChevronRight, XIcon } from 'lucide-react'
 import { MyTweet } from '~/components/tweet/Tweet'
 import { Button } from '~/components/ui/button'
+import { MediaImage, MediaVideo } from '~/components/ui/media'
 import { ScrollArea } from '~/components/ui/scroll-area'
 import { cn } from '~/lib/utils'
+import { getMp4Video } from '../react-tweet/utils'
 
 interface DesktopMediaViewerProps {
   open: boolean
@@ -31,6 +33,9 @@ export function DesktopMediaViewer({
   if (!open)
     return null
 
+  const isVideo = currentItem?.type === 'video' || currentItem?.type === 'animated_gif'
+  const mp4Video = isVideo && currentItem?.videoInfo ? getMp4Video({ video_info: currentItem.videoInfo } as any) : null
+
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
       <DialogPrimitive.Portal>
@@ -41,18 +46,31 @@ export function DesktopMediaViewer({
             <div className="relative flex-1 bg-black flex items-center justify-center select-none group/media">
               {/* 关闭按钮 */}
               <button
-                onClick={() => onOpenChange(false)}
+                onClick={() => onOpenChange(false)/* @cc-off */}
                 className="absolute top-4 left-4 z-50 p-2 rounded-full bg-black/50 text-white hover:bg-white/10 transition-colors"
                 aria-label="Close preview"
               >
                 <XIcon className="size-6" />
               </button>
 
-              <img
-                src={currentItem?.url}
-                alt="preview"
-                className="max-w-full max-h-full object-contain"
-              />
+              {isVideo && mp4Video ? (
+                <MediaVideo
+                  key={mp4Video.url}
+                  className="max-w-full max-h-full object-contain"
+                  controls
+                  autoPlay
+                  playsInline
+                  loop={currentItem.type === 'animated_gif'}
+                >
+                  <source src={`https://proxy.chilfish.top/${mp4Video.url}`} type={mp4Video.content_type} />
+                </MediaVideo>
+              ) : (
+                <MediaImage
+                  src={currentItem?.url}
+                  alt="preview"
+                  className="max-w-full max-h-full object-contain"
+                />
+              )}
 
               {/* 左右导航按钮 (悬浮在图片两侧) */}
               {tweetMediaItems.length > 1 && (

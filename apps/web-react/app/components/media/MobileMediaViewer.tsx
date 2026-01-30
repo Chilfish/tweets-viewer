@@ -1,12 +1,13 @@
 import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
-import type { FlatMediaItem } from '~/routes/media'
+import type { FlatMediaItem } from '~/lib/media'
 import { ChevronLeft, ChevronRight, XIcon } from 'lucide-react'
 import { MyTweet } from '~/components/tweet/Tweet'
 import { Button } from '~/components/ui/button'
 import { ScrollArea } from '~/components/ui/scroll-area'
 import { Sheet, SheetContent } from '~/components/ui/sheet'
 import { cn } from '~/lib/utils'
-import { MediaImage } from '../ui/media'
+import { getMp4Video } from '../react-tweet/utils'
+import { MediaImage, MediaVideo } from '../ui/media'
 
 interface MobileMediaViewerProps {
   open: boolean
@@ -30,16 +31,32 @@ export function MobileMediaViewer({
   if (!open)
     return null
 
+  const isVideo = currentItem?.type === 'video' || currentItem?.type === 'animated_gif'
+  const mp4Video = isVideo && currentItem?.videoInfo ? getMp4Video({ video_info: currentItem.videoInfo } as any) : null
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="p-0 gap-0" showCloseButton={false}>
+      <SheetContent side="bottom" className="p-0 gap-0 border-none bg-black" showCloseButton={false}>
         {/* 顶部大图区域 */}
-        <div className="max-h-[55vh] bg-black flex items-center justify-center relative">
-          <MediaImage
-            src={currentItem?.url}
-            alt="preview"
-            className="max-w-full max-h-full object-contain"
-          />
+        <div className="max-h-[55vh] min-h-[40vh] bg-black flex items-center justify-center relative">
+          {isVideo && mp4Video ? (
+            <MediaVideo
+              key={mp4Video.url}
+              className="max-w-full max-h-full object-contain"
+              controls
+              autoPlay
+              playsInline
+              loop={currentItem.type === 'animated_gif'}
+            >
+              <source src={`https://proxy.chilfish.top/${mp4Video.url}`} type={mp4Video.content_type} />
+            </MediaVideo>
+          ) : (
+            <MediaImage
+              src={currentItem?.url}
+              alt="preview"
+              className="max-w-full max-h-full object-contain"
+            />
+          )}
           {/* 关闭按钮 */}
           <Button
             size="icon"
