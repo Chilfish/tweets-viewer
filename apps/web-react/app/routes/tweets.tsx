@@ -21,7 +21,7 @@ export function meta({ params }: Route.MetaArgs) {
   ]
 }
 
-export async function loader({ params, request }: Route.LoaderArgs) {
+export async function clientLoader({ params, request }: Route.ClientLoaderArgs) {
   const { name } = params
   const url = new URL(request.url)
   const page = Number(url.searchParams.get('page')) || 1
@@ -116,7 +116,7 @@ export default function TweetsPage({ loaderData, params }: Route.ComponentProps)
         </div>
       </div>
 
-      <div className="w-full max-w-3xl flex flex-col gap-4 px-4 mt-4 mb-20">
+      <div className="w-full max-w-3xl flex flex-col gap-4 mb-16">
         <div className="flex flex-col gap-3">
           {tweets.map(tweet => (
             <MyTweet tweet={tweet} key={tweet.id} />

@@ -20,7 +20,7 @@ export function meta({ location }: Route.MetaArgs) {
   ]
 }
 
-export async function loader({ params, request }: Route.LoaderArgs) {
+export async function clientLoader({ params, request }: Route.ClientLoaderArgs) {
   const url = new URL(request.url)
   const q = url.searchParams.get('q') || ''
   const page = Number(url.searchParams.get('page')) || 1
@@ -155,7 +155,7 @@ export default function SearchPage({ loaderData, params }: Route.ComponentProps)
         className="px-4 w-full mx-auto"
       />
 
-      <div className="w-full max-w-3xl flex flex-col gap-4 px-4 mt-4 mb-20">
+      <div className="w-full max-w-3xl flex flex-col gap-4 mt-4 mb-16">
         {renderContent()}
       </div>
     </>

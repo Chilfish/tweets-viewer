@@ -1,4 +1,5 @@
 import type { EnrichedUser } from '@tweets-viewer/rettiwt-api'
+import type { ClientLoaderFunctionArgs, ShouldRevalidateFunctionArgs } from 'react-router'
 import { useEffect } from 'react'
 import { Outlet, useLoaderData, useLocation, useMatches, useParams } from 'react-router'
 import { TopNav } from '~/components/top-nav'
@@ -9,20 +10,38 @@ import { ProfileHeader } from '../profile/ProfileHeader'
 import { BottomNav } from './bottom-nav'
 import { Sidebar } from './sidebar'
 
-export async function loader({ params }: { params: { name?: string } }) {
+export async function clientLoader({ params }: ClientLoaderFunctionArgs) {
   const { name } = params
+  const { users } = useUserStore.getState()
 
-  const usersRes = await apiClient.get<EnrichedUser[]>(`/users/all`)
-  const activeUser = usersRes.data.find(user => user.userName === name) || null
+  // 仅在 store 为空时获取用户列表
+  let allUsers = users
+  if (allUsers.length === 0) {
+    const usersRes = await apiClient.get<EnrichedUser[]>(`/users/all`)
+    allUsers = usersRes.data
+  }
+
+  const activeUser = allUsers.find(user => user.userName === name) || null
 
   return {
-    allUsers: usersRes.data,
+    allUsers,
     activeUser,
   }
 }
 
+export function shouldRevalidate({
+  currentParams,
+  nextParams,
+  defaultShouldRevalidate,
+}: ShouldRevalidateFunctionArgs) {
+  // 只有当用户名路由参数变化时才重新触发 loader
+  if (currentParams.name !== nextParams.name) {
+    return true
+  }
+  return defaultShouldRevalidate
+}
+
 export default function Layout() {
-  const { allUsers, activeUser } = useLoaderData<typeof loader>()
   const params = useParams()
   const location = useLocation()
   const isMobile = useIsMobile()
@@ -32,15 +51,22 @@ export default function Layout() {
   const isWide = matches.some((m: any) => m.handle?.isWide)
   const isHome = matches.some((m: any) => m.handle?.isHome)
 
-  const { setUsers, setActiveUser } = useUserStore()
+  const { setUsers, setActiveUser, users: storeUsers, activeUser: storeActiveUser } = useUserStore()
+  const { allUsers, activeUser } = useLoaderData<typeof clientLoader>()
 
+  // 同步初始化数据到 store
   useEffect(() => {
-    setUsers(allUsers)
-  }, [allUsers, setUsers])
+    if (storeUsers.length === 0 && allUsers.length > 0) {
+      setUsers(allUsers)
+    }
+  }, [allUsers, setUsers, storeUsers.length])
 
   useEffect(() => {
     setActiveUser(activeUser)
   }, [activeUser, setActiveUser])
+
+  // 渲染时优先使用 store 中的数据
+  const displayActiveUser = storeActiveUser || activeUser
 
   const outletWrapper = (
     <div
@@ -58,7 +84,7 @@ export default function Layout() {
 
         <main className="flex-1 flex flex-col items-center justify-start gap-4 pt-2 mx-auto min-w-0 border-r border-border/40">
 
-          {!isHome && <ProfileHeader user={activeUser} isWide={isWide} />}
+          {!isHome && <ProfileHeader user={displayActiveUser} isWide={isWide} />}
           {outletWrapper}
         </main>
 
@@ -78,7 +104,7 @@ export default function Layout() {
         isWide ? 'sm:max-w-6xl' : 'sm:max-w-[600px]',
       )}
       >
-        {!isHome && <ProfileHeader user={activeUser} isWide={isWide} />}
+        {!isHome && <ProfileHeader user={displayActiveUser} isWide={isWide} />}
         {outletWrapper}
       </main>
     </div>

@@ -59,9 +59,9 @@ export function MediaWall({ items, isLoading, isEmpty }: MediaWallProps) {
 
   return (
     <>
-      <div className="flex gap-2 items-start">
+      <div className="flex gap-1 items-start">
         {buckets.map((bucket, colIndex) => (
-          <div key={colIndex} className="flex-1 space-y-2">
+          <div key={colIndex} className="flex-1 space-y-1">
             {bucket.map(({ item, originalIndex }) => (
               <div key={item.id}>
                 <MediaCard

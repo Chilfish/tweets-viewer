@@ -30,7 +30,7 @@ export function meta({ params }: Route.MetaArgs) {
 /**
  * Loader 现在仅处理第一页，作为首屏注水数据
  */
-export async function loader({ params, request }: Route.LoaderArgs) {
+export async function clientLoader({ params, request }: Route.ClientLoaderArgs) {
   const { name } = params
   const url = new URL(request.url)
   const reverse = url.searchParams.get('reverse') === 'true'
@@ -147,7 +147,7 @@ export default function MediaPage({ loaderData, params }: Route.ComponentProps) 
         </div>
       </div>
 
-      <div className="w-full max-w-6xl px-4 mt-6 mb-20">
+      <div className="w-full max-w-6xl mt-4 mb-16">
         <MediaWall
           items={mediaItems}
           isLoading={status === 'fetching' && mediaItems.length === 0}

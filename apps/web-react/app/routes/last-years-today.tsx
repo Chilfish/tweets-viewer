@@ -22,7 +22,7 @@ export function meta({ params }: Route.MetaArgs) {
   ]
 }
 
-export async function loader({ params, request }: Route.LoaderArgs) {
+export async function clientLoader({ params, request }: Route.ClientLoaderArgs) {
   const { name } = params
   const url = new URL(request.url)
   const page = Number(url.searchParams.get('page')) || 1
@@ -141,7 +141,7 @@ export default function LastYearsTodayPage({ loaderData, params }: Route.Compone
         </div>
       </div>
 
-      <div className="w-full max-w-3xl flex flex-col gap-4 px-4 mt-4 mb-20">
+      <div className="w-full max-w-3xl flex flex-col gap-4 mt-4 mb-16">
         <div className="flex items-center gap-2 px-1 pt-2 pb-0">
           <h2 className="text-xl font-bold flex items-center gap-2">
             <History className="size-6 text-primary" />
