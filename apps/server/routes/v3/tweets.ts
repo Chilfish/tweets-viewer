@@ -130,4 +130,32 @@ app.get('/get/:name/last-years-today', async (c) => {
   return c.json(response)
 })
 
+app.get('/search', async (c) => {
+  const name = c.req.query('name')
+  const { page, pageSize, reverse } = getPaginationParams(c)
+
+  const startDateStr = c.req.query('start_date')
+  const endDateStr = c.req.query('end_date')
+
+  const startDate = startDateStr ? new Date(startDateStr) : null
+  const endDate = endDateStr ? new Date(endDateStr) : null
+
+  // 1. 过滤用户
+  let filteredTweets = allTweets.filter(tweet => tweet.user.screen_name === name)
+
+  // 2. 过滤日期范围
+  if (startDate) {
+    filteredTweets = filteredTweets.filter(t => new Date(t.created_at) >= startDate)
+  }
+  if (endDate) {
+    const end = new Date(endDate)
+    end.setHours(23, 59, 59, 999)
+    filteredTweets = filteredTweets.filter(t => new Date(t.created_at) <= end)
+  }
+
+  // 3. 构造分页响应
+  const response = paginateTweets(filteredTweets, page, pageSize, reverse)
+  return c.json(response)
+})
+
 export default app

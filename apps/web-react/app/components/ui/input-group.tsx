@@ -50,7 +50,7 @@ function InputGroupAddon({
 }: React.ComponentProps<'div'> & VariantProps<typeof inputGroupAddonVariants>) {
   return (
     <div
-      className={cn(inputGroupAddonVariants({ align }), className)}
+      className={cn(inputGroupAddonVariants({ align }), 'cursor-pointer', className)}
       data-align={align}
       data-slot="input-group-addon"
       onMouseDown={(e) => {
