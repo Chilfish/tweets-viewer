@@ -6,7 +6,7 @@ import { format, parseISO } from 'date-fns'
 import { twMerge } from 'tailwind-merge'
 
 export const apiClient = Axios.create({
-  baseURL: apiUrl,
+  baseURL: `${apiUrl}/v3`,
 })
 
 export function cn(...inputs: ClassValue[]) {

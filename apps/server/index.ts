@@ -6,7 +6,6 @@ import { drizzle } from 'drizzle-orm/neon-http'
 import { Hono } from 'hono'
 import { contextStorage } from 'hono/context-storage'
 import { cors } from 'hono/cors'
-import { env } from '../../env.server'
 import { cachedData } from './common'
 import imageApp from './routes/image'
 
@@ -25,7 +24,7 @@ app
   //   keyGenerator: c => c.req.header('cf-connecting-ip') ?? c.req.header('x-forwarded-for') ?? 'unknown',
   // }))
   .use(async (c, next) => {
-    const sql = neon(env.DATABASE_URL)
+    const sql = neon(c.env.DATABASE_URL)
     const db = drizzle({ client: sql, schema })
     c.set('db', db)
     return next()
