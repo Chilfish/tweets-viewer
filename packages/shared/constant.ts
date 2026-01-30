@@ -15,7 +15,7 @@ export const proxyUrl = 'https://proxy.chilfish.top/?url='
 export const apiUrl = isPreview
   ? 'https://tweet-api-dev.chill4fish.workers.dev/'
   : isDev
-    ? '/api'
+    ? 'http://localhost:3000/v3'
     : 'https://tweet-api.chilfish.top/v2'
 
 export const staticUrl = isDev ? '/static' : 'https://p.chilfish.top'
@@ -23,3 +23,5 @@ export const staticUrl = isDev ? '/static' : 'https://p.chilfish.top'
 export const notfountRetry = 3
 
 export const fallbackUser = 'ttisrn_0710'
+
+export const PAGE_SIZE = 15

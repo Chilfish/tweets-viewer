@@ -1,6 +1,7 @@
 import type { EnrichedTweet, EnrichedUser } from '@tweets-viewer/rettiwt-api'
 import type { PaginatedResponse } from '@tweets-viewer/shared'
 import type { DB } from '..'
+import type { SelectTweet } from '../schema'
 import { now } from '@tweets-viewer/shared'
 import { and, asc, count, desc, eq, sql } from 'drizzle-orm'
 import { tweetsTable, usersTable } from '../schema'
@@ -43,7 +44,14 @@ function _order(reverse: boolean) {
  * 获取推文列表
  * @param total - 可选的总数，如果提供不再查询数据库
  */
-export async function getTweets({ db, name, page, pageSize, reverse, total: providedTotal }: GetTweet & { total?: number }): Promise<PaginatedResponse<EnrichedTweet>> {
+export async function getTweets({
+  db,
+  name,
+  page,
+  pageSize,
+  reverse,
+  total: providedTotal,
+}: GetTweet & { total?: number }): Promise<PaginatedResponse<EnrichedTweet>> {
   const offset = (page - 1) * pageSize
 
   let totalNum = providedTotal
@@ -63,7 +71,7 @@ export async function getTweets({ db, name, page, pageSize, reverse, total: prov
     .limit(pageSize)
     .offset(offset)
 
-  const data = rows.map(row => row.jsonData as EnrichedTweet)
+  const data = rows.map(mapToEnrichedTweet)
 
   return {
     data,
@@ -76,7 +84,13 @@ export async function getTweets({ db, name, page, pageSize, reverse, total: prov
   }
 }
 
-export async function getLastYearsTodayTweets({ db, name, reverse, page, pageSize }: GetTweet): Promise<PaginatedResponse<EnrichedTweet>> {
+export async function getLastYearsTodayTweets({
+  db,
+  name,
+  reverse,
+  page,
+  pageSize,
+}: GetTweet): Promise<PaginatedResponse<EnrichedTweet>> {
   const today = now('beijing')
   const offset = (page - 1) * pageSize
 
@@ -99,7 +113,7 @@ export async function getLastYearsTodayTweets({ db, name, reverse, page, pageSiz
     .limit(pageSize)
     .offset(offset)
 
-  const data = rows.map(row => row.jsonData as EnrichedTweet)
+  const data = rows.map(mapToEnrichedTweet)
 
   return {
     data,
@@ -140,7 +154,7 @@ export async function getTweetsByDateRange({
     .limit(pageSize)
     .offset(offset)
 
-  const data = rows.map(row => row.jsonData as EnrichedTweet)
+  const data = rows.map(mapToEnrichedTweet)
 
   return {
     data,
@@ -180,7 +194,7 @@ export async function getTweetsByKeyword({
     .limit(pageSize)
     .offset(offset)
 
-  const data = rows.map(row => row.jsonData as EnrichedTweet)
+  const data = rows.map(mapToEnrichedTweet)
 
   return {
     data,
@@ -219,4 +233,8 @@ export async function getLatestTweets(db: DB) {
     screenName: row.screen_name as string,
     createdAt: new Date(row.created_at as string),
   }))
+}
+
+export function mapToEnrichedTweet(tweet: SelectTweet): EnrichedTweet {
+  return tweet.jsonData
 }

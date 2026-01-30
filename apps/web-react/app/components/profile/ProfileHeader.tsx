@@ -4,13 +4,18 @@ import { zhCN } from 'date-fns/locale'
 import { BalloonIcon, CalendarDays, LinkIcon, MapPin } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import { TweetText } from '../tweet/TweetText'
+import { ProfileHeaderSkeleton } from './profile-header-skeleton'
 
 interface ProfileHeaderProps {
-  user: EnrichedUser
+  user: EnrichedUser | null
   children?: React.ReactNode
 }
 
 export function ProfileHeader({ user, children }: ProfileHeaderProps) {
+  if (!user) {
+    return <ProfileHeaderSkeleton />
+  }
+
   const formattedDate = user.createdAt
     ? format(new Date(user.createdAt), 'yyyy年M月', { locale: zhCN })
     : ''

@@ -2,38 +2,41 @@ import type { EnrichedUser } from '@tweets-viewer/rettiwt-api'
 import { apiUrl } from '@tweets-viewer/shared'
 import axios from 'axios'
 import { useEffect } from 'react'
-import { Outlet, useLocation, useParams } from 'react-router'
-import useSWR from 'swr'
+import { Outlet, useLoaderData, useLocation, useParams } from 'react-router'
 import { TopNav } from '~/components/top-nav'
 import { useIsMobile } from '~/hooks/use-mobile'
 import { useUserStore } from '~/store/use-user-store'
 import { BottomNav } from './bottom-nav'
 import { Sidebar } from './sidebar'
 
-async function getAllUsers() {
-  const { data } = await axios.get<EnrichedUser[]>(`${apiUrl}/users/all`)
-  return data
+export async function loader({ params }: { params: { name?: string } }) {
+  const { name } = params
+
+  const usersRes = await axios.get<EnrichedUser[]>(`${apiUrl}/users/all`)
+  const activeUser = usersRes.data.find(user => user.userName === name) || null
+
+  return {
+    allUsers: usersRes.data,
+    activeUser,
+  }
 }
 
 export default function Layout() {
+  const { allUsers, activeUser } = useLoaderData<typeof loader>()
   const params = useParams()
   const location = useLocation()
   const isMobile = useIsMobile()
   const curUserName = params.name
 
-  const setUsers = useUserStore(state => state.setUsers)
-
-  // Fetch all archived users globally
-  const { data: users } = useSWR('all-users', getAllUsers, {
-    revalidateOnFocus: false,
-    revalidateIfStale: false,
-  })
+  const { setUsers, setActiveUser } = useUserStore()
 
   useEffect(() => {
-    if (users) {
-      setUsers(users)
-    }
-  }, [users, setUsers])
+    setUsers(allUsers)
+  }, [allUsers, setUsers])
+
+  useEffect(() => {
+    setActiveUser(activeUser)
+  }, [activeUser, setActiveUser])
 
   const outletWrapper = (
     <div key={location.pathname} className="animate-in fade-in-0 duration-300">

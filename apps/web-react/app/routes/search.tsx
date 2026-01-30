@@ -1,31 +1,16 @@
 import type { EnrichedTweet, EnrichedUser } from '@tweets-viewer/rettiwt-api'
+import type { PaginatedResponse } from '@tweets-viewer/shared'
 import type { Route } from './+types/search'
-import { apiUrl } from '@tweets-viewer/shared'
+import { apiUrl, PAGE_SIZE } from '@tweets-viewer/shared'
 import axios from 'axios'
-import { useEffect } from 'react'
-import { useSearchParams } from 'react-router'
-import useSWR from 'swr/immutable'
-import { ProfileHeaderSkeleton } from '~/components/profile/profile-header-skeleton'
+import { useEffect, useRef } from 'react'
+import { useRouteLoaderData, useSearchParams } from 'react-router'
 import { ProfileHeader } from '~/components/profile/ProfileHeader'
 import { SearchInput } from '~/components/search-input'
 import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
 import { MyTweet } from '~/components/tweet/Tweet'
-import { TweetSkeleton } from '~/components/tweet/tweet-skeleton'
 import { TweetFeedStatus } from '~/components/tweet/TweetFeedStatus'
 import { useTweetStore } from '~/store/use-tweet-store'
-
-const PAGE_SIZE = 20
-
-export interface PaginatedResponse<T> {
-  data: T[]
-  meta: {
-    total: number
-    page: number
-    pageSize: number
-    hasMore: boolean
-    nextCursor?: number | string
-  }
-}
 
 export function meta({ location }: Route.MetaArgs) {
   const params = new URLSearchParams(location.search)
@@ -36,75 +21,73 @@ export function meta({ location }: Route.MetaArgs) {
   ]
 }
 
-async function searchTweets(q: string, name: string | null, page: number) {
-  const { data } = await axios.get<PaginatedResponse<EnrichedTweet>>(`${apiUrl}/tweets/search`, {
-    params: { q, name, page, pageSize: PAGE_SIZE },
-  })
-  return data
+export async function loader({ params, request }: Route.LoaderArgs) {
+  const url = new URL(request.url)
+  const q = url.searchParams.get('q') || ''
+  const page = Number(url.searchParams.get('page')) || 1
+  const username = params.name
+
+  let paginatedTweets: PaginatedResponse<EnrichedTweet> = { data: [], meta: { total: 0, page: 1, pageSize: PAGE_SIZE, hasMore: false } }
+
+  if (q) {
+    try {
+      const tweetsRes = await axios.get<PaginatedResponse<EnrichedTweet>>(`${apiUrl}/tweets/search`, {
+        params: { q, name: username, page, pageSize: PAGE_SIZE },
+      })
+      paginatedTweets = tweetsRes.data
+    }
+    catch (e) { /* ignore */ }
+  }
+
+  return { paginatedTweets, q }
 }
 
-async function getUser(username: string) {
-  const { data } = await axios.get<EnrichedUser>(`${apiUrl}/users/get/${username}`)
-  return data
-}
-
-export default function SearchPage({ params }: Route.ComponentProps) {
+export default function SearchPage({ loaderData, params }: Route.ComponentProps) {
+  const { paginatedTweets, q: serverQ } = loaderData
   const [searchParams, setSearchParams] = useSearchParams()
 
   const q = searchParams.get('q') || ''
-  const username = params.name
   const page = Number(searchParams.get('page')) || 1
+  const username = params.name
 
   const { tweets, status, setStatus, appendTweets, resetStream } = useTweetStore()
+  const layoutData = useRouteLoaderData('rootLayout') as { activeUser: EnrichedUser | null }
+  const user = layoutData?.activeUser
 
-  const { data: user, isLoading: userIsLoading } = useSWR(
-    username ? [username, 'user'] : null,
-    ([name]) => getUser(name),
-  )
-
-  const { data: paginatedResponse, isLoading, error } = useSWR(
-    q ? ['search', q, username, page] : null,
-    ([_, qVal, uVal, pVal]) => searchTweets(qVal, uVal || null, pVal as number),
-    { revalidateOnFocus: false },
-  )
-
-  const newData = paginatedResponse?.data
-  const meta = paginatedResponse?.meta
+  const prevFilterKey = useRef<string>('')
+  const filterKey = `${q}-${username}`
 
   useEffect(() => {
-    resetStream()
-  }, [q, username, resetStream])
+    let shouldReset = false
+    if (prevFilterKey.current !== filterKey) {
+      shouldReset = true
+      prevFilterKey.current = filterKey
+    }
 
-  useEffect(() => {
+    if (shouldReset || page === 1) {
+      resetStream()
+    }
+
+    if (paginatedTweets.data.length > 0) {
+      appendTweets(paginatedTweets.data)
+    }
+
     if (!q) {
       setStatus('ready')
-      return
     }
-
-    if (isLoading) {
-      setStatus('fetching')
-    }
-    else if (error) {
-      setStatus('error')
-    }
-    else if (newData) {
-      if (newData.length === 0) {
-        setStatus(tweets.length > 0 ? 'exhausted' : 'ready')
+    else {
+      if (!paginatedTweets.meta.hasMore) {
+        setStatus('exhausted')
       }
       else {
-        appendTweets(newData)
+        setStatus('ready')
       }
     }
-  }, [isLoading, error, newData, setStatus, appendTweets, tweets.length, q])
+  }, [paginatedTweets, filterKey, page, resetStream, appendTweets, setStatus, q])
 
   const handleLoadMore = () => {
     if (status === 'fetching' || status === 'exhausted' || status === 'error')
       return
-
-    if (meta && !meta.hasMore) {
-      setStatus('exhausted')
-      return
-    }
 
     setSearchParams((prev) => {
       const currentP = Number(prev.get('page')) || 1
@@ -114,23 +97,13 @@ export default function SearchPage({ params }: Route.ComponentProps) {
   }
 
   const renderProfileCtx = () => {
-    if (!username)
+    if (!username || !user)
       return null
-    if (userIsLoading && !user) {
-      return (
-        <div className="w-full flex justify-center">
-          <ProfileHeaderSkeleton />
-        </div>
-      )
-    }
-    if (user) {
-      return (
-        <div className="w-full flex flex-col items-center gap-2 py-2">
-          <ProfileHeader user={user} />
-        </div>
-      )
-    }
-    return null
+    return (
+      <div className="w-full flex flex-col items-center gap-2 py-2">
+        <ProfileHeader user={user} />
+      </div>
+    )
   }
 
   const renderContent = () => {
@@ -142,14 +115,6 @@ export default function SearchPage({ params }: Route.ComponentProps) {
       )
     }
 
-    // Initial loading or skeleton
-    if (isLoading && tweets.length === 0) {
-      return Array.from({ length: 5 }).map((_, i) => (
-        <TweetSkeleton key={i} />
-      ))
-    }
-
-    // No results found
     if (tweets.length === 0 && status !== 'fetching' && status !== 'error') {
       return (
         <div className="flex flex-col items-center justify-center py-20 text-muted-foreground gap-2">
@@ -189,7 +154,7 @@ export default function SearchPage({ params }: Route.ComponentProps) {
       {renderProfileCtx()}
 
       <SearchInput
-        user={user}
+        user={user ?? undefined}
         defaultValue={q}
         placeholder={username ? `Search tweets by ${username}...` : 'Search tweets...'}
         className="px-4 w-full mx-auto"
