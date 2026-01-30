@@ -8,6 +8,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from 'react-router'
+import { ProgressBar } from './components/progress-bar'
 import { Button } from './components/ui/button'
 import './app.css'
 
@@ -42,6 +43,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         />
       </head>
       <body>
+        <ProgressBar />
         {children}
         <ScrollRestoration getKey={location => location.pathname} />
         <Scripts />

@@ -1,7 +1,13 @@
 import type { ClassValue } from 'clsx'
+import { apiUrl } from '@tweets-viewer/shared'
+import Axios from 'axios'
 import { clsx } from 'clsx'
 import { format, parseISO } from 'date-fns'
 import { twMerge } from 'tailwind-merge'
+
+export const apiClient = Axios.create({
+  baseURL: apiUrl,
+})
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))

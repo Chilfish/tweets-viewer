@@ -1,8 +1,8 @@
 import type { EnrichedTweet, EnrichedUser } from '@tweets-viewer/rettiwt-api'
 import type { PaginatedResponse } from '@tweets-viewer/shared'
 import type { Route } from './+types/tweets'
-import { apiUrl, PAGE_SIZE } from '@tweets-viewer/shared'
-import axios, { isAxiosError } from 'axios'
+import { PAGE_SIZE } from '@tweets-viewer/shared'
+import { isAxiosError } from 'axios'
 import { useEffect, useRef } from 'react'
 import { useRouteLoaderData, useSearchParams } from 'react-router'
 import { ProfileHeader } from '~/components/profile/ProfileHeader'
@@ -11,6 +11,7 @@ import { MyTweet } from '~/components/tweet/Tweet'
 import { TweetFeedStatus } from '~/components/tweet/TweetFeedStatus'
 import { TweetNavigation } from '~/components/tweet/TweetNavigation'
 import { TweetsToolbarActions } from '~/components/tweets/tweets-toolbar-actions'
+import { apiClient } from '~/lib/utils'
 import { useTweetStore } from '~/store/use-tweet-store'
 
 export function meta({ params }: Route.MetaArgs) {
@@ -30,8 +31,14 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   const end = url.searchParams.get('end') || undefined
 
   try {
-    const { data: paginatedTweets } = await axios.get<PaginatedResponse<EnrichedTweet>>(`${apiUrl}/tweets/get/${name}`, {
-      params: { page, reverse, pageSize: PAGE_SIZE, start, end },
+    const { data: paginatedTweets } = await apiClient.get<PaginatedResponse<EnrichedTweet>>(`/tweets/get/${name}`, {
+      params: {
+        page,
+        reverse,
+        pageSize: PAGE_SIZE,
+        start,
+        end,
+      },
     })
 
     return {

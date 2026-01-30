@@ -1,10 +1,9 @@
 import type { EnrichedUser } from '@tweets-viewer/rettiwt-api'
-import { apiUrl } from '@tweets-viewer/shared'
-import axios from 'axios'
 import { useEffect } from 'react'
 import { Outlet, useLoaderData, useLocation, useParams } from 'react-router'
 import { TopNav } from '~/components/top-nav'
 import { useIsMobile } from '~/hooks/use-mobile'
+import { apiClient } from '~/lib/utils'
 import { useUserStore } from '~/store/use-user-store'
 import { BottomNav } from './bottom-nav'
 import { Sidebar } from './sidebar'
@@ -12,7 +11,7 @@ import { Sidebar } from './sidebar'
 export async function loader({ params }: { params: { name?: string } }) {
   const { name } = params
 
-  const usersRes = await axios.get<EnrichedUser[]>(`${apiUrl}/users/all`)
+  const usersRes = await apiClient.get<EnrichedUser[]>(`/users/all`)
   const activeUser = usersRes.data.find(user => user.userName === name) || null
 
   return {
