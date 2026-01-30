@@ -1,5 +1,5 @@
 import type { FlatMediaItem } from '~/lib/media'
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useIsMobile } from '~/hooks/use-mobile'
 import { DesktopMediaViewer } from './DesktopMediaViewer'
 import { MobileMediaViewer } from './MobileMediaViewer'
@@ -26,10 +26,11 @@ export function MediaPreviewModal({
   const tweetMediaItems = items.filter(item => item.tweetId === currentItem?.tweetId)
   const currentMediaIndexInTweet = tweetMediaItems.findIndex(item => item.id === currentItem?.id)
 
-  const navigateTweet = (direction: 'next' | 'prev') => {
+  const navigateTweet = useCallback((direction: 'next' | 'prev') => {
+    if (!currentItem)
+      return
     let targetIndex = -1
     if (direction === 'next') {
-      // 寻找下一个不同 tweetId 的项
       for (let i = currentIndex + 1; i < items.length; i++) {
         if (items[i].tweetId !== currentItem.tweetId) {
           targetIndex = i
@@ -38,10 +39,8 @@ export function MediaPreviewModal({
       }
     }
     else {
-      // 寻找上一个不同 tweetId 的项 (且最好是该组的第一个)
       for (let i = currentIndex - 1; i >= 0; i--) {
         if (items[i].tweetId !== currentItem.tweetId) {
-          // 找到上一组的最后一个，我们需要找上一组的第一个
           const prevTweetId = items[i].tweetId
           let firstIndexOfPrevTweet = i
           while (firstIndexOfPrevTweet > 0 && items[firstIndexOfPrevTweet - 1].tweetId === prevTweetId) {
@@ -56,9 +55,9 @@ export function MediaPreviewModal({
     if (targetIndex !== -1) {
       onNavigate(targetIndex)
     }
-  }
+  }, [currentIndex, items, currentItem, onNavigate])
 
-  const navigateMedia = (direction: 'next' | 'prev') => {
+  const navigateMedia = useCallback((direction: 'next' | 'prev') => {
     if (direction === 'next' && currentMediaIndexInTweet < tweetMediaItems.length - 1) {
       const nextMediaId = tweetMediaItems[currentMediaIndexInTweet + 1].id
       const globalIndex = items.findIndex(item => item.id === nextMediaId)
@@ -69,34 +68,44 @@ export function MediaPreviewModal({
       const globalIndex = items.findIndex(item => item.id === prevMediaId)
       onNavigate(globalIndex)
     }
-  }
+  }, [currentMediaIndexInTweet, tweetMediaItems, items, onNavigate])
 
   useEffect(() => {
     if (!open)
       return
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') {
-        e.preventDefault()
-        navigateMedia('prev')
+      // 避免在输入框中触发
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return
       }
-      if (e.key === 'ArrowRight') {
-        e.preventDefault()
-        navigateMedia('next')
+
+      switch (e.key) {
+        case 'ArrowLeft':
+          e.preventDefault()
+          navigateMedia('prev')
+          break
+        case 'ArrowRight':
+          e.preventDefault()
+          navigateMedia('next')
+          break
+        case 'ArrowUp':
+          e.preventDefault()
+          navigateTweet('prev')
+          break
+        case 'ArrowDown':
+          e.preventDefault()
+          navigateTweet('next')
+          break
+        case 'Escape':
+          onOpenChange(false)
+          break
       }
-      if (e.key === 'ArrowUp') {
-        e.preventDefault()
-        navigateTweet('prev')
-      }
-      if (e.key === 'ArrowDown') {
-        e.preventDefault()
-        navigateTweet('next')
-      }
-      if (e.key === 'Escape')
-        onOpenChange(false)
     }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [open, currentIndex, currentMediaIndexInTweet, tweetMediaItems.length]) // 依赖项更新
+
+    window.addEventListener('keydown', handleKeyDown, true) // 使用捕获阶段确保优先处理
+    return () => window.removeEventListener('keydown', handleKeyDown, true)
+  }, [open, navigateMedia, navigateTweet, onOpenChange])
 
   // 根据设备类型条件渲染，避免重复挂载
   return isMobile
