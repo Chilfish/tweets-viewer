@@ -3,7 +3,7 @@ import type { AxiosRequestConfig } from 'axios'
 import type { RawAnalyticsGranularity, RawAnalyticsMetric } from '../enums/raw/Analytics'
 
 import type { IProfileUpdateOptions } from '../types/args/ProfileArgs'
-import qs from 'node:querystring'
+import * as qs from 'neoqs'
 
 /**
  * Collection of requests related to users.

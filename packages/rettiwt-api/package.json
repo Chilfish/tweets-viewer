@@ -35,6 +35,7 @@
     "cookiejar": "^2.1.4",
     "happy-dom": "^20.4.0",
     "https-proxy-agent": "^7.0.6",
+    "neoqs": "^6.13.0",
     "node-html-parser": "^7.0.2",
     "x-client-transaction-id": "^0.1.9"
   },

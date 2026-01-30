@@ -37,7 +37,7 @@ export async function createTweets({ db, tweets, user }: { db: DB, tweets: Enric
 }
 
 function _order(reverse: boolean) {
-  return reverse ? desc(tweetsTable.createdAt) : asc(tweetsTable.createdAt)
+  return reverse ? asc(tweetsTable.createdAt) : desc(tweetsTable.createdAt)
 }
 
 /**

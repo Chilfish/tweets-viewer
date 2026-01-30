@@ -1,6 +1,6 @@
 import type { AxiosRequestConfig } from 'axios'
 
-import qs from 'node:querystring'
+import * as qs from 'neoqs'
 
 /**
  * Common parameter sets for DM requests
