@@ -33,8 +33,11 @@
       "name": "@tweets-viewer/scripts-v2",
       "version": "0.0.0",
       "dependencies": {
+        "@neondatabase/serverless": "^1.0.2",
+        "@tweets-viewer/database": "workspace:*",
         "@tweets-viewer/rettiwt-api": "workspace:*",
         "@tweets-viewer/shared": "workspace:*",
+        "drizzle-orm": "^0.45.1",
       },
     },
     "apps/server": {
@@ -116,11 +119,10 @@
       "name": "@tweets-viewer/database",
       "version": "0.0.0",
       "dependencies": {
+        "@tweets-viewer/rettiwt-api": "workspace:*",
+        "@tweets-viewer/shared": "workspace:*",
         "drizzle-kit": "^0.31.8",
         "drizzle-orm": "^0.45.1",
-      },
-      "devDependencies": {
-        "rettiwt-api": "^6.2.0",
       },
     },
     "packages/rettiwt-api": {

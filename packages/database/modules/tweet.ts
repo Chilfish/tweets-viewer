@@ -1,5 +1,5 @@
+import type { EnrichedTweet, EnrichedUser } from '@tweets-viewer/rettiwt-api'
 import type { DB } from '..'
-import type { InsertTweet } from '../schema'
 import { now } from '@tweets-viewer/shared'
 import { and, asc, count, desc, eq, sql } from 'drizzle-orm'
 import { tweetsTable, usersTable } from '../schema'
@@ -11,17 +11,23 @@ interface GetTweet {
   db: DB
 }
 
-const pageSize = 10
+const PAGE_SIZE = 10
+const BANCH_SIZE = 1000
 
-export async function createTweets(db: DB, tweets: InsertTweet[]) {
-  const banchSize = 1000
+export async function createTweets({ db, tweets, user}: { db: DB, tweets: EnrichedTweet[], user: EnrichedUser }) {
   let insertedCount = 0
-  for (let i = 0; i < tweets.length; i += banchSize) {
-    const chunk = tweets.slice(i, i + banchSize)
+  for (let i = 0; i < tweets.length; i += BANCH_SIZE) {
+    const chunk = tweets.slice(i, i + BANCH_SIZE)
 
     const { rowCount } = await db
       .insert(tweetsTable)
-      .values(chunk)
+      .values(chunk.map(tweet => ({
+        tweetId: tweet.id,
+        userId: user.userName,
+        fullText: tweet.text,
+        createdAt: new Date(tweet.created_at),
+        jsonData: tweet,
+      })))
       .onConflictDoNothing()
     insertedCount += rowCount
   }
@@ -38,8 +44,8 @@ export async function getTweets({ db, name, page, reverse }: GetTweet) {
     .from(tweetsTable)
     .where(eq(tweetsTable.userId, name))
     .orderBy(_order(reverse))
-    .limit(pageSize)
-    .offset(page * pageSize)
+    .limit(PAGE_SIZE)
+    .offset(page * PAGE_SIZE)
 }
 
 export async function getLastYearsTodayTweets({ db, name, reverse }: GetTweet) {
@@ -76,8 +82,8 @@ export async function getTweetsByDateRange({
       ),
     )
     .orderBy(_order(reverse))
-    .limit(pageSize)
-    .offset(page * pageSize)
+    .limit(PAGE_SIZE)
+    .offset(page * PAGE_SIZE)
 }
 
 export async function getTweetsByKeyword({
@@ -97,8 +103,8 @@ export async function getTweetsByKeyword({
       ),
     )
     .orderBy(_order(reverse))
-    .limit(pageSize)
-    .offset(page * pageSize)
+    .limit(PAGE_SIZE)
+    .offset(page * PAGE_SIZE)
 }
 
 export async function getTweetsCount(db: DB, name: string) {
@@ -128,30 +134,4 @@ export async function getLatestTweets(db: DB) {
     // fullText: row.full_text as string,
     createdAt: new Date(row.created_at as string),
   }))
-}
-
-export async function updateUserTweets({
-  db,
-  user,
-  tweets,
-}: {
-  db: DB
-  user: {
-    screenName: string
-    tweetEnd: Date
-  }
-  tweets: InsertTweet[]
-}) {
-  // Error: No transactions support in neon-http driver
-  let insertedCount = 0
-  const res1 = await createTweets(db, tweets)
-
-  const res2 = await db
-    .update(usersTable)
-    .set({ tweetEnd: user.tweetEnd })
-    .where(eq(usersTable.screenName, user.screenName))
-
-  insertedCount = res1.rowCount + res2.rowCount - 1
-
-  return { rowCount: insertedCount }
 }

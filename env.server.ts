@@ -1,12 +1,20 @@
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { config } from 'dotenv'
 import { z } from 'zod'
-import 'dotenv/config'
+
+const rootPath = path.dirname(fileURLToPath(import.meta.url))
+
+config({
+  path: path.join(rootPath, '.env'),
+})
 
 /**
  * Server environment schema definition with validation rules
  */
 const serverEnvSchema = z.object({
   ENVIRONMENT: z.enum(['development', 'production']).default('development'),
-  TWEET_KEY: z.string().min(1),
+  TWEET_KEYS: z.string().min(1),
   DATABASE_URL: z.url(),
 })
 
@@ -19,7 +27,7 @@ export const env = (() => {
   if (parsed.success === false) {
     console.error(
       '❌ Invalid environment variables:',
-      z.treeifyError(parsed.error),
+      z.treeifyError(parsed.error).properties,
     )
     throw new Error('Invalid environment variables')
   }
