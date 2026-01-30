@@ -48,6 +48,7 @@
         "@neondatabase/serverless": "^1.0.2",
         "@tweets-viewer/database": "workspace:*",
         "@tweets-viewer/shared": "workspace:*",
+        "drizzle-orm": "^0.45.1",
         "hono": "^4.11.7",
       },
       "devDependencies": {

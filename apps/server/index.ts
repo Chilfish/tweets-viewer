@@ -1,15 +1,18 @@
 import type { AppType } from './common'
+import { neon } from '@neondatabase/serverless'
+import { schema } from '@tweets-viewer/database'
 import { now } from '@tweets-viewer/shared'
+import { drizzle } from 'drizzle-orm/neon-http'
 import { Hono } from 'hono'
 import { contextStorage } from 'hono/context-storage'
 import { cors } from 'hono/cors'
+import { env } from '../../env.server'
 import { cachedData } from './common'
 import imageApp from './routes/image'
+
 import insApp from './routes/ins'
 import tweetsApp from './routes/tweets'
 import usersApp from './routes/users'
-import tweetsAppV3 from './routes/v3/tweets'
-
 import 'dotenv'
 
 const app = new Hono<AppType>()
@@ -22,10 +25,9 @@ app
   //   keyGenerator: c => c.req.header('cf-connecting-ip') ?? c.req.header('x-forwarded-for') ?? 'unknown',
   // }))
   .use(async (c, next) => {
-    const { DATABASE_URL } = c.env
-    // const sql = neon(DATABASE_URL)
-    // const db = drizzle({ client: sql })
-    // c.set('db', db)
+    const sql = neon(env.DATABASE_URL)
+    const db = drizzle({ client: sql, schema })
+    c.set('db', db)
     return next()
   })
 
@@ -48,11 +50,10 @@ app
       tweetsSize,
     })
   })
-  .route('/v2/tweets', tweetsApp)
+  .route('/v3/tweets', tweetsApp)
   .route('/v3/users', usersApp)
-  .route('/v2/image', imageApp)
-  .route('/v2/ins', insApp)
-  .route('/v3/tweets', tweetsAppV3)
+  .route('/v3/image', imageApp)
+  .route('/v3/ins', insApp)
 
 app.onError((err, c) => {
   console.error(`${err}`)

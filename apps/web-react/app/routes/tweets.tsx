@@ -16,7 +16,7 @@ import { TweetsToolbarActions } from '~/components/tweets/tweets-toolbar-actions
 import { useTweetStore } from '~/store/use-tweet-store'
 import { useUserStore } from '~/store/use-user-store'
 
-const PAGE_SIZE = 20
+const PAGE_SIZE = 10
 
 export function meta({ params }: Route.MetaArgs) {
   const { name } = params
