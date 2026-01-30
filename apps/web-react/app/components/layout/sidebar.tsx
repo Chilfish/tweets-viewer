@@ -2,6 +2,7 @@ import { Moon, Sun } from 'lucide-react'
 import { Link } from 'react-router'
 import { Button } from '~/components/ui/button'
 import { cn } from '~/lib/utils'
+import { useAppStore } from '~/store/use-app-store'
 import { useNavItems } from './nav'
 import { UserSelector } from './user-selector'
 
@@ -11,6 +12,15 @@ interface SidebarProps {
 
 export function Sidebar({ currentUser }: SidebarProps) {
   const navItems = useNavItems(currentUser)
+  const theme = useAppStore(s => s.theme)
+  const setTheme = useAppStore(s => s.setTheme)
+
+  const toggleTheme = () => {
+    // 简单的 light/dark 切换，如果当前是 system 则根据实际色板切换或直接切到对面
+    // 这里简单处理：system -> dark -> light -> dark ...
+    const nextTheme = theme === 'dark' ? 'light' : 'dark'
+    setTheme(nextTheme)
+  }
 
   return (
     <aside className="hidden md:flex sticky top-0 z-40 h-screen w-auto xl:w-[260px] flex-col justify-between p-2 xl:p-4 bg-background/90 backdrop-blur-xl border-r border-border/40 transition-all duration-200">
@@ -57,6 +67,7 @@ export function Sidebar({ currentUser }: SidebarProps) {
           {/* Theme Toggle */}
           <Button
             variant="ghost"
+            onClick={toggleTheme}
             className="justify-start gap-4 p-3 xl:px-4 h-auto rounded-full text-foreground/80 hover:bg-accent/50 hover:text-foreground transition-all duration-200"
           >
             <Sun className="size-4 shrink-0 dark:hidden" />

@@ -6,6 +6,8 @@ interface AppState {
   sidebarCollapsed: boolean
   /** Data display density */
   density: 'comfortable' | 'compact'
+  /** Theme mode */
+  theme: 'light' | 'dark' | 'system'
 
   _hasHydrated: boolean
 }
@@ -13,6 +15,7 @@ interface AppState {
 interface AppActions {
   setSidebarCollapsed: (collapsed: boolean) => void
   setDensity: (density: AppState['density']) => void
+  setTheme: (theme: AppState['theme']) => void
   setHasHydrated: (state: boolean) => void
 }
 
@@ -23,10 +26,12 @@ export const useAppStore = create<AppStore>()(
     set => ({
       sidebarCollapsed: false,
       density: 'comfortable',
+      theme: 'system',
       _hasHydrated: false,
 
       setSidebarCollapsed: collapsed => set({ sidebarCollapsed: collapsed }),
       setDensity: density => set({ density }),
+      setTheme: theme => set({ theme }),
       setHasHydrated: state => set({ _hasHydrated: state }),
     }),
     {

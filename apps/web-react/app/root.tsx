@@ -11,6 +11,7 @@ import {
 import { GlobalMediaViewer } from './components/media/GlobalMediaViewer'
 import { ProgressBar } from './components/progress-bar'
 import { Button } from './components/ui/button'
+import { useTheme } from './hooks/use-theme'
 import './app.css'
 
 export const links: Route.LinksFunction = () => [
@@ -40,8 +41,25 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
         <script
-          src="//unpkg.com/react-scan/dist/auto.global.js"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const storage = localStorage.getItem('tweets-viewer-app-storage');
+                  if (storage) {
+                    const theme = JSON.parse(storage).state.theme;
+                    if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                      document.documentElement.classList.add('dark');
+                    }
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
         />
+        {/* <script
+          src="//unpkg.com/react-scan/dist/auto.global.js"
+        /> */}
       </head>
       <body>
         <ProgressBar />
@@ -55,6 +73,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  useTheme()
   return <Outlet />
 }
 
