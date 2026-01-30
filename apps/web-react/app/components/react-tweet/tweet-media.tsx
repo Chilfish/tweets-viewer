@@ -28,9 +28,10 @@ interface Props {
   tweet: EnrichedTweet
   quoted?: boolean
   showCoverOnly?: boolean
+  onMediaClick?: (index: number) => void
 }
 
-export function TweetMedia({ tweet, quoted, showCoverOnly }: Props) {
+export function TweetMedia({ tweet, quoted, showCoverOnly, onMediaClick }: Props) {
   const length = tweet.media_details?.length ?? 0
   const isInlineMedia = !!tweet.is_inline_media
 
@@ -50,14 +51,15 @@ export function TweetMedia({ tweet, quoted, showCoverOnly }: Props) {
           length > 4 && 'grid-rows-2',
         )}
       >
-        {tweet.media_details?.map(media => (
+        {tweet.media_details?.map((media, index) => (
           <Fragment key={media.media_url_https}>
             {media.type === 'photo'
               ? (
                   <div
                     className={cn(
-                      'relative h-full w-full flex items-center justify-center no-underline outline-none',
+                      'relative h-full w-full flex items-center justify-center no-underline outline-none cursor-zoom-in',
                     )}
+                    onClick={() => onMediaClick?.(index)}
                   >
                     {!isInlineMedia && (
                       <Skeleton

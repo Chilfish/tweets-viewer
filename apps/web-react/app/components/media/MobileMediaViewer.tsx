@@ -1,11 +1,12 @@
 import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
 import type { FlatMediaItem } from '~/routes/media'
-import { ChevronLeft, ChevronRight, X } from 'lucide-react'
+import { ChevronLeft, ChevronRight, XIcon } from 'lucide-react'
 import { MyTweet } from '~/components/tweet/Tweet'
 import { Button } from '~/components/ui/button'
 import { ScrollArea } from '~/components/ui/scroll-area'
 import { Sheet, SheetContent } from '~/components/ui/sheet'
 import { cn } from '~/lib/utils'
+import { MediaImage } from '../ui/media'
 
 interface MobileMediaViewerProps {
   open: boolean
@@ -31,15 +32,14 @@ export function MobileMediaViewer({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-[85vh] p-0 gap-0" showCloseButton={false}>
+      <SheetContent side="bottom" className="p-0 gap-0" showCloseButton={false}>
         {/* 顶部大图区域 */}
-        <div className="h-[55%] bg-black flex items-center justify-center relative">
-          <img
+        <div className="max-h-[55vh] bg-black flex items-center justify-center relative">
+          <MediaImage
             src={currentItem?.url}
             alt="preview"
             className="max-w-full max-h-full object-contain"
           />
-
           {/* 关闭按钮 */}
           <Button
             size="icon"
@@ -48,7 +48,7 @@ export function MobileMediaViewer({
             onClick={() => onOpenChange(false)}
             aria-label="Close preview"
           >
-            <X className="size-5" />
+            <XIcon className="size-5" />
           </Button>
 
           {/* 媒体切换按钮 */}
@@ -95,11 +95,9 @@ export function MobileMediaViewer({
         </div>
 
         {/* 底部推文详情 */}
-        <div className="h-[45%] overflow-y-auto bg-background border-t border-border">
-          <ScrollArea className="h-full">
-            <div className="p-4">
-              {currentTweet && <MyTweet tweet={currentTweet} hideMedia />}
-            </div>
+        <div className="overflow-y-auto bg-background border-t border-border">
+          <ScrollArea className="h-full pt-4">
+            {currentTweet && <MyTweet tweet={currentTweet} hideMedia />}
           </ScrollArea>
         </div>
       </SheetContent>

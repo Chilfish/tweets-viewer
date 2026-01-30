@@ -8,6 +8,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from 'react-router'
+import { GlobalMediaViewer } from './components/media/GlobalMediaViewer'
 import { ProgressBar } from './components/progress-bar'
 import { Button } from './components/ui/button'
 import './app.css'
@@ -45,6 +46,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <body>
         <ProgressBar />
         {children}
+        <GlobalMediaViewer />
         <ScrollRestoration getKey={location => location.pathname} />
         <Scripts />
       </body>

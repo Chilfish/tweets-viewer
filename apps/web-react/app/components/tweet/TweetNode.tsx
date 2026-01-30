@@ -2,6 +2,7 @@ import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
 import { Repeat2Icon } from 'lucide-react'
 import { forwardRef, useMemo } from 'react'
 import { cn, pubTime } from '~/lib/utils'
+import { useMediaViewer } from '~/store/use-media-viewer'
 import {
   formatDate,
   TweetAction,
@@ -26,12 +27,15 @@ interface TweetNodeProps {
 }
 
 function TweetMediaSection({ tweet, hideMedia }: { tweet: EnrichedTweet, hideMedia?: boolean }) {
+  const openViewer = useMediaViewer(s => s.open)
+
   if (hideMedia || !(tweet.media_details || []).length)
     return null
 
   return (
     <TweetMedia
       tweet={tweet}
+      onMediaClick={index => openViewer(tweet, index)}
     />
   )
 }
