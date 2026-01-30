@@ -9,7 +9,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
-import { cn } from '~/lib/utils'
 
 import { useUserStore } from '~/store/use-user-store'
 
@@ -30,9 +29,6 @@ export function UserSelector() {
       <DropdownMenuTrigger render={(
         <Button
           variant="ghost"
-          className={cn(
-            'flex items-center gap-3 h-auto py-2 px-3 justify-start w-full transition-colors hover:bg-accent',
-          )}
         />
       )}
       >

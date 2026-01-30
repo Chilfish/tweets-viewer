@@ -4,7 +4,6 @@ import type { Route } from './+types/search'
 import { PAGE_SIZE } from '@tweets-viewer/shared'
 import { useEffect, useRef } from 'react'
 import { useRouteLoaderData, useSearchParams } from 'react-router'
-import { ProfileHeader } from '~/components/profile/ProfileHeader'
 import { SearchInput } from '~/components/search-input'
 import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
 import { MyTweet } from '~/components/tweet/Tweet'
@@ -104,16 +103,6 @@ export default function SearchPage({ loaderData, params }: Route.ComponentProps)
     }, { replace: true })
   }
 
-  const renderProfileCtx = () => {
-    if (!username || !user)
-      return null
-    return (
-      <div className="w-full flex flex-col items-center gap-2 py-2">
-        <ProfileHeader user={user} />
-      </div>
-    )
-  }
-
   const renderContent = () => {
     if (!q) {
       return (
@@ -158,9 +147,7 @@ export default function SearchPage({ loaderData, params }: Route.ComponentProps)
   }
 
   return (
-    <main className="min-h-svh bg-background flex flex-col justify-center mx-auto gap-2 items-center sm:max-w-[600px]">
-      {renderProfileCtx()}
-
+    <>
       <SearchInput
         user={user ?? undefined}
         defaultValue={q}
@@ -171,6 +158,6 @@ export default function SearchPage({ loaderData, params }: Route.ComponentProps)
       <div className="w-full max-w-3xl flex flex-col gap-4 px-4 mt-4 mb-20">
         {renderContent()}
       </div>
-    </main>
+    </>
   )
 }

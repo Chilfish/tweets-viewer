@@ -9,9 +9,10 @@ import { ProfileHeaderSkeleton } from './profile-header-skeleton'
 interface ProfileHeaderProps {
   user: EnrichedUser | null
   children?: React.ReactNode
+  isWide?: boolean
 }
 
-export function ProfileHeader({ user, children }: ProfileHeaderProps) {
+export function ProfileHeader({ user, children, isWide }: ProfileHeaderProps) {
   if (!user) {
     return <ProfileHeaderSkeleton />
   }

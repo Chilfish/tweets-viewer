@@ -8,7 +8,6 @@ import { isAxiosError } from 'axios'
 import { useEffect, useRef, useState } from 'react'
 import { useRouteLoaderData, useSearchParams } from 'react-router'
 import { MediaWall } from '~/components/media/MediaWall'
-import { ProfileHeader } from '~/components/profile/ProfileHeader'
 import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
 import { TweetFeedStatus } from '~/components/tweet/TweetFeedStatus'
 import { TweetNavigation } from '~/components/tweet/TweetNavigation'
@@ -16,6 +15,10 @@ import { TweetsToolbarActions } from '~/components/tweets/tweets-toolbar-actions
 import { extractMediaFromTweets } from '~/lib/media'
 import { apiClient } from '~/lib/utils'
 import { useUserStore } from '~/store/use-user-store'
+
+export const handle = {
+  isWide: true,
+}
 
 export function meta({ params }: Route.MetaArgs) {
   const { name } = params
@@ -146,11 +149,7 @@ export default function MediaPage({ loaderData, params }: Route.ComponentProps) 
   }
 
   return (
-    <main className="min-h-svh bg-background flex flex-col items-center">
-      <div className="w-full flex flex-col items-center gap-2 py-2">
-        <ProfileHeader user={user} />
-      </div>
-
+    <>
       <div className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-xl border-b border-border/40 transition-all">
         <div className="w-full max-w-6xl mx-auto px-4 h-11 flex items-center justify-between gap-4">
           <TweetNavigation
@@ -181,6 +180,6 @@ export default function MediaPage({ loaderData, params }: Route.ComponentProps) 
           />
         </div>
       </div>
-    </main>
+    </>
   )
 }

@@ -1,10 +1,11 @@
 import type { EnrichedUser } from '@tweets-viewer/rettiwt-api'
 import { useEffect } from 'react'
-import { Outlet, useLoaderData, useLocation, useParams } from 'react-router'
+import { Outlet, useLoaderData, useLocation, useMatches, useParams } from 'react-router'
 import { TopNav } from '~/components/top-nav'
 import { useIsMobile } from '~/hooks/use-mobile'
-import { apiClient } from '~/lib/utils'
+import { apiClient, cn } from '~/lib/utils'
 import { useUserStore } from '~/store/use-user-store'
+import { ProfileHeader } from '../profile/ProfileHeader'
 import { BottomNav } from './bottom-nav'
 import { Sidebar } from './sidebar'
 
@@ -27,6 +28,9 @@ export default function Layout() {
   const isMobile = useIsMobile()
   const curUserName = params.name
 
+  const matches = useMatches()
+  const isWide = matches.some((m: any) => m.handle?.isWide)
+
   const { setUsers, setActiveUser } = useUserStore()
 
   useEffect(() => {
@@ -38,7 +42,10 @@ export default function Layout() {
   }, [activeUser, setActiveUser])
 
   const outletWrapper = (
-    <div key={location.pathname} className="animate-in fade-in-0 duration-300">
+    <div
+      key={location.pathname}
+      className="animate-in fade-in-0 duration-300 w-full"
+    >
       <Outlet />
     </div>
   )
@@ -48,7 +55,11 @@ export default function Layout() {
       <div className="min-h-screen bg-background transition-colors duration-200">
         <TopNav title={curUserName ? `@${curUserName}` : 'Tweets Viewer'} />
 
-        <main className="min-h-full pb-20">{outletWrapper}</main>
+        <main className="flex-1 flex flex-col items-center justify-start gap-4 pt-2 mx-auto min-w-0 border-r border-border/40">
+
+          <ProfileHeader user={activeUser} isWide={isWide} />
+          {outletWrapper}
+        </main>
 
         <BottomNav currentUser={curUserName} />
       </div>
@@ -61,8 +72,13 @@ export default function Layout() {
       <Sidebar currentUser={curUserName} />
 
       {/* Main Content */}
-      <main className="flex-1 min-w-0 border-r border-border/40">
-        <div className="mx-auto h-full">{outletWrapper}</div>
+      <main className={cn(
+        'flex-1 flex flex-col items-center justify-start gap-4 pt-2 mx-auto min-w-0 border-r border-border/40 transition-all duration-300',
+        isWide ? 'sm:max-w-6xl' : 'sm:max-w-[600px]',
+      )}
+      >
+        <ProfileHeader user={activeUser} isWide={isWide} />
+        {outletWrapper}
       </main>
     </div>
   )

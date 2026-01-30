@@ -5,7 +5,6 @@ import { PAGE_SIZE } from '@tweets-viewer/shared'
 import { isAxiosError } from 'axios'
 import { useEffect, useRef } from 'react'
 import { useRouteLoaderData, useSearchParams } from 'react-router'
-import { ProfileHeader } from '~/components/profile/ProfileHeader'
 import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
 import { MyTweet } from '~/components/tweet/Tweet'
 import { TweetFeedStatus } from '~/components/tweet/TweetFeedStatus'
@@ -109,11 +108,7 @@ export default function TweetsPage({ loaderData, params }: Route.ComponentProps)
   }
 
   return (
-    <main className="min-h-svh bg-background flex flex-col items-center">
-      <div className="w-full flex flex-col items-center gap-2 py-2">
-        <ProfileHeader user={user} />
-      </div>
-
+    <>
       <div className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-xl border-b border-border/40 transition-all">
         <div className="w-full max-w-2xl mx-auto px-4 flex items-center justify-between gap-4">
           <TweetNavigation totalPages={totalPages} />
@@ -139,6 +134,6 @@ export default function TweetsPage({ loaderData, params }: Route.ComponentProps)
           disabled={status === 'fetching' || status === 'exhausted' || status === 'error'}
         />
       </div>
-    </main>
+    </>
   )
 }
