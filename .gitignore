@@ -49,3 +49,6 @@ storybook-static
 
 .vercel/
 cache/
+
+.vercel
+.env*.local

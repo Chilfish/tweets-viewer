@@ -1,5 +1,4 @@
 export * from './date'
-export * from './fetch'
 
 export function uniqueObj<T extends Record<string, any>[]>(
   arr: T,
