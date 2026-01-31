@@ -41,6 +41,7 @@ app.get('/get/:name', async (c) => {
   // 日期筛选参数
   const startDateStr = c.req.query('start')
   const endDateStr = c.req.query('end')
+  const noReplies = c.req.query('noReplies') === 'true'
 
   const startDate = startDateStr ? new Date(startDateStr) : null
   const endDate = endDateStr ? new Date(endDateStr) : null
@@ -58,16 +59,18 @@ app.get('/get/:name', async (c) => {
       page,
       pageSize,
       reverse,
+      noReplies,
     })
   }
   else {
     // 尝试从缓存获取总数
-    let total = tweetCountCache.get(name)
+    const cacheKey = noReplies ? `${name}:no-replies` : name
+    let total = tweetCountCache.get(cacheKey)
 
     if (total === undefined) {
-      const [{ value }] = await getTweetsCount(db, name)
+      const [{ value }] = await getTweetsCount(db, name, noReplies)
       total = value
-      tweetCountCache.set(name, total)
+      tweetCountCache.set(cacheKey, total)
     }
 
     tweets = await getTweets({
@@ -77,6 +80,7 @@ app.get('/get/:name', async (c) => {
       pageSize,
       reverse,
       total,
+      noReplies,
     })
   }
 

@@ -1,5 +1,5 @@
 import { format } from 'date-fns'
-import { Calendar as CalendarIcon, FilterX, SortAsc, SortDesc } from 'lucide-react'
+import { Calendar as CalendarIcon, FilterX, MessageSquareOff, SortAsc, SortDesc } from 'lucide-react'
 import { useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { Button } from '~/components/ui/button'
@@ -12,11 +12,17 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
 import { cn } from '~/lib/utils'
 
-export function TweetsToolbarActions({ className }: { className?: string }) {
+interface Props {
+  hideComments?: boolean
+  className?: string
+}
+
+export function TweetsToolbarActions({ className, hideComments = false }: Props) {
   const [searchParams, setSearchParams] = useSearchParams()
   const [open, setOpen] = useState(false)
 
   const isReverse = searchParams.get('reverse') === 'true'
+  const noReplies = searchParams.get('no_replies') === 'true'
   const startDateStr = searchParams.get('start')
   const endDateStr = searchParams.get('end')
 
@@ -36,6 +42,17 @@ export function TweetsToolbarActions({ className }: { className?: string }) {
       if (isReverse)
         prev.delete('reverse')
       else prev.set('reverse', 'true')
+      prev.delete('page')
+      return prev
+    })
+  }
+
+  // 2. No Replies Toggle
+  const toggleNoReplies = () => {
+    setSearchParams((prev) => {
+      if (noReplies)
+        prev.delete('no_replies')
+      else prev.set('no_replies', 'true')
       prev.delete('page')
       return prev
     })
@@ -88,7 +105,7 @@ export function TweetsToolbarActions({ className }: { className?: string }) {
   const hasDraftValues = !!(draftStart || draftEnd)
 
   return (
-    <div className={cn('flex items-center gap-2', className)}>
+    <div className={cn('flex items-center gap-2 py-1', className)}>
       <Button
         variant="ghost"
         size="sm"
@@ -98,7 +115,19 @@ export function TweetsToolbarActions({ className }: { className?: string }) {
         <span className="hidden sm:inline text-xs font-medium">排序</span>
       </Button>
 
-      <div className="h-4 w-px bg-border/40 mx-1 hidden sm:block" />
+      {
+        !hideComments && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleNoReplies}
+            className={cn(noReplies && 'text-primary bg-primary/10 hover:bg-primary/20 hover:text-primary')}
+          >
+            <MessageSquareOff className="size-4" />
+            <span className="hidden sm:inline text-xs font-medium">不看评论</span>
+          </Button>
+        )
+      }
 
       <Popover open={open} onOpenChange={handleOpenInfo}>
         <PopoverTrigger render={(

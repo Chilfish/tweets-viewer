@@ -143,7 +143,7 @@ export default function MediaPage({ loaderData, params }: Route.ComponentProps) 
             currentPage={currentPage}
             onPageChange={handlePageChange}
           />
-          <TweetsToolbarActions />
+          <TweetsToolbarActions hideComments />
         </div>
       </div>
 

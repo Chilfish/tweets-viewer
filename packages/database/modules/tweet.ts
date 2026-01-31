@@ -12,6 +12,7 @@ interface GetTweet {
   pageSize: number
   reverse: boolean
   db: DB
+  noReplies?: boolean
 }
 
 const BANCH_SIZE = 1000
@@ -50,23 +51,28 @@ export async function getTweets({
   page,
   pageSize,
   reverse,
+  noReplies,
   total: providedTotal,
 }: GetTweet & { total?: number }): Promise<PaginatedResponse<EnrichedTweet>> {
   const offset = (page - 1) * pageSize
+  const whereClause = and(
+    eq(tweetsTable.userId, name),
+    noReplies ? sql`${tweetsTable.jsonData}->>'parent_id' IS NULL` : undefined,
+  )
 
   let totalNum = providedTotal
   if (totalNum === undefined) {
     const [{ value }] = await db
       .select({ value: count() })
       .from(tweetsTable)
-      .where(eq(tweetsTable.userId, name))
+      .where(whereClause)
     totalNum = value
   }
 
   const rows = await db
     .select()
     .from(tweetsTable)
-    .where(eq(tweetsTable.userId, name))
+    .where(whereClause)
     .orderBy(_order(reverse))
     .limit(pageSize)
     .offset(offset)
@@ -134,11 +140,13 @@ export async function getTweetsByDateRange({
   reverse,
   page,
   pageSize,
+  noReplies,
 }: GetTweet & { startDate: Date, endDate: Date }): Promise<PaginatedResponse<EnrichedTweet>> {
   const offset = (page - 1) * pageSize
   const whereClause = and(
     eq(tweetsTable.userId, name),
     sql`CAST(${tweetsTable.createdAt} AS DATE) BETWEEN ${startDate} AND ${endDate}`,
+    noReplies ? sql`${tweetsTable.jsonData}->>'parent_id' IS NULL` : undefined,
   )
 
   const [{ value: total }] = await db
@@ -207,13 +215,16 @@ export async function getTweetsByKeyword({
   }
 }
 
-export async function getTweetsCount(db: DB, name: string) {
+export async function getTweetsCount(db: DB, name: string, noReplies?: boolean) {
   return db
     .select({
       value: count(tweetsTable.id),
     })
     .from(tweetsTable)
-    .where(eq(tweetsTable.userId, name))
+    .where(and(
+      eq(tweetsTable.userId, name),
+      noReplies ? sql`${tweetsTable.jsonData}->>'parent_id' IS NULL` : undefined,
+    ))
 }
 
 /**

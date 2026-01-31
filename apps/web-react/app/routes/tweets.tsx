@@ -28,6 +28,7 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
   const reverse = url.searchParams.get('reverse') === 'true'
   const start = url.searchParams.get('start') || undefined
   const end = url.searchParams.get('end') || undefined
+  const noReplies = url.searchParams.get('no_replies') === 'true'
 
   try {
     const { data: paginatedTweets } = await apiClient.get<PaginatedResponse<EnrichedTweet>>(`/tweets/get/${name}`, {
@@ -37,6 +38,7 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
         pageSize: PAGE_SIZE,
         start,
         end,
+        noReplies,
       },
     })
 
@@ -60,13 +62,14 @@ export default function TweetsPage({ loaderData, params }: Route.ComponentProps)
   const reverse = searchParams.get('reverse') === 'true'
   const start = searchParams.get('start') || undefined
   const end = searchParams.get('end') || undefined
+  const noReplies = searchParams.get('no_replies') === 'true'
 
   const { tweets, status, setStatus, appendTweets, resetStream } = useTweetStore()
   const layoutData = useRouteLoaderData('rootLayout') as { activeUser: EnrichedUser | null }
   const user = layoutData?.activeUser
 
   const prevFilterKey = useRef<string>('')
-  const filterKey = `${params.name}-${reverse}-${start}-${end}`
+  const filterKey = `${params.name}-${reverse}-${start}-${end}-${noReplies}`
 
   // Hydrate Store with SSR Data & Handle Infinite Scroll
   useEffect(() => {
