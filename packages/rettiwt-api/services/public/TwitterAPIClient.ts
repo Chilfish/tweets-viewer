@@ -85,13 +85,22 @@ export class TwitterAPIClient {
   /**
    * 获取用户时间线原始数据
    */
-  async fetchUserTimelineRaw(userId: string): Promise<RawTweet[]> {
+  async fetchUserTimelineRaw(userId: string, cursor?: string): Promise<CursoredTweets> {
     return this.pool.run(async (fetcher) => {
       const response = await fetcher.request<IUserTweetsResponse>(
         ResourceType.USER_TIMELINE,
-        { id: userId },
+        { id: userId, cursor },
       )
-      return this.extractTimelineTweets(response)
+      const cursoredData = new CursoredData(response, BaseType.TWEET)
+      await this.onFetchedresponse(`${ResourceType.USER_TIMELINE}-${userId}`, {
+        response,
+        cursor: cursoredData.next,
+      })
+      const tweets = this.extractTimelineTweets(response)
+      return {
+        tweets,
+        cursor: cursoredData.next,
+      }
     })
   }
 

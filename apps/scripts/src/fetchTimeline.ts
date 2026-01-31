@@ -1,10 +1,10 @@
 import { mkdir, readFile, stat, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { RettiwtPool, TweetEnrichmentService, TwitterAPIClient } from '@tweets-viewer/rettiwt-api'
-import { getLocalCache } from '../src/localCache'
-import { cacheDir, writeJson } from '../src/utils'
+import { userId } from '../config'
+import { getLocalCache } from './localCache'
+import { cacheDir, writeJson } from './utils'
 
-const userId = '240y_k'
 const KEYS = (process.env.TWEET_KEYS || '').split(',').filter(Boolean)
 
 const twitterPool = new RettiwtPool(KEYS)
@@ -41,7 +41,7 @@ if (!user?.id) {
   process.exit(1)
 }
 
-const rawTweets = await apiClient.fetchUserTimelineWithRepliesRaw(user.id, cursor)
+const rawTweets = await apiClient.fetchUserTimelineRaw(user.id, cursor)
 if (!rawTweets.tweets.length) {
   console.error('No tweets found')
   process.exit(1)

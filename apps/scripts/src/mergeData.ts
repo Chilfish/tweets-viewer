@@ -1,9 +1,8 @@
 import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
 import { readdir } from 'node:fs/promises'
 import path from 'node:path'
-import { cacheDir, readJson, writeJson } from '../src/utils'
-
-const userId = '240y_k'
+import { userId } from '../config'
+import { cacheDir, readJson, writeJson } from './utils'
 
 const dataPath = path.join(cacheDir, `data/${userId}`)
 

@@ -3,12 +3,11 @@ import { neon } from '@neondatabase/serverless'
 import { createTweets, createUser, schema } from '@tweets-viewer/database'
 import { drizzle } from 'drizzle-orm/neon-http'
 import { env } from '../../../env.server'
+import { userId } from '../config'
 import { readJson } from './utils'
 
 const client = neon(env.DATABASE_URL)
 const db = drizzle({ client, schema })
-
-const userId = '240y_k'
 
 const { data: user } = await readJson<{ data: EnrichedUser }>(`user-${userId}.json`)
 console.log(user)
