@@ -66,7 +66,7 @@ export function UserSelector() {
               <DropdownMenuItem
                 key={user.fullName}
                 className="flex items-center gap-3 p-2 cursor-pointer"
-                render={<NavLink to={`/${curPath}/${user.fullName}`} />}
+                render={<NavLink to={`/${curPath}/${user.userName}`} />}
               >
                 <Avatar className="size-8">
                   <AvatarImage src={user.profileImage} />

@@ -1,6 +1,5 @@
 import type { EnrichedUser } from '@tweets-viewer/rettiwt-api'
 import type { ClientLoaderFunctionArgs, ShouldRevalidateFunctionArgs } from 'react-router'
-import { useEffect } from 'react'
 import { Outlet, useLoaderData, useLocation, useMatches, useParams } from 'react-router'
 import { TopNav } from '~/components/top-nav'
 import { useIsMobile } from '~/hooks/use-mobile'
@@ -12,16 +11,19 @@ import { Sidebar } from './sidebar'
 
 export async function clientLoader({ params }: ClientLoaderFunctionArgs) {
   const { name } = params
-  const { users } = useUserStore.getState()
+  const { users, isInitialized, setUsers, setInitialized, setActiveUser } = useUserStore.getState()
 
-  // 仅在 store 为空时获取用户列表
+  // 仅在当前会话未初始化或 store 为空时获取用户列表
   let allUsers = users
-  if (allUsers.length === 0) {
+  if (!isInitialized || allUsers.length === 0) {
     const usersRes = await apiClient.get<EnrichedUser[]>(`/users/all`)
     allUsers = usersRes.data
+    setUsers(allUsers)
+    setInitialized(true)
   }
 
   const activeUser = allUsers.find(user => user.userName === name) || null
+  setActiveUser(activeUser)
 
   return {
     allUsers,
@@ -51,22 +53,11 @@ export default function Layout() {
   const isWide = matches.some((m: any) => m.handle?.isWide)
   const isHome = matches.some((m: any) => m.handle?.isHome)
 
-  const { setUsers, setActiveUser, users: storeUsers, activeUser: storeActiveUser } = useUserStore()
-  const { allUsers, activeUser } = useLoaderData<typeof clientLoader>()
+  const { activeUser: storeActiveUser } = useUserStore()
+  const { activeUser: loaderActiveUser } = useLoaderData<typeof clientLoader>()
 
-  // 同步初始化数据到 store
-  useEffect(() => {
-    if (storeUsers.length === 0 && allUsers.length > 0) {
-      setUsers(allUsers)
-    }
-  }, [allUsers, setUsers, storeUsers.length])
-
-  useEffect(() => {
-    setActiveUser(activeUser)
-  }, [activeUser, setActiveUser])
-
-  // 渲染时优先使用 store 中的数据
-  const displayActiveUser = storeActiveUser || activeUser
+  // 渲染时优先使用 store 中的最新数据，loader 数据作为降级
+  const displayActiveUser = storeActiveUser || loaderActiveUser
 
   const outletWrapper = (
     <div
