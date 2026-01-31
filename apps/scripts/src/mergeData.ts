@@ -7,7 +7,7 @@ import { cacheDir, readJson, writeJson } from './utils'
 const dataPath = path.join(cacheDir, `data/${userId}`)
 
 const jsons = await readdir(dataPath).then(files => files
-  .filter(file => file.endsWith('.json'))
+  .filter(file => file.endsWith('.json') && !file.startsWith('merged'))
   .map(file => path.join(dataPath, file)),
 )
 
@@ -21,4 +21,14 @@ const mergedData = await Promise.all(jsons.map(async (file) => {
   return data.tweets
 })).then(tweets => tweets.flat().filter(Boolean))
 
-await writeJson(mergedData, path.join(dataPath, 'merged.json'))
+const uniqueTweetIds = Array.from(new Set(mergedData.map(tweet => tweet.id)))
+
+const uniqueTweets = mergedData
+  .filter(tweet => uniqueTweetIds.includes(tweet.id))
+  .sort((a, b) => {
+    const dateA = new Date(a.created_at)
+    const dateB = new Date(b.created_at)
+    return dateB.getTime() - dateA.getTime()
+  })
+
+await writeJson(uniqueTweets, path.join(dataPath, 'merged.json'))

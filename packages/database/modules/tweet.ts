@@ -38,7 +38,8 @@ export async function createTweets({ db, tweets, user }: { db: DB, tweets: Enric
 }
 
 function _order(reverse: boolean) {
-  return reverse ? asc(tweetsTable.createdAt) : desc(tweetsTable.createdAt)
+  const sortKey = sql`CAST(COALESCE(${tweetsTable.jsonData}->>'retweeted_original_id', ${tweetsTable.tweetId}) AS BIGINT)`
+  return reverse ? asc(sortKey) : desc(sortKey)
 }
 
 /**

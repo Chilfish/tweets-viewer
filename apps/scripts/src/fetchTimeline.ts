@@ -15,7 +15,7 @@ const enrichmentService = new TweetEnrichmentService()
 const dataPath = path.join(cacheDir, `data/${userId}`)
 const rawPath = path.join(cacheDir, `raw/${userId}`)
 const cursorPath = path.join(dataPath, 'cursor.txt')
-const cursor = await readFile(cursorPath, 'utf8').catch(() => undefined)
+const cursor = await readFile(cursorPath, 'utf8').then(d => d.trim()).catch(() => undefined)
 
 if (!await stat(dataPath).then(() => true).catch(() => false)) {
   await mkdir(dataPath, { recursive: true })
@@ -41,7 +41,7 @@ if (!user?.id) {
   process.exit(1)
 }
 
-const rawTweets = await apiClient.fetchUserTimelineRaw(user.id, cursor)
+const rawTweets = await apiClient.fetchUserTimelineWithRepliesRaw(user.id, cursor)
 if (!rawTweets.tweets.length) {
   console.error('No tweets found')
   process.exit(1)
@@ -54,4 +54,7 @@ await writeJson({
   cursor: rawTweets.cursor,
 }, `data/${userId}/timeline-${user.userName}-${Date.now()}.json`)
 
-await writeFile(cursorPath, rawTweets.cursor, 'utf8')
+if (rawTweets.cursor) {
+  await writeFile(cursorPath, rawTweets.cursor, 'utf8')
+  console.log(`Cursor saved: ${rawTweets.cursor}`)
+}

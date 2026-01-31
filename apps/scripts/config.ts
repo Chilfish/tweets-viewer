@@ -1,1 +1,1 @@
-export const userId = 'rikako_ito216'
+export const userId = 'aoki__hina'
