@@ -216,6 +216,72 @@ export async function getTweetsCount(db: DB, name: string) {
     .where(eq(tweetsTable.userId, name))
 }
 
+/**
+ * 获取带媒体的推文列表（排除转推）
+ */
+export async function getMediaTweets({
+  db,
+  name,
+  page,
+  pageSize,
+  reverse,
+  total: providedTotal,
+}: GetTweet & { total?: number }): Promise<PaginatedResponse<EnrichedTweet>> {
+  const offset = (page - 1) * pageSize
+
+  const whereClause = and(
+    eq(tweetsTable.userId, name),
+    // 排除转推
+    sql`${tweetsTable.jsonData}->>'retweeted_original_id' IS NULL`,
+    // 必须包含媒体
+    sql`json_typeof(${tweetsTable.jsonData}->'media_details') = 'array'`,
+    sql`json_array_length(${tweetsTable.jsonData}->'media_details') > 0`,
+  )
+
+  let totalNum = providedTotal
+  if (totalNum === undefined) {
+    const [{ value }] = await db
+      .select({ value: count() })
+      .from(tweetsTable)
+      .where(whereClause)
+    totalNum = value
+  }
+
+  const rows = await db
+    .select()
+    .from(tweetsTable)
+    .where(whereClause)
+    .orderBy(_order(reverse))
+    .limit(pageSize)
+    .offset(offset)
+
+  const data = rows.map(mapToEnrichedTweet)
+
+  return {
+    data,
+    meta: {
+      total: totalNum,
+      page,
+      pageSize,
+      hasMore: offset + data.length < totalNum,
+    },
+  }
+}
+
+export async function getMediaTweetsCount(db: DB, name: string) {
+  return db
+    .select({
+      value: count(),
+    })
+    .from(tweetsTable)
+    .where(and(
+      eq(tweetsTable.userId, name),
+      sql`${tweetsTable.jsonData}->>'retweeted_original_id' IS NULL`,
+      sql`json_typeof(${tweetsTable.jsonData}->'media_details') = 'array'`,
+      sql`json_array_length(${tweetsTable.jsonData}->'media_details') > 0`,
+    ))
+}
+
 export async function getLatestTweets(db: DB) {
   const result = await db.execute(sql`
     SELECT u.screen_name, u.rest_id, t.created_at

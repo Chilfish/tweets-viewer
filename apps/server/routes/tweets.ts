@@ -4,6 +4,8 @@ import type { Context } from 'hono'
 import type { AppType } from '../common'
 import {
   getLastYearsTodayTweets,
+  getMediaTweets,
+  getMediaTweetsCount,
   getTweets,
   getTweetsByDateRange,
   getTweetsByKeyword,
@@ -18,6 +20,7 @@ const app = new Hono<AppType>()
 // 简单的 LRU 缓存，用于存储用户的推文总数
 // Key: userName (string), Value: totalCount (number)
 const tweetCountCache = new SimpleLRUCache<string, number>(1000)
+const mediaTweetCountCache = new SimpleLRUCache<string, number>(1000)
 
 /**
  * 提取通用分页参数
@@ -76,6 +79,33 @@ app.get('/get/:name', async (c) => {
       total,
     })
   }
+
+  return c.json(tweets)
+})
+
+app.get('/medias/:name', async (c) => {
+  const name = c.req.param('name')
+  const { page, pageSize, reverse } = getPaginationParams(c)
+
+  const { db } = getContext<AppType>().var
+
+  // 尝试从缓存获取媒体推文总数
+  let total = mediaTweetCountCache.get(name)
+
+  if (total === undefined) {
+    const [{ value }] = await getMediaTweetsCount(db, name)
+    total = value
+    mediaTweetCountCache.set(name, total)
+  }
+
+  const tweets = await getMediaTweets({
+    db,
+    name,
+    page,
+    pageSize,
+    reverse,
+    total,
+  })
 
   return c.json(tweets)
 })

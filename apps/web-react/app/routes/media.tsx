@@ -38,7 +38,7 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
   const end = url.searchParams.get('end') || undefined
 
   try {
-    const { data: firstPage } = await apiClient.get<PaginatedResponse<EnrichedTweet>>(`/tweets/get/${name}`, {
+    const { data: firstPage } = await apiClient.get<PaginatedResponse<EnrichedTweet>>(`/tweets/medias/${name}`, {
       params: { page: 1, reverse, pageSize: PAGE_SIZE, start, end },
     })
     return { firstPage }
@@ -71,7 +71,7 @@ export default function MediaPage({ loaderData, params }: Route.ComponentProps) 
   const fetchNextPage = useCallback(async (pageNum: number, isReset = false) => {
     setStatus('fetching')
     try {
-      const { data: response } = await apiClient.get<PaginatedResponse<EnrichedTweet>>(`/tweets/get/${params.name}`, {
+      const { data: response } = await apiClient.get<PaginatedResponse<EnrichedTweet>>(`/tweets/medias/${params.name}`, {
         params: { page: pageNum, reverse, pageSize: PAGE_SIZE, start, end },
       })
 

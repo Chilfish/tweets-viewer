@@ -24,7 +24,7 @@ app
   //   keyGenerator: c => c.req.header('cf-connecting-ip') ?? c.req.header('x-forwarded-for') ?? 'unknown',
   // }))
   .use(async (c, next) => {
-    const sql = neon(c.env.DATABASE_URL)
+    const sql = neon(process.env.DATABASE_URL || c.env.DATABASE_URL)
     const db = drizzle({ client: sql, schema })
     c.set('db', db)
     return next()
