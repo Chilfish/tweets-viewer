@@ -114,7 +114,11 @@ export default function LastYearsTodayPage({ loaderData, params }: Route.Compone
       <>
         <div className="flex flex-col gap-3">
           {tweets.map(tweet => (
-            <MyTweet tweet={tweet} key={tweet.id} />
+            <MyTweet
+              tweet={tweet}
+              tweetAuthorName={user!.fullName}
+              key={tweet.id}
+            />
           ))}
         </div>
 

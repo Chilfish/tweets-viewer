@@ -5,12 +5,14 @@ import { TweetNode } from './TweetNode'
 
 interface MyTweetProps {
   tweet: EnrichedTweet
+  tweetAuthorName: string
   containerClassName?: string
   hideMedia?: boolean // 新增：用于媒体预览模态框中隐藏媒体部分
 }
 
 export const MyTweet = memo(({
   tweet,
+  tweetAuthorName,
   containerClassName,
   hideMedia = false,
 }: MyTweetProps) => {
@@ -26,6 +28,7 @@ export const MyTweet = memo(({
         containerClassName,
       )}
       hideMedia={hideMedia}
+      tweetAuthorName={tweetAuthorName}
     />
   )
 })

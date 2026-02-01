@@ -21,6 +21,7 @@ interface TweetNodeProps {
   id: string
   tweet: EnrichedTweet
   variant: TweetVariant
+  tweetAuthorName: string
   hasParent?: boolean
   className?: string
   hideMedia?: boolean
@@ -45,6 +46,7 @@ export const TweetNode = forwardRef<HTMLDivElement, TweetNodeProps>(({
   tweet,
   variant,
   className,
+  tweetAuthorName,
   hideMedia = false,
 }, ref) => {
   const isQuoted = variant === 'quoted'
@@ -74,6 +76,9 @@ export const TweetNode = forwardRef<HTMLDivElement, TweetNodeProps>(({
             rel="noopener noreferrer"
           >
             <Repeat2Icon className="size-4 mr-1" />
+            @
+            {tweetAuthorName}
+            {' '}
             转推于
             {' '}
             {formatDate(pubTime(retweetedId))}
@@ -102,6 +107,7 @@ export const TweetNode = forwardRef<HTMLDivElement, TweetNodeProps>(({
             variant="quoted"
             hasParent={false}
             id={tweet.quoted_tweet.id}
+            tweetAuthorName={tweetAuthorName}
           />
         )}
 

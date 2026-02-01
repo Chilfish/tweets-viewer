@@ -128,7 +128,11 @@ export default function SearchPage({ loaderData, params }: Route.ComponentProps)
       <>
         <div className="flex flex-col gap-3">
           {tweets.map(tweet => (
-            <MyTweet tweet={tweet} key={tweet.id} />
+            <MyTweet
+              tweet={tweet}
+              tweetAuthorName={user!.fullName}
+              key={tweet.id}
+            />
           ))}
         </div>
 

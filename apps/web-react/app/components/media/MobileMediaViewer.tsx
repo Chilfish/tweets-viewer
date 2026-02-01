@@ -1,13 +1,11 @@
 import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
 import type { FlatMediaItem } from '~/lib/media'
-import { ChevronLeft, ChevronRight, XIcon } from 'lucide-react'
-import { MyTweet } from '~/components/tweet/Tweet'
-import { Button } from '~/components/ui/button'
-import { ScrollArea } from '~/components/ui/scroll-area'
+import { useCallback, useEffect, useState } from 'react'
 import { Sheet, SheetContent } from '~/components/ui/sheet'
-import { cn } from '~/lib/utils'
 import { getMp4Video } from '../react-tweet/utils'
 import { MediaImage, MediaVideo } from '../ui/media'
+import { MediaViewerOverlay } from './MediaViewerOverlay'
+import { TweetDetailDrawer } from './TweetDetailDrawer'
 
 interface MobileMediaViewerProps {
   open: boolean
@@ -28,6 +26,21 @@ export function MobileMediaViewer({
   currentMediaIndexInTweet,
   onNavigateMedia,
 }: MobileMediaViewerProps) {
+  const [showTweetDetails, setShowTweetDetails] = useState(false)
+  const [showControls, setShowControls] = useState(true)
+
+  const toggleControls = useCallback(() => {
+    setShowControls(prev => !prev)
+  }, [])
+
+  useEffect(() => {
+    if (open) {
+      setShowControls(true)
+      const timer = setTimeout(() => setShowControls(false), 3500)
+      return () => clearTimeout(timer)
+    }
+  }, [open, currentMediaIndexInTweet])
+
   if (!open)
     return null
 
@@ -36,17 +49,24 @@ export function MobileMediaViewer({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="p-0 gap-0 border-none bg-black" showCloseButton={false}>
-        {/* 顶部大图区域 */}
-        <div className="max-h-[55vh] min-h-[40vh] bg-black flex items-center justify-center relative">
+      <SheetContent
+        side="bottom"
+        className="p-0 gap-0 border-none bg-black h-dvh outline-none overflow-hidden"
+        showCloseButton={false}
+      >
+        <div
+          className="h-full w-full bg-black flex items-center justify-center relative touch-none select-none"
+          onClick={toggleControls}
+        >
           {isVideo && mp4Video ? (
             <MediaVideo
               key={mp4Video.url}
-              className="max-w-full max-h-full object-contain"
-              controls
+              className="max-w-full max-h-full object-contain pointer-events-auto"
+              controls={showControls}
               autoPlay
               playsInline
               loop={currentItem.type === 'animated_gif'}
+              onClick={e => e.stopPropagation()}
             >
               <source src={`https://proxy.chilfish.top/${mp4Video.url}`} type={mp4Video.content_type} />
             </MediaVideo>
@@ -54,69 +74,27 @@ export function MobileMediaViewer({
             <MediaImage
               src={currentItem?.url}
               alt="preview"
-              className="max-w-full max-h-full object-contain"
+              className="max-w-full max-h-full object-contain pointer-events-none"
+              draggable={false}
             />
           )}
-          {/* 关闭按钮 */}
-          <Button
-            size="icon"
-            variant="ghost"
-            className="absolute top-2 right-2 text-white bg-black/50 backdrop-blur-sm hover:bg-black/70 rounded-full"
-            onClick={() => onOpenChange(false)}
-            aria-label="Close preview"
-          >
-            <XIcon className="size-5" />
-          </Button>
-
-          {/* 媒体切换按钮 */}
-          {tweetMediaItems.length > 1 && (
-            <>
-              {currentMediaIndexInTweet > 0 && (
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="absolute left-2 top-1/2 -translate-y-1/2 size-10 rounded-full bg-black/50 backdrop-blur-sm text-white"
-                  onClick={() => onNavigateMedia('prev')}
-                  aria-label="Previous image"
-                >
-                  <ChevronLeft className="size-5" />
-                </Button>
-              )}
-
-              {currentMediaIndexInTweet < tweetMediaItems.length - 1 && (
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 size-10 rounded-full bg-black/50 backdrop-blur-sm text-white"
-                  onClick={() => onNavigateMedia('next')}
-                  aria-label="Next image"
-                >
-                  <ChevronRight className="size-5" />
-                </Button>
-              )}
-
-              {/* 指示器 */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 bg-black/60 backdrop-blur-md px-3 py-2 rounded-full">
-                {tweetMediaItems.map((_, idx) => (
-                  <div
-                    key={idx}
-                    className={cn(
-                      'h-1.5 rounded-full transition-all',
-                      idx === currentMediaIndexInTweet ? 'bg-white w-5' : 'bg-white/40 w-1.5',
-                    )}
-                  />
-                ))}
-              </div>
-            </>
-          )}
         </div>
 
-        {/* 底部推文详情 */}
-        <div className="overflow-y-auto bg-background border-t border-border">
-          <ScrollArea className="h-full pt-4">
-            {currentTweet && <MyTweet tweet={currentTweet} hideMedia />}
-          </ScrollArea>
-        </div>
+        <MediaViewerOverlay
+          show={showControls}
+          onClose={() => onOpenChange(false)}
+          onShowDetails={() => setShowTweetDetails(true)}
+          hasMultipleMedia={tweetMediaItems.length > 1}
+          currentIndex={currentMediaIndexInTweet}
+          totalMedia={tweetMediaItems.length}
+          onNavigate={onNavigateMedia}
+        />
+
+        <TweetDetailDrawer
+          open={showTweetDetails}
+          onOpenChange={setShowTweetDetails}
+          currentTweet={currentTweet}
+        />
       </SheetContent>
     </Sheet>
   )

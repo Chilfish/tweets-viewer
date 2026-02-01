@@ -122,7 +122,11 @@ export default function TweetsPage({ loaderData, params }: Route.ComponentProps)
       <div className="w-full max-w-3xl flex flex-col gap-4 mb-16">
         <div className="flex flex-col gap-3">
           {tweets.map(tweet => (
-            <MyTweet tweet={tweet} key={tweet.id} />
+            <MyTweet
+              tweet={tweet}
+              tweetAuthorName={user!.fullName}
+              key={tweet.id}
+            />
           ))}
         </div>
 
