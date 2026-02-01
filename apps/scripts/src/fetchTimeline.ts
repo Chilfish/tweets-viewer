@@ -38,13 +38,13 @@ const user = await getLocalCache({
 
 if (!user?.id) {
   console.error('User not found')
-  process.exit(1)
+  process.exit(104)
 }
 
 const rawTweets = await apiClient.fetchUserTimelineWithRepliesRaw(user.id, cursor)
 if (!rawTweets.tweets.length) {
   console.error('No tweets found')
-  process.exit(1)
+  process.exit(104)
 }
 
 const enrichedTweets = enrichmentService.enrichUserTimelineTweets(rawTweets.tweets, user.id)
