@@ -1,8 +1,10 @@
 import type { RettiwtPool } from '../../helper/RettiwtPool'
+import type { ITweetFilter } from '../../types/args/FetchArgs'
 import type { EnrichedUser, RawTweet } from '../../types/enriched'
 import type { IListTweetsResponse } from '../../types/raw/list/Tweets'
 import type { ITweetDetailsResponse } from '../../types/raw/tweet/Details'
 import type { ITweetRepliesResponse } from '../../types/raw/tweet/Replies'
+import type { ITweetSearchResponse, SearchInstruction } from '../../types/raw/tweet/Search'
 import type { IUserDetailsResponse } from '../../types/raw/user/Details'
 import type { IUserTweetsResponse } from '../../types/raw/user/Tweets'
 import { Extractors } from '../../collections/Extractors'
@@ -11,7 +13,7 @@ import { ResourceType } from '../../enums/Resource'
 import { TweetRepliesSortType } from '../../enums/Tweet'
 import { CursoredData } from '../../models/data/CursoredData'
 
-interface CursoredTweets {
+export interface CursoredTweets {
   tweets: RawTweet[]
   cursor: string
 }
@@ -156,6 +158,42 @@ export class TwitterAPIClient {
   }
 
   /**
+   * 搜索推文
+   */
+  public async searchTweetsRaw(filter: ITweetFilter, cursor?: string, count?: number): Promise<CursoredTweets> {
+    return this.pool.run(async (fetcher) => {
+      const resource = ResourceType.TWEET_SEARCH
+
+      // Fetching raw list of filtered tweets
+      const response = await fetcher.request<ITweetSearchResponse>(resource, {
+        filter,
+        count,
+        cursor,
+      })
+
+      const cursoredData = new CursoredData(response, BaseType.TWEET)
+      await this.onFetchedresponse(`${resource}-${filter.fromUsers?.[0]}`, {
+        response,
+        cursor: cursoredData.next,
+      })
+
+      const instructions = response.data
+        .search_by_raw_query
+        .search_timeline
+        .timeline
+        .instructions
+        .filter(t => t.type === 'TimelineAddEntries')
+
+      const tweets = this.extractSearchTweets(instructions)
+
+      return {
+        tweets,
+        cursor: cursoredData.next,
+      }
+    })
+  }
+
+  /**
    * 从时间线响应中提取推文列表
    * @private
    */
@@ -193,6 +231,7 @@ export class TwitterAPIClient {
    * 提取主推文
    * @private
    */
+
   private extractMainTweet(instructions: any[]): RawTweet {
     const mainTweet = instructions
       .flatMap(d => d.entries?.filter((e: any) => e.content.entryType === 'TimelineTimelineItem') || [])
@@ -214,5 +253,16 @@ export class TwitterAPIClient {
         (entry.content.items || []).map((d: any) => d.item.itemContent.tweet_results.result),
       )
       .filter((result: any): result is RawTweet => result !== null && result !== undefined)
+  }
+
+  /**
+   * 提取搜索结果的推文
+   * @private
+   */
+  private extractSearchTweets(instructions: SearchInstruction[]): RawTweet[] {
+    return instructions
+      .flatMap(t => t.entries?.filter(d => d.content.entryType === 'TimelineTimelineItem') || [])
+      .flatMap(entry => entry.content.itemContent?.tweet_results.result)
+      .filter(result => !!result) as unknown as RawTweet[]
   }
 }

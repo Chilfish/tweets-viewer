@@ -1,10 +1,8 @@
 import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
 import { readdir } from 'node:fs/promises'
 import path from 'node:path'
-import { userId } from '../config'
-import { cacheDir, readJson, writeJson } from './utils'
-
-const dataPath = path.join(cacheDir, `data/${userId}`)
+import { dataPath } from './common'
+import { readJson, writeJson } from './utils'
 
 const jsons = await readdir(dataPath).then(files => files
   .filter(file => file.endsWith('.json') && !file.startsWith('merged'))
