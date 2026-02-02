@@ -1,210 +1,167 @@
-import type { SortOrder } from '~/stores'
-import { Search, X } from 'lucide-react'
+import type { EnrichedTweet, EnrichedUser } from '@tweets-viewer/rettiwt-api'
+import type { PaginatedResponse } from '@tweets-viewer/shared'
+import type { Route } from './+types/search'
+import { PAGE_SIZE } from '@tweets-viewer/shared'
 import { useEffect, useRef } from 'react'
-import { useSearchParams } from 'react-router'
-import { TweetsList } from '~/components/tweets/tweets-list'
-import { Button } from '~/components/ui/button'
-import { Input } from '~/components/ui/input'
-import { useSearchStore } from '~/stores'
-import { useUserStore } from '~/stores/user-store'
+import { useRouteLoaderData, useSearchParams } from 'react-router'
+import { SearchInput } from '~/components/search-input'
+import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
+import { MyTweet } from '~/components/tweet/Tweet'
+import { TweetFeedStatus } from '~/components/tweet/TweetFeedStatus'
+import { apiClient } from '~/lib/utils'
+import { useTweetStore } from '~/store/use-tweet-store'
 
-export function meta() {
+export function meta({ location }: Route.MetaArgs) {
+  const params = new URLSearchParams(location.search)
+  const q = params.get('q')
   return [
-    { title: 'Search Tweets' },
-    { name: 'description', content: 'Search through tweets' },
+    { title: q ? `Search: ${q}` : 'Search Tweets' },
+    { name: 'description', content: 'Search tweets' },
   ]
 }
 
-export default function SearchPage() {
-  const { curUser } = useUserStore()
-  const {
-    data,
-    searchTweets,
-    clearSearch,
-    setKeyword,
-    keyword,
-    isLoading: isSearching,
-    setCurrentUser,
-    hasMore,
-    error,
-    loadMore,
-    setSortOrder,
-    setDateRange,
-    filters,
-    clearData,
-    page,
-    setPage,
-    currentUser: storeUser,
-  } = useSearchStore()
+export async function clientLoader({ params, request }: Route.ClientLoaderArgs) {
+  const url = new URL(request.url)
+  const q = url.searchParams.get('q') || ''
+  const page = Number(url.searchParams.get('page')) || 1
+  const username = params.name
 
-  const [searchParams, setSearchParams] = useSearchParams()
-  const isInitialized = useRef(false)
+  let paginatedTweets: PaginatedResponse<EnrichedTweet> = {
+    data: [],
+    meta: {
+      total: 0,
+      page: 1,
+      pageSize: PAGE_SIZE,
+      hasMore: false,
+    },
+  }
 
-  useEffect(() => {
-    if (!curUser)
-      return
-
-    const userChanged = storeUser !== curUser.screenName
-    if (userChanged) {
-      clearData()
-      setCurrentUser(curUser.screenName)
-      isInitialized.current = false
-    }
-
-    if (!isInitialized.current) {
-      const q = searchParams.get('q') || ''
-      const pageParam = Number.parseInt(searchParams.get('page') || '1', 10) - 1
-      const sortParam = (searchParams.get('sort') as SortOrder) || 'desc'
-      const startDateParam = searchParams.get('startDate')
-      const endDateParam = searchParams.get('endDate')
-
-      setKeyword(q)
-      setPage(pageParam)
-      setSortOrder(sortParam)
-      setDateRange({
-        startDate: startDateParam ? new Date(startDateParam) : null,
-        endDate: endDateParam ? new Date(endDateParam) : null,
+  if (q) {
+    try {
+      const tweetsRes = await apiClient.get<PaginatedResponse<EnrichedTweet>>(`/tweets/search`, {
+        params: { q, name: username, page, pageSize: PAGE_SIZE },
       })
-
-      if (q) {
-        searchTweets(true)
-      }
-      isInitialized.current = true
+      paginatedTweets = tweetsRes.data
     }
-  }, [
-    curUser,
-    storeUser,
-    searchParams,
-    clearData,
-    setCurrentUser,
-    setKeyword,
-    setPage,
-    setSortOrder,
-    setDateRange,
-    searchTweets,
-  ])
+    catch (e) { /* ignore */ }
+  }
+
+  return { paginatedTweets, q }
+}
+
+export default function SearchPage({ loaderData, params }: Route.ComponentProps) {
+  const { paginatedTweets, q: serverQ } = loaderData
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const q = searchParams.get('q') || ''
+  const page = Number(searchParams.get('page')) || 1
+  const username = params.name
+
+  const { tweets, status, setStatus, appendTweets, resetStream } = useTweetStore()
+  const layoutData = useRouteLoaderData('rootLayout') as { activeUser: EnrichedUser | null }
+  const user = layoutData?.activeUser
+
+  const prevFilterKey = useRef<string>('')
+  const filterKey = `${q}-${username}`
 
   useEffect(() => {
-    if (!isInitialized.current)
+    let shouldReset = false
+    if (prevFilterKey.current !== filterKey) {
+      shouldReset = true
+      prevFilterKey.current = filterKey
+    }
+
+    if (shouldReset || page === 1) {
+      resetStream()
+    }
+
+    if (paginatedTweets.data.length > 0) {
+      appendTweets(paginatedTweets.data)
+    }
+
+    if (!q) {
+      setStatus('ready')
+    }
+    else {
+      if (!paginatedTweets.meta.hasMore) {
+        setStatus('exhausted')
+      }
+      else {
+        setStatus('ready')
+      }
+    }
+  }, [paginatedTweets, filterKey, page, resetStream, appendTweets, setStatus, q])
+
+  const handleLoadMore = () => {
+    if (status === 'fetching' || status === 'exhausted' || status === 'error')
       return
 
-    const params = new URLSearchParams()
-    if (keyword) {
-      params.set('q', keyword)
-    }
-    if (page > 0) {
-      params.set('page', String(page + 1))
-    }
-    if (filters.sortOrder !== 'desc') {
-      params.set('sort', filters.sortOrder)
-    }
-    if (filters.dateRange.startDate) {
-      params.set(
-        'startDate',
-        filters.dateRange.startDate.toISOString().split('T')[0],
-      )
-    }
-    if (filters.dateRange.endDate) {
-      params.set(
-        'endDate',
-        filters.dateRange.endDate.toISOString().split('T')[0],
+    setSearchParams((prev) => {
+      const currentP = Number(prev.get('page')) || 1
+      prev.set('page', (currentP + 1).toString())
+      return prev
+    }, { replace: true })
+  }
+
+  const renderContent = () => {
+    if (!q) {
+      return (
+        <div className="flex flex-col items-center justify-center py-20 text-muted-foreground gap-2">
+          <div className="text-lg">Enter keywords to search</div>
+        </div>
       )
     }
 
-    setSearchParams(params, { replace: true })
-  }, [keyword, page, filters, setSearchParams])
+    if (tweets.length === 0 && status !== 'fetching' && status !== 'error') {
+      return (
+        <div className="flex flex-col items-center justify-center py-20 text-muted-foreground gap-2">
+          <div className="text-lg">No tweets found</div>
+          <div className="text-sm">
+            Try different keywords
+            {username ? ' or clear user filter' : ''}
+          </div>
+        </div>
+      )
+    }
 
-  if (!curUser)
-    return null
-
-  return (
-    <div className="min-h-screen bg-background text-foreground transition-colors duration-200">
-      <div className="max-w-2xl mx-auto">
-        {/* Search Header */}
-        <div className="sticky top-0 z-10 bg-background/60 backdrop-blur-lg border-b border-border transition-colors duration-200">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault()
-              searchTweets(true)
-            }}
-            className="p-4 flex items-center gap-2"
-          >
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                name="search"
-                type="text"
-                placeholder="搜索推文..."
-                value={keyword}
-                onChange={e => setKeyword(e.target.value)}
-                className="pl-10 pr-10 bg-input border-border text-foreground placeholder:text-muted-foreground transition-colors duration-200"
-              />
-              {keyword && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={clearSearch}
-                  type="reset"
-                  className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
-                >
-                  <X className="h-3 w-3" />
-                </Button>
-              )}
-            </div>
-            <Button
-              type="submit"
-              disabled={!keyword.trim() || isSearching}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground transition-colors duration-200"
-            >
-              {isSearching ? '搜索中...' : '搜索'}
-            </Button>
-          </form>
+    return (
+      <>
+        <div className="flex flex-col gap-3">
+          {tweets.map(tweet => (
+            <MyTweet
+              tweet={tweet}
+              tweetAuthorName={user!.fullName}
+              key={tweet.id}
+            />
+          ))}
         </div>
 
-        {/* Search Results */}
-        {!keyword?.trim() ? (
-          <div className="text-center py-12">
-            <Search className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-            <h2 className="text-xl font-semibold mb-2 text-muted-foreground">
-              搜索推文
-            </h2>
-          </div>
-        ) : isSearching && data.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Searching...</p>
-          </div>
-        ) : !isSearching && data.length === 0 ? (
-          <div className="text-center py-12">
-            <Search className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-            <h2 className="text-xl font-semibold mb-2 text-muted-foreground">
-              找不到结果
-            </h2>
-            <p className="text-muted-foreground">
-              请尝试不同的关键词或检查拼写
-            </p>
-          </div>
-        ) : null}
-        {data.length > 0 && (
-          <TweetsList
-            user={curUser}
-            tweets={data}
-            showDateFilter={false}
-            showSortControls={false}
-            paginationActions={{
-              isLoading: isSearching,
-              hasMore,
-              error,
-              loadMore,
-            }}
-            sortControlsActions={{
-              setSortOrder,
-              setDateRange,
-              filters,
-            }}
-          />
-        )}
+        <TweetFeedStatus
+          status={status}
+          hasTweets={tweets.length > 0}
+          onRetry={() => window.location.reload()}
+        />
+
+        <InfiniteScrollTrigger
+          onIntersect={handleLoadMore}
+          disabled={status === 'fetching' || status === 'exhausted' || status === 'error'}
+        />
+      </>
+    )
+  }
+
+  return (
+    <>
+      <SearchInput
+        user={user ?? undefined}
+        defaultValue={q}
+        placeholder={username ? `Search tweets by ${username}...` : 'Search tweets...'}
+        className="px-4 w-full mx-auto"
+      />
+
+      <div className="w-full max-w-3xl flex flex-col gap-4 mt-4 mb-16">
+        {renderContent()}
       </div>
-    </div>
+    </>
   )
 }

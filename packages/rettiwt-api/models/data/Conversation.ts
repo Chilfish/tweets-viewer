@@ -13,10 +13,7 @@ import { DirectMessage } from './DirectMessage'
  * Type guard to check if the response is an IConversationTimelineResponse
  */
 function isConversationTimelineResponse(
-  response:
-    | IConversationTimelineResponse
-    | IInboxInitialResponse
-    | IInboxTimelineResponse,
+  response: IConversationTimelineResponse | IInboxInitialResponse | IInboxTimelineResponse,
 ): response is IConversationTimelineResponse {
   return 'conversation_timeline' in response
 }
@@ -25,10 +22,7 @@ function isConversationTimelineResponse(
  * Type guard to check if the response is an IInboxInitialResponse
  */
 function isInboxInitialResponse(
-  response:
-    | IConversationTimelineResponse
-    | IInboxInitialResponse
-    | IInboxTimelineResponse,
+  response: IConversationTimelineResponse | IInboxInitialResponse | IInboxTimelineResponse,
 ): response is IInboxInitialResponse {
   return 'inbox_initial_state' in response
 }
@@ -37,10 +31,7 @@ function isInboxInitialResponse(
  * Type guard to check if the response is an IInboxTimelineResponse
  */
 function isInboxTimelineResponse(
-  response:
-    | IConversationTimelineResponse
-    | IInboxInitialResponse
-    | IInboxTimelineResponse,
+  response: IConversationTimelineResponse | IInboxInitialResponse | IInboxTimelineResponse,
 ): response is IInboxTimelineResponse {
   return 'inbox_timeline' in response
 }
@@ -48,9 +39,7 @@ function isInboxTimelineResponse(
 /**
  * Extract typed conversation data from raw conversations object
  */
-function extractConversationData(
-  rawConversations: RawConversations,
-): Array<[string, RawConversation]> {
+function extractConversationData(rawConversations: RawConversations): Array<[string, RawConversation]> {
   return Object.entries(rawConversations)
 }
 
@@ -85,23 +74,17 @@ export class Conversation implements IConversation {
 
     const conv = conversation as Record<string, unknown>
 
-    this.id =
-      conv.conversation_id && typeof conv.conversation_id === 'string'
-        ? conv.conversation_id
-        : ''
+    this.id = conv.conversation_id && typeof conv.conversation_id === 'string' ? conv.conversation_id : ''
     this.type = this._parseConversationType(conv.type)
     this.participants = this._parseParticipants(conv.participants)
-    this.name =
-      conv.name && typeof conv.name === 'string' ? conv.name : undefined
+    this.name = conv.name && typeof conv.name === 'string' ? conv.name : undefined
     this.avatarUrl = this._parseAvatarUrl(conv)
     this.trusted = Boolean(conv.trusted)
     this.muted = Boolean(conv.muted)
     this.notificationsDisabled = Boolean(conv.notifications_disabled)
     this.lastActivityAt = this._parseTimestamp(conv.sort_timestamp)
-    this.lastMessageId =
-      conv.sort_event_id && typeof conv.sort_event_id === 'string'
-        ? conv.sort_event_id
-        : undefined
+    this.lastMessageId
+      = conv.sort_event_id && typeof conv.sort_event_id === 'string' ? conv.sort_event_id : undefined
     this.hasMore = conv.status === 'HAS_MORE'
     this.messages = messages
   }
@@ -116,19 +99,14 @@ export class Conversation implements IConversation {
    */
   private _parseAvatarUrl(conv: Record<string, unknown>): string | undefined {
     // Try avatar_image_https first
-    if (
-      conv.avatar_image_https &&
-      typeof conv.avatar_image_https === 'string'
-    ) {
+    if (conv.avatar_image_https && typeof conv.avatar_image_https === 'string') {
       return conv.avatar_image_https
     }
 
     // Try nested avatar.image.original_info.url
     const avatar = conv.avatar as Record<string, unknown> | undefined
     const image = avatar?.image as Record<string, unknown> | undefined
-    const originalInfo = image?.original_info as
-      | Record<string, unknown>
-      | undefined
+    const originalInfo = image?.original_info as Record<string, unknown> | undefined
 
     if (originalInfo?.url && typeof originalInfo.url === 'string') {
       return originalInfo.url
@@ -172,10 +150,7 @@ export class Conversation implements IConversation {
    * Parse timestamp with proper fallback
    */
   private _parseTimestamp(timestamp: unknown): string {
-    if (
-      timestamp &&
-      (typeof timestamp === 'string' || typeof timestamp === 'number')
-    ) {
+    if (timestamp && (typeof timestamp === 'string' || typeof timestamp === 'number')) {
       const date = new Date(Number(timestamp))
       if (!isNaN(date.getTime())) {
         return date.toISOString()
@@ -191,9 +166,7 @@ export class Conversation implements IConversation {
    *
    * @returns The deserialized conversation with full message history.
    */
-  public static fromConversationTimeline(
-    response: IConversationTimelineResponse,
-  ): Conversation | undefined {
+  public static fromConversationTimeline(response: IConversationTimelineResponse): Conversation | undefined {
     if (!response.conversation_timeline?.conversations) {
       return undefined
     }
@@ -228,9 +201,7 @@ export class Conversation implements IConversation {
    *
    * @returns The deserialized list of conversations with their preview messages.
    */
-  public static listFromInboxInitial(
-    response: IInboxInitialResponse,
-  ): Conversation[] {
+  public static listFromInboxInitial(response: IInboxInitialResponse): Conversation[] {
     const conversations: Conversation[] = []
 
     if (!response.inbox_initial_state?.conversations) {
@@ -258,8 +229,7 @@ export class Conversation implements IConversation {
     // Create conversations with their messages
     const conversationEntries = extractConversationData(rawConversations)
     for (const [, conversation] of conversationEntries) {
-      const convId = (conversation as unknown as Record<string, unknown>)
-        .conversation_id as string
+      const convId = (conversation as unknown as Record<string, unknown>).conversation_id as string
       const messages = messagesByConversation.get(convId) ?? []
       conversations.push(new Conversation(conversation, messages))
     }
@@ -274,9 +244,7 @@ export class Conversation implements IConversation {
    *
    * @returns The deserialized list of conversations with their messages.
    */
-  public static listFromInboxTimeline(
-    response: IInboxTimelineResponse,
-  ): Conversation[] {
+  public static listFromInboxTimeline(response: IInboxTimelineResponse): Conversation[] {
     const conversations: Conversation[] = []
 
     if (!response.inbox_timeline?.conversations) {
@@ -304,8 +272,7 @@ export class Conversation implements IConversation {
     // Create conversations with their messages
     const conversationEntries = extractConversationData(rawConversations)
     for (const [, conversation] of conversationEntries) {
-      const convId = (conversation as unknown as Record<string, unknown>)
-        .conversation_id as string
+      const convId = (conversation as unknown as Record<string, unknown>).conversation_id as string
       const messages = messagesByConversation.get(convId) ?? []
       conversations.push(new Conversation(conversation, messages))
     }
@@ -317,17 +284,16 @@ export class Conversation implements IConversation {
    * Generic method to extract conversations from any supported response type
    */
   public static listFromResponse(
-    response:
-      | IConversationTimelineResponse
-      | IInboxInitialResponse
-      | IInboxTimelineResponse,
+    response: IConversationTimelineResponse | IInboxInitialResponse | IInboxTimelineResponse,
   ): Conversation[] {
     if (isConversationTimelineResponse(response)) {
       const conversation = Conversation.fromConversationTimeline(response)
       return conversation ? [conversation] : []
-    } else if (isInboxInitialResponse(response)) {
+    }
+    else if (isInboxInitialResponse(response)) {
       return Conversation.listFromInboxInitial(response)
-    } else if (isInboxTimelineResponse(response)) {
+    }
+    else if (isInboxTimelineResponse(response)) {
       return Conversation.listFromInboxTimeline(response)
     }
     return []
@@ -340,7 +306,7 @@ export class Conversation implements IConversation {
     if (!this.isOneToOne() || this.participants.length !== 2) {
       return undefined
     }
-    return this.participants.find((id) => id !== currentUserId)
+    return this.participants.find(id => id !== currentUserId)
   }
 
   /**
@@ -367,7 +333,7 @@ export class Conversation implements IConversation {
       id: this.id,
       lastActivityAt: this.lastActivityAt,
       lastMessageId: this.lastMessageId,
-      messages: this.messages.map((msg) => msg.toJSON()),
+      messages: this.messages.map(msg => msg.toJSON()),
       muted: this.muted,
       name: this.name,
       notificationsDisabled: this.notificationsDisabled,

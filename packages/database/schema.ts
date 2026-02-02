@@ -1,7 +1,5 @@
-import type { QuotedTweet, ReTweet, TweetMedia } from '@tweets-viewer/shared'
+import type { EnrichedTweet, EnrichedUser } from '@tweets-viewer/rettiwt-api'
 import {
-  index,
-  integer,
   json,
   pgTable,
   serial,
@@ -11,51 +9,24 @@ import {
 
 export const usersTable = pgTable('users', {
   id: serial('id').primaryKey(),
-  restId: text('rest_id').notNull().default(''),
-  name: text('name').notNull(),
-  screenName: text('screen_name').notNull().unique(),
-  avatarUrl: text('avatar_url').notNull(),
-  profileBannerUrl: text('profile_banner_url').notNull(),
-  followersCount: integer('followers_count').notNull(),
-  followingCount: integer('following_count').notNull(),
-  bio: text('bio').notNull(),
-  createdAt: timestamp('created_at').notNull(),
-  location: text('location'),
-  website: text('website'),
-  birthday: timestamp('birthday'),
-  tweetStart: timestamp('tweet_start').notNull().defaultNow(),
-  tweetEnd: timestamp('tweet_end').notNull().defaultNow(),
+  restId: text('restId').notNull(),
+  userName: text('userName').notNull().unique(),
+  jsonData: json('jsonData').$type<EnrichedUser>().notNull(),
 })
 
 export const tweetsTable = pgTable(
   'tweets',
   {
     id: serial('id').primaryKey(),
-    tweetId: text('tweet_id').notNull().unique(),
-    userId: text('user_name')
+    tweetId: text('tweetId').notNull().unique(),
+    userId: text('userName')
       .notNull()
-      .references(() => usersTable.screenName, { onDelete: 'cascade' }),
+      .references(() => usersTable.userName, { onDelete: 'cascade' }),
 
-    createdAt: timestamp('created_at').notNull(),
-    fullText: text('full_text').notNull(),
-
-    media: json('media').notNull().default([]).$type<TweetMedia[]>(),
-
-    // Tweet metrics
-    retweetCount: integer('retweet_count').notNull().default(0),
-    quoteCount: integer('quote_count').notNull().default(0),
-    replyCount: integer('reply_count').notNull().default(0),
-    favoriteCount: integer('favorite_count').notNull().default(0),
-    viewsCount: integer('views_count').notNull().default(0),
-
-    retweetedStatus: json('retweeted_status').$type<ReTweet>(),
-    quotedStatus: json('quoted_status').$type<QuotedTweet>(),
+    fullText: text('fullText').notNull(),
+    createdAt: timestamp('createdAt').notNull(),
+    jsonData: json('jsonData').$type<EnrichedTweet>().notNull(),
   },
-  table => ({
-    tweetIdIdx: index('tweet_id_idx').on(table.tweetId),
-    createdAtIdx: index('created_at_idx').on(table.createdAt),
-    textIdx: index('text_idx').on(table.fullText),
-  }),
 )
 
 export type InsertUser = typeof usersTable.$inferInsert

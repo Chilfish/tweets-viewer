@@ -32,6 +32,9 @@ interface Result {
   in_reply_to_status_id_str?: string
   quoted_status_result?: TweetResult
   card?: any
+  tombstone?: {
+    __typename: 'TextTombstone'
+  }
 }
 
 interface Core {
@@ -53,6 +56,14 @@ interface Result2 {
   legacy: Legacy
   professional: Professional
   verified_phone_status: boolean
+  core: {
+    created_at: string
+    name: string
+    screen_name: string
+  }
+  avatar: {
+    image_url: string
+  }
 }
 
 interface AffiliatesHighlightedLabel {}
@@ -160,22 +171,9 @@ interface Result3 {
 }
 
 interface EntitySet {
-  user_mentions: {
-    id_str: string
-    name: string
-    screen_name: string
-    indices: [number, number]
-  }[]
-  urls: {
-    display_url: string
-    expanded_url: string
-    url: string
-    indices: [number, number]
-  }[]
-  hashtags: {
-    text: string
-    indices: [number, number]
-  }[]
+  user_mentions: any[]
+  urls: any[]
+  hashtags: any[]
   symbols: any[]
 }
 
@@ -190,7 +188,10 @@ interface RichtextTag {
 }
 
 interface Media {
-  inline_media: any[]
+  inline_media: {
+    media_id: string
+    index: number
+  }[]
 }
 
 interface Legacy2 {
@@ -212,8 +213,10 @@ interface Legacy2 {
   retweeted: boolean
   user_id_str: string
   id_str: string
+  retweeted_status_result?: TweetResult
   possibly_sensitive?: boolean
   in_reply_to_status_id_str?: string
+  in_reply_to_screen_name?: string
 }
 
 interface Entities2 extends EntitySet {

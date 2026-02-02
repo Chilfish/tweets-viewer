@@ -1,5 +1,7 @@
+import type { EnrichedTweet, EnrichedUser } from '@tweets-viewer/rettiwt-api'
+import type { PaginatedResponse } from '@tweets-viewer/shared'
 import type { DB } from '..'
-import type { InsertTweet } from '../schema'
+import type { SelectTweet } from '../schema'
 import { now } from '@tweets-viewer/shared'
 import { and, asc, count, desc, eq, sql } from 'drizzle-orm'
 import { tweetsTable, usersTable } from '../schema'
@@ -7,21 +9,28 @@ import { tweetsTable, usersTable } from '../schema'
 interface GetTweet {
   name: string
   page: number
+  pageSize: number
   reverse: boolean
   db: DB
+  noReplies?: boolean
 }
 
-const pageSize = 10
+const BANCH_SIZE = 1000
 
-export async function createTweets(db: DB, tweets: InsertTweet[]) {
-  const banchSize = 1000
+export async function createTweets({ db, tweets, user }: { db: DB, tweets: EnrichedTweet[], user: EnrichedUser }) {
   let insertedCount = 0
-  for (let i = 0; i < tweets.length; i += banchSize) {
-    const chunk = tweets.slice(i, i + banchSize)
+  for (let i = 0; i < tweets.length; i += BANCH_SIZE) {
+    const chunk = tweets.slice(i, i + BANCH_SIZE)
 
     const { rowCount } = await db
       .insert(tweetsTable)
-      .values(chunk)
+      .values(chunk.map(tweet => ({
+        tweetId: tweet.id,
+        userId: user.userName,
+        fullText: tweet.text,
+        createdAt: new Date(tweet.created_at),
+        jsonData: tweet,
+      })))
       .onConflictDoNothing()
     insertedCount += rowCount
   }
@@ -29,55 +38,142 @@ export async function createTweets(db: DB, tweets: InsertTweet[]) {
 }
 
 function _order(reverse: boolean) {
-  return reverse ? desc(tweetsTable.createdAt) : asc(tweetsTable.createdAt)
+  const sortKey = sql`CAST(COALESCE(${tweetsTable.jsonData}->>'retweeted_original_id', ${tweetsTable.tweetId}) AS BIGINT)`
+  return reverse ? asc(sortKey) : desc(sortKey)
 }
 
-export async function getTweets({ db, name, page, reverse }: GetTweet) {
-  return db
+/**
+ * 获取推文列表
+ * @param total - 可选的总数，如果提供不再查询数据库
+ */
+export async function getTweets({
+  db,
+  name,
+  page,
+  pageSize,
+  reverse,
+  noReplies,
+  total: providedTotal,
+}: GetTweet & { total?: number }): Promise<PaginatedResponse<EnrichedTweet>> {
+  const offset = (page - 1) * pageSize
+  const whereClause = and(
+    eq(tweetsTable.userId, name),
+    noReplies ? sql`${tweetsTable.jsonData}->>'parent_id' IS NULL` : undefined,
+  )
+
+  let totalNum = providedTotal
+  if (totalNum === undefined) {
+    const [{ value }] = await db
+      .select({ value: count() })
+      .from(tweetsTable)
+      .where(whereClause)
+    totalNum = value
+  }
+
+  const rows = await db
     .select()
     .from(tweetsTable)
-    .where(eq(tweetsTable.userId, name))
+    .where(whereClause)
     .orderBy(_order(reverse))
     .limit(pageSize)
-    .offset(page * pageSize)
+    .offset(offset)
+
+  const data = rows.map(mapToEnrichedTweet)
+
+  return {
+    data,
+    meta: {
+      total: totalNum,
+      page,
+      pageSize,
+      hasMore: offset + data.length < totalNum,
+    },
+  }
 }
 
-export async function getLastYearsTodayTweets({ db, name, reverse }: GetTweet) {
+export async function getLastYearsTodayTweets({
+  db,
+  name,
+  reverse,
+  page,
+  pageSize,
+}: GetTweet): Promise<PaginatedResponse<EnrichedTweet>> {
   const today = now('beijing')
+  const offset = (page - 1) * pageSize
 
-  return db
+  const whereClause = and(
+    eq(tweetsTable.userId, name),
+    sql`EXTRACT(DAY FROM ${tweetsTable.createdAt}) = ${today.getDate()}`,
+    sql`EXTRACT(MONTH FROM ${tweetsTable.createdAt}) = ${today.getMonth() + 1}`,
+  )
+
+  const [{ value: total }] = await db
+    .select({ value: count() })
+    .from(tweetsTable)
+    .where(whereClause)
+
+  const rows = await db
     .select()
     .from(tweetsTable)
-    .where(
-      and(
-        eq(tweetsTable.userId, name),
-        sql`EXTRACT(DAY FROM ${tweetsTable.createdAt}) = ${today.getDate()}`,
-        sql`EXTRACT(MONTH FROM ${tweetsTable.createdAt}) = ${today.getMonth() + 1}`,
-      ),
-    )
+    .where(whereClause)
     .orderBy(_order(reverse))
+    .limit(pageSize)
+    .offset(offset)
+
+  const data = rows.map(mapToEnrichedTweet)
+
+  return {
+    data,
+    meta: {
+      total,
+      page,
+      pageSize,
+      hasMore: offset + data.length < total,
+    },
+  }
 }
 
 export async function getTweetsByDateRange({
   db,
   name,
-  start,
-  end,
+  startDate,
+  endDate,
   reverse,
   page,
-}: GetTweet & { start: number, end: number }) {
-  return db
+  pageSize,
+  noReplies,
+}: GetTweet & { startDate: Date, endDate: Date }): Promise<PaginatedResponse<EnrichedTweet>> {
+  const offset = (page - 1) * pageSize
+  const whereClause = and(
+    eq(tweetsTable.userId, name),
+    sql`CAST(${tweetsTable.createdAt} AS DATE) BETWEEN ${startDate} AND ${endDate}`,
+    noReplies ? sql`${tweetsTable.jsonData}->>'parent_id' IS NULL` : undefined,
+  )
+
+  const [{ value: total }] = await db
+    .select({ value: count() })
+    .from(tweetsTable)
+    .where(whereClause)
+
+  const rows = await db
     .select()
     .from(tweetsTable)
-    .where(
-      and(
-        eq(tweetsTable.userId, name),
-        sql`CAST(${tweetsTable.createdAt} AS DATE) BETWEEN ${new Date(start)} AND ${new Date(end)}`,
-      ),
-    )
+    .where(whereClause)
     .orderBy(_order(reverse))
     .limit(pageSize)
-    .offset(page * pageSize)
+    .offset(offset)
+
+  const data = rows.map(mapToEnrichedTweet)
+
+  return {
+    data,
+    meta: {
+      total,
+      page,
+      pageSize,
+      hasMore: offset + data.length < total,
+    },
+  }
 }
 
 export async function getTweetsByKeyword({
@@ -85,29 +181,117 @@ export async function getTweetsByKeyword({
   name,
   keyword,
   page,
+  pageSize,
   reverse,
-}: GetTweet & { keyword: string }) {
-  return db
+}: GetTweet & { keyword: string }): Promise<PaginatedResponse<EnrichedTweet>> {
+  const offset = (page - 1) * pageSize
+  const whereClause = and(
+    eq(tweetsTable.userId, name),
+    sql`${tweetsTable.fullText} ILIKE ${`%${keyword}%`}`,
+  )
+
+  const [{ value: total }] = await db
+    .select({ value: count() })
+    .from(tweetsTable)
+    .where(whereClause)
+
+  const rows = await db
     .select()
     .from(tweetsTable)
-    .where(
-      and(
-        eq(tweetsTable.userId, name),
-        sql`${tweetsTable.fullText} ILIKE ${`%${keyword}%`}`,
-      ),
-    )
+    .where(whereClause)
     .orderBy(_order(reverse))
     .limit(pageSize)
-    .offset(page * pageSize)
+    .offset(offset)
+
+  const data = rows.map(mapToEnrichedTweet)
+
+  return {
+    data,
+    meta: {
+      total,
+      page,
+      pageSize,
+      hasMore: offset + data.length < total,
+    },
+  }
 }
 
-export async function getTweetsCount(db: DB, name: string) {
+export async function getTweetsCount(db: DB, name: string, noReplies?: boolean) {
   return db
     .select({
       value: count(tweetsTable.id),
     })
     .from(tweetsTable)
-    .where(eq(tweetsTable.userId, name))
+    .where(and(
+      eq(tweetsTable.userId, name),
+      noReplies ? sql`${tweetsTable.jsonData}->>'parent_id' IS NULL` : undefined,
+    ))
+}
+
+/**
+ * 获取带媒体的推文列表（排除转推）
+ */
+export async function getMediaTweets({
+  db,
+  name,
+  page,
+  pageSize,
+  reverse,
+  total: providedTotal,
+}: GetTweet & { total?: number }): Promise<PaginatedResponse<EnrichedTweet>> {
+  const offset = (page - 1) * pageSize
+
+  const whereClause = and(
+    eq(tweetsTable.userId, name),
+    // 排除转推
+    sql`${tweetsTable.jsonData}->>'retweeted_original_id' IS NULL`,
+    // 必须包含媒体
+    sql`json_typeof(${tweetsTable.jsonData}->'media_details') = 'array'`,
+    sql`json_array_length(${tweetsTable.jsonData}->'media_details') > 0`,
+  )
+
+  let totalNum = providedTotal
+  if (totalNum === undefined) {
+    const [{ value }] = await db
+      .select({ value: count() })
+      .from(tweetsTable)
+      .where(whereClause)
+    totalNum = value
+  }
+
+  const rows = await db
+    .select()
+    .from(tweetsTable)
+    .where(whereClause)
+    .orderBy(_order(reverse))
+    .limit(pageSize)
+    .offset(offset)
+
+  const data = rows.map(mapToEnrichedTweet)
+
+  return {
+    data,
+    meta: {
+      total: totalNum,
+      page,
+      pageSize,
+      hasMore: offset + data.length < totalNum,
+    },
+  }
+}
+
+export async function getMediaTweetsCount(db: DB, name: string) {
+  return db
+    .select({
+      value: count(),
+    })
+    .from(tweetsTable)
+    .where(and(
+      eq(tweetsTable.userId, name),
+      sql`${tweetsTable.jsonData}->>'retweeted_original_id' IS NULL`,
+      sql`json_typeof(${tweetsTable.jsonData}->'media_details') = 'array'`,
+      sql`json_array_length(${tweetsTable.jsonData}->'media_details') > 0`,
+    ))
 }
 
 export async function getLatestTweets(db: DB) {
@@ -125,33 +309,10 @@ export async function getLatestTweets(db: DB) {
   return result.rows.map(row => ({
     restId: row.rest_id as string,
     screenName: row.screen_name as string,
-    // fullText: row.full_text as string,
     createdAt: new Date(row.created_at as string),
   }))
 }
 
-export async function updateUserTweets({
-  db,
-  user,
-  tweets,
-}: {
-  db: DB
-  user: {
-    screenName: string
-    tweetEnd: Date
-  }
-  tweets: InsertTweet[]
-}) {
-  // Error: No transactions support in neon-http driver
-  let insertedCount = 0
-  const res1 = await createTweets(db, tweets)
-
-  const res2 = await db
-    .update(usersTable)
-    .set({ tweetEnd: user.tweetEnd })
-    .where(eq(usersTable.screenName, user.screenName))
-
-  insertedCount = res1.rowCount + res2.rowCount - 1
-
-  return { rowCount: insertedCount }
+export function mapToEnrichedTweet(tweet: SelectTweet): EnrichedTweet {
+  return tweet.jsonData
 }

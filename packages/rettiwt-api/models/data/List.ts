@@ -1,10 +1,10 @@
-import { LogActions } from '../../enums/Logging'
-import { findByFilter } from '../../helper/JsonUtils'
-import { LogService } from '../../services/internal/LogService'
 import type { IList } from '../../types/data/List'
 import type { IList as IRawList } from '../../types/raw/base/List'
 import type { ITimelineList } from '../../types/raw/composite/TimelineList'
 import type { IListDetailsResponse } from '../../types/raw/list/Details'
+import { LogActions } from '../../enums/Logging'
+import { findByFilter } from '../../helper/JsonUtils'
+import { LogService } from '../../services/internal/LogService'
 
 /**
  * The details of a single Twitter List.
@@ -54,10 +54,7 @@ export class List implements IList {
    *
    * @returns The target deserialized list.
    */
-  public static single(
-    response: IListDetailsResponse,
-    id: string,
-  ): List | undefined {
+  public static single(response: IListDetailsResponse, id: string): List | undefined {
     // If list found
     if (response.data.list.id_str === id) {
       return new List(response.data.list as unknown as IRawList)
@@ -79,20 +76,14 @@ export class List implements IList {
     const lists: List[] = []
 
     // Extracting the matching data
-    const extract = findByFilter<ITimelineList>(
-      response,
-      '__typename',
-      'TimelineTwitterList',
-    ).map((item) => item.list)
+    const extract = findByFilter<ITimelineList>(response, '__typename', 'TimelineTwitterList').map(
+      item => item.list,
+    )
 
     // Deserializing valid data
     for (const item of extract) {
       // If valid list
-      if (
-        item !== undefined &&
-        item.id !== undefined &&
-        item.following === true
-      ) {
+      if (item !== undefined && item.id !== undefined && item.following === true) {
         // Logging
         LogService.log(LogActions.DESERIALIZE, { id: item.id })
 

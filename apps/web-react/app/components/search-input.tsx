@@ -1,37 +1,52 @@
-import type { User } from '@tweets-viewer/shared'
-import { Search } from 'lucide-react'
+import type { EnrichedUser } from '@tweets-viewer/rettiwt-api'
+import { SearchIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
-import { Input } from '~/components/ui/input'
+import { InputGroup, InputGroupAddon, InputGroupInput } from '~/components/ui/input-group'
+import { cn } from '~/lib/utils'
 
-interface UserTabsProps {
-  user: User
+interface SearchInputProps {
+  user?: EnrichedUser
+  className?: string
+  placeholder?: string
+  defaultValue?: string
 }
 
-export function SearchInput({ user }: UserTabsProps) {
+export function SearchInput({ user, className, placeholder, defaultValue }: SearchInputProps) {
   const navigate = useNavigate()
-  const [keyword, setKeyword] = useState('')
-  const handleSearch = (e: React.FormEvent) => {
+  const [keyword, setKeyword] = useState(defaultValue || '')
+
+  const handleSearch = (e: any) => {
     e.preventDefault()
     if (keyword.trim()) {
-      navigate(
-        `/search/${user.screenName}?q=${encodeURIComponent(keyword.trim())}`,
-      )
+      const url = user
+        ? `/search/${user.userName}?q=${encodeURIComponent(keyword.trim())}`
+        : `/search?q=${encodeURIComponent(keyword.trim())}`
+      navigate(url)
     }
   }
 
   return (
-    <form onSubmit={handleSearch} className="flex items-center gap-2 ml-auto">
-      <div className="relative">
-        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
+    <form
+      onSubmit={handleSearch}
+      className={cn(className)}
+    >
+
+      <InputGroup>
+        <InputGroupInput
+          aria-label="Search"
+          placeholder={placeholder || 'Search'}
           type="search"
-          placeholder="搜索推文..."
-          className="pl-9 h-9 w-32 md:w-56"
+          autoComplete="off"
           value={keyword}
           onChange={e => setKeyword(e.target.value)}
         />
-      </div>
+        <InputGroupAddon
+          onClick={handleSearch}
+        >
+          <SearchIcon aria-hidden="true" className="size-4" />
+        </InputGroupAddon>
+      </InputGroup>
     </form>
   )
 }

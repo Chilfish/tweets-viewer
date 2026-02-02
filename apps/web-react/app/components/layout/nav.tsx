@@ -9,9 +9,8 @@ export interface NavItem {
   disabled?: boolean
 }
 
-export function getNavItems(currentUser?: string): NavItem[] {
+export function useNavItems(currentUser?: string): NavItem[] {
   const location = useLocation()
-  const curPath = location.pathname.split('/')[1]
 
   return [
     {
@@ -38,7 +37,8 @@ export function getNavItems(currentUser?: string): NavItem[] {
       isActive: currentUser
         ? location.pathname === `/ins/${currentUser}`
         : false,
-      disabled: !currentUser,
+      disabled: true,
+      // disabled: !currentUser,
     },
     {
       label: '那年今日',

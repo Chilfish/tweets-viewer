@@ -1,17 +1,8 @@
-import type { JSX } from 'react'
-import { formatDate } from '@tweets-viewer/shared'
 import { Link } from 'react-router'
+import { HomeFeatures } from '~/components/home/features'
+import { HomeFooter } from '~/components/home/footer'
+import { HomeHero } from '~/components/home/hero'
 import { Button } from '~/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '~/components/ui/card'
-import { Separator } from '~/components/ui/separator'
-import { cn } from '~/lib/utils'
 
 export function meta() {
   return [
@@ -23,92 +14,46 @@ export function meta() {
   ]
 }
 
-interface LinkProps {
-  to: string
-  className?: string
-  children?: JSX.Element | string
-}
-
-function Linker({ to, className, children }: LinkProps) {
-  return (
-    <a
-      href={to}
-      className={cn(
-        'inline-flex items-center gap-1 text-primary underline-offset-4 hover:underline mx-1',
-        className,
-      )}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      {children}
-    </a>
-  )
+export const handle = {
+  isHome: true,
 }
 
 export default function HomePage() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-full p-4">
-      <Card className="w-full max-w-2xl">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">推文存档站</CardTitle>
-          <CardDescription>
-            一个第三方 Twitter 存档站，专注于阅读体验和用户友好的界面设计。
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div>
-            <h3 className="font-semibold">✨ 主要功能</h3>
-            <ul className="mt-2 ml-4 space-y-2 list-disc text-muted-foreground">
-              <li>多用户快速切换</li>
-              <li>推文无限滚动加载</li>
-              <li>按日期和关键字搜索推文</li>
-              <li>“那年今日”回顾历史推文</li>
-            </ul>
-          </div>
-          <div className="flex flex-col items-center gap-4">
-            <Button
-              render={<Link to="/tweets/240y_k" />}
-              size="lg"
-            >
-              开始查看
-            </Button>
-          </div>
-        </CardContent>
-        <Separator />
-        <CardFooter className="flex flex-col items-center justify-center text-sm">
-          <p>
-            Made by
-            <Linker to="https://space.bilibili.com/259486090">@Chilfish</Linker>
-          </p>
-          <div className="text-center">
-            <span>其他作品：</span>
-            <span className="inline-flex gap-1">
-              <Linker to="https://anon-tweet.chilfish.top">烤推机</Linker>
-              /
-              <Linker to="https://nishio.chilfish.top/zh">西尾文明暦</Linker>
-              /
-              <Linker to="https://replive.chilfish.top">
-                西尾夕香 replive
-              </Linker>
-              /
-              <Linker to="https://oshitabi.chilfish.top/">
-                推し旅 AR 镜头
-              </Linker>
-            </span>
-          </div>
+    <main className="relative flex flex-col items-center justify-start min-h-screen px-6 pt-24 pb-12 overflow-hidden">
+      {/* Background Decorative Glows */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 -z-10 w-full max-w-6xl h-full pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[20%] right-[-5%] w-[30%] h-[30%] bg-blue-500/5 blur-[100px] rounded-full" />
+      </div>
 
-          <div className="mt-2 flex items-center justify-center gap-2 text-xs text-muted-foreground/70">
-            <span>
-              上次构建于：
-              {formatDate(new Date(__GIT_DATE__))}
-            </span>
-            <span className="inline-flex items-center gap-1 px-2 py-1 bg-muted/50 rounded-md border">
-              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-              <span>{__GIT_HASH__}</span>
-            </span>
-          </div>
-        </CardFooter>
-      </Card>
-    </div>
+      {/* Hero Section */}
+      <HomeHero />
+
+      {/* Primary Action */}
+      <div className="mb-16 animate-in fade-in slide-in-from-bottom-3 duration-500 delay-100 fill-mode-both">
+        <Button
+          render={<Link to="/tweets/240y_k" />}
+          size="lg"
+          className="rounded-full px-8 h-12 text-sm font-semibold transition-all hover:-translate-y-0.5"
+        >
+          查看示例存档
+        </Button>
+      </div>
+
+      {/* Visual Separation / Section Header */}
+      <div className="mb-8 flex flex-col items-center gap-2">
+        <div className="h-px w-8 bg-border" />
+        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/40">
+          Core Features
+        </span>
+      </div>
+
+      {/* Features Grid */}
+      <HomeFeatures />
+
+      {/* Footer & Build Info */}
+      <HomeFooter />
+    </main>
   )
 }

@@ -3,9 +3,11 @@
     "composite": true,
     "target": "ESNext",
     "lib": ["ESNext"],
-    "baseUrl": ".",
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "paths": {
+      "@/*": ["../src/*"]
+    },
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
     "strict": true,
@@ -16,5 +18,8 @@
     "isolatedModules": true,
     "skipLibCheck": true
   },
-  "references": [{ "path": "../../tsconfig.base.json" }]
+  "include": [
+    "**/*.ts",
+    "../../env.server.ts"
+  ]
 }

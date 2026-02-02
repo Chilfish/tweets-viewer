@@ -1,5 +1,5 @@
 {
-  "id": "95b22560-ce77-4c3a-a404-ddcf2e03f834",
+  "id": "2bb630ab-9b25-4475-83a1-3675cefe777d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -14,149 +14,61 @@
           "primaryKey": true,
           "notNull": true
         },
-        "tweet_id": {
-          "name": "tweet_id",
+        "tweetId": {
+          "name": "tweetId",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "user_name": {
-          "name": "user_name",
+        "userName": {
+          "name": "userName",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "created_at": {
-          "name": "created_at",
+        "fullText": {
+          "name": "fullText",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAt": {
+          "name": "createdAt",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true
         },
-        "full_text": {
-          "name": "full_text",
-          "type": "text",
+        "jsonData": {
+          "name": "jsonData",
+          "type": "json",
           "primaryKey": false,
           "notNull": true
-        },
-        "media": {
-          "name": "media",
-          "type": "json",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'[]'::json"
-        },
-        "retweet_count": {
-          "name": "retweet_count",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "quote_count": {
-          "name": "quote_count",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "reply_count": {
-          "name": "reply_count",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "favorite_count": {
-          "name": "favorite_count",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "views_count": {
-          "name": "views_count",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "retweeted_status": {
-          "name": "retweeted_status",
-          "type": "json",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "quoted_status": {
-          "name": "quoted_status",
-          "type": "json",
-          "primaryKey": false,
-          "notNull": false
         }
       },
-      "indexes": {
-        "tweet_id_idx": {
-          "name": "tweet_id_idx",
-          "columns": [
-            {
-              "expression": "tweet_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "created_at_idx": {
-          "name": "created_at_idx",
-          "columns": [
-            {
-              "expression": "created_at",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "text_idx": {
-          "name": "text_idx",
-          "columns": [
-            {
-              "expression": "full_text",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
+      "indexes": {},
       "foreignKeys": {
-        "tweets_user_name_users_screen_name_fk": {
-          "name": "tweets_user_name_users_screen_name_fk",
+        "tweets_userName_users_userName_fk": {
+          "name": "tweets_userName_users_userName_fk",
           "tableFrom": "tweets",
           "tableTo": "users",
-          "columnsFrom": ["user_name"],
-          "columnsTo": ["screen_name"],
+          "columnsFrom": [
+            "userName"
+          ],
+          "columnsTo": [
+            "userName"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "tweets_tweet_id_unique": {
-          "name": "tweets_tweet_id_unique",
+        "tweets_tweetId_unique": {
+          "name": "tweets_tweetId_unique",
           "nullsNotDistinct": false,
-          "columns": ["tweet_id"]
+          "columns": [
+            "tweetId"
+          ]
         }
       },
       "policies": {},
@@ -173,95 +85,35 @@
           "primaryKey": true,
           "notNull": true
         },
-        "name": {
-          "name": "name",
+        "restId": {
+          "name": "restId",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "screen_name": {
-          "name": "screen_name",
+        "userName": {
+          "name": "userName",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "avatar_url": {
-          "name": "avatar_url",
-          "type": "text",
+        "jsonData": {
+          "name": "jsonData",
+          "type": "json",
           "primaryKey": false,
           "notNull": true
-        },
-        "profile_banner_url": {
-          "name": "profile_banner_url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "followers_count": {
-          "name": "followers_count",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "following_count": {
-          "name": "following_count",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "bio": {
-          "name": "bio",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "location": {
-          "name": "location",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "website": {
-          "name": "website",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "birthday": {
-          "name": "birthday",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "tweet_start": {
-          "name": "tweet_start",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "tweet_end": {
-          "name": "tweet_end",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
         }
       },
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "users_screen_name_unique": {
-          "name": "users_screen_name_unique",
+        "users_userName_unique": {
+          "name": "users_userName_unique",
           "nullsNotDistinct": false,
-          "columns": ["screen_name"]
+          "columns": [
+            "userName"
+          ]
         }
       },
       "policies": {},

@@ -8,11 +8,7 @@
  *
  * @internal
  */
-export function findByFilter<T>(
-  data: NonNullable<unknown>,
-  key: string,
-  value: string,
-): T[] {
+export function findByFilter<T>(data: NonNullable<unknown>, key: string, value: string): T[] {
   /**
    * The list containing all the objects matching given filter.
    */
@@ -28,21 +24,14 @@ export function findByFilter<T>(
      * Therefore, map(item =\> findByFilter(.......)) returns an array of arrays.
      * Therefore, using ... operator to spread the 2-D array in 1-D array.
      */
-    res = res.concat(
-      ...data.map((item: NonNullable<unknown>) =>
-        findByFilter<T>(item, key, value),
-      ),
-    )
+    res = res.concat(...data.map((item: NonNullable<unknown>) => findByFilter<T>(item, key, value)))
   }
   // If the data is an object
   else if (data !== null && typeof data === 'object') {
     /**
      * If the object includes the key and the value specified by the key matches the filter, add it to the result.
      */
-    if (
-      Object.keys(data).includes(key)
-      && data[key as keyof typeof data] === value
-    ) {
+    if (Object.keys(data).includes(key) && data[key as keyof typeof data] === value) {
       res.push(data as T)
     }
 
@@ -66,10 +55,7 @@ export function findByFilter<T>(
  *
  * @internal
  */
-export function findKeyByValue(
-  data: NonNullable<unknown>,
-  value: string,
-): string | undefined {
+export function findKeyByValue(data: NonNullable<unknown>, value: string): string | undefined {
   // Finding the key-value pairs that have the given value
   const kvPair = Object.entries(data).filter(([, v]) => v === value)[0]
 

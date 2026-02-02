@@ -21,8 +21,6 @@
   },
   "include": [
     "**/*.ts",
-    "../src/types/index.ts",
-    "../src/utils/**/*.ts",
-    "../server/**/*.ts"
+    "../../env.server.ts"
   ]
 }

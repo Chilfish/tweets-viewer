@@ -6,10 +6,10 @@ import { RawTweetRepliesSortType } from '../enums/raw/Tweet'
  *
  * @internal
  */
-export const TweetRepliesSortTypeMap: {
-  [key in keyof typeof TweetRepliesSortType]: RawTweetRepliesSortType
-} = {
+export const TweetRepliesSortTypeMap: { [key in keyof typeof TweetRepliesSortType]: RawTweetRepliesSortType } = {
+
   LATEST: RawTweetRepliesSortType.LATEST,
   LIKES: RawTweetRepliesSortType.LIKES,
   RELEVANCE: RawTweetRepliesSortType.RELEVACE,
+
 }

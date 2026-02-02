@@ -12,8 +12,10 @@ dist
 auto-*.d.ts
 .env
 .vscode
-database
-scripts
-server
 wrangler.toml
-
+apps/scripts
+apps/server
+packages/database
+tmp
+docs
+.github

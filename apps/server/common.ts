@@ -1,5 +1,6 @@
-import type { DB, SelectUser } from '@tweets-viewer/database'
-import type { Tweet } from '@tweets-viewer/shared'
+import type { DB } from '@tweets-viewer/database'
+import type { SelectUser } from '@tweets-viewer/database/schema'
+import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
 
 export const staticUrl
   // = 'http://127.0.0.1:8080'
@@ -7,17 +8,15 @@ export const staticUrl
 
 export interface AppType {
   Variables: {
-    rateLimit: boolean
     db: DB
   }
   Bindings: {
-    RATE_LIMITER: RateLimit
     DATABASE_URL: string
     TWEET_KEY: string
   }
 }
 
-export const cachedData = new Map<string, Tweet[]>()
+export const cachedData = new Map<string, EnrichedTweet[]>()
 
 export async function getData(name: string) {
   if (cachedData.has(name)) {
@@ -33,9 +32,9 @@ export async function getData(name: string) {
   if (!rawData) {
     return []
   }
-  const tweets = rawData as Tweet[]
+  const tweets = rawData as EnrichedTweet[]
   tweets.sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
   )
 
   console.log('getInsData', name, tweets.length)
@@ -45,5 +44,5 @@ export async function getData(name: string) {
 }
 
 export async function setAllUsersInsData(users: SelectUser[]) {
-  await Promise.all(users.map(user => getData(user.screenName)))
+  await Promise.all(users.map(user => getData(user.userName)))
 }

@@ -1,5 +1,5 @@
 import type { Route } from './+types/root'
-import { AlertTriangle, Loader2 } from 'lucide-react'
+import { AlertTriangle } from 'lucide-react'
 import {
   isRouteErrorResponse,
   Links,
@@ -8,9 +8,10 @@ import {
   Scripts,
   ScrollRestoration,
 } from 'react-router'
-import { GlobalMediaModal } from './components/media/global-media-modal'
+import { GlobalMediaViewer } from './components/media/GlobalMediaViewer'
+import { ProgressBar } from './components/progress-bar'
 import { Button } from './components/ui/button'
-import { useAppStore } from './stores/app-store'
+import { useTheme } from './hooks/use-theme'
 import './app.css'
 
 export const links: Route.LinksFunction = () => [
@@ -27,19 +28,43 @@ export const links: Route.LinksFunction = () => [
 ]
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  const { isDarkMode } = useAppStore()
   return (
-    <html lang="en" className={isDarkMode ? 'dark' : ''}>
+    <html
+      lang="zh"
+      className="touch-manipulation overflow-x-hidden"
+      suppressHydrationWarning
+    >
       <head>
         <meta charSet="utf-8" />
         <link rel="icon" type="image/jpeg" href="/icon.jpg" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const storage = localStorage.getItem('tweets-viewer-app-storage');
+                  if (storage) {
+                    const theme = JSON.parse(storage).state.theme;
+                    if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                      document.documentElement.classList.add('dark');
+                    }
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+        {/* <script
+          src="//unpkg.com/react-scan/dist/auto.global.js"
+        /> */}
       </head>
       <body>
+        <ProgressBar />
         {children}
-        <GlobalMediaModal />
+        <GlobalMediaViewer />
         <ScrollRestoration getKey={location => location.pathname} />
         <Scripts />
       </body>
@@ -48,17 +73,18 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  useTheme()
   return <Outlet />
 }
 
-export function HydrateFallback() {
-  return (
-    <div className="flex flex-col items-center justify-center h-screen bg-background text-foreground">
-      <Loader2 className="size-8 animate-spin text-primary" />
-      <p className="mt-4 text-muted-foreground">加载中...</p>
-    </div>
-  )
-}
+// export function HydrateFallback() {
+//   return (
+//     <div className="flex flex-col items-center justify-center h-screen bg-background text-foreground">
+//       <Loader2 className="size-8 animate-spin text-primary" />
+//       <p className="mt-4 text-muted-foreground">加载中...</p>
+//     </div>
+//   )
+// }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   let message = 'Oops! Something went wrong.'

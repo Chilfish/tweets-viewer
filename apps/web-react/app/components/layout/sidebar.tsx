@@ -2,8 +2,8 @@ import { Moon, Sun } from 'lucide-react'
 import { Link } from 'react-router'
 import { Button } from '~/components/ui/button'
 import { cn } from '~/lib/utils'
-import { useAppStore } from '~/stores/app-store'
-import { getNavItems } from './nav'
+import { useAppStore } from '~/store/use-app-store'
+import { useNavItems } from './nav'
 import { UserSelector } from './user-selector'
 
 interface SidebarProps {
@@ -11,51 +11,68 @@ interface SidebarProps {
 }
 
 export function Sidebar({ currentUser }: SidebarProps) {
-  const { toggleDarkMode } = useAppStore()
-  const navItems = getNavItems(currentUser)
+  const navItems = useNavItems(currentUser)
+  const theme = useAppStore(s => s.theme)
+  const setTheme = useAppStore(s => s.setTheme)
+
+  const toggleTheme = () => {
+    // 简单的 light/dark 切换，如果当前是 system 则根据实际色板切换或直接切到对面
+    // 这里简单处理：system -> dark -> light -> dark ...
+    const nextTheme = theme === 'dark' ? 'light' : 'dark'
+    setTheme(nextTheme)
+  }
 
   return (
-    <aside className="hidden md:flex sticky top-0 z-50 h-screen flex-col justify-between p-4 bg-sidebar border-r border-sidebar-border transition-colors duration-200">
-      <header className="flex items-center justify-center gap-4 border-b border-sidebar-border pb-4 mb-4">
+    <aside className="hidden md:flex sticky top-0 z-40 h-screen w-auto xl:w-[260px] flex-col justify-between p-2 xl:p-4 bg-background/90 backdrop-blur-xl border-r border-border/40 transition-all duration-200">
+      {/* Logo & Title */}
+      <header className="flex items-center justify-center xl:justify-start gap-3 px-2 py-4 mb-2">
         <img
           alt="logo"
           src="/icon.jpg"
           width={32}
           height={32}
-          className="rounded-lg"
+          className="rounded-lg flex-shrink-0"
         />
-        <h2 className="text-lg font-semibold text-sidebar-foreground">
+        <h2 className="text-xl font-bold hidden xl:block">
           推文存档站
         </h2>
       </header>
 
-      <div className="flex-1">
-        <nav className="space-y-2">
+      {/* Navigation */}
+      <div className="flex-1 px-1">
+        <nav className="flex flex-col gap-1">
           {navItems.map(item => (
             <Link
               key={item.label}
               to={item.href}
               className={cn(
-                'flex items-center gap-3 px-3 py-2 rounded-lg transition-colors duration-200',
-                item.disabled && 'pointer-events-none opacity-50',
+                'group flex items-center justify-start gap-4 p-3 xl:px-4 rounded-full transition-all duration-200',
+                item.disabled && 'pointer-events-none opacity-40',
                 item.isActive
-                  ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                  : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+                  ? 'bg-accent/80 text-accent-foreground font-semibold'
+                  : 'text-foreground/80 hover:bg-accent/50 hover:text-foreground',
               )}
             >
-              <item.icon className="size-5 flex-shrink-0" />
-              <span className="font-medium">{item.label}</span>
+              <item.icon className={cn(
+                'size-4 shrink-0 transition-transform group-hover:scale-110',
+                item.isActive && 'fill-current',
+              )}
+              />
+              <span className="text-md hidden md:block">
+                {item.label}
+              </span>
             </Link>
           ))}
 
+          {/* Theme Toggle */}
           <Button
             variant="ghost"
-            onClick={toggleDarkMode}
-            className="w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors duration-200"
+            onClick={toggleTheme}
+            className="justify-start gap-4 p-3 xl:px-4 h-auto rounded-full text-foreground/80 hover:bg-accent/50 hover:text-foreground transition-all duration-200"
           >
-            <Sun className="size-5 flex-shrink-0 dark:hidden" />
-            <Moon className="size-5 flex-shrink-0 hidden dark:block" />
-            <span className="font-medium">
+            <Sun className="size-4 shrink-0 dark:hidden" />
+            <Moon className="size-4 shrink-0 hidden dark:block" />
+            <span className="text-md hidden md:block">
               <span className="dark:hidden">夜间模式</span>
               <span className="hidden dark:inline">日间模式</span>
             </span>
@@ -63,7 +80,8 @@ export function Sidebar({ currentUser }: SidebarProps) {
         </nav>
       </div>
 
-      <footer className="border-t border-sidebar-border pt-4 flex flex-col gap-4">
+      {/* User Selector */}
+      <footer className="pt-4 border-t border-border/40">
         <UserSelector />
       </footer>
     </aside>
