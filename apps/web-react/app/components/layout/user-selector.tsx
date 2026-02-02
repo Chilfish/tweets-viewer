@@ -59,7 +59,7 @@ export function UserSelector() {
         <ChevronDown className="size-4 ml-auto text-muted-foreground" />
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="start" className="w-56">
+      <DropdownMenuContent align="start" className="w-56 max-h-100">
         {userList.length > 0 ? (
           <>
             {userList.map(user => (
@@ -86,12 +86,14 @@ export function UserSelector() {
                 )}
               </DropdownMenuItem>
             ))}
-            <DropdownMenuSeparator />
           </>
         ) : (
-          <div className="p-2 text-sm text-muted-foreground text-center">
-            无归档用户
-          </div>
+          <>
+            <DropdownMenuSeparator />
+            <div className="p-2 text-sm text-muted-foreground text-center">
+              无归档用户
+            </div>
+          </>
         )}
       </DropdownMenuContent>
     </DropdownMenu>
