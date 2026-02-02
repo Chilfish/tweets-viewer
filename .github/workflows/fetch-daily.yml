@@ -22,5 +22,5 @@ jobs:
       - name: Run fetch script
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          TWEET_KEY: ${{ secrets.TWEET_KEY }}
-        run: bun run apps/scripts/updateTweet.ts
+          TWEET_KEYS: ${{ secrets.TWEET_KEYS }}
+        run: bun run apps/scripts/dailyUpdate.ts

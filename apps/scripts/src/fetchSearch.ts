@@ -5,7 +5,7 @@ import { writeJson } from './utils'
 const filter: ITweetFilter = {
   fromUsers: [userId],
   startDate: new Date('2025-01-01'),
-  endDate: new Date('2026-02-04'),
+  endDate: new Date('2025-06-01'),
 }
 
 const data = await apiClient.searchTweetsRaw(filter, cursor).catch((e) => {
