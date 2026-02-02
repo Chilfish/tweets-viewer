@@ -1,6 +1,5 @@
 import { writeFile } from 'node:fs/promises'
-import { userId } from '../config'
-import { apiClient, cursor, cursorPath, enrichmentService, user } from './common'
+import { apiClient, cursor, cursorPath, enrichmentService, user, userId } from './common'
 import { writeJson } from './utils'
 
 const rawTweets = await apiClient.fetchUserTimelineWithRepliesRaw(user.id, cursor)

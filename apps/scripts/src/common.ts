@@ -2,12 +2,15 @@ import type { CursoredTweets, EnrichedUser } from '@tweets-viewer/rettiwt-api'
 import { mkdir, readFile, stat, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { RettiwtPool, TweetEnrichmentService, TwitterAPIClient } from '@tweets-viewer/rettiwt-api'
-import { userId } from '../config'
+
+import { env } from '../../../env.server'
 import { getLocalCache } from './localCache'
 import { cacheDir, writeJson } from './utils'
 
-const KEYS = (process.env.TWEET_KEYS || '').split(',').filter(Boolean)
+export const userId = 'amane_bushi'
 
+const KEYS = (env.TWEET_KEYS || '').split(',').filter(Boolean).map(key => key.trim())
+// console.log({KEYS})
 const twitterPool = new RettiwtPool(KEYS)
 
 export const apiClient = new TwitterAPIClient(twitterPool)

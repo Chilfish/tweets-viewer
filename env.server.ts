@@ -7,6 +7,7 @@ const rootPath = path.dirname(fileURLToPath(import.meta.url))
 
 config({
   path: path.join(rootPath, '.env'),
+  quiet: true,
 })
 
 /**

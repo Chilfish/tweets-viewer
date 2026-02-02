@@ -3,7 +3,7 @@ import { neon } from '@neondatabase/serverless'
 import { createTweets, createUser, schema } from '@tweets-viewer/database'
 import { drizzle } from 'drizzle-orm/neon-http'
 import { env } from '../../../env.server'
-import { userId } from '../config'
+import { userId } from './common'
 import { readJson } from './utils'
 
 const client = neon(env.DATABASE_URL)

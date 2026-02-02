@@ -29,4 +29,6 @@ const uniqueTweets = mergedData
     return dateB.getTime() - dateA.getTime()
   })
 
+console.log('Merged data:', uniqueTweets.length)
+
 await writeJson(uniqueTweets, path.join(dataPath, 'merged.json'))

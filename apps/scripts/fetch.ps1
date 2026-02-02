@@ -7,16 +7,13 @@ param (
     [int]$MaxTasks = 50,
 
     [Parameter(Position = 1, HelpMessage = "目标脚本路径")]
-    [string]$ScriptPath = (Join-Path -Path $PSScriptRoot -ChildPath "src\fetchTimeline.ts"),
+    [string]$ScriptPath = "src\fetchTimeline.ts",
 
     [Parameter()]
     [int]$MaxRetries = 5,
 
     [Parameter()]
-    [int]$TimeoutMs = 20000,
-
-    [Parameter()]
-    [int]$FatalCode = 104
+    [int]$TimeoutMs = 20000
 )
 
 function Invoke-FetchTimeline {
@@ -25,11 +22,11 @@ function Invoke-FetchTimeline {
         [int]$MaxTasks,
         [string]$ScriptPath,
         [int]$MaxRetries,
-        [int]$TimeoutMs,
-        [int]$FatalCode
+        [int]$TimeoutMs
     )
 
     process {
+        $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath $ScriptPath
         # 验证文件物理存在性
         if (-not (Test-Path $ScriptPath)) {
             Write-Error "CRITICAL: Target script not found at [$ScriptPath]"
@@ -74,9 +71,13 @@ function Invoke-FetchTimeline {
                             $success = $true
                             break
                         }
-                        elseif ($exitCode -eq $FatalCode) {
-                            Write-Error " -> Result: Fatal Error $FatalCode (No Data). Aborting."
-                            return # 终止整个函数执行
+                        elseif ($exitCode -eq 104) {
+                            Write-Error " -> Result: Fatal Error 404 (No Data). Aborting."
+                            return
+                        }
+                        elseif ($exitCode -eq 129) {
+                            Write-Error " -> Result: Fatal Error 429 (Rate Limit Exceeded). Aborting."
+                            return
                         }
                         else {
                             Write-Warning " -> Result: Non-zero Exit Code ($exitCode)."
@@ -108,5 +109,4 @@ Invoke-FetchTimeline `
     -MaxTasks $MaxTasks `
     -ScriptPath $ScriptPath `
     -MaxRetries $MaxRetries `
-    -TimeoutMs $TimeoutMs `
-    -FatalCode $FatalCode
+    -TimeoutMs $TimeoutMs
