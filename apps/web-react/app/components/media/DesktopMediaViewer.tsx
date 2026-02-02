@@ -76,7 +76,8 @@ export function DesktopMediaViewer({
                 <MediaImage
                   src={currentItem?.url}
                   alt="preview"
-                  className="max-w-full max-h-full object-contain pointer-events-none"
+                  className="max-w-full max-h-full object-contain"
+                  containerClassName="w-auto h-auto"
                 />
               )}
 

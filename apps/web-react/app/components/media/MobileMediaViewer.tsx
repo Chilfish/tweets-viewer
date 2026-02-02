@@ -61,7 +61,7 @@ export function MobileMediaViewer({
           {isVideo && mp4Video ? (
             <MediaVideo
               key={mp4Video.url}
-              className="max-w-full max-h-full object-contain pointer-events-auto"
+              className="max-w-full max-h-full object-contain"
               controls={showControls}
               autoPlay
               playsInline
@@ -74,7 +74,7 @@ export function MobileMediaViewer({
             <MediaImage
               src={currentItem?.url}
               alt="preview"
-              className="max-w-full max-h-full object-contain pointer-events-none"
+              className="max-w-full max-h-full object-contain"
               draggable={false}
             />
           )}
