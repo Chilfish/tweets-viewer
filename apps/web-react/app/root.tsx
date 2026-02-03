@@ -13,7 +13,7 @@ import { ProgressBar } from './components/progress-bar'
 import { Button } from './components/ui/button'
 import { useTheme } from './hooks/use-theme'
 import './app.css'
-import './font.css'
+import './fonts.css'
 
 export const links: Route.LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
