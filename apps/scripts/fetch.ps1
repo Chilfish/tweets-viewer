@@ -10,7 +10,7 @@ param (
     [string]$ScriptPath = "src\fetchTimeline.ts",
 
     [Parameter()]
-    [int]$MaxRetries = 5,
+    [int]$MaxRetries = 3,
 
     [Parameter()]
     [int]$TimeoutMs = 20000

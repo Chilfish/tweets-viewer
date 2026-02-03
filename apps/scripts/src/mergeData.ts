@@ -1,7 +1,7 @@
 import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
 import { readdir } from 'node:fs/promises'
 import path from 'node:path'
-import { dataPath } from './common'
+import { dataPath, userId } from './common'
 import { readJson, writeJson } from './utils'
 
 const jsons = await readdir(dataPath).then(files => files
@@ -29,6 +29,9 @@ const uniqueTweets = mergedData
     return dateB.getTime() - dateA.getTime()
   })
 
-console.log('Merged data:', uniqueTweets.length)
+console.log({
+  uniqueTweets: uniqueTweets.length,
+  user: userId,
+})
 
 await writeJson(uniqueTweets, path.join(dataPath, 'merged.json'))

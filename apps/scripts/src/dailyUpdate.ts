@@ -66,3 +66,7 @@ for (const user of users) {
     }
   }
 }
+
+console.log(`Daily update completed successfully.`)
+
+process.exit(0)

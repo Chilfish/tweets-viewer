@@ -42,7 +42,7 @@ export function enrichTweet(sourceData: RawTweet, retweetedOrignalId?: string): 
     card: mapTwitterCard(tweet.card),
     media_details: mapMediaDetails(tweet),
     retweeted_original_id: retweetedOrignalId,
-    is_inline_media: !!tweet.note_tweet?.note_tweet_results?.result?.media?.inline_media?.length,
+    is_inline_media: tweet.note_tweet?.note_tweet_results?.result?.media?.inline_media?.length ? true : undefined,
     reply_count: tweet.legacy.reply_count || 0,
     like_count: tweet.legacy.favorite_count || 0,
     retweet_count: tweet.legacy.quote_count || 0,

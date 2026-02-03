@@ -1,11 +1,12 @@
 import type { ITweetFilter } from '@tweets-viewer/rettiwt-api'
-import { apiClient, cursor, enrichmentService, userId, writeCursor } from './common'
-import { writeJson } from './utils'
+import { apiClient, cursor, enrichmentService, writeCursor } from '../src/common'
+import { writeJson } from '../src/utils'
+import { userId } from './common'
 
 const filter: ITweetFilter = {
   fromUsers: [userId],
-  startDate: new Date('2024-01-01'),
-  endDate: new Date('2024-06-01'),
+  startDate: new Date('2022-05-01'),
+  endDate: new Date('2023-07-14'),
 }
 
 const data = await apiClient.searchTweetsRaw(filter, cursor).catch((e) => {
