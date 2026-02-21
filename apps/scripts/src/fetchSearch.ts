@@ -5,8 +5,8 @@ import { userId } from './common'
 
 const filter: ITweetFilter = {
   fromUsers: [userId],
-  startDate: new Date('2022-05-01'),
-  endDate: new Date('2023-07-14'),
+  // startDate: new Date('2022-11-01'),
+  endDate: new Date('2016-05-30'),
 }
 
 const data = await apiClient.searchTweetsRaw(filter, cursor).catch((e) => {
@@ -31,3 +31,8 @@ await writeJson({
 }, `data/${userId}/search-${Date.now()}.json`)
 
 await writeCursor(data)
+
+console.log({
+  action: 'search-tweet',
+  lastTweetDate: enrichedTweets.at(-1)?.created_at,
+})

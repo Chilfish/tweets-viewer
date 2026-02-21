@@ -35,12 +35,6 @@ export const env = (() => {
 
   const validatedData = parsed.data
   Object.freeze(validatedData) // Ensure immutability
-
-  // Only log in development for better production security
-  if (validatedData.ENVIRONMENT === 'development') {
-    console.log(`✅ Environment: ${validatedData.ENVIRONMENT}`)
-  }
-
   return validatedData
 })()
 
