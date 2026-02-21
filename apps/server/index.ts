@@ -8,7 +8,6 @@ import { contextStorage } from 'hono/context-storage'
 import { cors } from 'hono/cors'
 import { cachedData } from './common'
 import imageApp from './routes/image'
-
 import insApp from './routes/ins'
 import tweetsApp from './routes/tweets'
 import usersApp from './routes/users'
@@ -19,10 +18,6 @@ const app = new Hono<AppType>()
 app
   .use(contextStorage())
   .use(cors())
-  // .use(cloudflareRateLimiter<AppType>({
-  //   rateLimitBinding: c => c.env.RATE_LIMITER,
-  //   keyGenerator: c => c.req.header('cf-connecting-ip') ?? c.req.header('x-forwarded-for') ?? 'unknown',
-  // }))
   .use(async (c, next) => {
     const sql = neon(process.env.DATABASE_URL || c.env.DATABASE_URL)
     const db = drizzle({ client: sql, schema })
@@ -32,10 +27,6 @@ app
 
 app
   .get('/', async (c) => {
-    // const { db } = getContext<AppType>().var
-    // const users = await getUsers(db)
-    // await setAllUsersInsData(users)
-
     const today = now()
     // name: size
     const tweetsSize: Record<string, number> = {}
@@ -55,7 +46,7 @@ app
   .route('/v3/ins', insApp)
 
 app.onError((err, c) => {
-  console.error(`${err}`)
+  console.error(err)
   return c.json(err, 500)
 })
 

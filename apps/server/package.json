@@ -3,23 +3,22 @@
   "type": "module",
   "version": "0.0.0",
   "private": true,
-  "packageManager": "bun@1.3.8",
+  "packageManager": "bun@1.3.9",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
-    "deploy": "bun run build; wrangler deploy --minify"
+    "deploy": "bun run build; wrangler --cwd .output/ deploy"
   },
   "dependencies": {
-    "@hono-rate-limiter/cloudflare": "^0.2.2",
     "@neondatabase/serverless": "^1.0.2",
     "@tweets-viewer/database": "workspace:*",
     "@tweets-viewer/shared": "workspace:*",
     "drizzle-orm": "^0.45.1",
-    "hono": "^4.11.7",
+    "hono": "^4.12.1",
     "nitro": "^3.0.1-alpha.2"
   },
   "devDependencies": {
     "vite": "^7.3.1",
-    "wrangler": "^4.61.1"
+    "wrangler": "^4.67.0"
   }
 }

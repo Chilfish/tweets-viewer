@@ -9,7 +9,7 @@ export default defineNitroConfig({
     deployConfig: true,
     nodeCompat: true,
     wrangler: {
-      name: 'tweet-api-dev',
+      name: 'tweet-api',
       observability: {
         logs: {
           enabled: true,
