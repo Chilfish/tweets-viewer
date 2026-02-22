@@ -5,11 +5,17 @@ import { PAGE_SIZE } from '@tweets-viewer/shared'
 import { useEffect, useRef } from 'react'
 import { useRouteLoaderData, useSearchParams } from 'react-router'
 import { SearchInput } from '~/components/search-input'
+import { TweetsHydrateFallback } from '~/components/skeletons/tweets'
 import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
 import { MyTweet } from '~/components/tweet/Tweet'
 import { TweetFeedStatus } from '~/components/tweet/TweetFeedStatus'
 import { apiClient } from '~/lib/utils'
 import { useTweetStore } from '~/store/use-tweet-store'
+
+export const handle = {
+  isWide: false,
+  skeleton: <TweetsHydrateFallback />,
+}
 
 export function meta({ location }: Route.MetaArgs) {
   const params = new URLSearchParams(location.search)

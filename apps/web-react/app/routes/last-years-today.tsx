@@ -6,6 +6,7 @@ import { isAxiosError } from 'axios'
 import { History } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { useRouteLoaderData, useSearchParams } from 'react-router'
+import { TweetsHydrateFallback } from '~/components/skeletons/tweets'
 import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
 import { MyTweet } from '~/components/tweet/Tweet'
 import { TweetFeedStatus } from '~/components/tweet/TweetFeedStatus'
@@ -14,6 +15,10 @@ import { TweetsToolbarActions } from '~/components/tweet/tweets-toolbar-actions'
 import { apiClient } from '~/lib/utils'
 import { useTweetStore } from '~/store/use-tweet-store'
 
+export const handle = {
+  isWide: false,
+  skeleton: <TweetsHydrateFallback />,
+}
 export function meta({ params }: Route.MetaArgs) {
   const { name } = params
   return [
@@ -27,7 +32,6 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
   const url = new URL(request.url)
   const page = Number(url.searchParams.get('page')) || 1
   const reverse = url.searchParams.get('reverse') === 'true'
-
   try {
     const { data: paginatedTweets } = await apiClient.get<PaginatedResponse<EnrichedTweet>>(`/tweets/get/${name}/last-years-today`, {
       params: {
@@ -109,6 +113,15 @@ export default function LastYearsTodayPage({ loaderData, params }: Route.Compone
         </div>
       )
     }
+
+    // if (status === 'fetching') {
+    //   return (
+    //     <div className="py-12 text-center flex flex-col gap-2 items-center justify-center text-muted-foreground">
+    //       <Loader2Icon className="size-12 animate-spin text-primary/60" />
+    //       <p>正在加载更多推文...</p>
+    //     </div>
+    //   )
+    // }
 
     return (
       <>

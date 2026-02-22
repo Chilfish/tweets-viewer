@@ -8,6 +8,7 @@ import { isAxiosError } from 'axios'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { MediaWall } from '~/components/media/MediaWall'
+import { MediaHydrateFallback } from '~/components/skeletons/media'
 import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
 import { TweetFeedStatus } from '~/components/tweet/TweetFeedStatus'
 import { TweetNavigation } from '~/components/tweet/TweetNavigation'
@@ -17,6 +18,7 @@ import { apiClient } from '~/lib/utils'
 
 export const handle = {
   isWide: true,
+  skeleton: <MediaHydrateFallback />,
 }
 
 export function meta({ params }: Route.MetaArgs) {

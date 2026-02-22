@@ -2,7 +2,7 @@ import { Skeleton } from '~/components/ui/skeleton'
 
 export function ProfileHeaderSkeleton() {
   return (
-    <div className="tweet-container p-0 rounded w-full bg-card border border-border/50 overflow-hidden">
+    <div className="tweet-container p-0 rounded w-full bg-card border-2 border-border/50 overflow-hidden min-h-fit">
       {/* Banner */}
       <div className="aspect-3/1 w-full relative">
         <Skeleton className="size-full rounded-none" />

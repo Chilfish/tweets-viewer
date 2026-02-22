@@ -78,15 +78,6 @@ export default function App() {
   return <Outlet />
 }
 
-// export function HydrateFallback() {
-//   return (
-//     <div className="flex flex-col items-center justify-center h-screen bg-background text-foreground">
-//       <Loader2 className="size-8 animate-spin text-primary" />
-//       <p className="mt-4 text-muted-foreground">加载中...</p>
-//     </div>
-//   )
-// }
-
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   let message = 'Oops! Something went wrong.'
   let details = 'An unexpected error occurred. Please try again later.'

@@ -5,6 +5,7 @@ import { PAGE_SIZE } from '@tweets-viewer/shared'
 import { isAxiosError } from 'axios'
 import { useEffect, useRef } from 'react'
 import { useRouteLoaderData, useSearchParams } from 'react-router'
+import { TweetsHydrateFallback } from '~/components/skeletons/tweets'
 import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
 import { MyTweet } from '~/components/tweet/Tweet'
 import { TweetFeedStatus } from '~/components/tweet/TweetFeedStatus'
@@ -19,6 +20,11 @@ export function meta({ params }: Route.MetaArgs) {
     { title: `@${name}'s Tweets` },
     { name: 'description', content: `See all tweets from @${name}` },
   ]
+}
+
+export const handle = {
+  isWide: false,
+  skeleton: <TweetsHydrateFallback />,
 }
 
 export async function clientLoader({ params, request }: Route.ClientLoaderArgs) {
