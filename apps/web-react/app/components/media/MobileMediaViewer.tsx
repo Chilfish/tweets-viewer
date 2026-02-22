@@ -34,10 +34,12 @@ export function MobileMediaViewer({
   }, [])
 
   useEffect(() => {
-    if (open) {
+    if (!open)
+      return
+    const timer = setTimeout(() => setShowControls(false), 3500)
+    return () => {
+      clearTimeout(timer)
       setShowControls(true)
-      const timer = setTimeout(() => setShowControls(false), 3500)
-      return () => clearTimeout(timer)
     }
   }, [open, currentMediaIndexInTweet])
 
@@ -56,7 +58,10 @@ export function MobileMediaViewer({
       >
         <div
           className="h-full w-full bg-black flex items-center justify-center relative touch-none select-none"
+          role="button"
+          tabIndex={0}
           onClick={toggleControls}
+          onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && toggleControls()}
         >
           {isVideo && mp4Video ? (
             <MediaVideo

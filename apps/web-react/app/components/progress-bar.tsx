@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { useNavigation } from 'react-router'
 import { useSpinDelay } from 'spin-delay'
 import { cn } from '~/lib/utils'
@@ -18,11 +18,14 @@ function ProgressBar({ showSpinner = false }: ProgressBarProps) {
   const ref = useRef<HTMLDivElement>(null)
   const [animationComplete, setAnimationComplete] = useState(true)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!ref.current)
       return
-    if (delayedPending)
-      setAnimationComplete(false)
+    const wasDelayed = delayedPending
+    Promise.resolve().then(() => {
+      if (wasDelayed)
+        setAnimationComplete(false)
+    })
 
     const animationPromises = ref.current
       .getAnimations()

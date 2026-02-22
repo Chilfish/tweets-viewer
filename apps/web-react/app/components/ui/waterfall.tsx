@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { AlertCircle, Loader2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert'
 import { Button } from '~/components/ui/button'
 import { useInfiniteScroll } from '~/hooks/use-infinite-scroll'
@@ -72,10 +72,8 @@ function useResponsiveColumns(
   })
 
   useEffect(() => {
-    if (typeof cols === 'number') {
-      setColumnCount(cols)
+    if (typeof cols === 'number')
       return
-    }
 
     const updateColumnCount = () => {
       const width = window.innerWidth
@@ -87,7 +85,7 @@ function useResponsiveColumns(
     return () => window.removeEventListener('resize', updateColumnCount)
   }, [cols])
 
-  return columnCount
+  return typeof cols === 'number' ? cols : columnCount
 }
 
 // 瀑布流布局 Hook - 稳定的排列算法，预先计算高度避免布局闪烁
@@ -96,15 +94,9 @@ function useMasonryLayout<T extends WaterfallItem>(
   columnCount: number,
   containerWidth: number = 800,
 ) {
-  const [columns, setColumns] = useState<
-    (T & { calculatedHeight: number })[][]
-  >([])
-
-  useEffect(() => {
-    if (items.length === 0) {
-      setColumns([])
-      return
-    }
+  return useMemo(() => {
+    if (items.length === 0)
+      return []
 
     // 计算每列的实际宽度（考虑间距）
     const columnWidth = (containerWidth - (columnCount - 1) * 4) / columnCount
@@ -147,10 +139,8 @@ function useMasonryLayout<T extends WaterfallItem>(
       columnHeights[targetColumnIndex] += calculatedHeight + 4
     })
 
-    setColumns(newColumns)
+    return newColumns
   }, [items, columnCount, containerWidth])
-
-  return columns
 }
 
 export function Waterfall<T extends WaterfallItem>({
@@ -296,7 +286,10 @@ export function Waterfall<T extends WaterfallItem>({
                     animationDelay: `${Math.min((columnIndex * 5 + itemIndex) * 50, 800)}ms`,
                     animationFillMode: 'backwards',
                   }}
+                  role="button"
+                  tabIndex={0}
                   onClick={() => handleItemClick(item, columnIndex, itemIndex)}
+                  onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && handleItemClick(item, columnIndex, itemIndex)}
                 >
                   {renderItem(item, columnIndex * column.length + itemIndex)}
                 </div>

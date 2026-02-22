@@ -6,7 +6,7 @@ import { env } from '../../../env.server'
 import { getLocalCache } from './localCache'
 import { cacheDir, writeJson } from './utils'
 
-export const userId = 'tanda_hazuki'
+export const userId = 'yuno_yumemita'
 
 const KEYS = (env.TWEET_KEYS || '').split(',').filter(Boolean).map(key => key.trim())
 

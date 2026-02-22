@@ -1,6 +1,6 @@
 import type { VariantProps } from 'class-variance-authority'
 import { cva } from 'class-variance-authority'
-import { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
+import { forwardRef, useCallback, useLayoutEffect, useRef, useState } from 'react'
 import { Skeleton } from '~/components/ui/skeleton'
 import { cn } from '~/lib/utils'
 
@@ -79,7 +79,7 @@ export interface MediaImageProps extends React.ImgHTMLAttributes<HTMLImageElemen
 }
 
 const MediaImage = forwardRef<HTMLImageElement, MediaImageProps>(
-  ({ className, containerClassName, loadingFallback, errorFallback, onLoad, onError, ...props }, ref) => {
+  ({ className, containerClassName, loadingFallback, errorFallback, onLoad, onError, alt, ...props }, ref) => {
     const [status, setStatus] = useState<MediaStatus>('loading')
     const imgRef = useRef<HTMLImageElement>(null)
 
@@ -103,9 +103,9 @@ const MediaImage = forwardRef<HTMLImageElement, MediaImageProps>(
       }
     }, [ref])
 
-    useEffect(() => {
+    useLayoutEffect(() => {
       if (imgRef.current?.complete && imgRef.current.naturalWidth > 0) {
-        setStatus('success')
+        Promise.resolve().then(() => setStatus('success'))
       }
     }, [])
 
@@ -124,6 +124,7 @@ const MediaImage = forwardRef<HTMLImageElement, MediaImageProps>(
           ref={mergedRef}
           onLoad={handleLoad}
           onError={handleError}
+          alt={alt}
           data-status={status}
           loading="lazy"
           className={cn(
@@ -185,10 +186,10 @@ const MediaVideo = forwardRef<HTMLVideoElement, MediaVideoProps>(
     }
 
     // 客户端检查视频是否已加载
-    useEffect(() => {
+    useLayoutEffect(() => {
       const video = videoRef.current
       if (video && video.readyState >= 2) { // HAVE_CURRENT_DATA
-        setStatus('success')
+        Promise.resolve().then(() => setStatus('success'))
       }
     }, [])
 

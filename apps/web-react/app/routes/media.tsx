@@ -51,15 +51,41 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
   }
 }
 
+async function fetchMediaPageData(
+  name: string,
+  pageNum: number,
+  options: { reverse: boolean, pageSize: number, start?: string, end?: string },
+): Promise<{ newMedia: FlatMediaItem[], total: number, hasMore: boolean } | null> {
+  try {
+    const { data: response } = await apiClient.get<PaginatedResponse<EnrichedTweet>>(
+      `/tweets/medias/${name}`,
+      { params: { page: pageNum, ...options } },
+    )
+    return {
+      newMedia: extractMediaFromTweets(response.data),
+      total: response.meta.total,
+      hasMore: response.meta.hasMore,
+    }
+  }
+  catch (error) {
+    console.error('Failed to fetch media:', error)
+    return null
+  }
+}
+
 export default function MediaPage({ loaderData, params }: Route.ComponentProps) {
   const { firstPage } = loaderData
   const [searchParams] = useSearchParams()
 
-  // 1. 纯客户端状态：分页、数据、状态
-  const [mediaItems, setMediaItems] = useState<FlatMediaItem[]>([])
+  // 1. 纯客户端状态：从 loaderData 初始化，避免 effect 内同步 setState
+  const [mediaItems, setMediaItems] = useState<FlatMediaItem[]>(() =>
+    extractMediaFromTweets(firstPage.data),
+  )
   const [currentPage, setCurrentPage] = useState(1)
-  const [status, setStatus] = useState<StreamStatus>('idle')
-  const [totalCount, setTotalCount] = useState(0)
+  const [status, setStatus] = useState<StreamStatus>(() =>
+    firstPage.meta.hasMore ? 'ready' : 'exhausted',
+  )
+  const [totalCount, setTotalCount] = useState(() => firstPage.meta.total)
 
   // 过滤参数 (来自 URL)
   const reverse = searchParams.get('reverse') === 'true'
@@ -69,46 +95,36 @@ export default function MediaPage({ loaderData, params }: Route.ComponentProps) 
 
   // 2. 核心：数据获取逻辑 (封装为纯客户端调用)
   const fetchNextPage = useCallback(async (pageNum: number, isReset = false) => {
-    setStatus('fetching')
-    try {
-      const { data: response } = await apiClient.get<PaginatedResponse<EnrichedTweet>>(`/tweets/medias/${params.name}`, {
-        params: { page: pageNum, reverse, pageSize: PAGE_SIZE, start, end },
-      })
-
-      const newMedia = extractMediaFromTweets(response.data)
-
-      setMediaItems((prev) => {
-        if (isReset)
-          return newMedia
-        const existingIds = new Set(prev.map(i => i.id))
-        return [...prev, ...newMedia.filter(i => !existingIds.has(i.id))]
-      })
-
-      setTotalCount(response.meta.total)
-      setStatus(response.meta.hasMore ? 'ready' : 'exhausted')
-    }
-    catch (error) {
-      console.error('Failed to fetch media:', error)
+    Promise.resolve().then(() => setStatus('fetching'))
+    const result = await fetchMediaPageData(params.name, pageNum, { reverse, pageSize: PAGE_SIZE, start, end })
+    if (result === null) {
       setStatus('error')
+      return
     }
+    setMediaItems((prev) => {
+      if (isReset)
+        return result.newMedia
+      const existingIds = new Set(prev.map(i => i.id))
+      return [...prev, ...result.newMedia.filter(i => !existingIds.has(i.id))]
+    })
+    setTotalCount(result.total)
+    if (result.hasMore) {
+      setStatus('ready')
+    }
+    else {
+      setStatus('exhausted')
+    }
+    if (isReset)
+      setCurrentPage(pageNum)
   }, [params.name, reverse, start, end])
 
-  // 3. 处理初始化与过滤器重置
+  // 3. 当过滤器或路由改变时重置（首次加载已通过 useState 初始化）
   const isFirstMount = useRef(true)
   useEffect(() => {
-    // 首次加载，直接从 loaderData (注水数据) 初始化
     if (isFirstMount.current) {
-      const initialMedia = extractMediaFromTweets(firstPage.data)
-      setMediaItems(initialMedia)
-      setTotalCount(firstPage.meta.total)
-      setStatus(firstPage.meta.hasMore ? 'ready' : 'exhausted')
-      setCurrentPage(1)
       isFirstMount.current = false
       return
     }
-
-    // 当过滤器改变（URL 变化）时，重置并重新抓取第 1 页
-    setCurrentPage(1)
     fetchNextPage(1, true)
   }, [filterKey, firstPage]) // 同时也监听 firstPage 以应对路由切换
 
@@ -124,9 +140,6 @@ export default function MediaPage({ loaderData, params }: Route.ComponentProps) 
   const handlePageChange = (targetPage: number) => {
     if (targetPage === currentPage || status === 'fetching')
       return
-    // 点击跳转依然会导致列表重新从该页开始（因为我们是瀑布流结合分页）
-    // 但根据需求，这里我们采取“跳转即重置”逻辑，或者“滚动到”逻辑
-    // 这里保持简单：跳转到新页并重置列表
     setCurrentPage(targetPage)
     fetchNextPage(targetPage, true)
   }

@@ -1,7 +1,7 @@
 import type { EnrichedUser } from '@tweets-viewer/rettiwt-api'
 import type { ClientLoaderFunctionArgs, ShouldRevalidateFunctionArgs } from 'react-router'
 import { Outlet, useLoaderData, useLocation, useMatches, useParams } from 'react-router'
-import { TopNav } from '~/components/top-nav'
+import { TopNav } from '~/components/layout/top-nav'
 import { useIsMobile } from '~/hooks/use-mobile'
 import { apiClient, cn } from '~/lib/utils'
 import { useUserStore } from '~/store/use-user-store'
@@ -17,7 +17,7 @@ export async function clientLoader({ params }: ClientLoaderFunctionArgs) {
   let allUsers = users
   if (!isInitialized || allUsers.length === 0) {
     const usersRes = await apiClient.get<EnrichedUser[]>(`/users/all`)
-    allUsers = usersRes.data
+    allUsers = usersRes.data.sort((a, b) => a.userName.localeCompare(b.userName))
     setUsers(allUsers)
     setInitialized(true)
   }
