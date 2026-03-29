@@ -16,7 +16,7 @@ export function UserTabs({ user }: UserTabsProps) {
     { name: '推文', value: 'tweets', href: `/tweets/${user.userName}` },
     { name: '媒体', value: 'media', href: `/media/${user.userName}` },
     { name: '那年今日', value: 'memo', href: `/memo/${user.userName}` },
-    { name: 'Instagram', value: 'ins', href: `/ins/${user.userName}` },
+    // { name: 'Instagram', value: 'ins', href: `/ins/${user.userName}` },
   ], [user.userName])
 
   // 根据当前路径自动计算激活的 Tab
