@@ -48,7 +48,7 @@ export function TweetPagination({ totalPages, className }: TweetPaginationProps)
       ) {
         pages.push(i)
       }
-      else if (pages[pages.length - 1] !== 'ellipsis') {
+      else if (pages.at(-1) !== 'ellipsis') {
         pages.push('ellipsis')
       }
     }

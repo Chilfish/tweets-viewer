@@ -34,12 +34,10 @@ export function MobileMediaViewer({
   }, [])
 
   useEffect(() => {
-    if (!open)
-      return
-    const timer = setTimeout(() => setShowControls(false), 3500)
-    return () => {
-      clearTimeout(timer)
+    if (open) {
       setShowControls(true)
+      const timer = setTimeout(setShowControls, 3500, false)
+      return () => clearTimeout(timer)
     }
   }, [open, currentMediaIndexInTweet])
 

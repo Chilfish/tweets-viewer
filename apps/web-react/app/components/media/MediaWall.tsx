@@ -1,8 +1,8 @@
 import type { FlatMediaItem } from '~/lib/media'
 import { VideoIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { Skeleton } from '~/components/ui/skeleton'
 import { useMediaColumns } from '~/hooks/use-media-columns'
-import { MediaWallSkeleton } from '../skeletons/media'
 import { MediaCard } from './MediaCard'
 import { MediaPreviewModal } from './MediaPreviewModal'
 
@@ -19,7 +19,7 @@ export function MediaWall({ items, isLoading, isEmpty }: MediaWallProps) {
 
   // Distribute items into columns (Round-Robin) to ensure L-R then T-B ordering stability
   const buckets = useMemo(() => {
-    const _buckets = Array.from({ length: columns }, () => [] as { item: FlatMediaItem, originalIndex: number }[])
+    const _buckets = Array.from({ length: columns }).fill([] as { item: FlatMediaItem, originalIndex: number }[])
     items.forEach((item, i) => {
       _buckets[i % columns].push({ item, originalIndex: i })
     })
@@ -72,5 +72,45 @@ export function MediaWall({ items, isLoading, isEmpty }: MediaWallProps) {
         />
       )}
     </>
+  )
+}
+
+function MediaWallSkeleton() {
+  const columns = useMediaColumns()
+  // Generate dummy skeletons distributed in columns
+  const skeletonHeights = [
+    220,
+    380,
+    280,
+    200,
+    320,
+    240,
+    180,
+    300,
+    260,
+    340,
+    210,
+    290,
+  ]
+
+  const buckets = Array.from({ length: columns }).fill([] as number[])
+  skeletonHeights.forEach((h, i) => {
+    buckets[i % columns].push(h)
+  })
+
+  return (
+    <div className="flex gap-2 items-start">
+      {buckets.map((bucket, i) => (
+        <div key={i} className="flex-1 space-y-2">
+          {bucket.map((height, j) => (
+            <Skeleton
+              key={j}
+              className="w-full rounded-lg"
+              style={{ height: `${height}px` }}
+            />
+          ))}
+        </div>
+      ))}
+    </div>
   )
 }

@@ -36,12 +36,10 @@ export function DesktopMediaViewer({
   }, [])
 
   useEffect(() => {
-    if (!open)
-      return
-    const timer = setTimeout(() => setShowControls(false), 3500)
-    return () => {
-      clearTimeout(timer)
+    if (open) {
       setShowControls(true)
+      const timer = setTimeout(setShowControls, 3500, false)
+      return () => clearTimeout(timer)
     }
   }, [open, currentMediaIndexInTweet])
 
@@ -60,10 +58,7 @@ export function DesktopMediaViewer({
             {/* 左侧：图像区域 (Flex-1) */}
             <div
               className="relative flex-1 bg-black flex items-center justify-center select-none cursor-pointer overflow-hidden"
-              role="button"
-              tabIndex={0}
               onClick={toggleControls}
-              onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && toggleControls()}
             >
               {isVideo && mp4Video ? (
                 <MediaVideo

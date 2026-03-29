@@ -23,4 +23,5 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           TWEET_KEYS: ${{ secrets.TWEET_KEYS }}
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
         run: bun run apps/scripts/src/dailyUpdate.ts
