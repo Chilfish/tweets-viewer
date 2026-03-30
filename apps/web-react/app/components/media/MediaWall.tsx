@@ -19,7 +19,7 @@ export function MediaWall({ items, isLoading, isEmpty }: MediaWallProps) {
 
   // Distribute items into columns (Round-Robin) to ensure L-R then T-B ordering stability
   const buckets = useMemo(() => {
-    const _buckets = Array.from({ length: columns }).fill([] as { item: FlatMediaItem, originalIndex: number }[])
+    const _buckets = Array.from({ length: columns }, () => [] as { item: FlatMediaItem, originalIndex: number }[])
     items.forEach((item, i) => {
       _buckets[i % columns].push({ item, originalIndex: i })
     })
@@ -93,7 +93,7 @@ function MediaWallSkeleton() {
     290,
   ]
 
-  const buckets = Array.from({ length: columns }).fill([] as number[])
+  const buckets = Array.from({ length: columns }, () => [] as number[])
   skeletonHeights.forEach((h, i) => {
     buckets[i % columns].push(h)
   })

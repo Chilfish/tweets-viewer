@@ -102,10 +102,10 @@ function useMasonryLayout<T extends WaterfallItem>(
     const columnWidth = (containerWidth - (columnCount - 1) * 4) / columnCount
 
     // 初始化列数组
-    const newColumns: (T & { calculatedHeight: number })[][] = Array.from({ length: columnCount }).fill([])
+    const newColumns: (T & { calculatedHeight: number })[][] = Array.from({ length: columnCount }, () => [])
 
     // 用于跟踪每列的累计高度
-    const columnHeights = Array.from({ length: columnCount }).fill(0)
+    const columnHeights = Array.from({ length: columnCount }, () => [])
 
     // 为每个项目预先计算高度并分配到最短的列
     items.forEach((item, index) => {
