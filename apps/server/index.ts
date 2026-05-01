@@ -1,4 +1,5 @@
 import type { AppType } from './common'
+import { cloudflareRateLimiter } from '@hono-rate-limiter/cloudflare'
 import { neon } from '@neondatabase/serverless'
 import { schema } from '@tweets-viewer/database'
 import { now } from '@tweets-viewer/shared'
@@ -13,11 +14,23 @@ import tweetsApp from './routes/tweets'
 import usersApp from './routes/users'
 import 'dotenv'
 
+const isDev = process.env.NODE_ENV === 'development'
+
 const app = new Hono<AppType>()
 
 app
   .use(contextStorage())
-  .use(cors())
+  .use(cors({
+    origin: isDev
+      ? '*'
+      : ['https://tweet.chilfish.top', 'https://tweets-viewer.pages.dev'],
+    allowMethods: ['GET', 'HEAD', 'OPTIONS'],
+    maxAge: 86400,
+  }))
+  .use(cloudflareRateLimiter({
+    rateLimitBinding: (c: any) => c.env.RATE_LIMITER,
+    keyGenerator: (c: any) => c.req.header('cf-connecting-ip') || 'anonymous',
+  }))
   .use(async (c, next) => {
     const sql = neon(process.env.DATABASE_URL || c.env.DATABASE_URL)
     const db = drizzle({ client: sql, schema })
@@ -47,10 +60,12 @@ app
 
 app.onError((err, c) => {
   console.error(err)
-  return c.json(err, 500)
+  if (isDev) {
+    return c.json({ error: err.message, stack: err.stack }, 500)
+  }
+  return c.json({ error: 'Internal Server Error' }, 500)
 })
 
 export default {
   fetch: app.fetch,
-  scheduled: async (_batch: any, _env: any) => {},
 }

@@ -4,12 +4,11 @@ import { TweetLink } from './tweet-link'
 
 interface TweetBodyProps {
   tweet: EnrichedTweet
-  isTranslated: boolean
   lang?: string
   className?: string
 }
 
-export function TweetBody({ tweet, isTranslated, lang, className }: TweetBodyProps) {
+export function TweetBody({ tweet, lang, className }: TweetBodyProps) {
   return (
     <p
       className={cn('tweet-body', className)}
@@ -17,9 +16,7 @@ export function TweetBody({ tweet, isTranslated, lang, className }: TweetBodyPro
       dir="auto"
     >
       {tweet.entities.map((item) => {
-        const text = isTranslated ? (item.translation || item.aiTranslation || item.text) : item.text
-        if (!isTranslated && item.index < 0)
-          return null
+        const text = item.text
 
         switch (item.type) {
           case 'url':

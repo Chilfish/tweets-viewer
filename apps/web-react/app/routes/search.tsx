@@ -136,7 +136,7 @@ export default function SearchPage({ loaderData, params }: Route.ComponentProps)
           {tweets.map(tweet => (
             <MyTweet
               tweet={tweet}
-              tweetAuthorName={user!.fullName}
+              tweetAuthorName={user?.fullName ?? name}
               key={tweet.id}
             />
           ))}

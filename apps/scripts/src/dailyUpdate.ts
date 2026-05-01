@@ -6,6 +6,7 @@ import { drizzle } from 'drizzle-orm/neon-http'
 
 const KEYS = (process.env.TWEET_KEYS || '').split(',').filter(Boolean).map(key => key.trim())
 const ENABLE_FULL_SYNC = true
+const SYNC_SINCE = new Date('2026-04-14')
 const twitterPool = new RettiwtPool(KEYS)
 
 const apiClient = new TwitterAPIClient(twitterPool)
@@ -48,10 +49,14 @@ async function fetchTimeline(userId: string, cursor?: string) {
   }
 }
 
-const client = neon(process.env.DATABASE_URL!)
+const DATABASE_URL = process.env.DATABASE_URL
+if (!DATABASE_URL) {
+  console.error('DATABASE_URL is required')
+  process.exit(1)
+}
+const client = neon(DATABASE_URL)
 const db = drizzle({ client, schema })
 const users = await getAllUsers(db)
-const now = new Date()
 
 console.log({
   action: 'get-users',
@@ -73,7 +78,7 @@ for (const user of users) {
         nowCursor = cursor
         const lastTweet = tweets.at(-1)
 
-        if (new Date(lastTweet!.created_at).getTime() < new Date('2026-04-14').getTime())
+        if (new Date(lastTweet!.created_at).getTime() < SYNC_SINCE.getTime())
           break
       } while (ENABLE_FULL_SYNC)
       console.log({

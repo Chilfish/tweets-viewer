@@ -8,6 +8,13 @@
       "when": 1769754130656,
       "tag": "0000_absurd_ted_forrester",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1746097200000,
+      "tag": "0001_add_performance_indexes",
+      "breakpoints": true
     }
   ]
 }

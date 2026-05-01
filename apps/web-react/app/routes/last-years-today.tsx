@@ -129,7 +129,7 @@ export default function LastYearsTodayPage({ loaderData, params }: Route.Compone
           {tweets.map(tweet => (
             <MyTweet
               tweet={tweet}
-              tweetAuthorName={user!.fullName}
+              tweetAuthorName={user?.fullName ?? name}
               key={tweet.id}
             />
           ))}

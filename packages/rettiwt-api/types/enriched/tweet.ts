@@ -60,10 +60,10 @@ export interface Tweet extends TweetBase {
   // conversation_count: number
   news_action_type: 'conversation'
   quoted_tweet?: QuotedTweet
-  in_reply_to_status_id_str?: string
   // parent?: TweetParent
   possibly_sensitive?: boolean
   card?: any
+  in_reply_to_status_id_str?: string
 }
 
 /**

@@ -12,8 +12,6 @@
     "resolveJsonModule": true,
     "types": ["node", "vite/client"],
     "strict": true,
-
-    "noImplicitAny": false,
     "noEmit": true,
     "noEmitOnError": true,
     "removeComments": false,

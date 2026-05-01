@@ -15,12 +15,12 @@ interface GetTweet {
   noReplies?: boolean
 }
 
-const BANCH_SIZE = 1000
+const BATCH_SIZE = 1000
 
 export async function createTweets({ db, tweets, user }: { db: DB, tweets: EnrichedTweet[], user: EnrichedUser }) {
   let insertedCount = 0
-  for (let i = 0; i < tweets.length; i += BANCH_SIZE) {
-    const chunk = tweets.slice(i, i + BANCH_SIZE)
+  for (let i = 0; i < tweets.length; i += BATCH_SIZE) {
+    const chunk = tweets.slice(i, i + BATCH_SIZE)
 
     const { rowCount } = await db
       .insert(tweetsTable)

@@ -36,6 +36,7 @@ export * from './requests/Tweet'
 export * from './requests/User'
 // MAIN
 export * from './Rettiwt'
+export * from './helper'
 
 // SERVICES
 export * from './services/public/DirectMessageService'
@@ -43,6 +44,8 @@ export * from './services/public/FetcherService'
 export * from './services/public/ListService'
 export * from './services/public/TweetService'
 export * from './services/public/UserService'
+export * from './services/public/TweetEnrichmentService'
+export * from './services/public/TwitterAPIClient'
 
 // TYPES
 export * from './types/args/FetchArgs'
