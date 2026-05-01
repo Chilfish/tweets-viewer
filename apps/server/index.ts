@@ -1,5 +1,4 @@
 import type { AppType } from './common'
-import { cloudflareRateLimiter } from '@hono-rate-limiter/cloudflare'
 import { neon } from '@neondatabase/serverless'
 import { schema } from '@tweets-viewer/database'
 import { now } from '@tweets-viewer/shared'
@@ -26,10 +25,6 @@ app
       : ['https://tweet.chilfish.top', 'https://tweets-viewer.pages.dev'],
     allowMethods: ['GET', 'HEAD', 'OPTIONS'],
     maxAge: 86400,
-  }))
-  .use(cloudflareRateLimiter({
-    rateLimitBinding: (c: any) => c.env.RATE_LIMITER,
-    keyGenerator: (c: any) => c.req.header('cf-connecting-ip') || 'anonymous',
   }))
   .use(async (c, next) => {
     const sql = neon(process.env.DATABASE_URL || c.env.DATABASE_URL)
