@@ -5,30 +5,45 @@ import { RettiwtPool, TweetEnrichmentService, TwitterAPIClient } from '@tweets-v
 import { drizzle } from 'drizzle-orm/neon-http'
 
 const KEYS = (process.env.TWEET_KEYS || '').split(',').filter(Boolean).map(key => key.trim())
+const ENABLE_FULL_SYNC = true
 const twitterPool = new RettiwtPool(KEYS)
 
 const apiClient = new TwitterAPIClient(twitterPool)
 const enrichmentService = new TweetEnrichmentService()
 
 async function fetchTimeline(userId: string, cursor?: string) {
-  const rawTweets = await apiClient.fetchUserTimelineWithRepliesRaw(userId, cursor)
-  if (!rawTweets.tweets.length) {
+  try {
+    const rawTweets = await apiClient.fetchUserTimelineWithRepliesRaw(userId, cursor)
+    if (!rawTweets.tweets.length) {
+      console.error({
+        userId,
+        message: 'No tweets found',
+        action: 'fetch-timeline',
+      })
+      return {
+        tweets: [],
+        cursor: '',
+      }
+    }
+
+    const enrichedTweets = enrichmentService.enrichUserTimelineTweets(rawTweets.tweets, userId)
+
+    return {
+      tweets: enrichedTweets,
+      cursor: rawTweets.cursor,
+    }
+  } catch (error) {
     console.error({
       userId,
-      message: 'No tweets found',
-      action: 'fetch-timeline',
+      cursor,
+      message: 'Error fetching timeline',
+      action: 'fetch-timeline-error',
+      error,
     })
     return {
       tweets: [],
       cursor: '',
     }
-  }
-
-  const enrichedTweets = enrichmentService.enrichUserTimelineTweets(rawTweets.tweets, userId)
-
-  return {
-    tweets: enrichedTweets,
-    cursor: rawTweets.cursor,
   }
 }
 
@@ -49,17 +64,17 @@ for (const user of users) {
     try {
       const allTweets = []
       let nowCursor: string | undefined
-      // while (true) {
-      const { tweets, cursor } = await fetchTimeline(user.id, nowCursor)
-      // if (!tweets.length)
-      // break
-      allTweets.push(...tweets)
-      nowCursor = cursor
-      const lastTweet = tweets.at(-1)
+      do {
+        const { tweets, cursor } = await fetchTimeline(user.id, nowCursor)
+        if (!tweets.length)
+          break
+        allTweets.push(...tweets)
+        nowCursor = cursor
+        const lastTweet = tweets.at(-1)
 
-      // if (new Date(lastTweet.created_at).getTime() < new Date('2026-03-17').getTime())
-      // break
-      // }
+        if (new Date(lastTweet!.created_at).getTime() < new Date('2026-04-14').getTime())
+          break
+      } while (ENABLE_FULL_SYNC)
       console.log({
         userId: user.id,
         username: user.fullName,
