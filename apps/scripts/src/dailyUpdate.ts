@@ -32,7 +32,8 @@ async function fetchTimeline(userId: string, cursor?: string) {
       tweets: enrichedTweets,
       cursor: rawTweets.cursor,
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.error({
       userId,
       cursor,

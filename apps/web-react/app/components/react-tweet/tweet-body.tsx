@@ -4,24 +4,27 @@ import { TweetLink } from './tweet-link'
 
 interface TweetBodyProps {
   tweet: EnrichedTweet
+  isTranslated: boolean
   lang?: string
   className?: string
 }
 
-export function TweetBody({ tweet, lang, className }: TweetBodyProps) {
+export function TweetBody({ tweet, isTranslated, lang, className }: TweetBodyProps) {
   return (
     <p
       className={cn('tweet-body', className)}
       lang={lang ?? tweet.lang}
       dir="auto"
     >
-      {tweet.entities.map((item, i) => {
-        const text = item.text
+      {tweet.entities.map((item) => {
+        const text = isTranslated ? (item.translation || item.aiTranslation || item.text) : item.text
+        if (!isTranslated && item.index < 0)
+          return null
 
         switch (item.type) {
           case 'url':
             return (
-              <TweetLink key={i} href={item.href}>
+              <TweetLink key={item.index} href={item.href}>
                 {text.length > 36 ? item.display_url : text}
               </TweetLink>
             )
@@ -30,7 +33,7 @@ export function TweetBody({ tweet, lang, className }: TweetBodyProps) {
           case 'mention':
           case 'symbol':
             return (
-              <TweetLink key={i} href={item.href}>
+              <TweetLink key={item.index} href={item.href}>
                 {text}
               </TweetLink>
             )
@@ -46,7 +49,7 @@ export function TweetBody({ tweet, lang, className }: TweetBodyProps) {
           // We use `dangerouslySetInnerHTML` to preserve the text encoding.
           // https://github.com/vercel-labs/react-tweet/issues/29
             return (
-              <span key={i} dangerouslySetInnerHTML={{ __html: text }} />
+              <span key={item.index} dangerouslySetInnerHTML={{ __html: text }} />
             )
         }
       })}

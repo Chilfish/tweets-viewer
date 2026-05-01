@@ -30,8 +30,6 @@ interface Instruction {
   entry?: Entry2
 }
 
-export type SearchInstruction = Instruction
-
 interface Entry {
   entryId: string
   sortIndex: string

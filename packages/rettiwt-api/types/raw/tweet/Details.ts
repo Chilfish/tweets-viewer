@@ -64,6 +64,11 @@ interface Result2 {
   avatar: {
     image_url: string
   }
+
+  verification: {
+    verified: boolean
+    verified_type?: 'Business' | 'Government'
+  }
 }
 
 interface AffiliatesHighlightedLabel {}
@@ -216,7 +221,6 @@ interface Legacy2 {
   retweeted_status_result?: TweetResult
   possibly_sensitive?: boolean
   in_reply_to_status_id_str?: string
-  in_reply_to_screen_name?: string
 }
 
 interface Entities2 extends EntitySet {

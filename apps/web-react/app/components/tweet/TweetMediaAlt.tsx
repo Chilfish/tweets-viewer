@@ -23,17 +23,18 @@ export function TweetMediaAlt({ tweet }: { tweet: EnrichedTweet }) {
           if (media.type !== 'photo' || !media.ext_alt_text)
             return null
           return (
-            <div key={i} className="flex gap-2 text-sm">
-              <span className="mt-0.5 flex h-fit shrink-0 items-center justify-center rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium shadow-sm ring-1 ring-inset ring-border/50">
-                图
-                {' '}
-                {i + 1}
-              </span>
-
-              <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-                <p className="wrap-break-word text-[13px] leading-relaxed">
-                  {media.ext_alt_text}
-                </p>
+            <div
+              key={media.media_url_https || i}
+              className="flex flex-col py-2.5 px-2 border border-border/50 rounded bg-muted/70"
+            >
+              <div className="tweet-body text-[13px] leading-relaxed wrap-break-words">
+                <span
+                  className="mr-1.5 inline-flex min-w-fit h-4 items-center justify-center rounded bg-card/30 border border-border/50 px-1.5 text-[10px] font-bold text-muted-foreground align-middle"
+                >
+                  图
+                  {i + 1}
+                </span>
+                {media.ext_alt_text}
               </div>
             </div>
           )
