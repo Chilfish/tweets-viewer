@@ -11,7 +11,7 @@ describe('tweets API Routes', () => {
       const res = await app.request('/v3/tweets/search')
       expect(res.status).toBe(400)
       const body = await res.json()
-      expect(body.error).toBe('keyword is required')
+      expect(body.error).toContain('keyword')
     })
   })
 

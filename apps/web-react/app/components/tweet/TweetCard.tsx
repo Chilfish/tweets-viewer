@@ -154,14 +154,14 @@ export function TweetLinkCard({ tweet, className }: TweetLinkCardProps) {
         className,
       )}
     >
-      {isLargeImageCard ? (
+      {isLargeImageCard && imageUrl ? (
         <>
-          <CardImage imageUrl={imageUrl!} altText={title || 'Link preview'} isLarge />
+          <CardImage imageUrl={imageUrl} altText={title || 'Link preview'} isLarge />
           <CardContent domain={domain} title={title} description={description} />
         </>
-      ) : hasImage ? (
+      ) : hasImage && imageUrl ? (
         <div className="flex">
-          <CardImage imageUrl={imageUrl!} altText={title || 'Link preview'} />
+          <CardImage imageUrl={imageUrl} altText={title || 'Link preview'} />
           <div className="flex-1 min-w-0">
             <CardContent domain={domain} title={title} description={description} compact />
           </div>

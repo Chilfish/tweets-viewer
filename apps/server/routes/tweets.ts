@@ -13,38 +13,68 @@ import {
 } from '@tweets-viewer/database'
 import { Hono } from 'hono'
 import { getContext } from 'hono/context-storage'
+import { z } from 'zod'
 import { SimpleLRUCache } from '../utils/lru-cache'
 
 const app = new Hono<AppType>()
 
-// 简单的 LRU 缓存，用于存储用户的推文总数
-// Key: userName (string), Value: totalCount (number)
 const tweetCountCache = new SimpleLRUCache<string, number>(1000)
 const mediaTweetCountCache = new SimpleLRUCache<string, number>(1000)
 
-/**
- * 提取通用分页参数
- */
+const paginationSchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).default(10),
+  reverse: z.enum(['true', 'false']).default('false').transform(v => v === 'true'),
+})
+
 function getPaginationParams(c: Context) {
-  let page = Number(c.req.query('page') || 1)
-  if (page < 1)
-    page = 1
-  const pageSize = Number(c.req.query('pageSize') || 10)
-  const reverse = c.req.query('reverse') === 'true'
-  return { page, pageSize, reverse }
+  const parsed = paginationSchema.safeParse(c.req.query())
+  if (!parsed.success) {
+    return null
+  }
+  return parsed.data
 }
 
-app.get('/get/:name', async (c) => {
+const nameSchema = z.string().min(1).max(50).regex(/^[a-zA-Z0-9_]+$/)
+
+function getName(c: Context) {
   const name = c.req.param('name')
-  const { page, pageSize, reverse } = getPaginationParams(c)
+  if (!nameSchema.safeParse(name).success) {
+    return null
+  }
+  return name
+}
 
-  // 日期筛选参数
-  const startDateStr = c.req.query('start')
-  const endDateStr = c.req.query('end')
-  const noReplies = c.req.query('noReplies') === 'true'
+const dateRangeSchema = z.object({
+  start: z.string().datetime().optional(),
+  end: z.string().datetime().optional(),
+  noReplies: z.enum(['true', 'false']).default('false').transform(v => v === 'true'),
+})
 
-  const startDate = startDateStr ? new Date(startDateStr) : null
-  const endDate = endDateStr ? new Date(endDateStr) : null
+const searchSchema = z.object({
+  q: z.string().min(1).max(200),
+  name: z.string().min(1).max(50).regex(/^[a-zA-Z0-9_]+$/).default(''),
+})
+
+app.get('/get/:name', async (c) => {
+  const name = getName(c)
+  if (!name) return c.json({ error: 'invalid name' }, 400)
+
+  const pagination = getPaginationParams(c)
+  if (!pagination) return c.json({ error: 'invalid pagination params' }, 400)
+
+  const dateResult = dateRangeSchema.safeParse(c.req.query())
+  if (!dateResult.success) return c.json({ error: 'invalid date range' }, 400)
+
+  const { page, pageSize, reverse } = pagination
+  const { start, end, noReplies } = dateResult.data
+
+  const startDate = start ? new Date(start) : null
+  const endDate = end ? new Date(end) : null
+
+  if ((startDate && !endDate) || (!startDate && endDate)) {
+    return c.json({ error: 'start and end must both be provided or omitted' }, 400)
+  }
 
   const { db } = getContext<AppType>().var
 
@@ -63,7 +93,6 @@ app.get('/get/:name', async (c) => {
     })
   }
   else {
-    // 尝试从缓存获取总数
     const cacheKey = noReplies ? `${name}:no-replies` : name
     let total = tweetCountCache.get(cacheKey)
 
@@ -88,12 +117,15 @@ app.get('/get/:name', async (c) => {
 })
 
 app.get('/medias/:name', async (c) => {
-  const name = c.req.param('name')
-  const { page, pageSize, reverse } = getPaginationParams(c)
+  const name = getName(c)
+  if (!name) return c.json({ error: 'invalid name' }, 400)
 
+  const pagination = getPaginationParams(c)
+  if (!pagination) return c.json({ error: 'invalid pagination params' }, 400)
+
+  const { page, pageSize, reverse } = pagination
   const { db } = getContext<AppType>().var
 
-  // 尝试从缓存获取媒体推文总数
   let total = mediaTweetCountCache.get(name)
 
   if (total === undefined) {
@@ -115,13 +147,16 @@ app.get('/medias/:name', async (c) => {
 })
 
 app.get('/search', async (c) => {
-  const name = c.req.query('name') || ''
-  const { page, pageSize, reverse } = getPaginationParams(c)
-  const keyword = c.req.query('q')
+  const searchResult = searchSchema.safeParse(c.req.query())
+  if (!searchResult.success) {
+    return c.json({ error: 'keyword is required (1-200 chars)' }, 400)
+  }
 
-  if (!keyword)
-    return c.json({ error: 'keyword is required' }, 400)
+  const { q: keyword, name } = searchResult.data
+  const pagination = getPaginationParams(c)
+  if (!pagination) return c.json({ error: 'invalid pagination params' }, 400)
 
+  const { page, pageSize, reverse } = pagination
   const { db } = getContext<AppType>().var
   const tweets = await getTweetsByKeyword({
     db,
@@ -135,12 +170,15 @@ app.get('/search', async (c) => {
 })
 
 app.get('/get/:name/last-years-today', async (c) => {
-  const name = c.req.param('name')
-  const { page, pageSize, reverse } = getPaginationParams(c)
+  const name = getName(c)
+  if (!name) return c.json({ error: 'invalid name' }, 400)
 
+  const pagination = getPaginationParams(c)
+  if (!pagination) return c.json({ error: 'invalid pagination params' }, 400)
+
+  const { page, pageSize, reverse } = pagination
   const { db } = getContext<AppType>().var
 
-  // 即使是"那年今日"，也支持分页，尽管通常数据量不大
   const tweets = await getLastYearsTodayTweets({
     db,
     name,
