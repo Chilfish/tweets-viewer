@@ -27,6 +27,7 @@ export function enrichTweet(sourceData: RawTweet, retweetedOrignalId?: string): 
   const tweetUrl = `https://twitter.com/${userScreenName}/status/${tweetId}`
 
   const text = tweet.note_tweet?.note_tweet_results?.result?.text || tweet.legacy.full_text
+  const inReplyToScreenName = (tweet.legacy as any).in_reply_to_screen_name
 
   return {
     id: tweet.rest_id,
@@ -36,7 +37,7 @@ export function enrichTweet(sourceData: RawTweet, retweetedOrignalId?: string): 
     user,
     text,
     parent_id: tweet.legacy.in_reply_to_status_id_str,
-    in_reply_to_screen_name: tweet.legacy.in_reply_to_screen_name,
+    in_reply_to_screen_name: inReplyToScreenName,
     entities: getEntities(tweet, text),
     quoted_tweet_id: tweet.quoted_status_result?.result?.rest_id,
     card: mapTwitterCard(tweet.card),
@@ -61,8 +62,7 @@ export function transformUserResponse(sourceData: RawTweet): TweetUser {
     is_blue_verified: RawTweet.is_blue_verified,
     profile_image_shape: RawTweet.profile_image_shape as TweetUser['profile_image_shape'],
     verified: legacy.verified,
-    // @ts-expect-error: The verified_type is not always defined
-    verified_type: legacy.verified_type,
+    verified_type: (legacy as Record<string, any>).verified_type,
     profile_image_url_https: RawTweet.avatar.image_url,
   }
 
@@ -180,13 +180,13 @@ export function mapTwitterCard(cardData: any): LinkPreviewCard | undefined {
 }
 
 export function mapMediaDetails(tweet: RawTweet): MediaDetails[] | undefined {
-  const mediaEntities = tweet.legacy.entities?.media
+  const mediaEntities = tweet.legacy.entities?.media as unknown as any[] | undefined
   if (!mediaEntities || mediaEntities.length === 0)
     return undefined
 
-  const noteMedia = tweet.note_tweet?.note_tweet_results?.result?.media?.inline_media || []
+  const noteMedia = tweet.note_tweet?.note_tweet_results?.result?.media?.inline_media || [] as any[]
 
-  return mediaEntities.map((media, idx) => {
+  return mediaEntities.map((media: any, idx: number) => {
     const mediaNoteIdx = noteMedia.findIndex(m => m.media_id === media.id_str)
     const mediaIdx = mediaNoteIdx === -1 ? idx : mediaNoteIdx
 
@@ -241,5 +241,5 @@ export function mapMediaDetails(tweet: RawTweet): MediaDetails[] | undefined {
       type: 'photo' as const,
     }
   })
-    .sort((a, b) => a.index - b.index)
+    .sort((a: any, b: any) => a.index - b.index) as unknown as MediaDetails[]
 }

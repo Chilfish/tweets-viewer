@@ -44,7 +44,7 @@ export function ProfileHeader({ user, children }: ProfileHeaderProps) {
             <Avatar className="w-24 h-24 sm:w-32 sm:h-32 border-4 border-background bg-background ring-offset-background">
               <AvatarImage src={user.profileImage} alt={user.fullName} className="object-cover" />
               <AvatarFallback className="text-2xl font-bold bg-muted">
-                {user.fullName.slice(0, 2).toUpperCase()}
+                {(user.fullName ?? '').slice(0, 2).toUpperCase()}
               </AvatarFallback>
             </Avatar>
           </div>
@@ -78,10 +78,10 @@ export function ProfileHeader({ user, children }: ProfileHeaderProps) {
 
         {/* Meta info (Location, Join Date) */}
         <div className="mt-3 flex flex-col gap-x-4 gap-y-1 text-[15px] text-muted-foreground">
-          {user.location && (
+          {user.location?.location && (
             <div className="flex items-center gap-1">
               <MapPin className="w-4 h-4 shrink-0" />
-              <span className="truncate">{user.location}</span>
+              <span className="truncate">{user.location.location}</span>
             </div>
           )}
           <div className="flex items-center gap-1">
@@ -125,15 +125,15 @@ export function ProfileHeader({ user, children }: ProfileHeaderProps) {
         {/* Following/Followers Count */}
         <div className="mt-3 flex gap-4 text-[15px]">
           <div className="hover:underline cursor-pointer flex gap-1 decoration-foreground">
-            <span className="font-bold text-foreground">{user.followingsCount.toLocaleString()}</span>
+            <span className="font-bold text-foreground">{(user.followingsCount ?? 0).toLocaleString()}</span>
             <span className="text-muted-foreground">正在关注</span>
           </div>
           <div className="hover:underline cursor-pointer flex gap-1 decoration-foreground">
-            <span className="font-bold text-foreground">{user.followersCount.toLocaleString()}</span>
+            <span className="font-bold text-foreground">{(user.followersCount ?? 0).toLocaleString()}</span>
             <span className="text-muted-foreground">关注者</span>
           </div>
           <div className="hover:underline cursor-pointer flex gap-1 decoration-foreground">
-            <span className="font-bold text-foreground">{user.statusesCount.toLocaleString()}</span>
+            <span className="font-bold text-foreground">{(user.statusesCount ?? 0).toLocaleString()}</span>
             <span className="text-muted-foreground">帖子</span>
           </div>
         </div>

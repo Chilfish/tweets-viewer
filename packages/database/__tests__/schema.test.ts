@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { schema } from '../index'
 
-describe('Database Schema', () => {
+describe('database Schema', () => {
   describe('usersTable', () => {
     it('should have expected columns', () => {
       const columns = schema.usersTable

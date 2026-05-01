@@ -20,7 +20,7 @@ export async function clientLoader({ params }: ClientLoaderFunctionArgs) {
   let allUsers = users
   if (!isInitialized || allUsers.length === 0) {
     const usersRes = await apiClient.get<EnrichedUser[]>(`/users/all`)
-    allUsers = usersRes.data.sort((a, b) => a.userName.localeCompare(b.userName))
+    allUsers = usersRes.data.sort((a, b) => (a.userName ?? '').localeCompare(b.userName ?? ''))
     setUsers(allUsers)
     setInitialized(true)
   }

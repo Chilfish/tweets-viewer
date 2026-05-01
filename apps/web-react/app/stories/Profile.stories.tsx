@@ -22,8 +22,7 @@ const user: EnrichedUser = {
   fullName: '西尾夕香',
   id: '1112674980603428866',
   isVerified: true,
-  likeCount: 22143,
-  location: '響 / GiGO POKER公認アンバサダー',
+  location: { location: '響 / GiGO POKER公認アンバサダー' },
   pinnedTweet: '1769714176031949172',
   profileBanner: 'https://pbs.twimg.com/profile_banners/1112674980603428866/1631429806',
   profileImage: 'https://pbs.twimg.com/profile_images/1636675305812422656/Sz3moSfs_400x400.jpg',
@@ -31,7 +30,7 @@ const user: EnrichedUser = {
   userName: '240y_k',
   birthdayString: '3/31',
   url: 'https://youtube.com/channel/UCfHUq_6X97dpBrJAw4xbrEA',
-}
+} as unknown as EnrichedUser
 
 export const Main: Story = {
   render: () => <ProfileHeader user={user} />,

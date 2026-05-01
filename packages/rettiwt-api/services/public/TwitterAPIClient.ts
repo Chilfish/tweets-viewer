@@ -4,7 +4,7 @@ import type { EnrichedUser, RawTweet } from '../../types/enriched'
 import type { IListTweetsResponse } from '../../types/raw/list/Tweets'
 import type { ITweetDetailsResponse } from '../../types/raw/tweet/Details'
 import type { ITweetRepliesResponse } from '../../types/raw/tweet/Replies'
-import type { ITweetSearchResponse, SearchInstruction } from '../../types/raw/tweet/Search'
+import type { ITweetSearchResponse } from '../../types/raw/tweet/Search'
 import type { IUserDetailsResponse } from '../../types/raw/user/Details'
 import type { IUserTweetsResponse } from '../../types/raw/user/Tweets'
 import { Extractors } from '../../collections/Extractors'
@@ -79,7 +79,7 @@ export class TwitterAPIClient {
       const response = await fetcher.request<IUserDetailsResponse>(resource, { id })
 
       await this.onFetchedresponse(`${ResourceType.USER_DETAILS_BY_ID}-${id}`, response)
-      const data = Extractors[resource](response)
+      const data = Extractors[resource](response) as unknown as EnrichedUser
       return data || null
     })
   }
@@ -259,10 +259,10 @@ export class TwitterAPIClient {
    * 提取搜索结果的推文
    * @private
    */
-  private extractSearchTweets(instructions: SearchInstruction[]): RawTweet[] {
+  private extractSearchTweets(instructions: any[]): RawTweet[] {
     return instructions
-      .flatMap(t => t.entries?.filter(d => d.content.entryType === 'TimelineTimelineItem') || [])
-      .flatMap(entry => entry.content.itemContent?.tweet_results.result)
+      .flatMap((t: any) => t.entries?.filter((d: any) => d.content.entryType === 'TimelineTimelineItem') || [])
+      .flatMap((entry: any) => entry.content.itemContent?.tweet_results.result)
       .filter(result => !!result) as unknown as RawTweet[]
   }
 }

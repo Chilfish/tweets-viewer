@@ -12,9 +12,10 @@ export * from './enums/raw/Notification'
 export * from './enums/raw/Tweet'
 export * from './enums/Resource'
 export * from './enums/Tweet'
+export * from './helper'
+
 // MODELS
 export * from './models/args/FetchArgs'
-
 export * from './models/args/PostArgs'
 export * from './models/args/ProfileArgs'
 export * from './models/data/BookmarkFolder'
@@ -27,25 +28,24 @@ export * from './models/data/Notification'
 export * from './models/data/Tweet'
 export * from './models/data/User'
 export * from './models/errors/TwitterError'
+
 // REQUESTS
 export * from './requests/DirectMessage'
-
 export * from './requests/List'
 export * from './requests/Media'
 export * from './requests/Tweet'
 export * from './requests/User'
 // MAIN
 export * from './Rettiwt'
-export * from './helper'
 
 // SERVICES
 export * from './services/public/DirectMessageService'
 export * from './services/public/FetcherService'
 export * from './services/public/ListService'
-export * from './services/public/TweetService'
-export * from './services/public/UserService'
 export * from './services/public/TweetEnrichmentService'
+export * from './services/public/TweetService'
 export * from './services/public/TwitterAPIClient'
+export * from './services/public/UserService'
 
 // TYPES
 export * from './types/args/FetchArgs'

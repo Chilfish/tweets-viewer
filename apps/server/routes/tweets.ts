@@ -35,7 +35,7 @@ function getPaginationParams(c: Context) {
   return parsed.data
 }
 
-const nameSchema = z.string().min(1).max(50).regex(/^[a-zA-Z0-9_]+$/)
+const nameSchema = z.string().min(1).max(50).regex(/^\w+$/)
 
 function getName(c: Context) {
   const name = c.req.param('name')
@@ -53,18 +53,21 @@ const dateRangeSchema = z.object({
 
 const searchSchema = z.object({
   q: z.string().min(1).max(200),
-  name: z.string().min(1).max(50).regex(/^[a-zA-Z0-9_]+$/).default(''),
+  name: z.string().min(1).max(50).regex(/^\w+$/).default(''),
 })
 
 app.get('/get/:name', async (c) => {
   const name = getName(c)
-  if (!name) return c.json({ error: 'invalid name' }, 400)
+  if (!name)
+    return c.json({ error: 'invalid name' }, 400)
 
   const pagination = getPaginationParams(c)
-  if (!pagination) return c.json({ error: 'invalid pagination params' }, 400)
+  if (!pagination)
+    return c.json({ error: 'invalid pagination params' }, 400)
 
   const dateResult = dateRangeSchema.safeParse(c.req.query())
-  if (!dateResult.success) return c.json({ error: 'invalid date range' }, 400)
+  if (!dateResult.success)
+    return c.json({ error: 'invalid date range' }, 400)
 
   const { page, pageSize, reverse } = pagination
   const { start, end, noReplies } = dateResult.data
@@ -118,10 +121,12 @@ app.get('/get/:name', async (c) => {
 
 app.get('/medias/:name', async (c) => {
   const name = getName(c)
-  if (!name) return c.json({ error: 'invalid name' }, 400)
+  if (!name)
+    return c.json({ error: 'invalid name' }, 400)
 
   const pagination = getPaginationParams(c)
-  if (!pagination) return c.json({ error: 'invalid pagination params' }, 400)
+  if (!pagination)
+    return c.json({ error: 'invalid pagination params' }, 400)
 
   const { page, pageSize, reverse } = pagination
   const { db } = getContext<AppType>().var
@@ -154,7 +159,8 @@ app.get('/search', async (c) => {
 
   const { q: keyword, name } = searchResult.data
   const pagination = getPaginationParams(c)
-  if (!pagination) return c.json({ error: 'invalid pagination params' }, 400)
+  if (!pagination)
+    return c.json({ error: 'invalid pagination params' }, 400)
 
   const { page, pageSize, reverse } = pagination
   const { db } = getContext<AppType>().var
@@ -171,10 +177,12 @@ app.get('/search', async (c) => {
 
 app.get('/get/:name/last-years-today', async (c) => {
   const name = getName(c)
-  if (!name) return c.json({ error: 'invalid name' }, 400)
+  if (!name)
+    return c.json({ error: 'invalid name' }, 400)
 
   const pagination = getPaginationParams(c)
-  if (!pagination) return c.json({ error: 'invalid pagination params' }, 400)
+  if (!pagination)
+    return c.json({ error: 'invalid pagination params' }, 400)
 
   const { page, pageSize, reverse } = pagination
   const { db } = getContext<AppType>().var

@@ -24,6 +24,7 @@ const tweetWithQoutedImage: EnrichedTweet = {
     name: '立石凛',
     screen_name: 'ttisrn_0710',
     is_blue_verified: true,
+    verified: true,
     profile_image_shape: 'Circle',
     profile_image_url_https: 'https://pbs.twimg.com/profile_images/1952673634377756672/FWjMlNpA_normal.jpg',
   },
@@ -57,6 +58,7 @@ const tweetWithQoutedImage: EnrichedTweet = {
       name: 'バンドリ！ BanG Dream! 公式',
       screen_name: 'bang_dream_info',
       is_blue_verified: false,
+      verified: false,
       profile_image_shape: 'Square',
       profile_image_url_https: 'https://pbs.twimg.com/profile_images/1973738194454872064/MRvlZY2A_normal.jpg',
     },
@@ -128,6 +130,7 @@ const replyTweet: EnrichedTweet = {
     name: '西尾夕香',
     screen_name: '240y_k',
     is_blue_verified: true,
+    verified: true,
     profile_image_shape: 'Circle',
     profile_image_url_https: 'https://pbs.twimg.com/profile_images/1636675305812422656/Sz3moSfs_normal.jpg',
   },
@@ -158,6 +161,7 @@ const withVideo: EnrichedTweet = {
     name: '西尾夕香',
     screen_name: '240y_k',
     is_blue_verified: true,
+    verified: true,
     profile_image_shape: 'Circle',
     profile_image_url_https: 'https://pbs.twimg.com/profile_images/1636675305812422656/Sz3moSfs_normal.jpg',
   },
@@ -221,6 +225,7 @@ const withVideo: EnrichedTweet = {
       },
       type: 'video',
       video_info: {
+        duration: 30000,
         aspect_ratio: [
           16,
           9,
@@ -253,6 +258,7 @@ const with3Images: EnrichedTweet = {
     name: '西尾夕香',
     screen_name: '240y_k',
     is_blue_verified: true,
+    verified: true,
     profile_image_shape: 'Circle',
     profile_image_url_https: 'https://pbs.twimg.com/profile_images/1636675305812422656/Sz3moSfs_normal.jpg',
   },
@@ -278,9 +284,8 @@ const with3Images: EnrichedTweet = {
     {
       type: 'media_alt',
       text: 'GiGO制服かわいい！',
-      media_url: 'https://pbs.twimg.com/media/G_blwpRXsAEvQqE.jpg',
       index: 20000,
-    },
+    } as any,
     {
       type: 'separator',
       text: ' | ',
@@ -290,9 +295,8 @@ const with3Images: EnrichedTweet = {
     {
       type: 'media_alt',
       text: '表彰の証～！すべりこみ！！嬉し！！',
-      media_url: 'https://pbs.twimg.com/media/G_blw26bkAATip2.jpg',
       index: 20002,
-    },
+    } as any,
   ],
   quoted_tweet_id: '2014967611084439985',
   media_details: [
@@ -341,6 +345,7 @@ const with3Images: EnrichedTweet = {
       name: 'GiGO POKER新宿',
       screen_name: 'GiGOPOKER_SHIN',
       is_blue_verified: true,
+      verified: true,
       profile_image_shape: 'Circle',
       profile_image_url_https: 'https://pbs.twimg.com/profile_images/1996380094278029312/WM8ZZ2BH_normal.png',
     },
@@ -398,6 +403,7 @@ const withLinkCard: EnrichedTweet = {
     name: 'バンドリ！ BanG Dream! 公式',
     screen_name: 'bang_dream_info',
     is_blue_verified: false,
+    verified: false,
     profile_image_shape: 'Square',
     profile_image_url_https: 'https://pbs.twimg.com/profile_images/1973738194454872064/MRvlZY2A_normal.jpg',
   },
@@ -433,6 +439,7 @@ const withLinkCard: EnrichedTweet = {
     type: 'unified_card',
     url: 'https://www.youtube.com/watch?v=ZUg94j8bOoQ',
     title: 'ミニアニメ「元祖！バンドリちゃん」第17話',
+    description: 'バンドリちゃんのミニアニメ',
     domain: 'youtube.com',
     imageUrl: 'https://pbs.twimg.com/media/G_zaUWHbcAAZolP.png',
   },
@@ -444,21 +451,21 @@ const withLinkCard: EnrichedTweet = {
 }
 
 export const TweetWithQoutedImage: Story = {
-  render: () => <MyTweet tweet={tweetWithQoutedImage} />,
+  render: () => <MyTweet tweet={tweetWithQoutedImage as any} tweetAuthorName="Test User" />,
 }
 
 export const ReplyTweet: Story = {
-  render: () => <MyTweet tweet={replyTweet} />,
+  render: () => <MyTweet tweet={replyTweet as any} tweetAuthorName="Test User" />,
 }
 
 export const TweetWithVideo: Story = {
-  render: () => <MyTweet tweet={withVideo} />,
+  render: () => <MyTweet tweet={withVideo as any} tweetAuthorName="Test User" />,
 }
 
 export const TweetWith3Images: Story = {
-  render: () => <MyTweet tweet={with3Images} />,
+  render: () => <MyTweet tweet={with3Images as any} tweetAuthorName="Test User" />,
 }
 
 export const TweetWithLinkCard: Story = {
-  render: () => <MyTweet tweet={withLinkCard} />,
+  render: () => <MyTweet tweet={withLinkCard as any} tweetAuthorName="Test User" />,
 }
