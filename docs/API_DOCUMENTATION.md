@@ -1,6 +1,8 @@
 # API Documentation
 
-本文档描述了 `/v3/tweets` 和 `/v3/users` 模块的 API 接口定义。
+本文档描述了 Tweets Viewer API 的完整接口定义，涵盖 `/v3/tweets`、`/v3/users`、`/v3/image` 和 `/v3/ins` 模块。
+
+> 基础 URL：`https://tweet-api.chilfish.top` (生产) / `http://localhost:3000` (开发)
 
 ## 通用类型定义
 
@@ -50,6 +52,7 @@ interface PaginatedResponse<T> {
   - `reverse` (boolean, default: false): 是否按时间倒序排列 (true 为旧 -> 新, false 为新 -> 旧)
   - `start` (string, ISO Date, optional): 筛选开始日期
   - `end` (string, ISO Date, optional): 筛选结束日期
+  - `noReplies` (boolean, default: false): 是否排除回复推文
 
 - **Response**: `PaginatedResponse<EnrichedTweet>`
 
@@ -61,7 +64,7 @@ interface PaginatedResponse<T> {
 
 - **Query Parameters**:
   - `q` (string, **required**): 搜索关键词
-  - `name` (string, optional): 指定用户的 Screen Name，若不填则可能为全局或默认范围
+  - `name` (string, optional): 指定用户的 Screen Name；若不填则返回空
   - `page` (number, default: 1): 页码
   - `pageSize` (number, default: 10): 每页数量
   - `reverse` (boolean): 排序方向
@@ -111,3 +114,49 @@ interface PaginatedResponse<T> {
 
 - **Error Response**:
   - 404 Not Found: `{ "error": "User not found" }`
+
+---
+
+### 4. 获取媒体推文列表
+
+获取指定用户所有含图片/视频附件的推文（排除转推）。
+
+- **Endpoint**: `GET /v3/tweets/medias/:name`
+
+- **Params**:
+  - `name` (string): 用户 Screen Name
+
+- **Query Parameters**:
+  - `page` (number, default: 1): 页码
+  - `pageSize` (number, default: 10): 每页数量
+  - `reverse` (boolean): 排序方向
+
+- **Response**: `PaginatedResponse<EnrichedTweet>`
+
+---
+
+## Image 模块 ( `/v3/image`)
+
+### 1. 获取随机图片
+
+- **Endpoint**: `GET /v3/image/get`
+- **Response**: `{ url: string, ... }` — 随机图片数据
+
+### 2. 获取所有图片
+
+- **Endpoint**: `GET /v3/image/all`
+- **Response**: 图片数据数组
+
+### 3. 更新图片缓存
+
+- **Endpoint**: `GET /v3/image/update`
+- **Response**: `{ success: boolean, size?: number }`
+
+---
+
+## Ins 模块 ( `/v3/ins`)
+
+提供 Instagram 风格的静态数据端点，从远程 JSON (`p.chilfish.top`) 缓存后返回。
+
+- **Endpoint**: `GET /v3/ins/*`
+- **详细路由**: 见 `apps/server/routes/ins.ts`

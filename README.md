@@ -77,6 +77,8 @@ bun run dev:client
 ## 文档索引
 
 - `./docs/README.md`（文档入口）
+- `./docs/ARCHITECTURE.md`（全局架构：Monorepo 结构、数据流、部署拓扑）
 - `./docs/Specification.md`（前端功能规格：事实来源）
 - `./docs/SKILLS/README.md`（SDD 规范与架构约束）
+- `./docs/API_DOCUMENTATION.md`（API 接口文档）
 - `./docs/ui-design/OVERVIEW.md`（UI/交互准则）

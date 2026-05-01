@@ -24,9 +24,9 @@
 系统必须维护一份**已归档用户列表**和**当前活跃用户**。
 
 - **行为规格**：
-  - **自动同步**: 当路由参数变化时，系统需自动切换“当前活跃用户”。
-  - **上下文重置**: 切换用户是一次“硬重置”操作，必须清除所有先前用户的推文数据、页码状态和临时过滤器，防止数据串扰。
-  - **元数据缓存**: 用户的基础信息（头像、ID、简介）应在客户端持久化，以支持离线访问和秒级切换。
+  - **自动同步**: 当路由 `/tweets/:name` 中的 `:name` 参数变化时，系统自动切换"当前活跃用户"。
+  - **上下文重置**: 切换用户是一次"硬重置"操作，`resetStream()` 清除所有先前用户的推文数据、页码状态和临时过滤器，防止数据串扰。
+  - **元数据缓存**: 用户的基础信息（头像、ID、简介）通过 Zustand `persist` 中间件持久化到 localStorage，以支持离线访问和秒级切换。
 
 ### 2.2 推文流 (Tweet Stream)
 
@@ -38,12 +38,8 @@
   - `Metrics`: 转推/点赞/引用数。
   - `Context`: 是否为回复、引用或转推。
 
-- **逻辑状态**:
-  - `Idle`: 初始状态。
-  - `Fetching`: 正在请求数据。
-  - `Ready`: 数据已加载且可渲染。
-  - `Exhausted`: 已无更多数据（End of List）。
-  - `Error`: 数据获取失败。
+- **逻辑状态** (定义于 `useTweetStore`):
+  - `status`: `'idle' | 'fetching' | 'ready' | 'exhausted' | 'error'`
 
 ### 2.3 过滤器 (Filters)
 
@@ -65,21 +61,23 @@
 
 ### 3.1 URL 结构规范
 
-所有视图路径均包含 `:userId` 作为核心锚点。
+所有视图路径均包含 `:name` (Twitter Screen Name) 作为核心锚点。
 
-| 逻辑视图     | URL 模式          | 职责描述                            | Query Params 支持                 |
-| :----------- | :---------------- | :---------------------------------- | :-------------------------------- |
-| **主时间线** | `/tweets/:userId` | 展示全量推文流，支持标准过滤。      | `page`, `reverse`, `start`, `end` |
-| **媒体墙**   | `/media/:userId`  | 仅展示图片/视频网格，点击查看详情。 | `page`                            |
-| **搜索视图** | `/search/:userId` | 基于关键词的搜索结果流。            | `q`                               |
+| 逻辑视图     | URL 模式         | 职责描述                            | Query Params 支持                              |
+| :----------- | :--------------- | :---------------------------------- | :--------------------------------------------- |
+| **主时间线** | `/tweets/:name`  | 展示全量推文流，支持标准过滤。      | `page`, `reverse`, `start`, `end`, `noReplies` |
+| **媒体墙**   | `/media/:name`   | 仅展示图片/视频网格，点击查看详情。 | `page`                                         |
+| **搜索视图** | `/search/:name?` | 基于关键词的搜索结果流。            | `q`                                            |
+| **那年今日** | `/memo/:name`    | 展示同月同日的历史推文。            | `page`, `reverse`                              |
+| **首页**     | `/`              | Landing page（Hero + 功能介绍）。   | —                                              |
 
 ### 3.2 状态同步协议 (State Sync Protocol)
 
 前端状态必须与 URL 查询参数 (Query Params) 保持双向强一致性。
 
-1. **初始化 (Hydration)** : 应用启动时，自动并将 URL 参数注入到数据获取层。
-2. **序列化 (Serialization)** : 用户在 UI 上修改 filters 后，系统**仅更新 URL**。
-3. **响应式 (Reactivity)** : 数据层监听 URL 变化，自动触发 `resetStream` 和重新加载数据。前端不手动调用 API，只负责操作 URL。
+1. **初始化 (Hydration)** : React Router v7 loader 在页面加载时读取 URL 参数，调用 API 获取数据。
+2. **序列化 (Serialization)** : 用户在 UI 上修改 filters 后，系统**仅更新 URL**（通过 `<Link>` / `useSearchParams`）。
+3. **响应式 (Reactivity)** : React Router loader 监听 URL 变化，自动触发重新获取数据。前端不手动调用 API，只负责操作 URL。
 
 ---
 
@@ -130,11 +128,11 @@
 
 ### 5.2 加载反馈 (Loading Feedback)
 
-抛弃传统的 Spinner，全面拥抱 **Skeleton Screens**。
+摒弃传统的 Spinner，全面拥抱 **Skeleton Screens**。
 
-- **Profile Header**: 加载用户信息时，展示包含 Banner、Avatar 占位符的骨架屏，防止布局抖动。
-- **Tweet List**: 初始加载或硬重置时，展示 3-5 个 Tweet Skeleton 列表。
-- **Infinite Loading**: 仅在追加数据时，于底部展示小型 Spinner。
+- **Profile Header**: 加载用户信息时，展示包含 Banner、Avatar 占位符的骨架屏 (`app/components/skeletons/`)。
+- **Tweet List**: 初始加载或硬重置时，展示 3-5 个 Tweet Skeleton (`tweet-skeleton.tsx`)。
+- **Infinite Loading**: 仅在底部加载更多时，展示 `TweetFeedStatus` 组件（含 loading 态）。
 
 ### 5.3 筛选器交互 (Filter Interactions)
 

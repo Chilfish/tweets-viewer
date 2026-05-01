@@ -30,11 +30,12 @@ metadata:
 ### 必须使用的技术
 
 - **包管理器**: `bun`
-- **UI 框架**: React 18+
-- **类型系统**: TypeScript (严格模式)
-- **样式方案**: Tailwind CSS + shadcn/ui 组件
-- **全局状态**: Zustand
-- **原子状态**: Jotai
+- **UI 框架**: React 19+
+- **类型系统**: TypeScript v6 (严格模式)
+- **路由方案**: React Router v7 (SSR mode)
+- **样式方案**: Tailwind CSS v4 + shadcn/ui 组件
+- **全局状态**: Zustand v5
+- **原子状态**: Jotai v2
 - **本地状态**: React.useState (仅限单组件内部)
 
 ### 禁止使用的模式
