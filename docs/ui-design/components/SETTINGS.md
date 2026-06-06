@@ -1,136 +1,277 @@
-# Settings Components Design Pattern
+# 设置页面设计模式（Settings Page Pattern）
 
-此文档定义了用于构建“设置”、“偏好”或“详情列表”页面的组件规范。该设计模仿 iOS/macOS 的系统设置风格，强调分组、层级和清晰的视觉分隔。
-
----
-
-## 1. 核心组件 (Core Components)
-
-设置页面主要由两个核心组件构成：
-
-1.  **`SettingsGroup`**: 一个圆角、带边框的容器，用于包裹一组相关的设置项。
-2.  **`SettingsRow`**: 容器内的一行，通常包含标签、控件（开关、输入框）或导航指示。
-
-### 1.1 视觉解构 (Visual Anatomy)
-
-- **容器 (Group):**
-  - `rounded-xl` (12px) 或 `rounded-2xl` (16px) 在移动端。
-  - `border` (1px solid border-border)。
-  - `bg-card` (背景色与底色区分)。
-  - `overflow-hidden` (确保子元素背景不溢出)。
-- **行 (Row):**
-  - `min-h-14` (56px) 保证手指易触。
-  - `border-b` (内部行之间的分隔线)，**最后一行无边框** (`not-last:border-b`)。
-  - `px-4` (左右内边距)。
-- **文本 (Typography):**
-  - Label: `text-sm font-medium`.
-  - Description: `text-xs text-muted-foreground`.
-  - Value: `text-sm text-muted-foreground` (通常右对齐)。
+> **级别：强制规范（Mandatory）**
+>
+> 本文档定义了设置页面、偏好面板、个人资料、配置列表的**唯一合法** UI 模式。
+> AI 必须使用本规范中的组件。禁止自定义 `div` 列表或表格来实现此类界面。
 
 ---
 
-## 2. 代码实现范式 (Implementation Patterns)
+## 1. 触发机制（When to Apply）
 
-请直接复用 `~/components/settings/SettingsUI.tsx` 中的组件，或参考以下结构。
+**遇到以下关键词/场景时，必须使用此模式：**
 
-### 2.1 基础结构 (Basic Structure)
+| 触发条件 | 示例                                                                                     |
+| -------- | ---------------------------------------------------------------------------------------- |
+| 关键词   | "设置"、"偏好"、"配置"、"个人资料"、"菜单"、"选项"、"Settings"、"Preferences"、"Profile" |
+| 视觉意图 | "iOS 风格列表"、"分组列表"、"表单行"、"macOS 设置风格"                                   |
+| 数据结构 | 键值对、开关、导航链接，以分组形式呈现                                                   |
+
+**不适用场景：**
+
+| 场景                  | 替代方案                 |
+| --------------------- | ------------------------ |
+| 数据表格（排序/筛选） | 使用 `DataTable`         |
+| 营销/展示内容         | 使用 `Card` 或自定义布局 |
+| 聊天/Feed 流          | 使用专用组件             |
+
+---
+
+## 2. 组件结构（Component Topology）
+
+### 2.1 层级关系
+
+```
+设置页面
+├── 标题区（页面标题 + 描述）
+├── SettingsGroup（分组 1）
+│   ├── SettingsItem（行 1）
+│   ├── SettingsItem（行 2）
+│   └── SettingsItem（行 3）
+├── SettingsGroup（分组 2）
+│   ├── SettingsItem（行 1）
+│   └── SettingsItem（行 2）
+└── ...
+```
+
+### 2.2 严禁模式
+
+- ❌ 手动 `<hr />` 或 `border-b` 分割行 — `SettingsItem` 通过 `:not(:last-child):border-b` 自动处理
+- ❌ 在 `SettingsGroup` 内嵌套 `Card` 组件
+- ❌ 在 `SettingsItem` 内使用标准带边框的 `Input`（场景 C 有特殊处理）
+- ❌ 使用 `table` 或 `div` 列表替代 SettingsGroup/SettingsItem
+
+---
+
+## 3. API 参考
+
+导入路径：`~/components/ui/settings-layout`
+
+### 3.1 SettingsGroup
 
 ```tsx
-import { SettingsGroup, SettingsRow } from '~/components/settings/SettingsUI'
+interface SettingsGroupProps {
+  title?: string         // 分组标题（大写、letter-spacing 加宽）
+  description?: string   // 标题下方的辅助说明
+  variant?: 'default' | 'ghost'  // default: 卡片样式; ghost: 无边框透明
+  className?: string
+  children: React.ReactNode
+}
+```
+
+**视觉细节：**
+
+- `title` 渲染为 `text-sm font-medium text-muted-foreground uppercase tracking-wider`
+- `description` 渲染为 `text-xs text-muted-foreground/70`
+- 默认 variant 包含 `rounded-xl border bg-card shadow-xs`
+
+### 3.2 SettingsItem
+
+```tsx
+interface SettingsItemProps {
+  label: React.ReactNode       // 左侧主文字（必填）
+  description?: React.ReactNode // 标签下方的辅助说明
+  icon?: React.ReactElement    // 左侧图标（LucideIcon）
+  destructive?: boolean        // 红色危险样式
+  disabled?: boolean           // 禁用态（半透明 + 无指针事件）
+  onClick?: () => void         // 使行可点击（自动添加 hover/active 态）
+  id?: string                  // 作为 Label 的 htmlFor，关联表单控件
+  className?: string
+  children: React.ReactNode    // 右侧内容槽（Switch、Input、Select、Chevron 等）
+}
+```
+
+**自动行为：**
+
+- `destructive` 为 true → 文字 + 图标变红
+- `onClick` 存在 → 自动 `cursor-pointer` + `active:bg-accent/80`
+- `disabled` 为 true → `opacity-50` + `pointer-events-none`
+- 最后一行不显示底部边框
+- `id` 会被 clone 到 children 元素上（用于 Label-Input 关联）
+
+---
+
+## 4. 标准场景（Stories）
+
+### 场景 A：布尔开关（Switch）
+
+```tsx
+import { BellIcon } from 'lucide-react'
+import { SettingsGroup, SettingsItem } from '~/components/ui/settings-layout'
 import { Switch } from '~/components/ui/switch'
 
-// ...
-
-<div className="space-y-6">
-  {/* Header Title */}
-  <div className="space-y-2">
-    <h4 className="px-1 text-sm font-medium text-muted-foreground">分组标题 (Header)</h4>
-
-    <SettingsGroup>
-      {/* Row 1: Simple Toggle */}
-      <SettingsRow>
-        <span className="text-sm font-medium">设置项名称</span>
-        <Switch />
-      </SettingsRow>
-
-      {/* Row 2: With Description */}
-      <SettingsRow>
-        <div className="flex flex-col gap-1">
-          <span className="text-sm font-medium">复杂设置项</span>
-          <span className="text-xs text-muted-foreground">这里是详细的功能描述文本。</span>
-        </div>
-        <Switch />
-      </SettingsRow>
-    </SettingsGroup>
-  </div>
-</div>
-```
-
-### 2.2 输入与编辑 (Input & Editing)
-
-对于需要输入文本的情况，我们追求“无框”或“融合”的视觉效果。
-
-```tsx
-<SettingsRow>
-  <Label className="w-20 shrink-0 font-medium">昵称</Label>
-  <Input
-    className="text-right h-8 border-none shadow-none focus-visible:ring-0 px-0 bg-transparent"
-    placeholder="输入昵称"
-    value={name}
-    onChange={e => setName(e.target.value)}
-  />
-</SettingsRow>
-```
-
-### 2.3 导航与动作 (Navigation & Actions)
-
-用于跳转子页面或触发操作。
-
-```tsx
-import { ChevronRight } from 'lucide-react'
-
-// ...
-
-<SettingsRow
-  className="cursor-pointer hover:bg-muted/50 transition-colors active:scale-[0.98]"
-  onClick={() => navigate('/sub-page')}
->
-  <span className="text-sm font-medium">账号安全</span>
-  <div className="flex items-center gap-2 text-muted-foreground">
-    <span className="text-sm">已保护</span>
-    <ChevronRight className="size-4 opacity-50" />
-  </div>
-</SettingsRow>
-```
-
-### 2.4 破坏性操作 (Destructive Actions)
-
-通常独立成组，或位于分组的最下方。
-
-```tsx
-<SettingsGroup>
-  <SettingsRow
-    className="justify-center cursor-pointer hover:bg-destructive/10 active:bg-destructive/20"
-    onClick={handleDelete}
+<SettingsGroup title="通知">
+  <SettingsItem
+    label="推送通知"
+    description="在移动设备上接收更新。"
+    icon={<BellIcon />}
+    id="push-notifs"
   >
-    <span className="text-sm font-medium text-destructive">删除账户</span>
-  </SettingsRow>
+    <Switch defaultChecked />
+  </SettingsItem>
 </SettingsGroup>
 ```
 
+### 场景 B：导航/深入（ChevronRight）
+
+```tsx
+import { ChevronRight, ShieldIcon } from 'lucide-react'
+
+<SettingsGroup title="账户">
+  <SettingsItem
+    label="安全设置"
+    icon={<ShieldIcon />}
+    onClick={() => router.push('/security')}
+  >
+    <div className="flex items-center gap-2 text-muted-foreground">
+      <span className="text-sm">已启用</span>
+      <ChevronRight className="size-4 opacity-50" />
+    </div>
+  </SettingsItem>
+</SettingsGroup>
+```
+
+**注意：** `ChevronRight` 必须手动放在 children 中。`onClick` 加在 `SettingsItem` 上而非内部 div。
+
+### 场景 C：行内编辑（无边框输入框）
+
+```tsx
+import { UserIcon } from 'lucide-react'
+import { Input } from '~/components/ui/input'
+
+<SettingsItem label="显示名称" icon={<UserIcon />} id="display-name">
+  <Input
+    id="display-name"
+    className="h-8 w-[200px] border-none bg-transparent px-0 text-right shadow-none focus-visible:ring-0"
+    defaultValue="Alice"
+    placeholder="输入名称"
+  />
+</SettingsItem>
+```
+
+**强制样式规则：**
+
+1. `text-right` — 右对齐
+2. `border-none shadow-none focus-visible:ring-0` — 移除所有默认 Input 外观
+3. `bg-transparent` — 与行背景融合
+4. `h-8` — 行内紧凑高度
+
+### 场景 D：选择器（Select/Dropdown）
+
+```tsx
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select'
+
+<SettingsItem label="主题" id="theme-select">
+  <Select defaultValue="system" getLabel={(v) => themeLabels[String(v)] || String(v)}>
+    <SelectTrigger className="w-[140px] h-8 border-none shadow-none bg-transparent focus:ring-0 justify-end px-0 gap-1">
+      <SelectValue placeholder="选择主题" />
+    </SelectTrigger>
+    <SelectContent>
+      <SelectItem value="light">浅色</SelectItem>
+      <SelectItem value="dark">深色</SelectItem>
+      <SelectItem value="system">跟随系统</SelectItem>
+    </SelectContent>
+  </Select>
+</SettingsItem>
+```
+
+**强制样式规则：**
+
+1. `border-none shadow-none bg-transparent focus:ring-0` — 无边框透明
+2. `justify-end` — 内容右对齐
+3. `h-8` — 紧凑高度
+4. 必须传 `getLabel` prop（参考 [select-best-practices.md](./select-best-practices.md)）
+
+### 场景 E：危险操作
+
+```tsx
+import { LogOutIcon } from 'lucide-react'
+
+<SettingsGroup>
+  <SettingsItem
+    label="退出登录"
+    icon={<LogOutIcon />}
+    destructive
+    onClick={handleSignOut}
+  />
+</SettingsGroup>
+```
+
+**说明：** `destructive` 属性自动将文字和图标变为红色（`text-destructive`），hover 时背景变红（`hover:bg-destructive/10`）。
+
 ---
 
-## 3. 响应式适配 (Responsive Adaptation)
+## 5. 强制检查清单（Mandatory Checklist）
 
-- **Mobile (PWA):**
-  - 分组的左右外边距应较小（如 `mx-4`）或者全宽（`rounded-none border-x-0`）。
-  - 标题文字 (`h4`) 可适当增大。
-- **Desktop:**
-  - 保持定宽或限制最大宽度 (`max-w-2xl`)，避免在大屏幕上行过长导致阅读困难。
+在生成任何设置页面代码之前，AI 必须逐项确认：
 
-## 4. 常见错误 (Common Pitfalls)
+1. [ ] 相关的行是否包裹在**同一个** `SettingsGroup` 中？
+2. [ ] 是否移除了所有手动 `border-b`、`<hr />`、`<Separator />`？（SettingsItem 自动处理）
+3. [ ] 如果使用了 `Input`，是否添加了 `border-none` 和 `text-right`？
+4. [ ] 如果使用了 `Select`，是否传了 `getLabel` prop？
+5. [ ] 如果使用了 `onClick`，是否加在 `SettingsItem` 上（而非内部元素）？
+6. [ ] `id` 是否正确设置以实现 Label-Input 关联？
+7. [ ] 是否有 `ChevronRight` 图标放在导航行的 children 末尾？
+8. [ ] `destructive` 属性是否仅用于不可逆的危险操作？
 
-- ❌ **Don't:** 在 `SettingsRow` 内部再嵌套 Card 组件。
-- ❌ **Don't:** 使用默认带边框的 `Input` 组件，这会破坏列表的整体感（除非是在模态框表单中）。
-- ❌ **Don't:** 忘记给可点击的行添加 Hover 和 Active 态反馈。
-- ✅ **Do:** 始终保持分组标题 (Header) 与 分组容器 (Group) 的左对齐（通常都有 `px-1` 或 `px-4` 的缩进）。
+---
+
+## 6. 完整示例：设置页面
+
+```tsx
+import { BellIcon, UserIcon, ShieldIcon, LogOutIcon } from 'lucide-react'
+import { SettingsGroup, SettingsItem } from '~/components/ui/settings-layout'
+import { Switch } from '~/components/ui/switch'
+import { Input } from '~/components/ui/input'
+
+export default function SettingsPage() {
+  return (
+    <div className="flex flex-col gap-8 max-w-2xl mx-auto p-4">
+      <div>
+        <h1 className="text-2xl font-bold">设置</h1>
+        <p className="text-sm text-muted-foreground mt-1">管理你的账户和应用偏好。</p>
+      </div>
+
+      <SettingsGroup title="个人资料">
+        <SettingsItem label="显示名称" icon={<UserIcon />} id="name">
+          <Input
+            id="name"
+            className="h-8 w-[200px] border-none bg-transparent px-0 text-right shadow-none focus-visible:ring-0"
+            defaultValue="Alice"
+          />
+        </SettingsItem>
+      </SettingsGroup>
+
+      <SettingsGroup title="通知">
+        <SettingsItem
+          label="推送通知"
+          description="接收移动设备上的更新。"
+          icon={<BellIcon />}
+          id="push"
+        >
+          <Switch id="push" defaultChecked />
+        </SettingsItem>
+      </SettingsGroup>
+
+      <SettingsGroup>
+        <SettingsItem
+          label="退出登录"
+          icon={<LogOutIcon />}
+          destructive
+          onClick={() => console.log('sign out')}
+        />
+      </SettingsGroup>
+    </div>
+  )
+}
+```

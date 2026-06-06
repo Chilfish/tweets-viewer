@@ -7,8 +7,9 @@
 
 > **📘 开发指南（必读）**：本项目遵循 **规格驱动开发 (SDD)**。开始改代码前请先读：
 >
-> 1. `./docs/SKILLS/README.md`（架构九条宪法/技术栈约束）
+> 1. `./CLAUDE.md`（项目总览、常用命令、架构核心）
 > 2. `./docs/Specification.md`（功能规格：URL 作为事实来源、分页/筛选行为等）
+> 3. `./docs/ARCHITECTURE.md`（全局架构：Monorepo 结构、数据流、部署拓扑）
 
 ## 仓库结构（Monorepo）
 
@@ -76,9 +77,9 @@ bun run dev:client
 
 ## 文档索引
 
+- `./CLAUDE.md`（项目总览与常用命令）
 - `./docs/README.md`（文档入口）
 - `./docs/ARCHITECTURE.md`（全局架构：Monorepo 结构、数据流、部署拓扑）
 - `./docs/Specification.md`（前端功能规格：事实来源）
-- `./docs/SKILLS/README.md`（SDD 规范与架构约束）
 - `./docs/API_DOCUMENTATION.md`（API 接口文档）
 - `./docs/ui-design/OVERVIEW.md`（UI/交互准则）

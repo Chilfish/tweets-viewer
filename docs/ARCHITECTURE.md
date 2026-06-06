@@ -15,7 +15,7 @@ tweets-viewer/
 │   ├── rettiwt-api/ # Twitter API 客户端库 (内部 Fork)
 │   └── shared/      # 共享常量、类型、工具
 ├── docs/            # 项目文档
-├── wrangler.toml    # Cloudflare Workers 部署配置
+├── wrangler.json    # Cloudflare Workers 部署配置
 ├── env.server.ts    # 服务端环境变量验证 (Zod)
 └── bunfig.toml      # Bun 配置 (hoisted 安装模式)
 ```
