@@ -17,7 +17,6 @@ interface User {
 
 interface Result {
   __typename: string
-  timeline: TimelineV2
   timeline_v2: TimelineV2
 }
 
@@ -47,11 +46,6 @@ interface Content {
   value?: string
   cursorType?: string
   stopOnEmptyResponse?: boolean
-  items: {
-    item: {
-      itemContent: ItemContent
-    }
-  }[]
 }
 
 interface ItemContent {

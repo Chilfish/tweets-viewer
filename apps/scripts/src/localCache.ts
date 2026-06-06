@@ -174,8 +174,8 @@ async function getAdapter(): Promise<ICacheAdapter> {
 
   // 这里的检测逻辑可以根据你的实际部署环境微调
   const isNodeRuntime = typeof process !== 'undefined'
-    && process.versions != null
-    && process.versions.node != null
+    && process.versions !== null
+    && process.versions.node !== null
 
   if (isNodeRuntime) {
     try {

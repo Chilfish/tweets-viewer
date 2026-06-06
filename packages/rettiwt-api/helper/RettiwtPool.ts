@@ -64,9 +64,9 @@ export class RettiwtPool {
     if (!this.instanceCache.has(key)) {
       const config = new RettiwtConfig({
         apiKey: key,
-        proxyUrl: typeof process !== 'undefined' && !!process.env.http_proxy
-          ? new URL(process.env.http_proxy)
-          : undefined,
+        // proxyUrl: typeof process !== 'undefined' && !!process.env.http_proxy
+        //   ? new URL(process.env.http_proxy)
+        //   : undefined,
       })
       this.instanceCache.set(key, new FetcherService(config))
     }

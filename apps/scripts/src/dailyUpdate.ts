@@ -5,9 +5,7 @@ import { RettiwtPool, TweetEnrichmentService, TwitterAPIClient } from '@tweets-v
 import { drizzle } from 'drizzle-orm/neon-http'
 
 const KEYS = (process.env.TWEET_KEYS || '').split(',').filter(Boolean).map(key => key.trim())
-const SYNC_SINCE = process.env.SYNC_SINCE
-  ? new Date(process.env.SYNC_SINCE)
-  : new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+const SYNC_SINCE = new Date('2026-04-28')
 const twitterPool = new RettiwtPool(KEYS)
 
 const apiClient = new TwitterAPIClient(twitterPool)

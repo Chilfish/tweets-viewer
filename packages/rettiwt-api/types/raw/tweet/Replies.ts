@@ -33,7 +33,7 @@ interface Content {
   items?: Item[]
   displayType?: string
   clientEventInfo?: ClientEventInfo2
-  itemContent?: ItemContent
+  itemContent?: ItemContent2
 }
 
 interface Item {

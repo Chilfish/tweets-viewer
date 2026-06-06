@@ -8,7 +8,8 @@ export interface ITweetPostResponse {
 }
 
 interface Data {
-  create_tweet: CreateTweet
+  create_tweet?: CreateTweet
+  create_note_tweet?: CreateTweet
 }
 
 interface CreateTweet {
@@ -146,3 +147,20 @@ interface UserMention {
 }
 
 interface UnmentionInfo {}
+
+/**
+ * The raw data received after creating a note tweet (long-form tweet for X Premium accounts).
+ *
+ * @public
+ */
+export interface ITweetPostNoteResponse {
+  data: NoteTweetData
+}
+
+interface NoteTweetData {
+  notetweet_create: NoteTweetCreate
+}
+
+interface NoteTweetCreate {
+  tweet_results: TweetResults
+}

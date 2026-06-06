@@ -3,6 +3,7 @@ import type { ResourceType } from '../../enums/Resource'
 import type { RettiwtConfig } from '../../models/RettiwtConfig'
 import type { IFetchArgs } from '../../types/args/FetchArgs'
 import type { IPostArgs } from '../../types/args/PostArgs'
+
 import type { ITransactionHeader } from '../../types/auth/TransactionHeader'
 import type { IErrorHandler } from '../../types/ErrorHandler'
 import type { IErrorData } from '../../types/raw/base/Error'
@@ -64,7 +65,7 @@ export class FetcherService {
    * @throws An error if not authorized to access the requested resource.
    */
   private _checkAuthorization(resource: ResourceType): void {
-  // Logging
+    // Logging
     LogService.log(LogActions.AUTHORIZATION, { authenticated: this.config.userId !== undefined })
 
     // Checking authorization status
@@ -106,29 +107,32 @@ export class FetcherService {
    * @returns The header containing the transaction ID.
    */
   private async _getTransactionHeader(method: string, url: string): Promise<ITransactionHeader> {
-  // Get the X homepage HTML document (using utility function)
+    // Get the X homepage HTML document (using utility function)
     const document = await this._handleXMigration()
 
     // Create and initialize ClientTransaction instance
     const transaction = await ClientTransaction.create(document)
 
     // Getting the URL path excluding all params
-    const path = new URL(url).pathname.split('?')[0]!.trim()
+    const path = new URL(url).pathname.split('?')[0].trim()
 
     // Generating the transaction ID
     const tid = await transaction.generateTransactionId(method.toUpperCase(), path)
 
     return {
+
       'x-client-transaction-id': tid,
+
     }
   }
 
   private async _handleXMigration(): Promise<Document> {
-  // Fetch X.com homepage
+    // Fetch X.com homepage
     const homePageResponse = await axios.get<string>('https://x.com', {
       headers: this.config.headers,
-      httpAgent: this.config.httpsAgent,
+      httpAgent: this.config.httpAgent,
       httpsAgent: this.config.httpsAgent,
+      proxy: this.config.axiosProxyConfig,
     })
 
     // Parse HTML using linkedom
@@ -149,8 +153,9 @@ export class FetcherService {
     if (migrationRedirectionUrl) {
       // Follow redirection URL
       const redirectResponse = await axios.get<string>(migrationRedirectionUrl[0], {
-        httpAgent: this.config.httpsAgent,
+        httpAgent: this.config.httpAgent,
         httpsAgent: this.config.httpsAgent,
+        proxy: this.config.axiosProxyConfig,
       })
 
       document = parseHTML(redirectResponse.data).document
@@ -183,11 +188,14 @@ export class FetcherService {
         url,
         data: requestPayload,
         headers: {
+
           'Content-Type': 'multipart/form-data',
           ...this.config.headers,
+
         },
-        httpAgent: this.config.httpsAgent,
+        httpAgent: this.config.httpAgent,
         httpsAgent: this.config.httpsAgent,
+        proxy: this.config.axiosProxyConfig,
       })
 
       document = parseHTML(formResponse.data).document
@@ -224,7 +232,7 @@ export class FetcherService {
    * Introduces a delay using the configured delay/delay function.
    */
   private async _wait(): Promise<void> {
-  // If no delay is set, skip
+    // If no delay is set, skip
     if (this._delay === undefined) {
       return
     }
@@ -233,10 +241,10 @@ export class FetcherService {
     let delay = 0
 
     // Getting the delay
-    if (this._delay && typeof this._delay == 'number') {
+    if (this._delay && typeof this._delay === 'number') {
       delay = this._delay
     }
-    else if (this._delay && typeof this._delay == 'function') {
+    else if (this._delay && typeof this._delay === 'function') {
       delay = await this._delay()
     }
 
@@ -273,8 +281,8 @@ export class FetcherService {
    * });
    * ```
    */
-  public async request<T = unknown>(resource: ResourceType, args: IFetchArgs | IPostArgs): Promise<AxiosResponse<T>['data']> {
-  /** The current retry number. */
+  public async request<T = unknown>(resource: ResourceType, args: IFetchArgs | IPostArgs): Promise<AxiosResponse<T>> {
+    /** The current retry number. */
     let retry = 0
 
     /** The error, if any. */
@@ -301,8 +309,9 @@ export class FetcherService {
       ...cred.toHeader(),
       ...this.config.headers,
     }
-    config.httpAgent = this.config.httpsAgent
+    config.httpAgent = this.config.httpAgent
     config.httpsAgent = this.config.httpsAgent
+    config.proxy = this.config.axiosProxyConfig
     config.timeout = this._timeout
 
     // Using retries for error 404
@@ -343,8 +352,13 @@ export class FetcherService {
           throw new TwitterError(axiosError)
         }
 
+        // Calling the request middleware, if configured
+        if (this.config.responseMiddleware !== undefined) {
+          await this.config.responseMiddleware(response)
+        }
+
         // Returning the response
-        return response.data
+        return response
       }
       catch (err) {
         // If it's an error 404, retry

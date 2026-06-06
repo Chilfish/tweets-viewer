@@ -167,7 +167,7 @@ export class AuthService {
 
     // If user id was found
     if (searchResults) {
-      return searchResults[0]!
+      return searchResults[0]
     }
     // If user id was not found
     else {
@@ -197,10 +197,12 @@ export class AuthService {
       const refreshResponse = await axios.get('https://x.com/i/api/1.1/account/verify_credentials.json', {
         headers: {
           ...cred.toHeader(),
-          authorization: 'Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA',
+          authorization:
+      'Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA',
         },
-        httpAgent: config.httpsAgent,
+        httpAgent: config.httpAgent,
         httpsAgent: config.httpsAgent,
+        proxy: config.axiosProxyConfig,
         validateStatus: () => true,
       })
 
@@ -233,11 +235,11 @@ export class AuthService {
    * // Logging in an getting a new guest key
    * rettiwt.auth.guest()
    * .then(guestKey => {
-   * 	// Use the guest key
-   * 	...
+   *  // Use the guest key
+   *  ...
    * })
    * .catch(err => {
-   * 	console.log(err);
+   *  console.log(err);
    * });
    * ```
    */
@@ -251,8 +253,9 @@ export class AuthService {
       guest_token: string
     }>('https://api.twitter.com/1.1/guest/activate.json', undefined, {
         headers: cred.toHeader(),
-        httpAgent: this._config.httpsAgent,
+        httpAgent: this._config.httpAgent,
         httpsAgent: this._config.httpsAgent,
+        proxy: this._config.axiosProxyConfig,
       })
       .then((res) => {
         cred.guestToken = res.data.guest_token
