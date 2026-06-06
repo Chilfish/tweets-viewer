@@ -8,42 +8,51 @@
  *
  * @internal
  */
+/**
+ * Search for all the sub-objects (even deep-nested ones) that have the given key-value pair(filter).
+ *
+ * Uses iterative traversal to avoid stack overflow on deeply nested API responses.
+ *
+ * @param data - The data on which search is to be performed.
+ * @param key - The key of the key-value pair to search.
+ * @param value - The value of the key-value pait to search.
+ * @returns The list of sub-objects from the given object, having the given key-value pair.
+ *
+ * @internal
+ */
 export function findByFilter<T>(data: NonNullable<unknown>, key: string, value: string): T[] {
-  /**
-   * The list containing all the objects matching given filter.
-   */
-  let res: T[] = []
+  const result: T[] = []
+  const visited = new Set<unknown>()
+  const queue: unknown[] = [data]
 
-  /**
-   * If the data is an array, recursively run the function of each element of the array and merge the results.
-   */
-  if (Array.isArray(data)) {
-    /**
-     * findByFilter returns an array.
-     * map() also returns an array.
-     * Therefore, map(item =\> findByFilter(.......)) returns an array of arrays.
-     * Therefore, using ... operator to spread the 2-D array in 1-D array.
-     */
-    res = res.concat(...data.map((item: NonNullable<unknown>) => findByFilter<T>(item, key, value)))
-  }
-  // If the data is an object
-  else if (data !== null && typeof data === 'object') {
-    /**
-     * If the object includes the key and the value specified by the key matches the filter, add it to the result.
-     */
-    if (Object.keys(data).includes(key) && data[key as keyof typeof data] === value) {
-      res.push(data as T)
+  let idx = 0
+  while (idx < queue.length) {
+    const current = queue[idx++]!
+
+    // Guard against circular references
+    if (visited.has(current))
+      continue
+    if (current !== null && typeof current === 'object')
+      visited.add(current)
+
+    if (Array.isArray(current)) {
+      for (const item of current) {
+        queue.push(item)
+      }
     }
-
-    /**
-     * Recursively run the function on each value specified by each key in the object, for subsequent matches.
-     */
-    for (const [, v] of Object.entries(data)) {
-      res = res.concat(findByFilter<T>(v as NonNullable<unknown>, key, value))
+    else if (current !== null && typeof current === 'object') {
+      const obj = current as Record<string, unknown>
+      if (key in obj && obj[key] === value) {
+        result.push(current as T)
+      }
+      for (const v of Object.values(obj)) {
+        if (v !== null && typeof v === 'object')
+          queue.push(v)
+      }
     }
   }
 
-  return res
+  return result
 }
 
 /**
