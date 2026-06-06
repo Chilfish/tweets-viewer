@@ -10,7 +10,16 @@ export async function writeJson(data: any, filePath: string): Promise<void> {
   let destPath = filePath
   if (!path.isAbsolute(filePath))
     destPath = path.join(cacheDir, filePath)
-  await writeFile(destPath, JSON.stringify(data, null, 2), 'utf8')
+
+  const seen = new WeakSet()
+  await writeFile(destPath, JSON.stringify(data, (key, value) => {
+    if (typeof value === 'object' && value !== null) {
+      if (seen.has(value))
+        return '[Circular]'
+      seen.add(value)
+    }
+    return value
+  }, 2), 'utf8')
 }
 
 export async function readJson<T>(filePath: string): Promise<T> {

@@ -49,7 +49,7 @@ tmp/
 storybook-static
 
 .vercel/
-cache/
+cache*/
 
 .vercel
 .env*.local

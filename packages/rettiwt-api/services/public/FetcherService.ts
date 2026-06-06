@@ -281,7 +281,7 @@ export class FetcherService {
    * });
    * ```
    */
-  public async request<T = unknown>(resource: ResourceType, args: IFetchArgs | IPostArgs): Promise<AxiosResponse<T>> {
+  public async request<T = unknown>(resource: ResourceType, args: IFetchArgs | IPostArgs): Promise<AxiosResponse<T>['data']> {
     /** The current retry number. */
     let retry = 0
 
@@ -358,7 +358,7 @@ export class FetcherService {
         }
 
         // Returning the response
-        return response
+        return response.data
       }
       catch (err) {
         // If it's an error 404, retry
