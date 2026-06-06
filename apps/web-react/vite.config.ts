@@ -3,7 +3,7 @@ import { reactRouter } from '@react-router/dev/vite'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'vite'
 import babel from 'vite-plugin-babel'
-import tsconfigPaths from 'vite-tsconfig-paths'
+import { apiUrl } from '../../packages/shared/constant'
 
 // 获取 git 信息
 function getGitInfo() {
@@ -30,14 +30,15 @@ function getGitInfo() {
 
 const gitInfo = getGitInfo()
 
+const babelInclude = /\.[jt]sx?$/
 const ReactCompilerConfig = { /* ... */ }
+
 export default defineConfig({
   plugins: [
     tailwindcss(),
     reactRouter(),
-    tsconfigPaths(),
     babel({
-      filter: /\.[jt]sx?$/,
+      include: babelInclude,
       babelConfig: {
         presets: ['@babel/preset-typescript'], // if you use TypeScript
         plugins: [
@@ -46,7 +47,46 @@ export default defineConfig({
       },
     }),
   ],
+  resolve: {
+    tsconfigPaths: true,
+  },
+  optimizeDeps: {
+    include: [
+      // base-ui
+      '@base-ui/react/avatar',
+      '@base-ui/react/checkbox',
+      '@base-ui/react/dialog',
+      '@base-ui/react/field',
+      '@base-ui/react/input',
+      '@base-ui/react/menu',
+      '@base-ui/react/merge-props',
+      '@base-ui/react/popover',
+      '@base-ui/react/scroll-area',
+      '@base-ui/react/select',
+      '@base-ui/react/switch',
+      '@base-ui/react/tabs',
+      '@base-ui/react/toast',
+      '@base-ui/react/toggle',
+      '@base-ui/react/tooltip',
+      '@base-ui/react/use-render',
+      // utilities
+      'axios',
+      'class-variance-authority',
+      'clsx',
+      'date-fns',
+      'lucide-react',
+      'react/compiler-runtime',
+      'spin-delay',
+      'tailwind-merge',
+      'zustand',
+      'zustand/middleware',
+      'zustand/react/shallow',
+    ],
+  },
   server: {
+    port: 9080,
+    host: '127.0.0.1',
+    allowedHosts: true,
     proxy: {
       '/static': {
         target: 'http://localhost:8080',
@@ -54,7 +94,7 @@ export default defineConfig({
         rewrite: path => path.replace(/^\/static/, ''),
       },
       '/api': {
-        target: 'http://localhost:3000/v3',
+        target: apiUrl,
         changeOrigin: true,
         rewrite: path => path.replace(/^\/api/, ''),
       },
