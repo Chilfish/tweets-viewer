@@ -74,24 +74,24 @@ tweets: id(serial PK), tweetId(UQ), userId(FK→users.userName), fullText, creat
 
 ### API 路由
 
-| 端点 | 说明 |
-|------|------|
-| `GET /v3/tweets/get/:name` | 用户推文列表（分页/日期范围/排除回复） |
-| `GET /v3/tweets/medias/:name` | 用户媒体推文（排除转推） |
-| `GET /v3/tweets/search?q=&name=` | 关键词搜索 |
-| `GET /v3/tweets/get/:name/last-years-today` | "那年今日" |
-| `GET /v3/users/all` | 所有用户 |
-| `GET /v3/users/get/:name` | 单个用户 |
+| 端点                                        | 说明                                   |
+| ------------------------------------------- | -------------------------------------- |
+| `GET /v3/tweets/get/:name`                  | 用户推文列表（分页/日期范围/排除回复） |
+| `GET /v3/tweets/medias/:name`               | 用户媒体推文（排除转推）               |
+| `GET /v3/tweets/search?q=&name=`            | 关键词搜索                             |
+| `GET /v3/tweets/get/:name/last-years-today` | "那年今日"                             |
+| `GET /v3/users/all`                         | 所有用户                               |
+| `GET /v3/users/get/:name`                   | 单个用户                               |
 
 ### 前端路由
 
-| URL | 视图 |
-|-----|------|
-| `/` | 首页 (Hero) |
-| `/tweets/:name` | 主时间线（无限滚动 + 分页器） |
-| `/media/:name` | 媒体墙（图片/视频网格） |
-| `/search/:name?` | 搜索视图 |
-| `/memo/:name` | "那年今日" |
+| URL              | 视图                          |
+| ---------------- | ----------------------------- |
+| `/`              | 首页 (Hero)                   |
+| `/tweets/:name`  | 主时间线（无限滚动 + 分页器） |
+| `/media/:name`   | 媒体墙（图片/视频网格）       |
+| `/search/:name?` | 搜索视图                      |
+| `/memo/:name`    | "那年今日"                    |
 
 ## 技术栈
 
@@ -107,6 +107,7 @@ tweets: id(serial PK), tweetId(UQ), userId(FK→users.userName), fullText, creat
 ### 规格驱动开发 (SDD)
 
 本项目遵循规格驱动开发。关键规格文件：
+
 - `docs/Specification.md` — 功能行为事实来源
 - `docs/ARCHITECTURE.md` — 全局架构
 - `docs/API_DOCUMENTATION.md` — API 接口
@@ -129,8 +130,8 @@ tweets: id(serial PK), tweetId(UQ), userId(FK→users.userName), fullText, creat
 
 ### 环境变量
 
-| 变量 | 用途 | 位置 |
-|------|------|------|
+| 变量           | 用途                 | 位置                    |
+| -------------- | -------------------- | ----------------------- |
 | `DATABASE_URL` | Neon Postgres 连接串 | `.env`, `wrangler.json` |
-| `TWEET_KEYS` | Twitter API Key 列表 | `.env`, `wrangler.json` |
-| `ENVIRONMENT` | 运行环境 | `env.server.ts` |
+| `TWEET_KEYS`   | Twitter API Key 列表 | `.env`, `wrangler.json` |
+| `ENVIRONMENT`  | 运行环境             | `env.server.ts`         |

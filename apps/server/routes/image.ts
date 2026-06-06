@@ -14,20 +14,23 @@ async function fetchImgData() {
 }
 
 function randomImg() {
-  const randomIndex = Math.floor(Math.random() * imgData.length)
-  const data = imgData[randomIndex]
-  if (!data.urls)
-    return randomImg()
+  // 只从有 urls 的数据中随机选，避免无限递归
+  const candidates = imgData.filter(d => d.urls?.length > 0)
+  if (!candidates.length)
+    return null
 
-  data.url = data.urls[Math.floor(Math.random() * data.urls.length)]
-  data.urls = undefined
-  return data
+  const data = candidates[Math.floor(Math.random() * candidates.length)]
+  const url = data.urls[Math.floor(Math.random() * data.urls.length)]
+
+  return { ...data, url, urls: undefined }
 }
 
 // random
 app.get('/get', async (c) => {
   await fetchImgData()
   const data = randomImg()
+  if (!data)
+    return c.json({ error: 'no image available' }, 404)
   return c.json(data)
 })
 

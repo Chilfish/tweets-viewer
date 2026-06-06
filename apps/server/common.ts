@@ -23,24 +23,25 @@ export async function getData(name: string) {
     return cachedData.get(name) || []
   }
 
-  const rawData = await fetch(`https://p.chilfish.top/tweet/ins/${name}.json`)
-    .then(res => res.json())
-    .catch((error) => {
-      console.error(`getInsData error ${name}`, error.message)
-      return null
-    })
-  if (!rawData) {
+  try {
+    const res = await fetch(`https://p.chilfish.top/tweet/ins/${name}.json`)
+    if (!res.ok) {
+      console.error(`getData ${name}: HTTP ${res.status}`)
+      return []
+    }
+    const rawData = await res.json() as EnrichedTweet[]
+    rawData.sort(
+      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+    )
+
+    console.log('getData', name, rawData.length)
+    cachedData.set(name, rawData)
+    return rawData
+  }
+  catch (error: any) {
+    console.error(`getData ${name}:`, error.message)
     return []
   }
-  const tweets = rawData as EnrichedTweet[]
-  tweets.sort(
-    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
-  )
-
-  console.log('getInsData', name, tweets.length)
-
-  cachedData.set(name, tweets)
-  return tweets
 }
 
 export async function setAllUsersInsData(users: SelectUser[]) {

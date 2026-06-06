@@ -30,9 +30,14 @@ const paginationSchema = z.object({
 function getPaginationParams(c: Context) {
   const parsed = paginationSchema.safeParse(c.req.query())
   if (!parsed.success) {
-    return null
+    const messages = parsed.error.issues.map(i => `${i.path}: ${i.message}`).join(', ')
+    return messages
   }
   return parsed.data
+}
+
+function isError(value: unknown): value is string {
+  return typeof value === 'string'
 }
 
 const nameSchema = z.string().min(1).max(50).regex(/^\w+$/)
@@ -63,7 +68,7 @@ app.get('/get/:name', async (c) => {
 
   const pagination = getPaginationParams(c)
   if (!pagination)
-    return c.json({ error: 'invalid pagination params' }, 400)
+    return c.json({ error: `invalid pagination: ${pagination}` }, 400)
 
   const dateResult = dateRangeSchema.safeParse(c.req.query())
   if (!dateResult.success)
@@ -125,8 +130,8 @@ app.get('/medias/:name', async (c) => {
     return c.json({ error: 'invalid name' }, 400)
 
   const pagination = getPaginationParams(c)
-  if (!pagination)
-    return c.json({ error: 'invalid pagination params' }, 400)
+  if (isError(pagination))
+    return c.json({ error: `invalid pagination: ${pagination}` }, 400)
 
   const { page, pageSize, reverse } = pagination
   const { db } = getContext<AppType>().var
@@ -159,8 +164,8 @@ app.get('/search', async (c) => {
 
   const { q: keyword, name } = searchResult.data
   const pagination = getPaginationParams(c)
-  if (!pagination)
-    return c.json({ error: 'invalid pagination params' }, 400)
+  if (isError(pagination))
+    return c.json({ error: `invalid pagination: ${pagination}` }, 400)
 
   const { page, pageSize, reverse } = pagination
   const { db } = getContext<AppType>().var
@@ -181,8 +186,8 @@ app.get('/get/:name/last-years-today', async (c) => {
     return c.json({ error: 'invalid name' }, 400)
 
   const pagination = getPaginationParams(c)
-  if (!pagination)
-    return c.json({ error: 'invalid pagination params' }, 400)
+  if (isError(pagination))
+    return c.json({ error: `invalid pagination: ${pagination}` }, 400)
 
   const { page, pageSize, reverse } = pagination
   const { db } = getContext<AppType>().var
