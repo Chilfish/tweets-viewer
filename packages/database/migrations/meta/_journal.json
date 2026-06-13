@@ -15,6 +15,13 @@
       "when": 1746097200000,
       "tag": "0001_add_performance_indexes",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1781363678336,
+      "tag": "0002_brave_zaladane",
+      "breakpoints": true
     }
   ]
 }
