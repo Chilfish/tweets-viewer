@@ -1,8 +1,11 @@
 import type { EnrichedUser } from '@tweets-viewer/rettiwt-api'
+import type { IGUserInfo } from '@tweets-viewer/shared'
 import type { ClientLoaderFunctionArgs, ShouldRevalidateFunctionArgs } from 'react-router'
 import type { Route } from './+types/layout'
 import { Outlet, useLocation, useMatches, useParams } from 'react-router'
 import { TopNav } from '~/components/layout/top-nav'
+import { InsProfileHeader } from '~/components/profile/InsProfileHeader'
+import { InsProfileHeaderSkeleton } from '~/components/skeletons/ins-profile'
 import { useIsMobile } from '~/hooks/use-mobile'
 import { apiClient, cn } from '~/lib/utils'
 import { useUserStore } from '~/store/use-user-store'
@@ -11,12 +14,18 @@ import { ProfileHeaderSkeleton } from '../skeletons/profile'
 import { BottomNav } from './bottom-nav'
 import { Sidebar } from './sidebar'
 
-export async function clientLoader({ params }: ClientLoaderFunctionArgs) {
+export async function clientLoader({ params, request }: ClientLoaderFunctionArgs) {
   const { name } = params
-  const { users, isInitialized, setUsers, setInitialized, setActiveUser } = useUserStore.getState()
+  const isInsRoute = new URL(request.url).pathname.startsWith('/ins/')
 
-  // await new Promise(resolve => setTimeout(resolve, 55000))
-  // 仅在当前会话未初始化或 store 为空时获取用户列表
+  // Instagram 路线：获取 IG 用户信息
+  if (isInsRoute) {
+    const { data } = await apiClient.get<{ user: IGUserInfo }>(`/ins/${name}`)
+    return { igUser: data.user, activeUser: null, allUsers: [] }
+  }
+
+  // Tweet 路线：获取 Twitter 用户列表
+  const { users, isInitialized, setUsers, setInitialized, setActiveUser } = useUserStore.getState()
   let allUsers = users
   if (!isInitialized || allUsers.length === 0) {
     const usersRes = await apiClient.get<EnrichedUser[]>(`/users/all`)
@@ -28,15 +37,14 @@ export async function clientLoader({ params }: ClientLoaderFunctionArgs) {
   const activeUser = allUsers.find(user => user.userName === name) || null
   setActiveUser(activeUser)
 
-  return {
-    allUsers,
-    activeUser,
-  }
+  return { activeUser, allUsers, igUser: null }
 }
 
 export function HydrateFallback() {
   const matches = useMatches()
+  const location = useLocation()
   const isMobile = useIsMobile()
+  const isInsRoute = location.pathname.startsWith('/ins/')
   const currentHandle = matches[matches.length - 1]?.handle as {
     skeleton?: React.ReactNode
     isWide?: boolean
@@ -49,7 +57,7 @@ export function HydrateFallback() {
 
         <main className="flex-1 flex flex-col items-center justify-start gap-4 pt-2 mx-auto min-w-0 border-r border-border/40">
 
-          <ProfileHeader user={null} />
+          {isInsRoute ? <InsProfileHeaderSkeleton /> : <ProfileHeader user={null} />}
           <div className="w-full">
             {currentHandle?.skeleton || <Outlet />}
           </div>
@@ -69,7 +77,7 @@ export function HydrateFallback() {
         currentHandle.isWide ? 'sm:max-w-6xl' : 'sm:max-w-[600px]',
       )}
       >
-        <ProfileHeaderSkeleton />
+        {isInsRoute ? <InsProfileHeaderSkeleton /> : <ProfileHeaderSkeleton />}
 
         <div className="w-full">
           {currentHandle?.skeleton || <Outlet />}
@@ -100,9 +108,10 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
   const matches = useMatches()
   const isWide = matches.some((m: any) => m.handle?.isWide)
   const isHome = matches.some((m: any) => m.handle?.isHome)
+  const isInsRoute = location.pathname.startsWith('/ins/')
 
   const { activeUser: storeActiveUser } = useUserStore()
-  const { activeUser: loaderActiveUser, allUsers } = loaderData
+  const { activeUser: loaderActiveUser, igUser: loaderIgUser } = loaderData
 
   // 渲染时优先使用 store 中的最新数据，loader 数据作为降级
   const displayActiveUser = storeActiveUser || loaderActiveUser
@@ -123,7 +132,11 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
 
         <main className="flex-1 flex flex-col items-center justify-start gap-4 pt-2 mx-auto min-w-0 border-r border-border/40">
 
-          {!isHome && <ProfileHeader user={displayActiveUser} isWide={isWide} />}
+          {!isHome && (
+            isInsRoute
+              ? <InsProfileHeader user={loaderIgUser} />
+              : <ProfileHeader user={displayActiveUser} isWide={isWide} />
+          )}
           {outletWrapper}
         </main>
 
@@ -143,7 +156,11 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
         isWide ? 'sm:max-w-6xl' : 'sm:max-w-[600px]',
       )}
       >
-        {!isHome && <ProfileHeader user={displayActiveUser} isWide={isWide} />}
+        {!isHome && (
+          isInsRoute
+            ? <InsProfileHeader user={loaderIgUser} />
+            : <ProfileHeader user={displayActiveUser} isWide={isWide} />
+        )}
         {outletWrapper}
       </main>
     </div>

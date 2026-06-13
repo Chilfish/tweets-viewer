@@ -102,6 +102,7 @@ export interface IGUserInfo {
   avatar_url?: string
   verified?: boolean
   bio?: string
+  external_url?: string
   followers_count?: number
   following_count?: number
   posts_count?: number

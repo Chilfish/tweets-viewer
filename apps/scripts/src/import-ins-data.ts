@@ -1,8 +1,11 @@
 /**
- * Import Instagram JSON data (IGPost[]) into the database.
+ * Import Instagram JSON data into the database.
  *
- * Reads local JSON files, extracts IGUserInfo from first post, and
- * upserts both user and posts to ins_users / ins_posts tables.
+ * Reads local JSON files in the format:
+ *   { "user": {...}, "posts": IGPost[] }
+ *
+ * Maps user fields (camelCase) to IGUserInfo and upserts both user and posts
+ * to ins_users / ins_posts tables.
  *
  * Usage:
  *   bun run apps/scripts/src/import-ins-data.ts <file.json> [<file2.json> ...]
@@ -18,6 +21,25 @@ import * as schema from '@tweets-viewer/database/schema'
 import { drizzle } from 'drizzle-orm/neon-http'
 import 'dotenv'
 
+/** 导入 JSON 文件中 user 部分的原始结构 */
+interface InsImportUser {
+  userName: string
+  fullName: string
+  profileImage?: string
+  isVerified?: boolean
+  description?: string
+  url?: string
+  followersCount?: number
+  followingsCount?: number
+  statusesCount?: number
+}
+
+/** 导入 JSON 文件的顶层结构 */
+interface InsImportData {
+  user: InsImportUser
+  posts: IGPost[]
+}
+
 const filePaths = process.argv.slice(2).filter(a => !a.startsWith('-'))
 if (filePaths.length === 0) {
   console.error('Usage: bun run apps/scripts/src/import-ins-data.ts <file.json> [<file2.json> ...]')
@@ -29,31 +51,41 @@ const db = drizzle({
   schema,
 })
 
+/** 将导入格式的 user 字段映射为 IGUserInfo */
+function mapUser(raw: InsImportUser): IGUserInfo {
+  return {
+    username: raw.userName,
+    fullname: raw.fullName,
+    avatar_url: raw.profileImage,
+    verified: raw.isVerified,
+    bio: raw.description,
+    external_url: raw.url,
+    followers_count: raw.followersCount,
+    following_count: raw.followingsCount,
+    posts_count: raw.statusesCount,
+  }
+}
+
 async function importFile(filePath: string): Promise<void> {
   console.log(`\nImporting ${filePath} ...`)
 
   const raw = await Bun.file(filePath).text()
-  const posts: IGPost[] = JSON.parse(raw)
-  console.log(`  Read ${posts.length} posts`)
+  const data: InsImportData = JSON.parse(raw)
+  const { user: rawUser, posts } = data
 
-  if (posts.length === 0)
+  console.log(`  User: ${rawUser.fullName} (@${rawUser.userName})`)
+  console.log(`  Posts: ${posts.length}`)
+
+  if (posts.length === 0) {
+    console.log('  No posts to import, skipping.')
     return
-
-  const username = posts[0].username
-
-  const user: IGUserInfo = {
-    username: posts[0].username,
-    fullname: posts[0].fullname,
-    avatar_url: posts[0].avatar_url,
-    verified: posts[0].verified,
-    posts_count: posts.length,
   }
 
+  const user = mapUser(rawUser)
   await createInsUser({ db, user })
-  console.log(`  User: ${user.fullname} (@${user.username})`)
 
-  const { rowCount } = await createInsPosts({ db, posts, username })
-  console.log(`  Posts: ${rowCount}/${posts.length}`)
+  const { rowCount } = await createInsPosts({ db, posts, username: user.username })
+  console.log(`  Inserted posts: ${rowCount}/${posts.length}`)
 }
 
 async function main(): Promise<void> {
