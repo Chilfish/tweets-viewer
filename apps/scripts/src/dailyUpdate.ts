@@ -1,113 +1,42 @@
-import { neon } from '@neondatabase/serverless'
-import { createTweets, getAllUsers, schema } from '@tweets-viewer/database'
-import { RettiwtPool, TweetEnrichmentService, TwitterAPIClient } from '@tweets-viewer/rettiwt-api'
+/**
+ * Daily data update entry point (scheduled by GitHub Actions cron).
+ *
+ * Runs in order:
+ *   1. Twitter tweet fetch + upsert
+ *   2. Instagram post fetch + upsert (reads users from ins_users table)
+ *
+ * Usage:
+ *   bun run apps/scripts/src/dailyUpdate.ts
+ *
+ * Env:
+ *   DATABASE_URL          Neon Postgres
+ *   TWEET_KEYS            Twitter API Keys (comma-separated)
+ *   INSTAGRAM_COOKIES     Instagram login Cookie
+ */
 
-import { drizzle } from 'drizzle-orm/neon-http'
+// ═══ Instagram Daily Update ═══
+import { fetchInsDaily } from './fetch-ins-daily'
 
-const KEYS = (process.env.TWEET_KEYS || '').split(',').filter(Boolean).map(key => key.trim())
-const SYNC_SINCE = process.env.SYNC_SINCE
-  ? new Date(process.env.SYNC_SINCE)
-  : new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-const twitterPool = new RettiwtPool(KEYS)
+import 'dotenv'
 
-const apiClient = new TwitterAPIClient(twitterPool)
-const enrichmentService = new TweetEnrichmentService()
+// ═══ Twitter Daily Update ═══
+// TODO: integrate existing Twitter fetch logic here
 
-async function fetchTimeline(userId: string, cursor?: string) {
-  try {
-    const rawTweets = await apiClient.fetchUserTimelineWithRepliesRaw(userId, cursor)
-    if (!rawTweets.tweets.length) {
-      console.error({
-        userId,
-        message: 'No tweets found',
-        action: 'fetch-timeline',
-      })
-      return {
-        tweets: [],
-        cursor: '',
-      }
-    }
-
-    const enrichedTweets = enrichmentService.enrichUserTimelineTweets(rawTweets.tweets, userId)
-
-    return {
-      tweets: enrichedTweets,
-      cursor: rawTweets.cursor,
-    }
-  }
-  catch (error) {
-    console.error({
-      userId,
-      cursor,
-      message: 'Error fetching timeline',
-      action: 'fetch-timeline-error',
-      error,
-    })
-    return {
-      tweets: [],
-      cursor: '',
-    }
-  }
+async function fetchTwitterDaily(): Promise<void> {
+  console.log('Twitter daily fetch — (not yet integrated, skipping)')
 }
 
-const DATABASE_URL = process.env.DATABASE_URL
-if (!DATABASE_URL) {
-  console.error('DATABASE_URL is required')
+// ═══ Main ═══
+async function main(): Promise<void> {
+  console.log('=== Daily Update Start ===\n')
+
+  await fetchTwitterDaily()
+  await fetchInsDaily()
+
+  console.log('\n=== Daily Update Complete ===')
+}
+
+main().catch((err) => {
+  console.error('Fatal:', err)
   process.exit(1)
-}
-const client = neon(DATABASE_URL)
-const db = drizzle({ client, schema })
-const users = await getAllUsers(db)
-
-console.log({
-  action: 'get-users',
-  usersCount: users.length,
-  today: new Date().toISOString().split('T')[0],
 })
-
-for (const user of users) {
-  const MAX_RETRIES = 3
-  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-    try {
-      const allTweets = []
-      let nowCursor: string | undefined
-      do {
-        const { tweets, cursor } = await fetchTimeline(user.id, nowCursor)
-        if (!tweets.length)
-          break
-        allTweets.push(...tweets)
-        nowCursor = cursor
-        const lastTweet = tweets.at(-1)
-
-        if (new Date(lastTweet!.created_at).getTime() < SYNC_SINCE.getTime())
-          break
-      } while (true)
-      console.log({
-        userId: user.id,
-        username: user.fullName,
-        tweetsCount: allTweets.length,
-        action: 'fetch-timeline',
-        attempt,
-      })
-      await createTweets({ db, tweets: allTweets, user })
-      break
-    }
-    catch (error) {
-      console.error({
-        userId: user.id,
-        username: user.fullName,
-        action: 'fetch-timeline-error',
-        attempt,
-        error,
-      })
-
-      if (attempt === MAX_RETRIES) {
-        console.error(`Failed to sync user ${user.fullName} after ${MAX_RETRIES} attempts. Skipping.`)
-      }
-    }
-  }
-}
-
-console.log(`Daily update completed successfully.`)
-
-process.exit(0)

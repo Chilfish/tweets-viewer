@@ -1,4 +1,4 @@
-name: Get Tweets
+name: Daily Data Update
 
 on:
   schedule:
@@ -23,5 +23,6 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           TWEET_KEYS: ${{ secrets.TWEET_KEYS }}
+          INSTAGRAM_COOKIES: ${{ secrets.INSTAGRAM_COOKIES }}
           FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
         run: bun run apps/scripts/src/dailyUpdate.ts

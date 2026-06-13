@@ -41,7 +41,7 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
 }
 
 export default function InsPage({ loaderData, params }: Route.ComponentProps) {
-  const { user, posts: paginatedPosts } = loaderData
+  const { posts: paginatedPosts } = loaderData
   const [searchParams, setSearchParams] = useSearchParams()
 
   const page = Number(searchParams.get('page')) || 1
