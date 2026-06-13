@@ -9,6 +9,8 @@
  */
 export const INSUsernameToTwitter: Record<string, string> = {
   'meeeei.gt': 'meeeei_Gt',
+  'watase_yuzuki': 'Watase_Yuzuki',
+  'aoki_hina_official': 'aoki__hina',
   // Add more mappings here as needed
 }
 
