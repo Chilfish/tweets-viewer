@@ -4,8 +4,9 @@
  * Reads local JSON files in the format:
  *   { "user": {...}, "posts": IGPost[] }
  *
- * Maps user fields (camelCase) to IGUserInfo and upserts both user and posts
- * to ins_users / ins_posts tables.
+ * Maps IG username → twitter username via mapping.ts, then:
+ *   1. Upserts IG user info into users.ins_json_data
+ *   2. Batch-inserts posts into ins_posts with FK = twitter username
  *
  * Usage:
  *   bun run apps/scripts/src/import-ins-data.ts <file.json> [<file2.json> ...]
@@ -16,9 +17,10 @@
 
 import type { IGPost, IGUserInfo } from '@tweets-viewer/shared'
 import { neon } from '@neondatabase/serverless'
-import { createInsPosts, createInsUser } from '@tweets-viewer/database'
+import { createInsPosts, upsertInsUserInfo } from '@tweets-viewer/database'
 import * as schema from '@tweets-viewer/database/schema'
 import { drizzle } from 'drizzle-orm/neon-http'
+import { INSUsernameToTwitter } from './mapping'
 import 'dotenv'
 
 /** 导入 JSON 文件中 user 部分的原始结构 */
@@ -81,10 +83,26 @@ async function importFile(filePath: string): Promise<void> {
     return
   }
 
-  const user = mapUser(rawUser)
-  await createInsUser({ db, user })
+  const insUsername = rawUser.userName
+  const twitterUsername = INSUsernameToTwitter[insUsername]
+  if (!twitterUsername) {
+    console.error(`  ✗ No twitter mapping for IG username "${insUsername}" — add to mapping.ts`)
+    return
+  }
 
-  const { rowCount } = await createInsPosts({ db, posts, username: user.username })
+  const user = mapUser(rawUser)
+
+  // Upsert IG user info into users table
+  await upsertInsUserInfo({
+    db,
+    twitterUsername,
+    insUsername,
+    user,
+  })
+  console.log(`  User info → users.ins_json_data (twitter: @${twitterUsername})`)
+
+  // Batch-insert posts referencing twitter username as FK
+  const { rowCount } = await createInsPosts({ db, posts, username: twitterUsername })
   console.log(`  Inserted posts: ${rowCount}/${posts.length}`)
 }
 

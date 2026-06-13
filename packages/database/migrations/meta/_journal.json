@@ -19,8 +19,8 @@
     {
       "idx": 2,
       "version": "7",
-      "when": 1781363678336,
-      "tag": "0002_brave_zaladane",
+      "when": 1781367100254,
+      "tag": "0002_fixed_banshee",
       "breakpoints": true
     }
   ]

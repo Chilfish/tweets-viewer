@@ -11,17 +11,24 @@ interface InsPageResponse {
   posts: PaginatedResponse<IGPost>
 }
 
+/**
+ * GET /ins/:name
+ *
+ * :name = twitter userName (not IG username).
+ * Looks up IG user info from users.ins_json_data and paginated posts from ins_posts.
+ * Returns 404 only when both user info AND posts are empty.
+ */
 app.get('/:name', async (c) => {
   const db = c.var.db
-  const name = c.req.param('name')
+  const twitterUsername = c.req.param('name')
   const page = Number(c.req.query('page') || 1)
 
   const [user, posts] = await Promise.all([
-    getInsUserByName(db, name),
-    getInsPosts({ db, username: name, page, pageSize: PAGE_SIZE }),
+    getInsUserByName(db, twitterUsername),
+    getInsPosts({ db, username: twitterUsername, page, pageSize: PAGE_SIZE }),
   ])
 
-  if (!user) {
+  if (!user && posts.data.length === 0) {
     return c.json({ user: null, posts } satisfies InsPageResponse, 404)
   }
 

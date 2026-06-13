@@ -1,9 +1,11 @@
 /**
  * Daily Instagram fetch via @chilfish/gallery-dl-instagram SDK.
  *
- * Reads tracked usernames from ins_users table, fetches latest posts
- * via SDK extract(), and upserts to database. post_id unique constraint
- * handles dedup; user info updated each run (avatar/fullname may change).
+ * Reads tracked usernames from users table (where ins_username IS NOT NULL),
+ * uses mapping.ts to convert twitter→ins username for Instagram URL,
+ * fetches latest posts via SDK extract(), and upserts to database.
+ *
+ * post_id unique constraint handles dedup; user info updated each run.
  *
  * Env:
  *   DATABASE_URL          Neon Postgres connection
@@ -20,7 +22,8 @@ import type {
 import type { IGPost, IGUserInfo } from '@tweets-viewer/shared'
 import { createSDK } from '@chilfish/gallery-dl-instagram/node'
 import { neon } from '@neondatabase/serverless'
-import { createInsPosts, createInsUser, schema } from '@tweets-viewer/database'
+import { createInsPosts, schema, upsertInsUserInfo } from '@tweets-viewer/database'
+import { isNotNull } from 'drizzle-orm'
 import { drizzle } from 'drizzle-orm/neon-http'
 
 const db = drizzle({
@@ -190,15 +193,15 @@ async function handleQueue(
 
 // ─── Per-user fetch ───
 
-async function fetchUser(ig: InstagramSDK, username: string): Promise<void> {
-  const url = `https://www.instagram.com/${username}/`
-  console.log(`\n@${username} — extracting...`)
+async function fetchUser(ig: InstagramSDK, twitterUsername: string, insUsername: string): Promise<void> {
+  const url = `https://www.instagram.com/${insUsername}/`
+  console.log(`\n@${insUsername} (twitter: @${twitterUsername}) — extracting...`)
 
   ig.config.set('extractor.instagram.user.include', 'all')
   const posts = await collectAll(ig, url)
 
   if (posts.length === 0) {
-    console.log(`  No posts found for @${username}`)
+    console.log(`  No posts found for @${insUsername}`)
     return
   }
 
@@ -206,11 +209,16 @@ async function fetchUser(ig: InstagramSDK, username: string): Promise<void> {
 
   const user = extractUserInfo(posts)
   if (user) {
-    await createInsUser({ db, user })
-    console.log(`  User: ${user.fullname} (@${user.username})`)
+    await upsertInsUserInfo({
+      db,
+      twitterUsername,
+      insUsername,
+      user,
+    })
+    console.log(`  User: ${user.fullname} (@${user.username}) → users.ins_json_data`)
   }
 
-  const result = await createInsPosts({ db, posts, username })
+  const result = await createInsPosts({ db, posts, username: twitterUsername })
   console.log(`  Posts: ${result.rowCount} new / ${posts.length} total`)
 }
 
@@ -223,28 +231,35 @@ export async function fetchInsDaily(): Promise<void> {
     return
   }
 
-  // Read usernames from ins_users table
-  const users = await db
-    .select({ username: schema.insUsersTable.username })
-    .from(schema.insUsersTable)
+  // Read users that have an Instagram account linked
+  const rows = await db
+    .select({
+      userName: schema.usersTable.userName,
+      insUsername: schema.usersTable.insUsername,
+    })
+    .from(schema.usersTable)
+    .where(isNotNull(schema.usersTable.insUsername))
 
-  const trackedUsers = users.map(u => u.username)
-
-  if (trackedUsers.length === 0) {
-    console.warn('No users in ins_users table — skipping IG fetch')
+  if (rows.length === 0) {
+    console.warn('No users with ins_username set — skipping IG fetch')
     return
   }
 
-  console.log(`IG Daily Fetch — ${trackedUsers.length} user(s): ${trackedUsers.join(', ')}`)
+  const trackedUsers = rows.map(r => ({
+    twitter: r.userName,
+    ins: r.insUsername!,
+  }))
+
+  console.log(`IG Daily Fetch — ${trackedUsers.length} user(s): ${trackedUsers.map(u => u.ins).join(', ')}`)
 
   const ig = await createSDK({ cookies })
 
-  for (const username of trackedUsers) {
+  for (const { twitter, ins } of trackedUsers) {
     try {
-      await fetchUser(ig, username)
+      await fetchUser(ig, twitter, ins)
     }
     catch (err: any) {
-      console.error(`  Error @${username}:`, err.message)
+      console.error(`  Error @${ins}:`, err.message)
     }
   }
 

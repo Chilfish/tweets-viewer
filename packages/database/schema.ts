@@ -13,6 +13,11 @@ export const usersTable = pgTable('users', {
   restId: text('restId').notNull(),
   userName: text('userName').notNull().unique(),
   jsonData: json('jsonData').$type<EnrichedUser>().notNull(),
+
+  /** Instagram username — nullable, populated when user also has IG account */
+  insUsername: text('ins_username').unique(),
+  /** Instagram user profile info (avatar, bio, follower counts, etc.) */
+  insJsonData: json('ins_json_data').$type<IGUserInfo>(),
 })
 
 export const tweetsTable = pgTable(
@@ -36,26 +41,20 @@ export type SelectUser = typeof usersTable.$inferSelect
 export type InsertTweet = typeof tweetsTable.$inferInsert
 export type SelectTweet = typeof tweetsTable.$inferSelect
 
-// ── Instagram Tables ──
-
-export const insUsersTable = pgTable('ins_users', {
-  id: serial('id').primaryKey(),
-  username: text('username').notNull().unique(),
-  jsonData: json('jsonData').$type<IGUserInfo>().notNull(),
-})
+// ── Instagram Posts Table ──
+// ins_users table removed — IG user info merged into users.ins_json_data.
+// FK now references users.userName (twitter username).
 
 export const insPostsTable = pgTable('ins_posts', {
   id: serial('id').primaryKey(),
   postId: text('post_id').notNull().unique(),
+  /** References users.userName (twitter username), NOT IG username */
   userId: text('username')
     .notNull()
-    .references(() => insUsersTable.username, { onDelete: 'cascade' }),
+    .references(() => usersTable.userName, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at').notNull(),
   jsonData: json('jsonData').$type<IGPost>().notNull(),
 })
-
-export type InsertInsUser = typeof insUsersTable.$inferInsert
-export type SelectInsUser = typeof insUsersTable.$inferSelect
 
 export type InsertInsPost = typeof insPostsTable.$inferInsert
 export type SelectInsPost = typeof insPostsTable.$inferSelect

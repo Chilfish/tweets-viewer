@@ -1,5 +1,5 @@
 {
-  "id": "ec831054-aee1-4f6c-bca9-caf5c679c0b4",
+  "id": "d0fcc353-8d2d-4779-b66e-7575c8be13ee",
   "prevId": "2bb630ab-9b25-4475-83a1-3675cefe777d",
   "version": "7",
   "dialect": "postgresql",
@@ -41,15 +41,15 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "ins_posts_username_ins_users_username_fk": {
-          "name": "ins_posts_username_ins_users_username_fk",
+        "ins_posts_username_users_userName_fk": {
+          "name": "ins_posts_username_users_userName_fk",
           "tableFrom": "ins_posts",
-          "tableTo": "ins_users",
+          "tableTo": "users",
           "columnsFrom": [
             "username"
           ],
           "columnsTo": [
-            "username"
+            "userName"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
@@ -62,45 +62,6 @@
           "nullsNotDistinct": false,
           "columns": [
             "post_id"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.ins_users": {
-      "name": "ins_users",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "username": {
-          "name": "username",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "jsonData": {
-          "name": "jsonData",
-          "type": "json",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "ins_users_username_unique": {
-          "name": "ins_users_username_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "username"
           ]
         }
       },
@@ -206,6 +167,18 @@
           "type": "json",
           "primaryKey": false,
           "notNull": true
+        },
+        "ins_username": {
+          "name": "ins_username",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ins_json_data": {
+          "name": "ins_json_data",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
@@ -217,6 +190,13 @@
           "nullsNotDistinct": false,
           "columns": [
             "userName"
+          ]
+        },
+        "users_ins_username_unique": {
+          "name": "users_ins_username_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "ins_username"
           ]
         }
       },
