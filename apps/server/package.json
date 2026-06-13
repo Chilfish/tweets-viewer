@@ -16,8 +16,8 @@
     "@tweets-viewer/database": "workspace:*",
     "@tweets-viewer/shared": "workspace:*",
     "drizzle-orm": "^0.45.2",
-    "hono": "^4.12.23",
-    "nitro": "^3.0.260603-beta"
+    "hono": "^4.12.25",
+    "nitro": "^3.0.260610-beta"
   },
   "devDependencies": {
     "vite": "^8.0.16",

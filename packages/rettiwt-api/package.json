@@ -34,16 +34,16 @@
     "commander": "^15.0.0",
     "cookiejar": "^2.1.4",
     "happy-dom": "20.1.0",
-    "http-proxy-agent": "^9.0.0",
-    "https-proxy-agent": "^9.0.0",
+    "http-proxy-agent": "^9.1.0",
+    "https-proxy-agent": "^9.1.0",
     "neoqs": "^6.13.0",
     "node-html-parser": "^7.1.0",
-    "socks-proxy-agent": "^10.0.0",
+    "socks-proxy-agent": "^10.1.0",
     "x-client-transaction-id": "^0.2.3"
   },
   "devDependencies": {
     "@types/cookiejar": "^2.1.5",
-    "@types/node": "^25.9.2",
+    "@types/node": "^25.9.3",
     "typescript": "^6.0.3"
   }
 }
