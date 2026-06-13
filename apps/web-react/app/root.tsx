@@ -97,24 +97,22 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   }
 
   return (
-    <Layout>
-      <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground p-4">
-        <div className="text-center max-w-md">
-          <AlertTriangle className="mx-auto h-16 w-16 text-destructive mb-4" />
-          <h1 className="text-3xl font-bold text-destructive mb-2">
-            {message}
-          </h1>
-          <p className="text-muted-foreground mb-6">{details}</p>
-          {stack && (
-            <pre className="w-full p-4 overflow-x-auto bg-muted text-muted-foreground rounded text-left text-sm">
-              <code>{stack}</code>
-            </pre>
-          )}
-          <Button render={<a href="/" />}>
-            Go back to Home
-          </Button>
-        </div>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground p-4">
+      <div className="text-center max-w-md">
+        <AlertTriangle className="mx-auto h-16 w-16 text-destructive mb-4" />
+        <h1 className="text-3xl font-bold text-destructive mb-2">
+          {message}
+        </h1>
+        <p className="text-muted-foreground mb-6">{details}</p>
+        {stack && (
+          <pre className="w-full p-4 overflow-x-auto bg-muted text-muted-foreground rounded text-left text-sm">
+            <code>{stack}</code>
+          </pre>
+        )}
+        <Button render={<a href="/" />}>
+          Go back to Home
+        </Button>
       </div>
-    </Layout>
+    </div>
   )
 }

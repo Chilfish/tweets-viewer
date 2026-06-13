@@ -1,6 +1,7 @@
 import type { IGPost, IGUserInfo, PaginatedResponse } from '@tweets-viewer/shared'
 import type { Route } from './+types/ins'
 import { PAGE_SIZE } from '@tweets-viewer/shared'
+import { isAxiosError } from 'axios'
 import { useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router'
 import { IGPostSkeleton } from '~/components/ins/IGPostSkeleton'
@@ -33,11 +34,30 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
   const url = new URL(request.url)
   const page = Number(url.searchParams.get('page')) || 1
 
-  const { data } = await apiClient.get<InsLoaderData>(`/ins/${name}`, {
-    params: { page },
-  })
+  try {
+    const { data } = await apiClient.get<InsLoaderData>(`/ins/${name}`, {
+      params: { page },
+    })
+    return data
+  }
+  catch (err) {
+    // Return empty data so the component renders its empty-state UI,
+    // avoiding the root ErrorBoundary's hydration bug.
+    // Only log unexpected errors; 404 is expected for users without IG data.
+    if (isAxiosError(err) && err.response) {
+      if (err.response.status !== 404) {
+        console.error(`IG load failed (${err.response.status}):`, err.message)
+      }
+    }
+    else {
+      console.error('IG load failed:', err)
+    }
 
-  return data
+    return {
+      posts: { data: [], meta: { total: 0, page: 0, pageSize: 0, hasMore: false } },
+      user: null,
+    } as InsLoaderData
+  }
 }
 
 export default function InsPage({ loaderData, params }: Route.ComponentProps) {
@@ -71,6 +91,22 @@ export default function InsPage({ loaderData, params }: Route.ComponentProps) {
       setStatus('ready')
     }
   }, [paginatedPosts, filterKey, page, resetStream, appendPosts, setStatus])
+
+  // --- Empty state (defensive: server should 404 in this case, but just in case)
+  if (!paginatedPosts.meta.total && paginatedPosts.data.length === 0) {
+    return (
+      <div className="w-full max-w-3xl mx-auto flex flex-col items-center justify-center py-20 gap-3 text-center">
+        <div className="text-5xl mb-2">📭</div>
+        <p className="text-lg font-semibold">No Instagram Data</p>
+        <p className="text-sm text-muted-foreground max-w-md">
+          @
+          {params.name}
+          {' '}
+          的 Instagram 数据未归档
+        </p>
+      </div>
+    )
+  }
 
   const totalPages = Math.ceil(paginatedPosts.meta.total / PAGE_SIZE)
 

@@ -2,6 +2,7 @@ import type { EnrichedUser } from '@tweets-viewer/rettiwt-api'
 import type { IGUserInfo } from '@tweets-viewer/shared'
 import type { ClientLoaderFunctionArgs, ShouldRevalidateFunctionArgs } from 'react-router'
 import type { Route } from './+types/layout'
+import { isAxiosError } from 'axios'
 import { Outlet, useLocation, useMatches, useParams } from 'react-router'
 import { TopNav } from '~/components/layout/top-nav'
 import { InsProfileHeader } from '~/components/profile/InsProfileHeader'
@@ -20,7 +21,23 @@ export async function clientLoader({ params, request }: ClientLoaderFunctionArgs
 
   // Instagram 路线：获取 IG 用户信息
   if (isInsRoute) {
-    const { data } = await apiClient.get<{ user: IGUserInfo }>(`/ins/${name}`)
+    const { data } = await apiClient.get<{ user: IGUserInfo }>(`/ins/${name}`).catch((err) => {
+      if (isAxiosError(err) && err.response) {
+        if (err.response.status !== 404) {
+          console.error(`IG load failed (${err.response.status}):`, err.message)
+        }
+      }
+      else {
+        console.error('IG load failed:', err)
+      }
+      return {
+        data: {
+          user: null,
+          activeUser: null,
+          allUsers: [],
+        },
+      }
+    })
     return { igUser: data.user, activeUser: null, allUsers: [] }
   }
 
