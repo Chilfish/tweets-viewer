@@ -26,12 +26,20 @@ export async function createTweets({ db, tweets, user }: { db: DB, tweets: Enric
       .insert(tweetsTable)
       .values(chunk.map(tweet => ({
         tweetId: tweet.id,
-        userId: user.userName,
+        userId: user.userName!,
         fullText: tweet.text,
         createdAt: new Date(tweet.created_at),
         jsonData: tweet,
       })))
-      .onConflictDoNothing()
+      .onConflictDoUpdate({
+        target: tweetsTable.tweetId,
+        set: {
+          userId: sql`excluded."userName"`,
+          fullText: sql`excluded."fullText"`,
+          createdAt: sql`excluded."createdAt"`,
+          jsonData: sql`excluded."jsonData"`,
+        },
+      })
     insertedCount += rowCount
   }
   return { rowCount: insertedCount }

@@ -8,11 +8,11 @@ export async function updateUser({ db, user }: { db: DB, user: EnrichedUser }) {
   return db
     .update(usersTable)
     .set({
-      userName: user.userName,
+      userName: user.userName!,
       restId: user.id,
       jsonData: user,
     })
-    .where(eq(usersTable.userName, user.userName))
+    .where(eq(usersTable.userName, user.userName!))
 }
 
 export async function createUser({ db, user }: { db: DB, user: EnrichedUser }) {
@@ -20,7 +20,7 @@ export async function createUser({ db, user }: { db: DB, user: EnrichedUser }) {
     .insert(usersTable)
     .values({
       restId: user.id,
-      userName: user.userName,
+      userName: user.userName!,
       jsonData: user,
     })
     .onConflictDoUpdate({

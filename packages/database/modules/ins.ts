@@ -2,7 +2,7 @@ import type { IGPost, IGUserInfo, PaginatedResponse } from '@tweets-viewer/share
 import type { DB } from '../'
 import type { SelectInsPost } from '../schema'
 import { PAGE_SIZE } from '@tweets-viewer/shared'
-import { count, desc, eq } from 'drizzle-orm'
+import { count, desc, eq, sql } from 'drizzle-orm'
 import { insPostsTable, usersTable } from '../schema'
 
 const BATCH_SIZE = 1000
@@ -50,7 +50,14 @@ export async function createInsPosts({ db, posts, username }: {
         createdAt: post.created_at ? new Date(post.created_at) : new Date(),
         jsonData: post,
       })))
-      .onConflictDoNothing()
+      .onConflictDoUpdate({
+        target: insPostsTable.postId,
+        set: {
+          userId: sql`excluded.username`,
+          createdAt: sql`excluded.created_at`,
+          jsonData: sql`excluded."jsonData"`,
+        },
+      })
     insertedCount += rowCount
   }
   return { rowCount: insertedCount }
