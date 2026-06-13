@@ -7,13 +7,11 @@ import { insPostsTable, usersTable } from '../schema'
 
 const BATCH_SIZE = 1000
 
-/**
- * Upsert IG user info into users table.
- * @param db - Database instance
- * @param twitterUsername - The user's twitter userName (FK target for ins_posts)
- * @param insUsername - The user's Instagram username
- * @param user - IGUserInfo from SDK or import
- */
+// Upsert IG user info into users table.
+// db: Database instance
+// twitterUsername: The user's twitter userName (FK target for ins_posts)
+// insUsername: The user's Instagram username
+// user: IGUserInfo from SDK or import
 export async function upsertInsUserInfo({
   db,
   twitterUsername,
