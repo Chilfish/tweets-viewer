@@ -1,36 +1,31 @@
-import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
-import type { PaginatedResponse } from '@tweets-viewer/shared'
+import type { IGPost, IGUserInfo, PaginatedResponse } from '@tweets-viewer/shared'
 import type { AppType } from '../common'
+import { getInsPosts, getInsUserByName } from '@tweets-viewer/database'
 import { PAGE_SIZE } from '@tweets-viewer/shared'
 import { Hono } from 'hono'
-import { getData } from '../common'
 
 const app = new Hono<AppType>()
 
-app.get('/get/:name', async (c) => {
+interface InsPageResponse {
+  user: IGUserInfo | null
+  posts: PaginatedResponse<IGPost>
+}
+
+app.get('/:name', async (c) => {
+  const db = c.var.db
   const name = c.req.param('name')
   const page = Number(c.req.query('page') || 1)
-  const reverse = c.req.query('reverse') === 'true'
 
-  const tweets = await getData(name)
-  const total = tweets.length
+  const [user, posts] = await Promise.all([
+    getInsUserByName(db, name),
+    getInsPosts({ db, username: name, page, pageSize: PAGE_SIZE }),
+  ])
 
-  // reverse=true: oldest first (正序), reverse=false: newest first (默认倒序)
-  const ordered = reverse ? [...tweets].reverse() : tweets
-  const offset = (page - 1) * PAGE_SIZE
-  const data = ordered.slice(offset, offset + PAGE_SIZE)
-
-  const response: PaginatedResponse<EnrichedTweet> = {
-    data,
-    meta: {
-      total,
-      page,
-      pageSize: PAGE_SIZE,
-      hasMore: offset + data.length < total,
-    },
+  if (!user) {
+    return c.json({ user: null, posts } satisfies InsPageResponse, 404)
   }
 
-  return c.json(response)
+  return c.json({ user, posts } satisfies InsPageResponse)
 })
 
 export default app

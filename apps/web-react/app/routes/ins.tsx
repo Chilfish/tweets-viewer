@@ -1,4 +1,4 @@
-import type { IGPostData } from '@tweets-viewer/shared'
+import type { IGPost, IGUserInfo, PaginatedResponse } from '@tweets-viewer/shared'
 import type { Route } from './+types/ins'
 import { PAGE_SIZE } from '@tweets-viewer/shared'
 import { useEffect, useRef } from 'react'
@@ -7,16 +7,12 @@ import { IGPostSkeleton } from '~/components/ins/IGPostSkeleton'
 import { InstagramPostCard } from '~/components/ins/InstagramPostCard'
 import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
 import { TweetNavigation } from '~/components/tweet/TweetNavigation'
+import { apiClient } from '~/lib/utils'
 import { useIGStore } from '~/store/use-ig-store'
 
-interface PaginatedIGResponse {
-  data: IGPostData
-  meta: {
-    total: number
-    page: number
-    pageSize: number
-    hasMore: boolean
-  }
+interface InsLoaderData {
+  user: IGUserInfo | null
+  posts: PaginatedResponse<IGPost>
 }
 
 export function meta({ params }: Route.MetaArgs) {
@@ -37,29 +33,15 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
   const url = new URL(request.url)
   const page = Number(url.searchParams.get('page')) || 1
 
-  const res = await fetch('/meeeei.gt.json')
-  if (!res.ok) {
-    throw new Response('Failed to load posts', { status: res.status })
-  }
+  const { data } = await apiClient.get<InsLoaderData>(`/ins/${name}`, {
+    params: { page },
+  })
 
-  const allPosts: IGPostData = await res.json()
-  const userPosts = allPosts.filter(p => p.username === name)
-
-  const total = userPosts.length
-  const start = (page - 1) * PAGE_SIZE
-  const end = start + PAGE_SIZE
-  const paged = userPosts.slice(start, end)
-
-  return {
-    paginatedPosts: {
-      data: paged,
-      meta: { total, page, pageSize: PAGE_SIZE, hasMore: end < total },
-    } as PaginatedIGResponse,
-  }
+  return data
 }
 
 export default function InsPage({ loaderData, params }: Route.ComponentProps) {
-  const { paginatedPosts } = loaderData
+  const { user, posts: paginatedPosts } = loaderData
   const [searchParams, setSearchParams] = useSearchParams()
 
   const page = Number(searchParams.get('page')) || 1
