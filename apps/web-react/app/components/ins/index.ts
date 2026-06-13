@@ -1,0 +1,8 @@
+export { IGActionBar } from './IGActionBar'
+export { IGCaption } from './IGCaption'
+export { IGCardHeader } from './IGCardHeader'
+export { IGMediaGrid } from './IGMediaGrid'
+export { IGMusicInfo } from './IGMusicInfo'
+export { IGPostSkeleton } from './IGPostSkeleton'
+export { default as InsLogo } from './InsLogo'
+export { InstagramPostCard } from './InstagramPostCard'

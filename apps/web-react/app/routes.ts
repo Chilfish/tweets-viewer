@@ -12,6 +12,6 @@ export default [
     route('/memo/:name', 'routes/last-years-today.tsx'),
     route('/search/:name?', 'routes/search.tsx'),
     route('/media/:name', 'routes/media.tsx'),
-    // route('/ins/:name', 'routes/ins.tsx'),
+    route('/ins/:name', 'routes/ins.tsx'),
   ]),
 ] satisfies RouteConfig

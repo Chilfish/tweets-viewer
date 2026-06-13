@@ -1,9 +1,10 @@
 import { Calendar, Home, ImageIcon, Search } from 'lucide-react'
 import { useLocation } from 'react-router'
+import { InsIcon } from '../ins/InsLogo'
 
 export interface NavItem {
   label: string
-  icon: typeof Home
+  icon: any
   href: string
   isActive: boolean
   disabled?: boolean
@@ -30,16 +31,16 @@ export function useNavItems(currentUser?: string): NavItem[] {
         : false,
       disabled: !currentUser,
     },
-    // {
-    //   label: 'Instagram',
-    //   icon: Instagram,
-    //   href: currentUser ? `/ins/${currentUser}` : '/',
-    //   isActive: currentUser
-    //     ? location.pathname === `/ins/${currentUser}`
-    //     : false,
-    //   disabled: true,
-    // disabled: !currentUser,
-    // },
+    {
+      label: 'Instagram',
+      icon: InsIcon,
+      href: currentUser ? `/ins/${currentUser}` : '/',
+      isActive: currentUser
+        ? location.pathname === `/ins/${currentUser}`
+        : false,
+      // disabled: true,
+      disabled: !currentUser,
+    },
     {
       label: '那年今日',
       icon: Calendar,

@@ -133,7 +133,7 @@ function createTextParser(...parsers: ParserFn[]) {
 }
 
 // The order is important: links first, then mentions and hashtags.
-const parseTweetText = createTextParser(
+const parseRichText = createTextParser(
   parseLinks,
   parseMentions,
   parseHashtags,
@@ -163,12 +163,12 @@ function getReplyInfo(text: string) {
 
 // --- Main Component ---
 
-interface TweetTextProps {
+interface RichTextProps {
   text: string
   className?: string
 }
 
-export const TweetText: React.FC<TweetTextProps> = ({ text, className }) => {
+export const RichText: React.FC<RichTextProps> = ({ text, className }) => {
   const { name: replyToName, text: content } = getReplyInfo(text)
 
   if (replyToName) {
@@ -181,11 +181,11 @@ export const TweetText: React.FC<TweetTextProps> = ({ text, className }) => {
           :
         </p>
         <p className={cn('wrap-anywhere', className)}>
-          {parseTweetText(content || '')}
+          {parseRichText(content || '')}
         </p>
       </>
     )
   }
 
-  return <p className={cn('pt-2 wrap-anywhere', className)}>{parseTweetText(text)}</p>
+  return <p className={cn('pt-2 wrap-anywhere', className)}>{parseRichText(text)}</p>
 }

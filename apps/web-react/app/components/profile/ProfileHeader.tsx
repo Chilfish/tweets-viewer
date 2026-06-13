@@ -3,8 +3,8 @@ import { format } from 'date-fns'
 import { zhCN } from 'date-fns/locale'
 import { BalloonIcon, CalendarDays, LinkIcon, MapPin } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
+import { RichText } from '../RichText'
 import { ProfileHeaderSkeleton } from '../skeletons/profile'
-import { TweetText } from '../tweet/TweetText'
 
 interface ProfileHeaderProps {
   user: EnrichedUser | null
@@ -70,7 +70,7 @@ export function ProfileHeader({ user, children }: ProfileHeaderProps) {
 
         {/* Bio */}
         {user.description && (
-          <TweetText
+          <RichText
             text={user.description}
             className="text-4"
           />

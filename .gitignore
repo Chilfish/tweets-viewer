@@ -54,3 +54,4 @@ cache*/
 .vercel
 .env*.local
 wrangler.json
+.alma-snapshots
