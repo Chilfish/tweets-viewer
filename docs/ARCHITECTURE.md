@@ -39,6 +39,7 @@ tweets-viewer/
   | `/media/:name` | 媒体墙（图片/视频网格，瀑布流布局） |
   | `/search/:name?` | 搜索视图（关键词全文检索） |
   | `/memo/:name` | "那年今日"视图（历史同天推文） |
+  | `/ins/:name` | Instagram 帖子浏览（无限滚动 + 分页器） |
 - **状态同步协议**：URL 作为唯一真值来源——前端不直接调用 API，只修改 URL；React Router 的 loader 监听 URL 变化后自动发起请求。
 - **部署**：Vercel (React Router v7 preset)，域名为 `tweet.chilfish.top`
 
@@ -50,7 +51,7 @@ tweets-viewer/
   - `routes/tweets.ts` — 推文列表、媒体列表、搜索、那年今日（含 LRU 缓存）
   - `routes/users.ts` — 用户查询
   - `routes/image.ts` — 随机图片（从静态 JSON 读取）
-  - `routes/ins.ts` — Instagram 风格数据端点（从静态文件缓存或远程拉取）
+  - `routes/ins.ts` — Instagram 帖子查询（分页），从 users.ins_json_data + ins_posts 表读取
 - **缓存策略**：
   - 服务端 LRU 缓存推文总数 (Map-based SimpleLRUCache, 容量 1000)
   - 客户端 axios-cache-interceptor 缓存 API 响应
@@ -64,14 +65,14 @@ tweets-viewer/
 - **核心脚本**：
   | 文件 | 用途 |
   |------|------|
-  | `dailyUpdate.ts` | 每日增量同步：遍历所有用户，全量同步推文（游标分页 + 自动重试） |
-  | `fetchTimeline.ts` | 抓取指定用户时间线（含回复），保存到缓存文件 |
-  | `fetchSearch.ts` | 抓取搜索结果 |
-  | `insertToDB.ts` | 读取本地 JSON，批量写入数据库 |
-  | `mergeData.ts` | 合并多个时间线 JSON 文件，去重排序 |
+  | `dailyUpdate.ts` | 每日增量同步入口（顺序执行 Twitter + IG） |
+  | `fetch-ins-daily.ts` | IG 每日抓取：从 users 表读取已关联 IG 的用户，SDK 抓取帖子，upsert 入库 |
+  | `import-ins-data.ts` | IG 批量导入：读取本地 JSON，查 mapping.ts 映射，写入 users.ins_json_data + ins_posts |
+  | `insertToDB.ts` | Twitter 批量导入：读取本地 JSON，写入 users + tweets |
+  | `mapping.ts` | IG username → twitter username 映射表，供导入脚本查询 |
 - **调度**：GitHub Actions cron (`0 16 * * *` UTC = 北京时间 00:00) + 手动触发
 - **工作流**：`.github/workflows/fetch-daily.yml` — checkout → setup Bun → install → run `dailyUpdate.ts`
-- **连接池**：`RettiwtPool` 多 API_KEY 轮转，避免速率限制
+- **连接池**：Twitter 用 `RettiwtPool` 多 API_KEY 轮转；IG 用 `@chilfish/gallery-dl-instagram` SDK + Cookie 认证
 
 ---
 
@@ -82,23 +83,33 @@ tweets-viewer/
 - **Schema**（定义于 `schema.ts`）：
 
   ```
-  users                        tweets
-  ┌────────────────────┐      ┌─────────────────────────────┐
-  │ id: serial (PK)    │◄─────│ userId: text (FK → userName) │
-  │ restId: text       │      │ tweetId: text (UNIQUE)       │
-  │ userName: text (UQ)│      │ fullText: text               │
-  │ jsonData: json     │      │ createdAt: timestamp         │
-  └────────────────────┘      │ jsonData: json               │
-                              └─────────────────────────────┘
+  users                              tweets
+  ┌──────────────────────────┐      ┌─────────────────────────────┐
+  │ id: serial (PK)          │◄──┬──│ userId: text (FK → userName) │
+  │ restId: text             │   │  │ tweetId: text (UNIQUE)       │
+  │ userName: text (UQ)      │   │  │ fullText: text               │
+  │ jsonData: json           │   │  │ createdAt: timestamp         │
+  │ insUsername: text (UQ,N) │   │  │ jsonData: json               │
+  │ insJsonData: json (N)    │   │  └─────────────────────────────┘
+  └──────────────────────────┘   │
+                                 │  ins_posts
+                                 │  ┌─────────────────────────────┐
+                                 └──│ username: text (FK → userName) │
+                                    │ post_id: text (UNIQUE)       │
+                                    │ created_at: timestamp        │
+                                    │ jsonData: json               │
+                                    └─────────────────────────────┘
   ```
 
-  - `jsonData` 列存储完整的 `EnrichedTweet` / `EnrichedUser` JSON
-  - 结构化列 (`tweetId`, `fullText`, `createdAt`) 用于高效查询
-  - 外键级联删除：删除用户时自动清除其推文
+  - `jsonData` 列存储完整的 `EnrichedTweet` / `EnrichedUser` / `IGPost` JSON
+  - 结构化列用于高效查询
+  - 外键级联删除：删除用户时自动清除其推文和 IG 帖子
+  - IG 用户信息已并入 `users` 表（`insUsername` + `insJsonData`），无独立 `ins_users` 表
 
 - **查询模块** (`modules/`)：
   - `tweet.ts`：`getTweets`, `getTweetsByDateRange`, `getTweetsByKeyword`, `getLastYearsTodayTweets`, `getMediaTweets`, `createTweets` (批量 upsert, 1000 条/批次)
   - `user.ts`：`createUser` (upsert), `getAllUsers`, `getUserByName`
+  - `ins.ts`：`upsertInsUserInfo` (更新 users 表的 IG 信息), `getInsUserByName`, `getInsUserByInsName`, `createInsPosts`, `getInsPosts`
 
 ### 3.2 `packages/rettiwt-api` — Twitter API 客户端
 
@@ -121,34 +132,43 @@ tweets-viewer/
 ## 4. 数据流向
 
 ```
-┌────────────────────┐
-│  Twitter API       │
-│ (Rettiwt-API)      │
-└────────┬───────────┘
-         │ 原始推文
-         ▼
-┌────────────────────┐
-│  apps/scripts      │───→ 本地 JSON 缓存文件
-│  (dailyUpdate.ts   │
-│   fetchTimeline.ts)│
-└────────┬───────────┘
-         │ EnrichedTweet[]
-         ▼
-┌────────────────────┐
-│  Neon PostgreSQL   │  (Drizzle ORM)
-└────────┬───────────┘
-         │ PaginatedResponse<T>
-         ▼
-┌────────────────────┐
-│  apps/server       │  (Hono + Cloudflare Workers)
-│  REST API          │
-└────────┬───────────┘
-         │ JSON
-         ▼
-┌────────────────────┐
-│  apps/web-react    │  (React Router v7 SSR)
-│  浏览器            │
-└────────────────────┘
+                         ┌────────────────────┐
+                         │  Twitter API        │
+                         │ (Rettiwt-API)       │
+                         └────────┬───────────┘
+                                  │ 原始推文
+                                  ▼
+┌────────────────────┐     ┌────────────────────┐
+│  Instagram SDK     │     │  apps/scripts      │───→ 本地 JSON 缓存文件
+│ (gallery-dl-ig)    │     │  (dailyUpdate.ts   │
+└────────┬───────────┘     │   insertToDB.ts)   │
+         │ IGPost[]        └────────┬───────────┘
+         │                          │ EnrichedTweet[]
+         │     mapping.ts           │
+         │  (ins→twitter)           │
+         │         │                │
+         ▼         ▼                ▼
+         ┌──────────────────────────────────┐
+         │       Neon PostgreSQL            │
+         │  users (含 ins_json_data)        │
+         │  tweets / ins_posts (Drizzle)    │
+         └────────┬─────────────────────────┘
+                  │ PaginatedResponse<T>
+                  ▼
+         ┌────────────────────┐
+         │  apps/server       │  (Hono + Cloudflare Workers)
+         │  REST API          │
+         │  /v3/tweets/*      │
+         │  /v3/ins/*         │
+         └────────┬───────────┘
+                  │ JSON
+                  ▼
+         ┌────────────────────┐
+         │  apps/web-react    │  (React Router v7 SSR)
+         │  浏览器            │
+         │  /tweets/:name     │
+         │  /ins/:name        │
+         └────────────────────┘
 ```
 
 ---
@@ -180,6 +200,7 @@ tweets-viewer/
 | -------------- | --------------------------------- | --------------------------------------- |
 | `DATABASE_URL` | Neon Postgres 连接串              | `.env`, `wrangler.toml`, GitHub Secrets |
 | `TWEET_KEYS`   | Twitter API Key 列表（逗号分隔）  | `.env`, `wrangler.toml`, GitHub Secrets |
+| `INSTAGRAM_COOKIES` | Instagram 登录 Cookie       | `.env`, GitHub Secrets                  |
 | `ENVIRONMENT`  | 运行环境 (development/production) | `env.server.ts` (Zod 验证)              |
 
 ---

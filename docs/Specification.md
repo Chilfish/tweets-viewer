@@ -69,6 +69,7 @@
 | **媒体墙**   | `/media/:name`   | 仅展示图片/视频网格，点击查看详情。 | `page`                                         |
 | **搜索视图** | `/search/:name?` | 基于关键词的搜索结果流。            | `q`                                            |
 | **那年今日** | `/memo/:name`    | 展示同月同日的历史推文。            | `page`, `reverse`                              |
+| **IG 帖子**  | `/ins/:name`     | 浏览用户的 Instagram 帖子。         | `page`                                         |
 | **首页**     | `/`              | Landing page（Hero + 功能介绍）。   | —                                              |
 
 ### 3.2 状态同步协议 (State Sync Protocol)

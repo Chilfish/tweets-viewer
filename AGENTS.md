@@ -66,11 +66,16 @@ Twitter API → scripts (抓取) → Neon PostgreSQL → server (Hono API) → w
 ### 数据库 Schema
 
 ```
-users: id(serial PK), restId, userName(UQ), jsonData(json)
+users: id(serial PK), restId, userName(UQ), jsonData(json),
+       ins_username(unique, nullable), ins_json_data(json, nullable)
 tweets: id(serial PK), tweetId(UQ), userId(FK→users.userName), fullText, createdAt, jsonData(json)
+ins_posts: id(serial PK), post_id(UQ), username(FK→users.userName), created_at, jsonData(json)
 ```
 
 索引：`idx_tweets_username_createdat` (复合)、`idx_tweets_createdat` (单列)
+
+> IG 用户信息已并入 `users` 表（`ins_username` + `ins_json_data`），不再独立 ins_users 表。
+> `ins_posts.username` 存的是 twitter userName，IG → twitter 映射维护在 `apps/scripts/src/mapping.ts`。
 
 ### API 路由
 
@@ -82,6 +87,7 @@ tweets: id(serial PK), tweetId(UQ), userId(FK→users.userName), fullText, creat
 | `GET /v3/tweets/get/:name/last-years-today` | "那年今日"                             |
 | `GET /v3/users/all`                         | 所有用户                               |
 | `GET /v3/users/get/:name`                   | 单个用户                               |
+| `GET /v3/ins/:name`                         | IG 用户信息 + 帖子（分页）             |
 
 ### 前端路由
 
@@ -92,6 +98,7 @@ tweets: id(serial PK), tweetId(UQ), userId(FK→users.userName), fullText, creat
 | `/media/:name`   | 媒体墙（图片/视频网格）       |
 | `/search/:name?` | 搜索视图                      |
 | `/memo/:name`    | "那年今日"                    |
+| `/ins/:name`     | Instagram 帖子浏览             |
 
 ## 技术栈
 
@@ -128,10 +135,21 @@ tweets: id(serial PK), tweetId(UQ), userId(FK→users.userName), fullText, creat
 - **URL SearchParams**：分页/筛选状态（与 loader 联动）
 - **useState**：组件局部状态
 
+### Scripts
+
+| 文件 | 用途 |
+|------|------|
+| `dailyUpdate.ts` | 每日增量同步（Twitter + IG），由 GitHub Actions cron 调用 |
+| `fetch-ins-daily.ts` | 从 users 表读取已关联 IG 的用户，用 SDK 抓取最新帖子并入库 |
+| `import-ins-data.ts` | 批量导入本地 IG JSON 文件，用 mapping.ts 做 ins→twitter 映射 |
+| `insertToDB.ts` | 读取本地 Twitter JSON 文件，批量导入 tweets + users |
+| `mapping.ts` | IG username → twitter username 映射表，供导入脚本使用 |
+
 ### 环境变量
 
 | 变量           | 用途                 | 位置                    |
 | -------------- | -------------------- | ----------------------- |
 | `DATABASE_URL` | Neon Postgres 连接串 | `.env`, `wrangler.json` |
 | `TWEET_KEYS`   | Twitter API Key 列表 | `.env`, `wrangler.json` |
+| `INSTAGRAM_COOKIES` | IG 登录 Cookie   | `.env`, GitHub Secrets  |
 | `ENVIRONMENT`  | 运行环境             | `env.server.ts`         |

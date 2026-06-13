@@ -156,7 +156,58 @@ interface PaginatedResponse<T> {
 
 ## Ins 模块 ( `/v3/ins`)
 
-提供 Instagram 风格的静态数据端点，从远程 JSON (`p.chilfish.top`) 缓存后返回。
+提供 Instagram 帖子和用户信息的查询端点。`:name` 参数为 **twitter username**（非 IG username），服务端通过 `users.ins_json_data` 查找对应的 IG 用户信息。
 
-- **Endpoint**: `GET /v3/ins/*`
-- **详细路由**: 见 `apps/server/routes/ins.ts`
+### 1. 获取 IG 用户信息与帖子
+
+- **Endpoint**: `GET /v3/ins/:name`
+
+- **Params**:
+  - `name` (string): 用户的 twitter userName
+
+- **Query Parameters**:
+  - `page` (number, default: 1): 页码
+
+- **Response**: `{ user: IGUserInfo | null, posts: PaginatedResponse<IGPost> }`
+
+- **Error Response**:
+  - 404 Not Found: `{ user: null, posts: { data: [], meta: {...} } }` (用户无 IG 数据且无帖子时)
+
+### IGUserInfo
+
+```typescript
+interface IGUserInfo {
+  username: string       // Instagram 用户名
+  fullname: string       // 显示名称
+  avatar_url?: string    // 头像 URL
+  verified?: boolean     // 是否认证
+  bio?: string           // 简介
+  external_url?: string  // 外部链接
+  followers_count?: number
+  following_count?: number
+  posts_count?: number
+}
+```
+
+### IGPost
+
+```typescript
+interface IGPost {
+  id: string             // 短码 (shortcode)
+  post_id: string        // 帖子 ID
+  url: string            // 帖子链接
+  username: string       // IG 用户名
+  fullname: string       // 显示名称
+  description: string    // 帖子描述
+  tags?: string[]        // 标签
+  likes: number          // 点赞数
+  type: 'post' | 'reel'  // 帖子类型
+  media: IGMedia[]       // 媒体列表（图片/视频）
+  avatar_url?: string    // 头像
+  created_at: string     // 发布时间 (ISO)
+  location_name?: string // 位置标签
+  audio?: IGAudio        // 音频信息 (Reels)
+  coauthors?: unknown[]  // 协作者
+  verified?: boolean     // 是否认证
+}
+```

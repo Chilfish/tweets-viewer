@@ -1,6 +1,6 @@
 # Tweets Viewer
 
-一个“推文归档阅读器”：数据来自离线归档（数据库/静态 JSON），前端提供沉浸式无限滚动 + 精确分页的阅读体验。
+一个"推文归档阅读器"：数据来自离线归档（数据库/静态 JSON），前端提供沉浸式无限滚动 + 精确分页的阅读体验。
 
 - 在线地址：`https://tweet.chilfish.top`
 - API 基址（生产）：`https://tweet-api.chilfish.top/v3`
@@ -36,6 +36,7 @@ bun install
 
 - `DATABASE_URL`：Neon/Postgres 连接串
 - `TWEET_KEYS`：逗号分隔的抓取 key 列表（仅 `apps/scripts` 抓取用）
+- `INSTAGRAM_COOKIES`：Instagram 登录 Cookie（仅 `apps/scripts` IG 抓取用）
 
 参考：`./example.env`（建议复制为根目录 `./.env`）。
 
@@ -64,20 +65,24 @@ bun run dev:client
 - `GET /v3/tweets/medias/:name`
 - `GET /v3/tweets/search`（`q` 必填，`name` 可选）
 - `GET /v3/tweets/get/:name/last-years-today`
+- `GET /v3/ins/:name`（Instagram 用户信息 + 帖子分页）
 
 ## 归档/同步数据（scripts）
 
-`apps/scripts` 提供抓取与入库能力（依赖 `DATABASE_URL`、`TWEET_KEYS`）。
+`apps/scripts` 提供抓取与入库能力（依赖 `DATABASE_URL`、`TWEET_KEYS`、`INSTAGRAM_COOKIES`）。
 
-- 抓取 timeline（带自动重试的 PowerShell 调度）：`./apps/scripts/fetch.ps1`
-- 直接入库示例：`./apps/scripts/src/insertToDB.ts`
-- 每日增量同步示例：`./apps/scripts/src/dailyUpdate.ts`
+| 脚本 | 用途 | 运行方式 |
+|------|------|----------|
+| `dailyUpdate.ts` | 每日增量同步（Twitter + IG） | GitHub Actions cron (`0 16 * * *`) |
+| `fetch-ins-daily.ts` | 从 DB 读取 IG 用户列表，SDK 抓取最新帖子入库 | `bun run apps/scripts/src/fetch-ins-daily.ts` |
+| `import-ins-data.ts` | 批量导入本地 IG JSON 文件 | `bun run apps/scripts/src/import-ins-data.ts <files...>` |
+| `insertToDB.ts` | 读取本地 Twitter JSON 导入数据库 | `bun run apps/scripts/src/insertToDB.ts` |
 
-> 注意：本项目的前端是“读库/读静态”的，展示体验优先；抓取与归档属于离线任务，建议独立运行。
+> **映射关系**：`apps/scripts/src/mapping.ts` 维护 IG username → twitter username 的映射。导入 IG 数据前需确保映射存在，否则脚本会跳过并报错。
 
 ## 文档索引
 
-- `./CLAUDE.md`（项目总览与常用命令）
+- `./AGENTS.md`（项目总览与常用命令）
 - `./docs/README.md`（文档入口）
 - `./docs/ARCHITECTURE.md`（全局架构：Monorepo 结构、数据流、部署拓扑）
 - `./docs/Specification.md`（前端功能规格：事实来源）
