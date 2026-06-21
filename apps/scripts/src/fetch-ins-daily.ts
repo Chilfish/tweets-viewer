@@ -1,9 +1,9 @@
 /**
  * Daily Instagram fetch via @chilfish/gallery-dl-instagram SDK.
  *
- * Reads tracked usernames from users table (where ins_username IS NOT NULL),
- * uses mapping.ts to convert twitter→ins username for Instagram URL,
- * fetches latest posts via SDK extract(), and upserts to database.
+ * Reads tracked Instagram users from mapping.ts (INSUsernameToTwitter),
+ * fetches only posts from the last 2 days via SDK extract(), and upserts
+ * to database. Non-IG users are simply not in the mapping.
  *
  * post_id unique constraint handles dedup; user info updated each run.
  *
@@ -23,8 +23,8 @@ import type { IGPost, IGUserInfo } from '@tweets-viewer/shared'
 import { createSDK } from '@chilfish/gallery-dl-instagram/node'
 import { neon } from '@neondatabase/serverless'
 import { createInsPosts, schema, upsertInsUserInfo } from '@tweets-viewer/database'
-import { isNotNull } from 'drizzle-orm'
 import { drizzle } from 'drizzle-orm/neon-http'
+import { INSUsernameToTwitter } from './mapping'
 
 const db = drizzle({
   client: neon(process.env.DATABASE_URL!),
@@ -121,27 +121,31 @@ function extractUserInfo(posts: IGPost[]): IGUserInfo | null {
 async function collectAll(
   ig: InstagramSDK,
   url: string,
-  maxPosts?: number,
+  since: Date,
 ): Promise<IGPost[]> {
   const all: IGPost[] = []
 
   for await (const msg of ig.extract(url)) {
     if (msg.type === 'directory') {
-      const post = convertToIGPost((msg as DirectoryMsg).metadata)
+      const meta = (msg as DirectoryMsg).metadata
+      // SDK yields newest→oldest; stop once we pass the date cutoff
+      const postDate = (meta.post_date ?? meta.date) as string | undefined
+      if (postDate && new Date(postDate) < since)
+        return all
+      const post = convertToIGPost(meta)
       if (post) {
         all.push(post)
         if (all.length % 10 === 0)
           console.log(`  ... ${all.length} posts`)
-        if (maxPosts !== undefined && all.length >= maxPosts)
-          return all
       }
     }
     else if (msg.type === 'queue') {
-      if (maxPosts !== undefined && all.length >= maxPosts)
-        return all
-      const budget = maxPosts !== undefined ? maxPosts - all.length : undefined
-      const children = await handleQueue(ig, msg as QueueMsg, budget)
-      for (const c of children) all.push(c)
+      const children = await handleQueue(ig, msg as QueueMsg, since)
+      for (const c of children) {
+        if (c.created_at && new Date(c.created_at) < since)
+          return all
+        all.push(c)
+      }
     }
   }
 
@@ -151,7 +155,7 @@ async function collectAll(
 async function handleQueue(
   ig: InstagramSDK,
   msg: QueueMsg,
-  remaining?: number,
+  since: Date,
 ): Promise<IGPost[]> {
   const ExtrClass = msg.metadata._extractor as
     | (ExtractorClass & { new(opts: Record<string, unknown>): { initialize: () => Promise<void>, [Symbol.asyncIterator]: () => AsyncGenerator<any, void, unknown> } })
@@ -180,10 +184,12 @@ async function handleQueue(
 
   const posts: IGPost[] = []
   for await (const m of child) {
-    if (remaining !== undefined && posts.length >= remaining)
-      break
     if (m.type === 'directory') {
-      const post = convertToIGPost((m as DirectoryMsg).metadata)
+      const meta = (m as DirectoryMsg).metadata
+      const postDate = (meta.post_date ?? meta.date) as string | undefined
+      if (postDate && new Date(postDate) < since)
+        break
+      const post = convertToIGPost(meta)
       if (post)
         posts.push(post)
     }
@@ -193,12 +199,12 @@ async function handleQueue(
 
 // ─── Per-user fetch ───
 
-async function fetchUser(ig: InstagramSDK, twitterUsername: string, insUsername: string): Promise<void> {
+async function fetchUser(ig: InstagramSDK, twitterUsername: string, insUsername: string, since: Date): Promise<void> {
   const url = `https://www.instagram.com/${insUsername}/`
-  console.log(`\n@${insUsername} (twitter: @${twitterUsername}) — extracting...`)
+  console.log(`\n@${insUsername} (twitter: @${twitterUsername}) — extracting since ${since.toISOString().split('T')[0]}...`)
 
   ig.config.set('extractor.instagram.user.include', 'all')
-  const posts = await collectAll(ig, url)
+  const posts = await collectAll(ig, url, since)
 
   if (posts.length === 0) {
     console.log(`  No posts found for @${insUsername}`)
@@ -231,32 +237,20 @@ export async function fetchInsDaily(): Promise<void> {
     return
   }
 
-  // Read users that have an Instagram account linked
-  const rows = await db
-    .select({
-      userName: schema.usersTable.userName,
-      insUsername: schema.usersTable.insUsername,
-    })
-    .from(schema.usersTable)
-    .where(isNotNull(schema.usersTable.insUsername))
-
-  if (rows.length === 0) {
-    console.warn('No users with ins_username set — skipping IG fetch')
+  const entries = Object.entries(INSUsernameToTwitter) as [string, string][]
+  if (entries.length === 0) {
+    console.warn('No Instagram users in mapping — skipping IG fetch')
     return
   }
 
-  const trackedUsers = rows.map(r => ({
-    twitter: r.userName,
-    ins: r.insUsername!,
-  }))
-
-  console.log(`IG Daily Fetch — ${trackedUsers.length} user(s): ${trackedUsers.map(u => u.ins).join(', ')}`)
+  const since = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
+  console.log(`IG Daily Fetch — ${entries.length} user(s): ${entries.map(([ins]) => ins).join(', ')} (since ${since.toISOString().split('T')[0]})`)
 
   const ig = await createSDK({ cookies })
 
-  for (const { twitter, ins } of trackedUsers) {
+  for (const [ins, twitter] of entries) {
     try {
-      await fetchUser(ig, twitter, ins)
+      await fetchUser(ig, twitter, ins, since)
     }
     catch (err: any) {
       console.error(`  Error @${ins}:`, err.message)

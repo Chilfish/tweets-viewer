@@ -39,9 +39,18 @@ export async function createInsPosts({ db, posts, username }: {
   /** twitter userName (FK to users.userName) */
   username: string
 }) {
+  // Dedup by postId to avoid PG ON CONFLICT double-hit (code 21000)
+  const seen = new Map<string, IGPost>()
+  for (const p of posts)
+    seen.set(p.id, p)
+  const deduped = [...seen.values()]
+  if (deduped.length < posts.length) {
+    console.warn(`createInsPosts: deduped ${posts.length - deduped.length} duplicate postId(s)`)
+  }
+
   let insertedCount = 0
-  for (let i = 0; i < posts.length; i += BATCH_SIZE) {
-    const chunk = posts.slice(i, i + BATCH_SIZE)
+  for (let i = 0; i < deduped.length; i += BATCH_SIZE) {
+    const chunk = deduped.slice(i, i + BATCH_SIZE)
     const { rowCount } = await db
       .insert(insPostsTable)
       .values(chunk.map(post => ({

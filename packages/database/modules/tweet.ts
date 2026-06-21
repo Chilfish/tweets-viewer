@@ -18,9 +18,19 @@ interface GetTweet {
 const BATCH_SIZE = 1000
 
 export async function createTweets({ db, tweets, user }: { db: DB, tweets: EnrichedTweet[], user: EnrichedUser }) {
+  // Dedup by tweetId: same ID in one batch triggers "ON CONFLICT DO UPDATE
+  // command cannot affect row a second time" (PG code 21000)
+  const seen = new Map<string, EnrichedTweet>()
+  for (const t of tweets)
+    seen.set(t.id, t)
+  const deduped = [...seen.values()]
+  if (deduped.length < tweets.length) {
+    console.warn(`createTweets: deduped ${tweets.length - deduped.length} duplicate tweetId(s)`)
+  }
+
   let insertedCount = 0
-  for (let i = 0; i < tweets.length; i += BATCH_SIZE) {
-    const chunk = tweets.slice(i, i + BATCH_SIZE)
+  for (let i = 0; i < deduped.length; i += BATCH_SIZE) {
+    const chunk = deduped.slice(i, i + BATCH_SIZE)
 
     const { rowCount } = await db
       .insert(tweetsTable)

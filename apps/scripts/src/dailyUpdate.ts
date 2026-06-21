@@ -16,21 +16,16 @@
 
 // ═══ Instagram Daily Update ═══
 import { fetchInsDaily } from './fetch-ins-daily'
+// ═══ Twitter Daily Update ═══
+import { fetchTweetDaily } from './fetch-tweet-daily'
 
 import 'dotenv'
-
-// ═══ Twitter Daily Update ═══
-// TODO: integrate existing Twitter fetch logic here
-
-async function fetchTwitterDaily(): Promise<void> {
-  console.log('Twitter daily fetch — (not yet integrated, skipping)')
-}
 
 // ═══ Main ═══
 async function main(): Promise<void> {
   console.log('=== Daily Update Start ===\n')
 
-  await fetchTwitterDaily()
+  await fetchTweetDaily()
   await fetchInsDaily()
 
   console.log('\n=== Daily Update Complete ===')
