@@ -22,7 +22,7 @@ const mergedData = await Promise.all(jsons.map(async (file) => {
 const uniqueTweetIds = Array.from(new Set(mergedData.map(tweet => tweet.id)))
 
 const uniqueTweets = mergedData
-  .filter(tweet => uniqueTweetIds.includes(tweet.id))
+  .filter(tweet => uniqueTweetIds.includes(tweet.id) && tweet.user.screen_name === userId)
   .sort((a, b) => {
     const dateA = new Date(a.created_at)
     const dateB = new Date(b.created_at)
