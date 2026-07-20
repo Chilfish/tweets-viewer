@@ -71,12 +71,12 @@ bun run dev:client
 
 `apps/scripts` 提供抓取与入库能力（依赖 `DATABASE_URL`、`TWEET_KEYS`、`INSTAGRAM_COOKIES`）。
 
-| 脚本 | 用途 | 运行方式 |
-|------|------|----------|
-| `dailyUpdate.ts` | 每日增量同步（Twitter + IG） | GitHub Actions cron (`0 16 * * *`) |
-| `fetch-ins-daily.ts` | 从 DB 读取 IG 用户列表，SDK 抓取最新帖子入库 | `bun run apps/scripts/src/fetch-ins-daily.ts` |
-| `import-ins-data.ts` | 批量导入本地 IG JSON 文件 | `bun run apps/scripts/src/import-ins-data.ts <files...>` |
-| `insertToDB.ts` | 读取本地 Twitter JSON 导入数据库 | `bun run apps/scripts/src/insertToDB.ts` |
+| 脚本                 | 用途                                         | 运行方式                                                 |
+| -------------------- | -------------------------------------------- | -------------------------------------------------------- |
+| `dailyUpdate.ts`     | 每日增量同步（Twitter + IG）                 | GitHub Actions cron (`0 16 * * *`)                       |
+| `fetch-ins-daily.ts` | 从 DB 读取 IG 用户列表，SDK 抓取最新帖子入库 | `bun run apps/scripts/src/fetch-ins-daily.ts`            |
+| `import-ins-data.ts` | 批量导入本地 IG JSON 文件                    | `bun run apps/scripts/src/import-ins-data.ts <files...>` |
+| `insertToDB.ts`      | 读取本地 Twitter JSON 导入数据库             | `bun run apps/scripts/src/insertToDB.ts`                 |
 
 > **映射关系**：`apps/scripts/src/mapping.ts` 维护 IG username → twitter username 的映射。导入 IG 数据前需确保映射存在，否则脚本会跳过并报错。
 

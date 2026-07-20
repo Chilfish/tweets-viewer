@@ -9,6 +9,7 @@ export default antfu({
     'apps/server/.wrangler/**',
     'docs/**',
     'packages/rettiwt-api/**',
+    '**/data/**',
   ],
   rules: {
     'unused-imports/no-unused-vars': 'warn',
@@ -18,7 +19,6 @@ export default antfu({
     'node/prefer-global/process': 'off',
     'accessor-pairs': 'off',
     'style/multiline-ternary': 'off',
-    'unicorn/prefer-number-properties': 'warn',
     'ts/no-use-before-define': 'warn',
     'no-case-declarations': 'off',
     'e18e/prefer-array-fill': 'off',

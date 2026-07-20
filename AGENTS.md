@@ -98,7 +98,7 @@ ins_posts: id(serial PK), post_id(UQ), username(FK→users.userName), created_at
 | `/media/:name`   | 媒体墙（图片/视频网格）       |
 | `/search/:name?` | 搜索视图                      |
 | `/memo/:name`    | "那年今日"                    |
-| `/ins/:name`     | Instagram 帖子浏览             |
+| `/ins/:name`     | Instagram 帖子浏览            |
 
 ## 技术栈
 
@@ -137,19 +137,19 @@ ins_posts: id(serial PK), post_id(UQ), username(FK→users.userName), created_at
 
 ### Scripts
 
-| 文件 | 用途 |
-|------|------|
-| `dailyUpdate.ts` | 每日增量同步（Twitter + IG），由 GitHub Actions cron 调用 |
-| `fetch-ins-daily.ts` | 从 users 表读取已关联 IG 的用户，用 SDK 抓取最新帖子并入库 |
+| 文件                 | 用途                                                         |
+| -------------------- | ------------------------------------------------------------ |
+| `dailyUpdate.ts`     | 每日增量同步（Twitter + IG），由 GitHub Actions cron 调用    |
+| `fetch-ins-daily.ts` | 从 users 表读取已关联 IG 的用户，用 SDK 抓取最新帖子并入库   |
 | `import-ins-data.ts` | 批量导入本地 IG JSON 文件，用 mapping.ts 做 ins→twitter 映射 |
-| `insertToDB.ts` | 读取本地 Twitter JSON 文件，批量导入 tweets + users |
-| `mapping.ts` | IG username → twitter username 映射表，供导入脚本使用 |
+| `insertToDB.ts`      | 读取本地 Twitter JSON 文件，批量导入 tweets + users          |
+| `mapping.ts`         | IG username → twitter username 映射表，供导入脚本使用        |
 
 ### 环境变量
 
-| 变量           | 用途                 | 位置                    |
-| -------------- | -------------------- | ----------------------- |
-| `DATABASE_URL` | Neon Postgres 连接串 | `.env`, `wrangler.json` |
-| `TWEET_KEYS`   | Twitter API Key 列表 | `.env`, `wrangler.json` |
-| `INSTAGRAM_COOKIES` | IG 登录 Cookie   | `.env`, GitHub Secrets  |
-| `ENVIRONMENT`  | 运行环境             | `env.server.ts`         |
+| 变量                | 用途                 | 位置                    |
+| ------------------- | -------------------- | ----------------------- |
+| `DATABASE_URL`      | Neon Postgres 连接串 | `.env`, `wrangler.json` |
+| `TWEET_KEYS`        | Twitter API Key 列表 | `.env`, `wrangler.json` |
+| `INSTAGRAM_COOKIES` | IG 登录 Cookie       | `.env`, GitHub Secrets  |
+| `ENVIRONMENT`       | 运行环境             | `env.server.ts`         |
