@@ -1,6 +1,6 @@
 import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
 import { neon } from '@neondatabase/serverless'
-import { createTweets, getAllUsers, schema } from '@tweets-viewer/database'
+import { createTweets, getDailyFetchUsers, schema } from '@tweets-viewer/database'
 import { RettiwtPool, TweetEnrichmentService, TwitterAPIClient } from '@tweets-viewer/rettiwt-api'
 import { drizzle } from 'drizzle-orm/neon-http'
 
@@ -60,7 +60,7 @@ export async function fetchTweetDaily(): Promise<void> {
 
   const client = neon(DATABASE_URL)
   const db = drizzle({ client, schema })
-  const users = await getAllUsers(db)
+  const users = await getDailyFetchUsers(db)
 
   console.log({
     action: 'get-users',

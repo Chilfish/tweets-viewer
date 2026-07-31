@@ -22,7 +22,7 @@ import type {
 import type { IGPost, IGUserInfo } from '@tweets-viewer/shared'
 import { createSDK } from '@chilfish/gallery-dl-instagram/node'
 import { neon } from '@neondatabase/serverless'
-import { createInsPosts, schema, upsertInsUserInfo } from '@tweets-viewer/database'
+import { createInsPosts, getDailyFetchUsers, schema, upsertInsUserInfo } from '@tweets-viewer/database'
 import { drizzle } from 'drizzle-orm/neon-http'
 import { INSUsernameToTwitter } from './mapping'
 
@@ -243,12 +243,27 @@ export async function fetchInsDaily(): Promise<void> {
     return
   }
 
+  // Filter out users with dailyFetch disabled
+  const dailyFetchUsers = await getDailyFetchUsers(db)
+  const dailyFetchSet = new Set(dailyFetchUsers.map(u => u.userName!))
+  const activeEntries = entries.filter(([, twitter]) => dailyFetchSet.has(twitter))
+
+  if (activeEntries.length === 0) {
+    console.warn('No Instagram users with dailyFetch enabled — skipping IG fetch')
+    return
+  }
+
+  const skipped = entries.filter(([, twitter]) => !dailyFetchSet.has(twitter))
+  if (skipped.length > 0) {
+    console.log(`Skipping ${skipped.length} user(s) (dailyFetch disabled): ${skipped.map(([ins]) => ins).join(', ')}`)
+  }
+
   const since = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
-  console.log(`IG Daily Fetch — ${entries.length} user(s): ${entries.map(([ins]) => ins).join(', ')} (since ${since.toISOString().split('T')[0]})`)
+  console.log(`IG Daily Fetch — ${activeEntries.length} user(s): ${activeEntries.map(([ins]) => ins).join(', ')} (since ${since.toISOString().split('T')[0]})`)
 
   const ig = await createSDK({ cookies })
 
-  for (const [ins, twitter] of entries) {
+  for (const [ins, twitter] of activeEntries) {
     try {
       await fetchUser(ig, twitter, ins, since)
     }
