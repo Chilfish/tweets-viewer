@@ -20,8 +20,8 @@ import { neon } from '@neondatabase/serverless'
 import { createInsPosts, upsertInsUserInfo } from '@tweets-viewer/database'
 import * as schema from '@tweets-viewer/database/schema'
 import { drizzle } from 'drizzle-orm/neon-http'
+import { env } from '../../../env.server'
 import { INSUsernameToTwitter } from './mapping'
-import 'dotenv'
 
 /** 导入 JSON 文件中 user 部分的原始结构 */
 interface InsImportUser {
@@ -49,7 +49,7 @@ if (filePaths.length === 0) {
 }
 
 const db = drizzle({
-  client: neon(process.env.DATABASE_URL!),
+  client: neon(env.DATABASE_URL!),
   schema,
 })
 
