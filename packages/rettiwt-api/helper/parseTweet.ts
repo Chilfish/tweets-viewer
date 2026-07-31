@@ -19,7 +19,11 @@ export function enrichTweet(sourceData: RawTweet, retweetedOrignalId?: string): 
   }
 
   const tweet = ('tweet' in sourceData ? sourceData.tweet : sourceData) as RawTweet
+  if (tweet.__typename === 'TweetUnavailable') {
+    return null
+  }
   const userBase = transformUserResponse(tweet)
+
   const userScreenName = userBase.screen_name
   const user = userBase
 
@@ -53,6 +57,9 @@ export function enrichTweet(sourceData: RawTweet, retweetedOrignalId?: string): 
 
 export function transformUserResponse(sourceData: RawTweet): TweetUser {
   const RawTweet = sourceData?.core?.user_results?.result
+  if (!RawTweet) {
+    console.error(sourceData)
+  }
   const legacy = RawTweet.legacy
 
   const transformedUser = {
