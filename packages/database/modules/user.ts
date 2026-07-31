@@ -37,6 +37,11 @@ export async function getAllUsers(db: DB): Promise<EnrichedUser[]> {
   return data.map(mapToEnrichedUser)
 }
 
+export async function getDailyFetchUsers(db: DB): Promise<EnrichedUser[]> {
+  const data = await db.select().from(usersTable).where(eq(usersTable.dailyFetch, true))
+  return data.map(mapToEnrichedUser)
+}
+
 export async function getUserByName(db: DB, name: string): Promise<EnrichedUser | null> {
   const data = await db.select().from(usersTable).where(eq(usersTable.userName, name))
   if (!data?.length) {

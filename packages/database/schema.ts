@@ -1,6 +1,7 @@
 import type { EnrichedTweet, EnrichedUser } from '@tweets-viewer/rettiwt-api'
 import type { IGPost, IGUserInfo } from '@tweets-viewer/shared'
 import {
+  boolean,
   json,
   pgTable,
   serial,
@@ -13,6 +14,9 @@ export const usersTable = pgTable('users', {
   restId: text('restId').notNull(),
   userName: text('userName').notNull().unique(),
   jsonData: json('jsonData').$type<EnrichedUser>().notNull(),
+
+  /** Whether this user should be included in daily fetch jobs. Defaults to true. */
+  dailyFetch: boolean('daily_fetch').default(true).notNull(),
 
   /** Instagram username — nullable, populated when user also has IG account */
   insUsername: text('ins_username').unique(),
