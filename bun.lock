@@ -56,6 +56,7 @@
       "name": "@tweets-viewer/web-react",
       "dependencies": {
         "@base-ui/react": "^1.6.0",
+        "@daypicker/react": "^10.0.1",
         "@fontsource-variable/noto-sans": "^5.3.0",
         "@hookform/resolvers": "^5.7.1",
         "@react-router/node": "^8.3.0",
@@ -74,7 +75,6 @@
         "lucide-react": "^1.28.0",
         "next-themes": "^0.4.6",
         "react": "^19.2.8",
-        "react-day-picker": "^10.0.1",
         "react-dom": "^19.2.8",
         "react-hook-form": "^7.84.0",
         "react-resizable-panels": "^4.12.2",
@@ -248,6 +248,8 @@
     "@cloudflare/workers-types": ["@cloudflare/workers-types@4.20250726.0", "", {}, "sha512-NtM1yVBKJFX4LgSoZkVU0EDhWWvSb1vt6REO+uMYZRgx1HAfQz9GDN6bBB0B+fm2ZIxzt6FzlDbmrXpGJ2M/4Q=="],
 
     "@date-fns/tz": ["@date-fns/tz@1.4.1", "", {}, "sha512-P5LUNhtbj6YfI3iJjw5EL9eUAG6OitD0W3fWQcpQjDRc/QIsL0tRNuO1PcDvPccWL1fSTXXdE1ds+l95DV/OFA=="],
+
+    "@daypicker/react": ["@daypicker/react@10.0.1", "", { "dependencies": { "react-day-picker": "10.0.1" }, "peerDependencies": { "@types/react": ">=16.8.0", "react": ">=16.8.0" }, "optionalPeers": ["@types/react"] }, "sha512-lH4YQz4iMBWP8hsI1bD9Eg0T7t503IkSUR/WDGGkV5mKZvwVv+ukCkJz7yN+uVFBv7vHTK+ww7a5EvlkeFwPYQ=="],
 
     "@dprint/formatter": ["@dprint/formatter@0.5.1", "", {}, "sha512-cdZUrm0iv/FnnY3CKE2dEcVhNEzrC551aE2h2mTFwQCRBrqyARLDnb7D+3PlXTUVp3s34ftlnGOVCmhLT9DeKA=="],
 
