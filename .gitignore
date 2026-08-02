@@ -24,6 +24,7 @@ dist-ssr
 
 .wrangler
 
+*.tsbuildinfo
 auto-*.d.ts
 .env
 wrangler.toml
