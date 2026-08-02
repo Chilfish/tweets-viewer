@@ -16,6 +16,7 @@
  */
 
 import type { IGPost, IGUserInfo } from '@tweets-viewer/shared'
+import { readFile } from 'node:fs/promises'
 import { neon } from '@neondatabase/serverless'
 import { createInsPosts, upsertInsUserInfo } from '@tweets-viewer/database'
 import * as schema from '@tweets-viewer/database/schema'
@@ -71,7 +72,7 @@ function mapUser(raw: InsImportUser): IGUserInfo {
 async function importFile(filePath: string): Promise<void> {
   console.log(`\nImporting ${filePath} ...`)
 
-  const raw = await Bun.file(filePath).text()
+  const raw = await readFile(filePath, 'utf8')
   const data: InsImportData = JSON.parse(raw)
   const { user: rawUser, posts } = data
 

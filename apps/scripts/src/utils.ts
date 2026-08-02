@@ -12,7 +12,7 @@ export async function writeJson(data: any, filePath: string): Promise<void> {
     destPath = path.join(cacheDir, filePath)
 
   const seen = new WeakSet()
-  await writeFile(destPath, JSON.stringify(data, (key, value) => {
+  await writeFile(destPath, JSON.stringify(data, (_key, value) => {
     if (typeof value === 'object' && value !== null) {
       if (seen.has(value))
         return '[Circular]'

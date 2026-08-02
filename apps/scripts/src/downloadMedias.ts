@@ -14,12 +14,12 @@
  *   bun run src/downloadMedias.ts --videos-only             # 仅下载视频/动图
  */
 
+import type { EnrichedTweet, MediaDetails } from '@tweets-viewer/rettiwt-api'
 import { createWriteStream, existsSync } from 'node:fs'
 import { mkdir, readFile, utimes } from 'node:fs/promises'
 import path from 'node:path'
 import { pipeline, Readable } from 'node:stream'
 import { promisify } from 'node:util'
-import type { EnrichedTweet, MediaDetails } from '@tweets-viewer/rettiwt-api'
 import { cacheDir } from './utils'
 
 const streamPipeline = promisify(pipeline)

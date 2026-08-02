@@ -1,8 +1,8 @@
 import type { ITweetFilter } from '@tweets-viewer/rettiwt-api'
+import { formatDate } from '@tweets-viewer/shared'
 import { apiClient, cursor, enrichmentService, writeCursor } from '../src/common'
 import { writeJson } from '../src/utils'
 import { userId } from './common'
-import { formatDate } from '@tweets-viewer/shared'
 
 const filter: ITweetFilter = {
   fromUsers: [userId],
@@ -43,5 +43,5 @@ await writeCursor(data)
 
 console.log({
   action: 'search-tweet',
-  lastTweetDate: formatDate(enrichedTweets.at(-1)?.created_at!),
+  lastTweetDate: formatDate(enrichedTweets.at(-1)?.created_at ?? ''),
 })
