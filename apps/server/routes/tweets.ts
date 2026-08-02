@@ -51,8 +51,8 @@ function getName(c: Context) {
 }
 
 const dateRangeSchema = z.object({
-  start: z.string().datetime().optional(),
-  end: z.string().datetime().optional(),
+  start: z.iso.date().optional(),
+  end: z.iso.date().optional(),
   noReplies: z.enum(['true', 'false']).default('false').transform(v => v === 'true'),
 })
 
