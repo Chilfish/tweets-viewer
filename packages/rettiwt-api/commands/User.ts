@@ -508,7 +508,7 @@ async function promptHidden(query: string): Promise<string> {
   let queryShown = false
 
   const mutedOutput = new Writable({
-    write(chunk: Buffer | string, encoding: BufferEncoding, callback: (error?: Error | null) => void): void {
+    write(chunk: Buffer | string, _encoding: BufferEncoding, callback: (error?: Error | null) => void): void {
       const text = chunk.toString()
 
       if (!queryShown) {

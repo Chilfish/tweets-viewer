@@ -44,6 +44,11 @@ interface Entry {
 interface Content {
   entryType: string
   itemContent?: ItemContent
+  items?: {
+    item: {
+      itemContent: ItemContent
+    }
+  }[]
   value?: string
   cursorType?: string
   stopOnEmptyResponse?: boolean

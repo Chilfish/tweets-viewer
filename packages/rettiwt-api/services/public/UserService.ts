@@ -145,7 +145,7 @@ export class UserService extends FetcherService {
     const response = await this.request<IUserAboutResponse>(resource, { id: userName })
 
     // Deserializing response
-    const data = Extractors[resource](response.data)
+    const data = Extractors[resource](response)
 
     return data
   }
@@ -188,7 +188,7 @@ export class UserService extends FetcherService {
     })
 
     // Deserializing response
-    const data = Extractors[resource](response.data)
+    const data = Extractors[resource](response)
 
     return data
   }
@@ -246,7 +246,7 @@ export class UserService extends FetcherService {
       showVerifiedFollowers,
     })
 
-    const data = Extractors[resource](response.data)
+    const data = Extractors[resource](response)
 
     return data
   }
@@ -289,7 +289,7 @@ export class UserService extends FetcherService {
     })
 
     // Deserializing response
-    const data = Extractors[resource](response.data)
+    const data = Extractors[resource](response)
 
     return data
   }
@@ -328,7 +328,7 @@ export class UserService extends FetcherService {
     })
 
     // Deserializing response
-    const data = Extractors[resource](response.data)
+    const data = Extractors[resource](response)
 
     return data
   }
@@ -369,7 +369,7 @@ export class UserService extends FetcherService {
     })
 
     // Deserializing response
-    const data = Extractors[resource](response.data)
+    const data = Extractors[resource](response)
 
     return data
   }
@@ -396,19 +396,11 @@ export class UserService extends FetcherService {
     })
 
     // Getting if password change was successful or not
-    const data = Extractors[resource](response.data) ?? false
+    const data = Extractors[resource](response) ?? false
 
     // If password change was successful
     if (data === true) {
-      // Getting the new API key
-      const newApiKey = AuthService.getApiKeyFromReponse(response)
-
-      // If new API key is generated, update current API key
-      if (newApiKey !== undefined) {
-        this.config.apiKey = newApiKey
-      }
-
-      // Getting the new CSRF token and updating current API key
+      // 刷新 CSRF token 并轮换 apiKey（request 只返回响应体，读不到 set-cookie 响应头）
       await AuthService.refreshCsrfToken(this.config)
     }
 
@@ -444,7 +436,7 @@ export class UserService extends FetcherService {
     })
 
     // Getting the updated username
-    const updatedUsername = Extractors[resource](response.data)
+    const updatedUsername = Extractors[resource](response)
 
     return updatedUsername?.toLowerCase() === username.toLowerCase()
   }
@@ -559,7 +551,7 @@ export class UserService extends FetcherService {
       const response = await this.request<IUserDetailsBulkResponse>(resource, { ids: id })
 
       // Deserializing response
-      const data = Extractors[resource](response.data, id)
+      const data = Extractors[resource](response, id)
 
       return data
     }
@@ -586,7 +578,7 @@ export class UserService extends FetcherService {
       const response = await this.request<IUserDetailsResponse>(resource, { id: id ?? this.config.userId })
 
       // Deserializing response
-      const data = Extractors[resource](response.data)
+      const data = Extractors[resource](response)
 
       return data
     }
@@ -626,7 +618,7 @@ export class UserService extends FetcherService {
     const response = await this.request<IUserFollowResponse>(ResourceType.USER_FOLLOW, { id })
 
     // Deserializing the response
-    const data = Extractors[resource](response.data) ?? false
+    const data = Extractors[resource](response) ?? false
 
     return data
   }
@@ -667,7 +659,7 @@ export class UserService extends FetcherService {
     })
 
     // Deserializing response
-    const data = Extractors[resource](response.data)
+    const data = Extractors[resource](response)
 
     return data
   }
@@ -710,7 +702,7 @@ export class UserService extends FetcherService {
     })
 
     // Deserializing response
-    const data = Extractors[resource](response.data)
+    const data = Extractors[resource](response)
 
     return data
   }
@@ -753,7 +745,7 @@ export class UserService extends FetcherService {
     })
 
     // Deserializing response
-    const data = Extractors[resource](response.data)
+    const data = Extractors[resource](response)
 
     return data
   }
@@ -796,7 +788,7 @@ export class UserService extends FetcherService {
     })
 
     // Deserializing response
-    const data = Extractors[resource](response.data)
+    const data = Extractors[resource](response)
 
     return data
   }
@@ -838,7 +830,7 @@ export class UserService extends FetcherService {
     })
 
     // Deserializing response
-    const data = Extractors[resource](response.data)
+    const data = Extractors[resource](response)
 
     return data
   }
@@ -880,7 +872,7 @@ export class UserService extends FetcherService {
     })
 
     // Deserializing response
-    const data = Extractors[resource](response.data)
+    const data = Extractors[resource](response)
 
     return data
   }
@@ -923,7 +915,7 @@ export class UserService extends FetcherService {
     })
 
     // Deserializing response
-    const data = Extractors[resource](response.data)
+    const data = Extractors[resource](response)
 
     return data
   }
@@ -980,7 +972,7 @@ export class UserService extends FetcherService {
       })
 
       // Deserializing response
-      const notifications = Extractors[resource](response.data)
+      const notifications = Extractors[resource](response)
 
       // Sorting the notifications by time, from oldest to recent
       notifications.list.sort((a, b) => new Date(a.receivedAt).valueOf() - new Date(b.receivedAt).valueOf())
@@ -1037,7 +1029,7 @@ export class UserService extends FetcherService {
     })
 
     // Deserializing response
-    const data = Extractors[resource](response.data)
+    const data = Extractors[resource](response)
 
     return data
   }
@@ -1076,7 +1068,7 @@ export class UserService extends FetcherService {
     const response = await this.request<IUserRemoveFollowerResponse>(resource, { id })
 
     // Deserializing the response
-    const data = Extractors[resource](response.data) ?? false
+    const data = Extractors[resource](response) ?? false
 
     return data
   }
@@ -1123,7 +1115,7 @@ export class UserService extends FetcherService {
     })
 
     // Deserializing response
-    const data = Extractors[resource](response.data)
+    const data = Extractors[resource](response)
 
     return data
   }
@@ -1166,7 +1158,7 @@ export class UserService extends FetcherService {
     })
 
     // Deserializing response
-    const data = Extractors[resource](response.data)
+    const data = Extractors[resource](response)
 
     return data
   }
@@ -1209,7 +1201,7 @@ export class UserService extends FetcherService {
     })
 
     // Deserializing response
-    const data = Extractors[resource](response.data)
+    const data = Extractors[resource](response)
 
     return data
   }
@@ -1257,7 +1249,7 @@ export class UserService extends FetcherService {
     })
 
     // Deserializing response
-    const data = Extractors[resource](response.data)
+    const data = Extractors[resource](response)
 
     return data
   }
@@ -1294,7 +1286,7 @@ export class UserService extends FetcherService {
     const response = await this.request<IUserUnfollowResponse>(ResourceType.USER_UNFOLLOW, { id })
 
     // Deserializing the response
-    const data = Extractors[resource](response.data) ?? false
+    const data = Extractors[resource](response) ?? false
 
     return data
   }
@@ -1359,7 +1351,7 @@ export class UserService extends FetcherService {
     const response = await this.request<IUserProfileUpdateResponse>(resource, { profileOptions: validatedOptions })
 
     // Deserializing the response
-    const data = Extractors[resource](response.data) ?? false
+    const data = Extractors[resource](response) ?? false
 
     return data
   }
@@ -1385,7 +1377,7 @@ export class UserService extends FetcherService {
       profileBanner: validatedBanner,
     })
 
-    const data = Extractors[resource](response.data) ?? false
+    const data = Extractors[resource](response) ?? false
 
     return data
   }
@@ -1411,7 +1403,7 @@ export class UserService extends FetcherService {
       profileImage: validatedImage,
     })
 
-    const data = Extractors[resource](response.data) ?? false
+    const data = Extractors[resource](response) ?? false
 
     return data
   }

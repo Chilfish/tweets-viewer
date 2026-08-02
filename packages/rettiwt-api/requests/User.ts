@@ -743,13 +743,13 @@ export class UserRequests {
    * @param count - The number of lists to fetch. Only works as a lower limit when used with a cursor.
    * @param cursor - The cursor to the batch of lists to fetch.
    */
-  public static lists(id: string, count?: number, cursor?: string): AxiosRequestConfig {
+  public static lists(_id: string, count?: number, cursor?: string): AxiosRequestConfig {
     return {
       method: 'get',
       url: 'https://x.com/i/api/graphql/9mQl9vR31wjodBP9b7_wyQ/ListsManagementPageTimeline',
       params: {
 
-        variables: JSON.stringify({ count: 100, cursor }),
+        variables: JSON.stringify({ count: count ?? 100, cursor }),
         features: JSON.stringify({
           rweb_video_screen_enabled: false,
           profile_label_improvements_pcf_label_in_post_enabled: true,

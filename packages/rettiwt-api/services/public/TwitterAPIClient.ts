@@ -198,15 +198,15 @@ export class TwitterAPIClient {
    * @private
    */
   private extractTimelineTweets(response: IUserTweetsResponse): RawTweet[] {
-    const rawTweets = response.data.user.result.timeline.timeline
-      .instructions
+    const rawTweets = response.data.user.result.timeline?.timeline
+      ?.instructions
       .filter(d => d.type === 'TimelineAddEntries')
       .flatMap(d => d.entries)
       .filter(entry =>
         ['tweet-', 'profile-conversation-'].some(prefix =>
           entry.entryId.startsWith(prefix),
         ),
-      )
+      ) ?? []
 
     const directTweets = rawTweets
       .filter(e => e.content.itemContent?.itemType === 'TimelineTweet')
@@ -216,9 +216,9 @@ export class TwitterAPIClient {
     const moduleTweets = rawTweets
       .filter(d => d.content.entryType === 'TimelineTimelineModule')
       .flatMap(d =>
-        d.content.items.map(({ item }) =>
+        (d.content.items?.map(({ item }) =>
           item.itemContent.tweet_results.result as unknown as RawTweet,
-        ),
+        ) ?? []),
       )
       .filter((tweet): tweet is RawTweet => tweet !== null && tweet !== undefined)
 
