@@ -21,6 +21,7 @@ export const INSUsernameToTwitter: Record<string, string> = {
   'dr_mikaco': 'mika_d_dr',
   'tandahazuki_': 'tanda_hazuki',
   'nonochantime_yumemita': 'nonoka_yumemita',
+  '38_385_popo': 'miyako_yumemita',
   // Add more mappings here as needed
 }
 

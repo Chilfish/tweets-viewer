@@ -4,7 +4,7 @@
 #>
 param (
     [Parameter(Position = 0, HelpMessage = "最大迭代任务数")]
-    [int]$MaxTasks = 50,
+    [int]$MaxTasks = 100,
 
     [Parameter(Position = 1, HelpMessage = "目标脚本路径")]
     [string]$ScriptPath = "src\fetchTimeline.ts",

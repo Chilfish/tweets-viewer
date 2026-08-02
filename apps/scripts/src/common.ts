@@ -6,7 +6,7 @@ import { env } from '../../../env.server'
 import { getLocalCache } from './localCache'
 import { cacheDir, writeJson } from './utils'
 
-export const userId = 'nonoka_yumemita'
+export const userId = 'yuno_yumemita'
 
 const KEYS = (env.TWEET_KEYS || '').split(',').filter(Boolean).map(key => key.trim())
 
@@ -18,7 +18,7 @@ export const enrichmentService = new TweetEnrichmentService()
 export const dataPath = path.join(cacheDir, `data/${userId}`)
 export const rawPath = path.join(cacheDir, `raw/${userId}`)
 export const cursorPath = path.join(dataPath, 'cursor.txt')
-export const cursor = await readFile(cursorPath, 'utf8').then(d => d.trim() || undefined).catch(() => undefined)
+export const cursor = await readFile(cursorPath, 'utf8').then(d => d.trim() || '').catch(() => '')
 
 if (!await stat(dataPath).then(() => true).catch(() => false)) {
   await mkdir(dataPath, { recursive: true })
@@ -30,7 +30,8 @@ if (!await stat(rawPath).then(() => true).catch(() => false)) {
 
 apiClient.onFetchedresponse = async (key: string, data: any) => {
   console.log(`Fetched ${key} data`)
-  await writeJson(data, `raw/${userId}/${key}-${cursor}.json`)
+  const now = Date.now()
+  await writeJson(data, `raw/${userId}/${key}-${now}.json`)
 }
 
 const user = await getLocalCache({

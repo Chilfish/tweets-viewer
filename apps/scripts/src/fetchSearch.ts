@@ -2,11 +2,12 @@ import type { ITweetFilter } from '@tweets-viewer/rettiwt-api'
 import { apiClient, cursor, enrichmentService, writeCursor } from '../src/common'
 import { writeJson } from '../src/utils'
 import { userId } from './common'
+import { formatDate } from '@tweets-viewer/shared'
 
 const filter: ITweetFilter = {
   fromUsers: [userId],
   // startDate: new Date('2020-01-01'),
-  endDate: new Date('2023-11-09'),
+  endDate: new Date('2023-11-10'),
 }
 
 const data = await apiClient.searchTweetsRaw(filter, cursor).catch((e) => {
@@ -14,6 +15,14 @@ const data = await apiClient.searchTweetsRaw(filter, cursor).catch((e) => {
     console.error(`Rate limit exceeded`)
     process.exit(129)
   }
+  if (e.message.includes('status code 404')) {
+    console.error('No tweets found')
+    process.exit(104)
+  }
+  console.error({
+    action: 'search-tweet',
+    error: e.message,
+  })
 
   return { tweets: [], cursor: '' }
 })
@@ -34,5 +43,5 @@ await writeCursor(data)
 
 console.log({
   action: 'search-tweet',
-  lastTweetDate: enrichedTweets.at(-1)?.created_at,
+  lastTweetDate: formatDate(enrichedTweets.at(-1)?.created_at!),
 })
