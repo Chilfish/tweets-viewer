@@ -1,15 +1,17 @@
 /**
- * 批量下载推文图片
+ * 批量下载推文媒体（图片 / 视频 / 动图）
  *
- * 从 EnrichedTweet[] JSON 中提取 photo 类型 media，
- * 以 ?name=large&format=jpg 格式流式下载到本地。
+ * 从 EnrichedTweet[] JSON 中提取 photo / video / animated_gif 类型 media：
+ * 图片以 ?name=large&format=jpg 格式流式下载，视频/动图选取最高码率的 MP4 变体。
  *
  * 用法:
- *   bun run src/downloadImages.ts                           # 默认输入/输出
- *   bun run src/downloadImages.ts path/to/data.json         # 指定输入
- *   bun run src/downloadImages.ts in.json ./out             # 指定输入和输出
- *   bun run src/downloadImages.ts --dry-run                 # 仅预览文件名
- *   bun run src/downloadImages.ts --patch                   # 修复已有文件的修改时间（HEAD 请求，不重新下载）
+ *   bun run src/downloadMedias.ts                           # 默认输入/输出
+ *   bun run src/downloadMedias.ts path/to/data.json         # 指定输入
+ *   bun run src/downloadMedias.ts in.json ./out             # 指定输入和输出
+ *   bun run src/downloadMedias.ts --dry-run                 # 仅预览文件名
+ *   bun run src/downloadMedias.ts --patch                   # 修复已有文件的修改时间（HEAD 请求，不重新下载）
+ *   bun run src/downloadMedias.ts --images-only             # 仅下载图片
+ *   bun run src/downloadMedias.ts --videos-only             # 仅下载视频/动图
  */
 
 import { createWriteStream, existsSync } from 'node:fs'
@@ -17,30 +19,18 @@ import { mkdir, readFile, utimes } from 'node:fs/promises'
 import path from 'node:path'
 import { pipeline, Readable } from 'node:stream'
 import { promisify } from 'node:util'
+import type { EnrichedTweet, MediaDetails } from '@tweets-viewer/rettiwt-api'
 import { cacheDir } from './utils'
 
 const streamPipeline = promisify(pipeline)
 
 // ─── 类型 ───────────────────────────────────────────────────
 
-interface MediaPhoto {
-  media_url_https: string
-  index: number
-  original_info: { height: number, width: number }
-  type: 'photo'
-}
-
-interface EnrichedTweet {
-  id: string
-  media_details?: (MediaPhoto | { type: 'animated_gif' | 'video' } & Record<string, unknown>)[]
-  user?: { screen_name?: string }
-  created_at?: string
-  [key: string]: unknown
-}
-
-/** 提取出的单张图片信息 */
-interface PhotoEntry {
+/** 提取出的单个媒体文件信息 */
+interface MediaEntry {
   url: string
+  ext: 'jpg' | 'mp4'
+  type: MediaDetails['type']
   tweetId: string
   index: number
   screenName: string
@@ -62,8 +52,13 @@ const DEFAULT_OUTPUT = path.join(cacheDir, 'downloads')
 
 const CONCURRENCY = 16
 const MAX_RETRIES = 2
-/** 单次请求超时（秒），避免 hung 连接阻塞整个批次 */
-const FETCH_TIMEOUT_S = 30
+/**
+ * 单次下载超时（秒）
+ *
+ * 仅作 hung 连接兜底，避免永久卡死阻塞批次。
+ * 视频体积大，30s 太短会导致下载中被 abort 反复重试，放宽到 120s。
+ */
+const FETCH_TIMEOUT_S = 120
 
 // ─── 工具函数 ────────────────────────────────────────────────
 
@@ -88,42 +83,85 @@ function sanitizeFilename(name: string): string {
   return name.replace(/[<>:"/\\|?*]/g, '_').trim()
 }
 
-/** 从推文数组中提取所有 photo 类型的 media */
-function extractPhotos(tweets: EnrichedTweet[]): PhotoEntry[] {
-  const photos: PhotoEntry[] = []
+/**
+ * 从视频 media 的 variants 中选出最高码率的 MP4 变体
+ *
+ * variants 可能同时含 video/mp4（有 bitrate）与 application/x-mpegURL
+ * （HLS 分片列表，不可直接下载为单文件），因此优先 MP4。
+ */
+function pickVideoUrl(media: Extract<MediaDetails, { type: 'video' | 'animated_gif' }>): string | undefined {
+  const variants = media.video_info?.variants ?? []
+  const mp4 = variants
+    .filter(v => v.content_type === 'video/mp4')
+    .sort((a, b) => (b.bitrate ?? 0) - (a.bitrate ?? 0))
+  return mp4[0]?.url
+}
+
+/** 从推文数组中提取所有可下载的 media（图片 + 视频/动图） */
+function extractMedias(tweets: EnrichedTweet[]): MediaEntry[] {
+  const medias: MediaEntry[] = []
   for (const tweet of tweets) {
     if (!tweet.media_details)
       continue
     for (const media of tweet.media_details) {
+      const base = {
+        tweetId: tweet.id,
+        index: media.index,
+        screenName: tweet.user?.screen_name ?? 'unknown',
+        createdAt: formatDate(tweet.created_at),
+      }
       if (media.type === 'photo') {
-        const photo = media as MediaPhoto
-        photos.push({
-          url: photo.media_url_https,
-          tweetId: tweet.id,
-          index: photo.index,
-          screenName: tweet.user?.screen_name ?? 'unknown',
-          createdAt: formatDate(tweet.created_at),
+        medias.push({
+          ...base,
+          type: 'photo',
+          ext: 'jpg',
+          url: `${media.media_url_https}?name=large&format=jpg`,
         })
+      }
+      else if (media.type === 'video' || media.type === 'animated_gif') {
+        const url = pickVideoUrl(media)
+        if (url) {
+          medias.push({
+            ...base,
+            type: media.type,
+            ext: 'mp4',
+            url,
+          })
+        }
+        else {
+          console.warn(`  ⚠️  无法解析视频源（${base.screenName} ${base.tweetId} 第 ${media.index} 个 media）`)
+        }
       }
     }
   }
-  return photos
+  return medias
 }
 
-/** 生成下载文件名：screenName-tweetId-createdAt[_index].jpg */
-function makeFilename(photo: PhotoEntry, hasMultipleInTweet: boolean): string {
-  const suffix = hasMultipleInTweet ? `_${photo.index}` : ''
-  const raw = `${photo.screenName}-${photo.tweetId}-${photo.createdAt}${suffix}.jpg`
+/** 生成下载文件名：screenName-tweetId-createdAt[_index].ext */
+function makeFilename(media: MediaEntry, hasMultipleInTweet: boolean): string {
+  const suffix = hasMultipleInTweet ? `_${media.index}` : ''
+  const raw = `${media.screenName}-${media.tweetId}-${media.createdAt}${suffix}.${media.ext}`
   return sanitizeFilename(raw)
 }
 
-/** 预计算每条推文的图片数量（O(n)，避免循环中重复 filter） */
-function countPhotosPerTweet(photos: PhotoEntry[]): Map<string, number> {
+/**
+ * 预计算每条推文各类型媒体的数量（O(n)，避免循环中重复 filter）
+ *
+ * key 为 `${tweetId}:${type}`，保证图片和视频各自按数量判断后缀，
+ * 避免同一推文里「1 张图 + 1 个视频」导致单张图片也被加上 `_index`。
+ */
+function countMediasPerTweet(medias: MediaEntry[]): Map<string, number> {
   const count = new Map<string, number>()
-  for (const p of photos) {
-    count.set(p.tweetId, (count.get(p.tweetId) ?? 0) + 1)
+  for (const m of medias) {
+    const key = `${m.tweetId}:${m.type}`
+    count.set(key, (count.get(key) ?? 0) + 1)
   }
   return count
+}
+
+/** 该媒体在同推文、同类型媒体中的序号（用于判断是否需要 `_index` 后缀） */
+function countKeyOf(media: MediaEntry): string {
+  return `${media.tweetId}:${media.type}`
 }
 
 /** 指数退避等待 */
@@ -135,7 +173,7 @@ const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
  * 从响应头 Last-Modified 恢复文件的修改时间
  *
  * 参考 download.ts：下载完成后将服务端返回的 Last-Modified
- * 写入文件 mtime，让图片浏览器能按原始时间排序。
+ * 写入文件 mtime，让媒体浏览器能按原始时间排序。
  */
 async function applyMtime(filePath: string, resp: Response): Promise<void> {
   const lastModified = resp.headers.get('last-modified')
@@ -146,7 +184,7 @@ async function applyMtime(filePath: string, resp: Response): Promise<void> {
 // ─── 核心下载 ────────────────────────────────────────────────
 
 /**
- * 下载单张图片到本地
+ * 下载单个媒体文件到本地
  *
  * - Node.js stream pipeline 流式写入，避免全量读入内存
  * - 自动从 Last-Modified 响应头恢复文件修改时间
@@ -154,24 +192,23 @@ async function applyMtime(filePath: string, resp: Response): Promise<void> {
  * - 已存在文件自动跳过
  */
 async function downloadOne(
-  photo: PhotoEntry,
+  media: MediaEntry,
   outputDir: string,
   hasMultipleInTweet: boolean,
 ): Promise<DownloadResult> {
-  const downloadUrl = `${photo.url}?name=large&format=jpg`
-  const fileName = makeFilename(photo, hasMultipleInTweet)
+  const fileName = makeFilename(media, hasMultipleInTweet)
   const filePath = path.join(outputDir, fileName)
 
   // 跳过已存在文件
   if (existsSync(filePath)) {
-    return { url: downloadUrl, filename: fileName, success: true }
+    return { url: media.url, filename: fileName, success: true }
   }
 
   let lastError: Error | undefined
 
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     try {
-      const resp = await fetch(downloadUrl, {
+      const resp = await fetch(media.url, {
         signal: AbortSignal.timeout(FETCH_TIMEOUT_S * 1000),
       })
 
@@ -186,7 +223,7 @@ async function downloadOne(
       // 恢复服务端的 Last-Modified 时间
       await applyMtime(filePath, resp)
 
-      return { url: downloadUrl, filename: fileName, success: true }
+      return { url: media.url, filename: fileName, success: true }
     }
     catch (err) {
       lastError = err as Error
@@ -198,35 +235,35 @@ async function downloadOne(
     }
   }
 
-  return { url: downloadUrl, filename: fileName, success: false, error: lastError!.message }
+  return { url: media.url, filename: fileName, success: false, error: lastError!.message }
 }
 
 // ─── 批量下载 ────────────────────────────────────────────────
 
 /**
- * 分批并发下载所有图片
+ * 分批并发下载所有媒体
  *
  * 每批最多 CONCURRENCY 个并行请求，批内并发、批间串行，
  * 避免同时打开过多连接。
  */
-async function downloadAll(photos: PhotoEntry[], outputDir: string): Promise<{ success: number, failed: number }> {
+async function downloadAll(medias: MediaEntry[], outputDir: string): Promise<{ success: number, failed: number }> {
   await mkdir(outputDir, { recursive: true })
 
-  const tweetPhotoCount = countPhotosPerTweet(photos)
-  const totalBatches = Math.ceil(photos.length / CONCURRENCY)
+  const tweetMediaCount = countMediasPerTweet(medias)
+  const totalBatches = Math.ceil(medias.length / CONCURRENCY)
 
   let completed = 0
   let failed = 0
 
-  for (let i = 0; i < photos.length; i += CONCURRENCY) {
+  for (let i = 0; i < medias.length; i += CONCURRENCY) {
     const batchNum = Math.floor(i / CONCURRENCY) + 1
-    const chunk = photos.slice(i, i + CONCURRENCY)
+    const chunk = medias.slice(i, i + CONCURRENCY)
 
     let results: DownloadResult[]
     try {
       results = await Promise.all(
-        chunk.map(photo =>
-          downloadOne(photo, outputDir, (tweetPhotoCount.get(photo.tweetId) ?? 0) > 1),
+        chunk.map(media =>
+          downloadOne(media, outputDir, (tweetMediaCount.get(countKeyOf(media)) ?? 0) > 1),
         ),
       )
     }
@@ -239,7 +276,7 @@ async function downloadAll(photos: PhotoEntry[], outputDir: string): Promise<{ s
     for (const r of results) {
       if (r.success) {
         completed++
-        console.log(`  ✅ [${completed}/${photos.length}] ${r.filename}`)
+        console.log(`  ✅ [${completed}/${medias.length}] ${r.filename}`)
       }
       else {
         failed++
@@ -262,48 +299,47 @@ async function downloadAll(photos: PhotoEntry[], outputDir: string): Promise<{ s
  * 不存在的文件走正常下载流程（含 mtime 写入）。
  */
 async function patchTimestamps(
-  photos: PhotoEntry[],
+  medias: MediaEntry[],
   outputDir: string,
 ): Promise<{ patched: number, downloaded: number, failed: number }> {
   await mkdir(outputDir, { recursive: true })
 
-  const tweetPhotoCount = countPhotosPerTweet(photos)
-  const totalBatches = Math.ceil(photos.length / CONCURRENCY)
+  const tweetMediaCount = countMediasPerTweet(medias)
+  const totalBatches = Math.ceil(medias.length / CONCURRENCY)
 
   let patched = 0
   let downloaded = 0
   let failed = 0
 
-  for (let i = 0; i < photos.length; i += CONCURRENCY) {
+  for (let i = 0; i < medias.length; i += CONCURRENCY) {
     const batchNum = Math.floor(i / CONCURRENCY) + 1
-    const chunk = photos.slice(i, i + CONCURRENCY)
+    const chunk = medias.slice(i, i + CONCURRENCY)
 
-    const tasks = chunk.map(async (photo) => {
-      const hasMultiple = (tweetPhotoCount.get(photo.tweetId) ?? 0) > 1
-      const fileName = makeFilename(photo, hasMultiple)
+    const tasks = chunk.map(async (media) => {
+      const hasMultiple = (tweetMediaCount.get(countKeyOf(media)) ?? 0) > 1
+      const fileName = makeFilename(media, hasMultiple)
       const filePath = path.join(outputDir, fileName)
-      const downloadUrl = `${photo.url}?name=large&format=jpg`
 
       // 文件不存在 → 正常下载
       if (!existsSync(filePath)) {
-        const result = await downloadOne(photo, outputDir, hasMultiple)
+        const result = await downloadOne(media, outputDir, hasMultiple)
         return { ...result, patched: false, downloaded: result.success }
       }
 
       // 文件已存在 → HEAD 请求获取 Last-Modified
       try {
-        const resp = await fetch(downloadUrl, {
+        const resp = await fetch(media.url, {
           method: 'HEAD',
           signal: AbortSignal.timeout(FETCH_TIMEOUT_S * 1000),
         })
         if (resp.ok) {
           await applyMtime(filePath, resp)
-          return { url: downloadUrl, filename: fileName, success: true, patched: true, downloaded: false }
+          return { url: media.url, filename: fileName, success: true, patched: true, downloaded: false }
         }
-        return { url: downloadUrl, filename: fileName, success: false, patched: true, downloaded: false, error: `HTTP ${resp.status}` }
+        return { url: media.url, filename: fileName, success: false, patched: true, downloaded: false, error: `HTTP ${resp.status}` }
       }
       catch (err) {
-        return { url: downloadUrl, filename: fileName, success: false, patched: true, downloaded: false, error: (err as Error).message }
+        return { url: media.url, filename: fileName, success: false, patched: true, downloaded: false, error: (err as Error).message }
       }
     })
 
@@ -339,6 +375,8 @@ async function main() {
   const args = process.argv.slice(2)
   const dryRun = args.includes('--dry-run') || args.includes('--dryrun')
   const patchMode = args.includes('--patch')
+  const imagesOnly = args.includes('--images-only')
+  const videosOnly = args.includes('--videos-only')
   const positional = args.filter(a => !a.startsWith('--'))
   const inputFile = positional[0] ? path.resolve(positional[0]) : DEFAULT_INPUT
   const outputDir = positional[1] ? path.resolve(positional[1]) : DEFAULT_OUTPUT
@@ -353,38 +391,46 @@ async function main() {
     process.exit(1)
   }
 
-  // 提取图片
-  const photos = extractPhotos(tweets)
-  if (photos.length === 0) {
-    console.log('⚠️  未找到任何 photo 类型的 media')
+  // 提取媒体 & 按需筛选
+  let medias = extractMedias(tweets)
+  if (imagesOnly)
+    medias = medias.filter(m => m.type === 'photo')
+  if (videosOnly)
+    medias = medias.filter(m => m.type !== 'photo')
+
+  if (medias.length === 0) {
+    console.log('⚠️  未找到任何可下载的 media')
     return
   }
-  console.log(`📸 共 ${photos.length} 张图片`)
+
+  const photoCount = medias.filter(m => m.type === 'photo').length
+  const videoCount = medias.length - photoCount
+  console.log(`🎬 共 ${medias.length} 个媒体（${photoCount} 张图片 / ${videoCount} 个视频）`)
 
   // ── dry-run：仅预览文件名 ──
   if (dryRun) {
     console.log('\n📋 Dry-run 模式，预览文件名:\n')
-    const tweetPhotoCount = countPhotosPerTweet(photos)
-    for (const photo of photos) {
-      console.log(`  ${makeFilename(photo, (tweetPhotoCount.get(photo.tweetId) ?? 0) > 1)}`)
+    const tweetMediaCount = countMediasPerTweet(medias)
+    for (const media of medias) {
+      console.log(`  ${makeFilename(media, (tweetMediaCount.get(countKeyOf(media)) ?? 0) > 1)}`)
     }
-    console.log(`\n共 ${photos.length} 张，确认无误后去掉 --dry-run 正式下载`)
+    console.log(`\n共 ${medias.length} 个，确认无误后去掉 --dry-run 正式下载`)
     return
   }
 
   // ── patch：修复已有文件时间，缺失的补下载 ──
   if (patchMode) {
     console.log('🔧 Patch 模式：已有文件 HEAD 获取 Last-Modified → utimes，缺失文件正常下载\n')
-    const { patched, downloaded, failed } = await patchTimestamps(photos, outputDir)
-    console.log(`\n🎉 完成！修时 ${patched} 张，下载 ${downloaded} 张，失败 ${failed} 张`)
+    const { patched, downloaded, failed } = await patchTimestamps(medias, outputDir)
+    console.log(`\n🎉 完成！修时 ${patched} 个，下载 ${downloaded} 个，失败 ${failed} 个`)
     console.log(`📁 保存到: ${outputDir}`)
     return
   }
 
   // ── 正式下载 ──
   console.log('开始下载...')
-  const { success, failed } = await downloadAll(photos, outputDir)
-  console.log(`\n🎉 完成！成功 ${success} 张，失败 ${failed} 张`)
+  const { success, failed } = await downloadAll(medias, outputDir)
+  console.log(`\n🎉 完成！成功 ${success} 个，失败 ${failed} 个`)
   console.log(`📁 保存到: ${outputDir}`)
 }
 
