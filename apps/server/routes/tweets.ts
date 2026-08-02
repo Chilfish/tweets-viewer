@@ -67,7 +67,7 @@ app.get('/get/:name', async (c) => {
     return c.json({ error: 'invalid name' }, 400)
 
   const pagination = getPaginationParams(c)
-  if (!pagination)
+  if (isError(pagination))
     return c.json({ error: `invalid pagination: ${pagination}` }, 400)
 
   const dateResult = dateRangeSchema.safeParse(c.req.query())
