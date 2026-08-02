@@ -11,6 +11,7 @@
     },
     "resolveJsonModule": true,
     "types": ["node", "vite/client"],
+    "allowImportingTsExtensions": true,
     "strict": true,
     "noEmit": true,
     "noEmitOnError": true,

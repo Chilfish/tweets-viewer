@@ -5,13 +5,11 @@ const isInVercel = process.env.VERCEL === 'true'
 
 const config: Config = {
   ssr: true,
-  presets: [vercelPreset()],
+  presets: isInVercel
+    ? ([vercelPreset()] as unknown as NonNullable<Config['presets']>)
+    : [],
   prerender: ['/'],
   splitRouteModules: true,
-}
-
-if (!isInVercel) {
-  config.presets = []
 }
 
 export default config

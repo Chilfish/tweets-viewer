@@ -3,7 +3,7 @@ import { reactRouter } from '@react-router/dev/vite'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'vite'
 import babel from 'vite-plugin-babel'
-import { apiUrl } from '../../packages/shared/constant'
+import { apiUrl } from '../../packages/shared/constant.ts'
 
 // 获取 git 信息
 function getGitInfo() {

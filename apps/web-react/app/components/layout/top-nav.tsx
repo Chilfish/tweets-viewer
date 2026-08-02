@@ -8,7 +8,7 @@ interface TopNavProps {
   children?: React.ReactNode
 }
 
-export function TopNav({ title, children }: TopNavProps) {
+export function TopNav({ title }: TopNavProps) {
   const theme = useAppStore(s => s.theme)
   const setTheme = useAppStore(s => s.setTheme)
 
@@ -23,6 +23,9 @@ export function TopNav({ title, children }: TopNavProps) {
     <div className="sticky top-0 z-50 bg-background/60 backdrop-blur-lg border-b border-border transition-colors duration-200">
       <div className="flex items-center py-1 px-4">
         <UserSelector />
+        {title && (
+          <span className="ml-2 font-semibold text-foreground">{title}</span>
+        )}
 
         {/* Dark mode toggle */}
         <Button

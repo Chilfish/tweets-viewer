@@ -49,7 +49,7 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
       })
       paginatedTweets = tweetsRes.data
     }
-    catch (e) { /* ignore */ }
+    catch { /* ignore */ }
   }
 
   return { paginatedTweets, q }
@@ -160,7 +160,7 @@ export default function SearchPage({ loaderData, params }: Route.ComponentProps)
     <>
       <SearchInput
         user={user ?? undefined}
-        defaultValue={q}
+        defaultValue={q || serverQ}
         placeholder={username ? `Search tweets by ${username}...` : 'Search tweets...'}
         className="px-4 w-full mx-auto"
       />

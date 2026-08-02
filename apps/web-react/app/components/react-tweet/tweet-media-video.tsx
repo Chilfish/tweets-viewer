@@ -12,7 +12,7 @@ interface Props {
   showCoverOnly?: boolean
 }
 
-export function TweetMediaVideo({ tweet, media, showCoverOnly }: Props) {
+export function TweetMediaVideo({ media, showCoverOnly }: Props) {
   'use no memo'
 
   const [showPlayButton, setShowPlayButton] = useState(true)
