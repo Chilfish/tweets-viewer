@@ -1,5 +1,5 @@
 export const isDev
-  = import.meta.env?.DEV || process.env.NODE_ENV === 'development'
+  = (import.meta as ImportMeta & { env?: { DEV?: boolean } }).env?.DEV || process.env.NODE_ENV === 'development'
 
 const isPreview = process.env.NODE_ENV === 'preview'
 

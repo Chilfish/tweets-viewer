@@ -62,7 +62,8 @@ function _order(reverse: boolean) {
 
 /**
  * 获取推文列表
- * @param total - 可选的总数，如果提供不再查询数据库
+ *
+ * 可选传入 `total`（总数），提供时不再查询数据库。
  */
 export async function getTweets({
   db,
