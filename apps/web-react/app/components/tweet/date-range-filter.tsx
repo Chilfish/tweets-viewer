@@ -1,6 +1,6 @@
 import type { DateRange } from '@daypicker/react'
 import { zhCN as dayPickerLocale } from '@daypicker/react/locale'
-import { format, isSameDay, subDays, subMonths, subYears } from 'date-fns'
+import { format } from 'date-fns'
 import { zhCN } from 'date-fns/locale'
 import { Calendar as CalendarIcon, FilterX, MoveRight } from 'lucide-react'
 import { useState } from 'react'
@@ -31,16 +31,6 @@ interface DateRangeFilterProps {
   onApply: (range: DateRange | undefined) => void
 }
 
-function getPresets(): { label: string, range: DateRange }[] {
-  const today = new Date()
-  return [
-    { label: '近7天', range: { from: subDays(today, 6), to: today } },
-    { label: '近30天', range: { from: subDays(today, 29), to: today } },
-    { label: '近6个月', range: { from: subMonths(today, 6), to: today } },
-    { label: '近1年', range: { from: subYears(today, 1), to: today } },
-  ]
-}
-
 function formatLabel(start?: Date, end?: Date) {
   if (start && end)
     return `${format(start, 'yyyy/MM/dd')} - ${format(end, 'yyyy/MM/dd')}`
@@ -63,11 +53,6 @@ function formatCompactLabel(start?: Date, end?: Date) {
   if (end)
     return `至 ${format(end, 'yy/MM/dd')} 止`
   return '日期'
-}
-
-function isSameRange(a: DateRange, b: DateRange) {
-  return !!a.from && !!a.to && !!b.from && !!b.to
-    && isSameDay(a.from, b.from) && isSameDay(a.to, b.to)
 }
 
 /** 预览条上的单个日期，可点击跳转到对应月份 */

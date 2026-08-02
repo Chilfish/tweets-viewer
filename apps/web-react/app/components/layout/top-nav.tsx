@@ -3,11 +3,7 @@ import { Button } from '~/components/ui/button'
 import { useAppStore } from '~/store/use-app-store'
 import { UserSelector } from './user-selector'
 
-interface TopNavProps {
-  children?: React.ReactNode
-}
-
-export function TopNav(args: TopNavProps) {
+export function TopNav() {
   const theme = useAppStore(s => s.theme)
   const setTheme = useAppStore(s => s.setTheme)
 
