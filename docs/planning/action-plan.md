@@ -22,14 +22,15 @@
 
 | 任务 | 说明 | 状态 |
 |---|---|---|
-| T1 | `fetchSearchFukuoka.ts` 关键词抓取脚本 | 🔄 进行中 |
-| T2 | `apps/scripts/src/fukuoka/` 数据处理模块（fetch/members/simplify） | 🔄 进行中 |
+| T1 | `fetchSearchFukuoka.ts` 关键词抓取脚本 | ✅ 已完成 |
+| T2 | `apps/scripts/src/fukuoka/` 数据处理模块（fetch/members/simplify） | ✅ 已完成 |
 | T3 | DateRangeFilter + 日期范围查询参数 | ✅ 已完成 |
 | T4 | Calendar 迁移到 @daypicker/react v10 | ✅ 已完成 |
 | T5 | 服务端接受 date-only 日期值 | ✅ 已完成 |
 | T6 | 文档体系对标 Float（当前任务） | ✅ 已完成 |
 | T7 | CI 门禁（lint + test） | ✅ 已完成 |
 | T8 | postmortem 001：Windows symlink mode 残留 | ✅ 已沉淀 |
+| T9 | **Apple 视角设计锐评与处置**（P0 架构一致性 → P1 产品表达 → P2 技术债） | 🔄 进行中，见 `review-r2-action.md` |
 
 ## 约定
 
