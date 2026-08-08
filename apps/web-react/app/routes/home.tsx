@@ -1,15 +1,15 @@
-import { Link } from 'react-router'
 import { HomeFeatures } from '~/components/home/features'
 import { HomeFooter } from '~/components/home/footer'
 import { HomeHero } from '~/components/home/hero'
-import { Button } from '~/components/ui/button'
+import { HomeMemoEntry } from '~/components/home/memo-entry'
+import { HomeUserEntry } from '~/components/home/user-entry'
 
 export function meta() {
   return [
-    { title: `推文存档站` },
+    { title: `完整人生归档 · Tweets Viewer` },
     {
       name: 'description',
-      content: `一个第三方 Twitter 查看器，专注于阅读体验和用户友好的界面设计。`,
+      content: `把一个人的完整网络人生归档，随时翻阅——推文、照片与每年今日的回忆，跨越时间线、媒体墙与搜索。`,
     },
   ]
 }
@@ -30,15 +30,14 @@ export default function HomePage() {
       {/* Hero Section */}
       <HomeHero />
 
-      {/* Primary Action */}
-      <div className="mb-16 animate-in fade-in slide-in-from-bottom-3 duration-500 delay-100 fill-mode-both">
-        <Button
-          render={<Link to="/tweets/240y_k" />}
-          size="lg"
-          className="rounded-full px-8 h-12 text-sm font-semibold transition-all hover:-translate-y-0.5"
-        >
-          查看示例存档
-        </Button>
+      {/* 那年今日仪式入口 */}
+      <div className="mb-6 w-full flex flex-col items-center">
+        <HomeMemoEntry />
+      </div>
+
+      {/* 归档用户入口：继续浏览 / 最近浏览 / 全部用户 */}
+      <div className="mb-16 w-full flex flex-col items-center">
+        <HomeUserEntry />
       </div>
 
       {/* Visual Separation / Section Header */}
