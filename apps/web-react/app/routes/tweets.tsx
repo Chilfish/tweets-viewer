@@ -131,7 +131,7 @@ export default function TweetsPage({ loaderData, params }: Route.ComponentProps)
           {tweets.map(tweet => (
             <MyTweet
               tweet={tweet}
-              tweetAuthorName={user?.fullName ?? name ?? ''}
+              tweetAuthorName={user?.fullName ?? params.name ?? ''}
               key={tweet.id}
             />
           ))}

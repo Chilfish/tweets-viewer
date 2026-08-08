@@ -2,6 +2,7 @@ import type { EnrichedTweet, EnrichedUser } from '@tweets-viewer/rettiwt-api'
 import type { PaginatedResponse } from '@tweets-viewer/shared'
 import type { Route } from './+types/search'
 import { PAGE_SIZE } from '@tweets-viewer/shared'
+import { Search } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { useRevalidator, useRouteLoaderData, useSearchParams } from 'react-router'
 import { SearchInput } from '~/components/search-input'
@@ -114,7 +115,11 @@ export default function SearchPage({ loaderData, params }: Route.ComponentProps)
     if (!q) {
       return (
         <div className="flex flex-col items-center justify-center py-20 text-muted-foreground gap-2">
-          <div className="text-lg">Enter keywords to search</div>
+          <Search className="size-10 opacity-20" />
+          <div className="text-base">输入关键词开始搜索</div>
+          <div className="text-sm text-muted-foreground/70">
+            {username ? `在 @${username} 的归档中检索` : '支持全文检索归档推文'}
+          </div>
         </div>
       )
     }
@@ -122,10 +127,10 @@ export default function SearchPage({ loaderData, params }: Route.ComponentProps)
     if (tweets.length === 0 && status !== 'fetching' && status !== 'error') {
       return (
         <div className="flex flex-col items-center justify-center py-20 text-muted-foreground gap-2">
-          <div className="text-lg">No tweets found</div>
-          <div className="text-sm">
-            Try different keywords
-            {username ? ' or clear user filter' : ''}
+          <div className="text-base">没有找到匹配的推文</div>
+          <div className="text-sm text-muted-foreground/70">
+            换个关键词试试
+            {username ? '，或清除用户筛选' : ''}
           </div>
         </div>
       )
@@ -137,7 +142,7 @@ export default function SearchPage({ loaderData, params }: Route.ComponentProps)
           {tweets.map(tweet => (
             <MyTweet
               tweet={tweet}
-              tweetAuthorName={user?.fullName ?? name ?? ''}
+              tweetAuthorName={user?.fullName ?? username ?? ''}
               key={tweet.id}
             />
           ))}
