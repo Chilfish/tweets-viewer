@@ -7,7 +7,7 @@ import { userId } from './common'
 const filter: ITweetFilter = {
   fromUsers: [userId],
   // startDate: new Date('2020-01-01'),
-  endDate: new Date('2023-11-10'),
+  endDate: new Date('2023-11-21'),
 }
 
 const data = await apiClient.searchTweetsRaw(filter, cursor).catch((e) => {
