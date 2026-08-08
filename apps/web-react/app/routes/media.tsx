@@ -5,8 +5,8 @@ import type { FlatMediaItem } from '~/lib/media'
 import type { StreamStatus } from '~/store/use-tweet-store'
 import { PAGE_SIZE } from '@tweets-viewer/shared'
 import { isAxiosError } from 'axios'
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { useSearchParams } from 'react-router'
+import { useEffect, useRef, useState } from 'react'
+import { useRevalidator, useSearchParams } from 'react-router'
 import { MediaWall } from '~/components/media/MediaWall'
 import { MediaHydrateFallback } from '~/components/skeletons/media'
 import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
@@ -30,20 +30,22 @@ export function meta({ params }: Route.MetaArgs) {
 }
 
 /**
- * Loader 现在仅处理第一页，作为首屏注水数据
+ * Loader 读取 URL 当前页，作为该页注水数据（URL 驱动分页，与 tweets/ins 一致）。
+ * 滚动追加下一页 / 分页器跳页，均由 URL page 变化 → loader 重跑驱动。
  */
 export async function clientLoader({ params, request }: Route.ClientLoaderArgs) {
   const { name } = params
   const url = new URL(request.url)
+  const page = Number(url.searchParams.get('page')) || 1
   const reverse = url.searchParams.get('reverse') === 'true'
   const start = url.searchParams.get('start') || undefined
   const end = url.searchParams.get('end') || undefined
 
   try {
-    const { data: firstPage } = await apiClient.get<PaginatedResponse<EnrichedTweet>>(`/tweets/medias/${name}`, {
-      params: { page: 1, reverse, pageSize: PAGE_SIZE, start, end },
+    const { data: pageData } = await apiClient.get<PaginatedResponse<EnrichedTweet>>(`/tweets/medias/${name}`, {
+      params: { page, reverse, pageSize: PAGE_SIZE, start, end },
     })
-    return { firstPage }
+    return { pageData }
   }
   catch (error) {
     if (isAxiosError(error) && error.response?.status === 404) {
@@ -53,97 +55,67 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
   }
 }
 
-async function fetchMediaPageData(
-  name: string,
-  pageNum: number,
-  options: { reverse: boolean, pageSize: number, start?: string, end?: string },
-): Promise<{ newMedia: FlatMediaItem[], total: number, hasMore: boolean } | null> {
-  try {
-    const { data: response } = await apiClient.get<PaginatedResponse<EnrichedTweet>>(
-      `/tweets/medias/${name}`,
-      { params: { page: pageNum, ...options } },
-    )
-    return {
-      newMedia: extractMediaFromTweets(response.data),
-      total: response.meta.total,
-      hasMore: response.meta.hasMore,
-    }
-  }
-  catch (error) {
-    console.error('Failed to fetch media:', error)
-    return null
-  }
-}
-
 export default function MediaPage({ loaderData, params }: Route.ComponentProps) {
-  const { firstPage } = loaderData
-  const [searchParams] = useSearchParams()
+  const { pageData } = loaderData
+  const [searchParams, setSearchParams] = useSearchParams()
+  const revalidator = useRevalidator()
 
-  // 1. 纯客户端状态：从 loaderData 初始化，避免 effect 内同步 setState
-  const [mediaItems, setMediaItems] = useState<FlatMediaItem[]>(() =>
-    extractMediaFromTweets(firstPage.data),
-  )
-  const [currentPage, setCurrentPage] = useState(1)
-  const [status, setStatus] = useState<StreamStatus>(() =>
-    firstPage.meta.hasMore ? 'ready' : 'exhausted',
-  )
-  const [totalCount, setTotalCount] = useState(() => firstPage.meta.total)
-
-  // 过滤参数 (来自 URL)
+  const page = Number(searchParams.get('page')) || 1
   const reverse = searchParams.get('reverse') === 'true'
   const start = searchParams.get('start') || undefined
   const end = searchParams.get('end') || undefined
   const filterKey = `${params.name}-${reverse}-${start}-${end}`
 
-  // 2. 核心：数据获取逻辑 (封装为纯客户端调用)
-  const fetchNextPage = useCallback(async (pageNum: number, isReset = false) => {
-    Promise.resolve().then(() => setStatus('fetching'))
-    const result = await fetchMediaPageData(params.name, pageNum, { reverse, pageSize: PAGE_SIZE, start, end })
-    if (result === null) {
-      setStatus('error')
-      return
-    }
-    setMediaItems((prev) => {
-      if (isReset)
-        return result.newMedia
-      const existingIds = new Set(prev.map(i => i.id))
-      return [...prev, ...result.newMedia.filter(i => !existingIds.has(i.id))]
-    })
-    setTotalCount(result.total)
-    if (result.hasMore) {
-      setStatus('ready')
-    }
-    else {
-      setStatus('exhausted')
-    }
-    if (isReset)
-      setCurrentPage(pageNum)
-  }, [params.name, reverse, start, end])
+  // 1. 纯客户端状态：从 loaderData 初始化，避免 effect 内同步 setState
+  const [mediaItems, setMediaItems] = useState<FlatMediaItem[]>(() =>
+    extractMediaFromTweets(pageData.data),
+  )
+  const [status, setStatus] = useState<StreamStatus>(() =>
+    pageData.meta.hasMore ? 'ready' : 'exhausted',
+  )
+  const [totalCount, setTotalCount] = useState(() => pageData.meta.total)
 
-  // 3. 当过滤器或路由改变时重置（首次加载已通过 useState 初始化）
   const isFirstMount = useRef(true)
+  const lastPageRef = useRef(page)
+  const prevFilterKey = useRef('')
+
+  // 2. URL page 变化时同步 loader 数据：顺序下一页追加，否则（跳页/筛选变化）替换
   useEffect(() => {
     if (isFirstMount.current) {
       isFirstMount.current = false
       return
     }
-    fetchNextPage(1, true)
-  }, [filterKey, firstPage]) // 同时也监听 firstPage 以应对路由切换
 
-  // 4. 交互处理
+    const isFilterChange = prevFilterKey.current !== filterKey
+    prevFilterKey.current = filterKey
+
+    const newMedia = extractMediaFromTweets(pageData.data)
+    const isSequential = page === lastPageRef.current + 1
+
+    if (isFilterChange || !isSequential) {
+      // 筛选变化 / 分页器跳页 → 替换为当前页
+      setMediaItems(newMedia)
+    }
+    else {
+      // 滚动下一页 → 追加（按 id 去重）
+      setMediaItems((prev) => {
+        const existingIds = new Set(prev.map(i => i.id))
+        return [...prev, ...newMedia.filter(i => !existingIds.has(i.id))]
+      })
+    }
+    lastPageRef.current = page
+    setTotalCount(pageData.meta.total)
+    setStatus(pageData.meta.hasMore ? 'ready' : 'exhausted')
+  }, [pageData, page, filterKey])
+
+  // 3. 交互处理：滚动加载更多 = 更新 URL page（loader 自动重跑）
   const handleLoadMore = () => {
     if (status !== 'ready')
       return
-    const nextPage = currentPage + 1
-    setCurrentPage(nextPage)
-    fetchNextPage(nextPage)
-  }
-
-  const handlePageChange = (targetPage: number) => {
-    if (targetPage === currentPage || status === 'fetching')
-      return
-    setCurrentPage(targetPage)
-    fetchNextPage(targetPage, true)
+    setSearchParams((prev) => {
+      prev.set('page', ((Number(prev.get('page')) || 1) + 1).toString())
+      return prev
+    }, { replace: true })
   }
 
   // 计算总页数
@@ -153,11 +125,7 @@ export default function MediaPage({ loaderData, params }: Route.ComponentProps) 
     <>
       <div className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-xl border-b border-border/40 transition-all">
         <div className="w-full max-w-6xl mx-auto px-4 h-11 flex items-center justify-between gap-4">
-          <TweetNavigation
-            totalPages={totalPages}
-            currentPage={currentPage}
-            onPageChange={handlePageChange}
-          />
+          <TweetNavigation totalPages={totalPages} />
           <TweetsToolbarActions hideComments />
         </div>
       </div>
@@ -173,7 +141,7 @@ export default function MediaPage({ loaderData, params }: Route.ComponentProps) 
           <TweetFeedStatus
             status={status}
             hasTweets={mediaItems.length > 0}
-            onRetry={handleLoadMore}
+            onRetry={() => revalidator.revalidate()}
           />
           {/* 触底触发器 */}
           <InfiniteScrollTrigger
