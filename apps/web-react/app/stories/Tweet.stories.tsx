@@ -26,7 +26,7 @@ const tweetWithQoutedImage: EnrichedTweet = {
     is_blue_verified: true,
     verified: true,
     profile_image_shape: 'Circle',
-    profile_image_url_https: 'https://pbs.twimg.com/profile_images/1952673634377756672/FWjMlNpA_normal.jpg',
+    profile_image_url_https: 'https://pbs.twimg.com/profile_images/1952673634377756672/FWjMlNpA.jpg',
   },
   text: 'MyGO!!!!!×Ave Mujica 合同ライブ\n「わかれ道の、その先へ」 LIVE FILM\n\n2/7はひなりんで登壇致します！\n何度観ても楽しいライブなので是非🙂‍↕️\n\n#わかれ道のその先へLIVEFILM',
   entities: [
@@ -60,7 +60,7 @@ const tweetWithQoutedImage: EnrichedTweet = {
       is_blue_verified: false,
       verified: false,
       profile_image_shape: 'Square',
-      profile_image_url_https: 'https://pbs.twimg.com/profile_images/1973738194454872064/MRvlZY2A_normal.jpg',
+      profile_image_url_https: 'https://pbs.twimg.com/profile_images/1973738194454872064/MRvlZY2A.jpg',
     },
     text: '＼新情報📢／\n\nMyGO!!!!!×Ave Mujica 合同ライブ\n「わかれ道の、その先へ」 LIVE FILM📽️\n\n2/7(土)・8(日)に上映会が再び開催決定💡\nキャスト登壇のトークショーも✨\n\nチケット先着受付\n⏰1/30(金) 12:00 ～\n\n▼詳細はこちら\nhttps://t.co/WkjtKxUFdD\n\n#わかれ道のその先へLIVEFILM\n#バンドリ https://t.co/7o7DsEtyp0',
     entities: [
@@ -132,7 +132,7 @@ const replyTweet: EnrichedTweet = {
     is_blue_verified: true,
     verified: true,
     profile_image_shape: 'Circle',
-    profile_image_url_https: 'https://pbs.twimg.com/profile_images/1636675305812422656/Sz3moSfs_normal.jpg',
+    profile_image_url_https: 'https://pbs.twimg.com/profile_images/1636675305812422656/Sz3moSfs.jpg',
   },
   text: '@lxxeju センスの塊すぎる素敵なMVに感動しました！！\nありがとうございました！！',
   parent_id: '2016463941162197006',
@@ -163,7 +163,7 @@ const withVideo: EnrichedTweet = {
     is_blue_verified: true,
     verified: true,
     profile_image_shape: 'Circle',
-    profile_image_url_https: 'https://pbs.twimg.com/profile_images/1636675305812422656/Sz3moSfs_normal.jpg',
+    profile_image_url_https: 'https://pbs.twimg.com/profile_images/1636675305812422656/Sz3moSfs.jpg',
   },
   text: '【オリジナル楽曲公開！】\n\n「hermit」\n作詞  西尾夕香\n作曲・編曲  藤井健太郎\n\nヤドカリは英語で言うとhermit crabだよ🦞🐚\nhttps://t.co/dLWM2WtLMe\n\n#西尾331計画 #nishio331project #おゆちゅーぶ https://t.co/DHSJsrvrX5',
   entities: [
@@ -260,7 +260,7 @@ const with3Images: EnrichedTweet = {
     is_blue_verified: true,
     verified: true,
     profile_image_shape: 'Circle',
-    profile_image_url_https: 'https://pbs.twimg.com/profile_images/1636675305812422656/Sz3moSfs_normal.jpg',
+    profile_image_url_https: 'https://pbs.twimg.com/profile_images/1636675305812422656/Sz3moSfs.jpg',
   },
   text: '第1回 240 CUP in GiGO POKERありがとうございましたー！\n\n9位～！\n\n次回は、Dealer\'s shuffle up and deal!を次回は上手く言えるようになろうと思う。笑\n#gigopoker https://t.co/hTvomk1SFl',
   entities: [
@@ -405,7 +405,7 @@ const withLinkCard: EnrichedTweet = {
     is_blue_verified: false,
     verified: false,
     profile_image_shape: 'Square',
-    profile_image_url_https: 'https://pbs.twimg.com/profile_images/1973738194454872064/MRvlZY2A_normal.jpg',
+    profile_image_url_https: 'https://pbs.twimg.com/profile_images/1973738194454872064/MRvlZY2A.jpg',
   },
   text: '／\nミニアニメ「元祖！バンドリちゃん」\n本日第17話配信・放送🌟\n＼\n\n第17話「チュチュPのカリスマラジオ」\nYouTube配信はこちら📺✨\nhttps://t.co/UE1LOaEzIb\n\n⟡22:00〜 YouTube「バンドリちゃんねる☆」ほかにて順次配信\n⟡23:25〜 TOKYO MXにて放送\n\nお見逃しなく❣\n\n#元祖バンドリちゃん',
   entities: [
