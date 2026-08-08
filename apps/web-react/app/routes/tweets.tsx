@@ -4,7 +4,7 @@ import type { Route } from './+types/tweets'
 import { PAGE_SIZE } from '@tweets-viewer/shared'
 import { isAxiosError } from 'axios'
 import { useEffect, useRef } from 'react'
-import { useRouteLoaderData, useSearchParams } from 'react-router'
+import { useRevalidator, useRouteLoaderData, useSearchParams } from 'react-router'
 import { TweetsHydrateFallback } from '~/components/skeletons/tweets'
 import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
 import { MyTweet } from '~/components/tweet/Tweet'
@@ -71,6 +71,7 @@ export default function TweetsPage({ loaderData, params }: Route.ComponentProps)
   const noReplies = searchParams.get('no_replies') === 'true'
 
   const { tweets, status, setStatus, appendTweets, resetStream } = useTweetStore()
+  const revalidator = useRevalidator()
   const layoutData = useRouteLoaderData('rootLayout') as { activeUser: EnrichedUser | null }
   const user = layoutData?.activeUser
 
@@ -139,7 +140,7 @@ export default function TweetsPage({ loaderData, params }: Route.ComponentProps)
         <TweetFeedStatus
           status={status}
           hasTweets={tweets.length > 0}
-          onRetry={() => window.location.reload()}
+          onRetry={() => revalidator.revalidate()}
         />
 
         <InfiniteScrollTrigger

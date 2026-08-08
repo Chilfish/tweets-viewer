@@ -5,7 +5,7 @@ import { PAGE_SIZE } from '@tweets-viewer/shared'
 import { isAxiosError } from 'axios'
 import { History } from 'lucide-react'
 import { useEffect, useRef } from 'react'
-import { useRouteLoaderData, useSearchParams } from 'react-router'
+import { useRevalidator, useRouteLoaderData, useSearchParams } from 'react-router'
 import { TweetsHydrateFallback } from '~/components/skeletons/tweets'
 import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
 import { MyTweet } from '~/components/tweet/Tweet'
@@ -61,6 +61,7 @@ export default function LastYearsTodayPage({ loaderData, params }: Route.Compone
   const reverse = searchParams.get('reverse') === 'true'
 
   const { tweets, status, setStatus, appendTweets, resetStream } = useTweetStore()
+  const revalidator = useRevalidator()
   const layoutData = useRouteLoaderData('rootLayout') as { activeUser: EnrichedUser | null }
   const user = layoutData?.activeUser
 
@@ -138,7 +139,7 @@ export default function LastYearsTodayPage({ loaderData, params }: Route.Compone
         <TweetFeedStatus
           status={status}
           hasTweets={tweets.length > 0}
-          onRetry={() => window.location.reload()}
+          onRetry={() => revalidator.revalidate()}
         />
 
         <InfiniteScrollTrigger

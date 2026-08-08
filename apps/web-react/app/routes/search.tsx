@@ -3,7 +3,7 @@ import type { PaginatedResponse } from '@tweets-viewer/shared'
 import type { Route } from './+types/search'
 import { PAGE_SIZE } from '@tweets-viewer/shared'
 import { useEffect, useRef } from 'react'
-import { useRouteLoaderData, useSearchParams } from 'react-router'
+import { useRevalidator, useRouteLoaderData, useSearchParams } from 'react-router'
 import { SearchInput } from '~/components/search-input'
 import { TweetsHydrateFallback } from '~/components/skeletons/tweets'
 import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
@@ -64,6 +64,7 @@ export default function SearchPage({ loaderData, params }: Route.ComponentProps)
   const username = params.name
 
   const { tweets, status, setStatus, appendTweets, resetStream } = useTweetStore()
+  const revalidator = useRevalidator()
   const layoutData = useRouteLoaderData('rootLayout') as { activeUser: EnrichedUser | null }
   const user = layoutData?.activeUser
 
@@ -145,7 +146,7 @@ export default function SearchPage({ loaderData, params }: Route.ComponentProps)
         <TweetFeedStatus
           status={status}
           hasTweets={tweets.length > 0}
-          onRetry={() => window.location.reload()}
+          onRetry={() => revalidator.revalidate()}
         />
 
         <InfiniteScrollTrigger
