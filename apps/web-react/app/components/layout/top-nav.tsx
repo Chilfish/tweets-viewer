@@ -3,7 +3,7 @@ import { Button } from '~/components/ui/button'
 import { useAppStore } from '~/store/use-app-store'
 import { UserSelector } from './user-selector'
 
-export function TopNav() {
+export function TopNav({ title }: { title?: string }) {
   const theme = useAppStore(s => s.theme)
   const setTheme = useAppStore(s => s.setTheme)
 
@@ -17,6 +17,9 @@ export function TopNav() {
   return (
     <div className="sticky top-0 z-50 bg-background/60 backdrop-blur-lg border-b border-border transition-colors duration-200">
       <div className="flex items-center py-1 px-4">
+        {title && (
+          <span className="font-semibold text-sm truncate">{title}</span>
+        )}
         <UserSelector />
 
         {/* Dark mode toggle */}
