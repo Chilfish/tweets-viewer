@@ -8,7 +8,7 @@
 
 | 编号 | 主题 | 根因归类 | 一句话教训 | 状态 |
 |---|---|---|---|---|
-| （暂无） | — | — | — | — |
+| [001](001-windows-symlink-mode-sticky.md) | Windows 下符号链接改普通文件后 index mode 残留 symlink | 工具反馈滞后 | symlink→file 迁移必须 `git rm --cached` + `git add` 刷新 mode，提交后核对 `git ls-files -s` | 已沉淀 |
 
 ## 高频雷区（写码前自查）
 
@@ -33,6 +33,7 @@
 
 - **文档滞后**：改功能先更新 Specification/API 文档再动代码，避免文档与实现漂移
 - **commit 过大**：>10 文件或 >200 行主动拆分，见 `docs/engineering/git-workflow.md`
+- **Windows symlink 迁移**：`core.symlinks=false` 时把已跟踪符号链接改为普通文件，仅 `git add` 不会刷新 index mode（仍 `120000`）；必须 `git rm --cached <file> && git add <file>` 强制重算，提交后核对 `git ls-files -s`（见 [001](001-windows-symlink-mode-sticky.md)）
 
 ## 如何新增一条 postmortem
 

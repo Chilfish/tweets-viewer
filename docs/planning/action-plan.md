@@ -27,8 +27,9 @@
 | T3 | DateRangeFilter + 日期范围查询参数 | ✅ 已完成 |
 | T4 | Calendar 迁移到 @daypicker/react v10 | ✅ 已完成 |
 | T5 | 服务端接受 date-only 日期值 | ✅ 已完成 |
-| T6 | 文档体系对标 Float（当前任务） | 🔄 进行中 |
-| T7 | CI 门禁（lint + test） | ⬜ 待办 |
+| T6 | 文档体系对标 Float（当前任务） | ✅ 已完成 |
+| T7 | CI 门禁（lint + test） | ✅ 已完成 |
+| T8 | postmortem 001：Windows symlink mode 残留 | ✅ 已沉淀 |
 
 ## 约定
 
