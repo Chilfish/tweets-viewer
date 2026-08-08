@@ -2,7 +2,7 @@ import type { EnrichedTweet, EnrichedUser } from '@tweets-viewer/rettiwt-api'
 import type { PaginatedResponse } from '@tweets-viewer/shared'
 import type { Route } from './+types/search'
 import { PAGE_SIZE } from '@tweets-viewer/shared'
-import { Search } from 'lucide-react'
+import { Search, SearchX } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { useRevalidator, useRouteLoaderData, useSearchParams } from 'react-router'
 import { SearchInput } from '~/components/search-input'
@@ -22,8 +22,8 @@ export function meta({ location }: Route.MetaArgs) {
   const params = new URLSearchParams(location.search)
   const q = params.get('q')
   return [
-    { title: q ? `Search: ${q}` : 'Search Tweets' },
-    { name: 'description', content: 'Search tweets' },
+    { title: q ? `搜索「${q}」` : '搜索归档' },
+    { name: 'description', content: '在归档中全文检索推文' },
   ]
 }
 
@@ -114,24 +114,29 @@ export default function SearchPage({ loaderData, params }: Route.ComponentProps)
   const renderContent = () => {
     if (!q) {
       return (
-        <div className="flex flex-col items-center justify-center py-20 text-muted-foreground gap-2">
-          <Search className="size-10 opacity-20" />
-          <div className="text-base">输入关键词开始搜索</div>
-          <div className="text-sm text-muted-foreground/70">
-            {username ? `在 @${username} 的归档中检索` : '支持全文检索归档推文'}
+        <div className="flex flex-col items-center justify-center py-20 text-center gap-3">
+          <div className="flex size-16 items-center justify-center rounded-full bg-muted/60">
+            <Search className="size-7 text-muted-foreground/60" />
           </div>
+          <p className="text-base font-medium">输入关键词开始搜索</p>
+          <p className="text-sm text-muted-foreground">
+            {username ? `在 @${username} 的归档中全文检索` : '支持全文检索归档推文'}
+          </p>
         </div>
       )
     }
 
     if (tweets.length === 0 && status !== 'fetching' && status !== 'error') {
       return (
-        <div className="flex flex-col items-center justify-center py-20 text-muted-foreground gap-2">
-          <div className="text-base">没有找到匹配的推文</div>
-          <div className="text-sm text-muted-foreground/70">
+        <div className="flex flex-col items-center justify-center py-20 text-center gap-3">
+          <div className="flex size-16 items-center justify-center rounded-full bg-muted/60">
+            <SearchX className="size-7 text-muted-foreground/60" />
+          </div>
+          <p className="text-base font-medium">没有找到匹配的推文</p>
+          <p className="text-sm text-muted-foreground">
             换个关键词试试
             {username ? '，或清除用户筛选' : ''}
-          </div>
+          </p>
         </div>
       )
     }
@@ -164,14 +169,43 @@ export default function SearchPage({ loaderData, params }: Route.ComponentProps)
 
   return (
     <>
-      <SearchInput
-        user={user ?? undefined}
-        defaultValue={q || serverQ}
-        placeholder={username ? `Search tweets by ${username}...` : 'Search tweets...'}
-        className="px-4 w-full mx-auto"
-      />
+      {/* 搜索工具栏：与时间线/媒体同一 sticky glass 材质，滚动不消失 */}
+      <div className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-xl border-b border-border/40 transition-all">
+        <div className="w-full max-w-2xl mx-auto px-4 py-2 flex items-center gap-3">
+          <SearchInput
+            user={user ?? undefined}
+            defaultValue={q || serverQ}
+            placeholder={username ? `搜索 @${username} 的推文` : '搜索全部归档推文'}
+            className="flex-1"
+          />
+          {username && (
+            <span className="hidden sm:inline-flex shrink-0 items-center text-xs text-muted-foreground">
+              在 @
+              {username}
+              {' '}
+              中
+            </span>
+          )}
+        </div>
+      </div>
 
       <div className="w-full max-w-3xl flex flex-col gap-4 mt-4 mb-16">
+        {q && tweets.length > 0 && (
+          <div className="flex items-baseline gap-2 px-1">
+            <span className="text-sm font-semibold text-foreground">
+              「
+              {q}
+              」
+            </span>
+            <span className="text-xs text-muted-foreground">
+              ·
+              {' '}
+              {paginatedTweets.meta?.total ?? 0}
+              {' '}
+              条结果
+            </span>
+          </div>
+        )}
         {renderContent()}
       </div>
     </>
