@@ -3,7 +3,7 @@ import type { PaginatedResponse } from '@tweets-viewer/shared'
 import type { Route } from './+types/last-years-today'
 import { PAGE_SIZE } from '@tweets-viewer/shared'
 import { isAxiosError } from 'axios'
-import { CalendarDays, History } from 'lucide-react'
+import { History } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { useRevalidator, useRouteLoaderData, useSearchParams } from 'react-router'
 import { TweetsHydrateFallback } from '~/components/skeletons/tweets'
@@ -65,31 +65,20 @@ function YearDivider({ year, className }: { year: number, className?: string }) 
   )
 }
 
-/** 「那年今日」仪式感头部：大字日期 + 回忆总数。 */
-function RitualHeader({ name, totalCount }: { name: string, totalCount: number }) {
+/** 「那年今日」仪式感头部：大字日期 + 回忆总数（@name 不重复，上方已有 ProfileHeader）。 */
+function RitualHeader({ totalCount }: { totalCount: number }) {
   const todayLabel = new Date().toLocaleDateString('zh-CN', { month: 'long', day: 'numeric' })
   return (
-    <div className="flex flex-col items-center gap-1 px-4 pb-4 pt-8 text-center">
-      <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/50">
-        <CalendarDays className="size-3.5" />
-        那年今日 · On This Day
-      </div>
-      <h1 className="mt-1 bg-linear-to-b from-foreground to-foreground/60 bg-clip-text text-6xl font-bold tracking-tight text-transparent md:text-7xl">
+    <div className="flex flex-col items-center gap-1 px-4 pb-5 pt-6 text-center">
+      <h1 className="bg-linear-to-b from-foreground to-foreground/70 bg-clip-text text-6xl font-bold tracking-tight text-transparent md:text-7xl">
         {todayLabel}
       </h1>
-      <p className="mt-1 text-sm text-muted-foreground">
-        @
-        {name}
-        {' '}
-        在往年今天留下过
-        <span className="font-semibold text-foreground">
-          {' '}
-          {totalCount}
-          {' '}
-        </span>
+      <p className="mt-1.5 text-sm text-muted-foreground">
+        往年今日，共
+        <span className="mx-1 font-semibold text-foreground">{totalCount}</span>
         条回忆
       </p>
-      <div className="mt-5 h-px w-16 bg-border" />
+      <div className="mt-5 h-px w-12 bg-border/70" />
     </div>
   )
 }
@@ -166,7 +155,7 @@ export default function LastYearsTodayPage({ loaderData, params }: Route.Compone
               {group.tweets.map(tweet => (
                 <MyTweet
                   tweet={tweet}
-                  tweetAuthorName={user?.fullName ?? name ?? ''}
+                  tweetAuthorName={user?.fullName ?? params.name ?? ''}
                   key={tweet.id}
                 />
               ))}
@@ -193,12 +182,12 @@ export default function LastYearsTodayPage({ loaderData, params }: Route.Compone
       <div className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-xl border-b border-border/40 transition-all">
         <div className="w-full max-w-2xl mx-auto px-4 flex items-center justify-between gap-4">
           <TweetNavigation totalPages={totalPages} />
-          <TweetsToolbarActions hideComments />
+          <TweetsToolbarActions hideComments hideDateRange />
         </div>
       </div>
 
       <div className="w-full max-w-3xl flex flex-col gap-4 mt-4 mb-16">
-        <RitualHeader name={params.name ?? ''} totalCount={totalCount} />
+        <RitualHeader totalCount={totalCount} />
         {renderTweets()}
       </div>
     </>

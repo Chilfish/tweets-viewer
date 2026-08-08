@@ -27,7 +27,7 @@ export function HomeMemoEntry() {
 
       <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/50">
         <CalendarDays className="size-3.5" />
-        那年今日 · On This Day
+        那年今日
       </div>
 
       <h2 className="mt-1 text-5xl font-bold tracking-tight text-foreground">
@@ -38,7 +38,7 @@ export function HomeMemoEntry() {
         @
         {memoUser.userName}
         {' '}
-        在往年今天留下的回忆
+        往年今日留下的回忆
       </p>
 
       <span className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-primary">

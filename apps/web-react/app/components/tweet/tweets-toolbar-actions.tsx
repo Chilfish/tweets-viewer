@@ -8,10 +8,12 @@ import { cn } from '~/lib/utils'
 
 interface Props {
   hideComments?: boolean
+  /** 隐藏日期范围筛选（如「那年今日」等按日聚合的页面，API 不支持 start/end） */
+  hideDateRange?: boolean
   className?: string
 }
 
-export function TweetsToolbarActions({ className, hideComments = false }: Props) {
+export function TweetsToolbarActions({ className, hideComments = false, hideDateRange = false }: Props) {
   const [searchParams, setSearchParams] = useSearchParams()
 
   const isReverse = searchParams.get('reverse') === 'true'
@@ -79,11 +81,15 @@ export function TweetsToolbarActions({ className, hideComments = false }: Props)
         )
       }
 
-      <DateRangeFilter
-        start={startDateStr ? new Date(startDateStr) : undefined}
-        end={endDateStr ? new Date(endDateStr) : undefined}
-        onApply={applyDateRange}
-      />
+      {
+        !hideDateRange && (
+          <DateRangeFilter
+            start={startDateStr ? new Date(startDateStr) : undefined}
+            end={endDateStr ? new Date(endDateStr) : undefined}
+            onApply={applyDateRange}
+          />
+        )
+      }
     </div>
   )
 }
