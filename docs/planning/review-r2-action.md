@@ -79,10 +79,10 @@
 
 | # | 任务 | 文件 | 状态 |
 |---|---|---|---|
-| P0-1 | 删除 `use-paginated-data.ts` 死代码 | `lib/use-paginated-data.ts` | ⬜ |
-| P0-2 | `media.tsx` 并入 URL 驱动分页 | `routes/media.tsx` | ⬜ |
-| P0-3 | 修 `ins.tsx` hydration bug，去 workaround | `routes/ins.tsx`, `root.tsx` | ⬜ |
-| P0-4 | 重试机制改为行内重试（去 reload） | `tweet/TweetFeedStatus.tsx` + 各 route | ⬜ |
+| P0-1 | 删除 `use-paginated-data.ts` 死代码 | `lib/use-paginated-data.ts` | ✅ 已完成 |
+| P0-2 | `media.tsx` 并入 URL 驱动分页 | `routes/media.tsx` | ✅ 已完成 |
+| P0-3 | 修 `ins.tsx` 错误处理，去 workaround | `routes/ins.tsx` | ✅ 已完成 |
+| P0-4 | 重试机制改为行内重试（去 reload） | `tweet/TweetFeedStatus.tsx` + 各 route | ✅ 已完成 |
 
 ### P1 — 产品表达
 
