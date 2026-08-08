@@ -8,12 +8,15 @@ import { IGPostSkeleton } from '~/components/ins/IGPostSkeleton'
 import { InstagramPostCard } from '~/components/ins/InstagramPostCard'
 import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
 import { TweetNavigation } from '~/components/tweet/TweetNavigation'
+import { Button } from '~/components/ui/button'
 import { apiClient } from '~/lib/utils'
 import { useIGStore } from '~/store/use-ig-store'
 
 interface InsLoaderData {
   user: IGUserInfo | null
   posts: PaginatedResponse<IGPost>
+  /** 加载失败时的错误信息（区别于 404 空态：404 是"无 IG 归档"业务态，不设 error） */
+  error?: string | null
 }
 
 export function meta({ params }: Route.MetaArgs) {
@@ -41,27 +44,27 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
     return data
   }
   catch (err) {
-    // Return empty data so the component renders its empty-state UI,
-    // avoiding the root ErrorBoundary's hydration bug.
-    // Only log unexpected errors; 404 is expected for users without IG data.
-    if (isAxiosError(err) && err.response) {
-      if (err.response.status !== 404) {
-        console.error(`IG load failed (${err.response.status}):`, err.message)
-      }
-    }
-    else {
-      console.error('IG load failed:', err)
+    // 404 = 该用户无 IG 归档，属正常业务态：返回空数据让组件渲染空态 UI，
+    // 而非抛给 root ErrorBoundary（会整页替换、且 SSR 首屏 hydration 时错位）。
+    // 其他错误（网络/5xx）显式传给组件渲染"加载失败"，不伪装成空态。
+    if (isAxiosError(err) && err.response?.status === 404) {
+      return {
+        posts: { data: [], meta: { total: 0, page: 0, pageSize: 0, hasMore: false } },
+        user: null,
+      } as InsLoaderData
     }
 
+    console.error('IG load failed:', err)
     return {
       posts: { data: [], meta: { total: 0, page: 0, pageSize: 0, hasMore: false } },
       user: null,
+      error: 'Instagram 数据加载失败，请重试',
     } as InsLoaderData
   }
 }
 
 export default function InsPage({ loaderData, params }: Route.ComponentProps) {
-  const { posts: paginatedPosts } = loaderData
+  const { posts: paginatedPosts, error } = loaderData
   const [searchParams, setSearchParams] = useSearchParams()
 
   const page = Number(searchParams.get('page')) || 1
@@ -91,6 +94,24 @@ export default function InsPage({ loaderData, params }: Route.ComponentProps) {
       setStatus('ready')
     }
   }, [paginatedPosts, filterKey, page, resetStream, appendPosts, setStatus])
+
+  // --- Error state: loader 显式标记的加载失败（区别于 404 空态）
+  if (error) {
+    return (
+      <div className="w-full max-w-3xl mx-auto flex flex-col items-center justify-center py-20 gap-3 text-center">
+        <div className="text-5xl mb-2">⚠️</div>
+        <p className="text-lg font-semibold">加载失败</p>
+        <p className="text-sm text-muted-foreground max-w-md">{error}</p>
+        <Button
+          variant="secondary"
+          className="mt-2"
+          onClick={() => window.location.reload()}
+        >
+          重新加载
+        </Button>
+      </div>
+    )
+  }
 
   // --- Empty state (defensive: server should 404 in this case, but just in case)
   if (!paginatedPosts.meta.total && paginatedPosts.data.length === 0) {
