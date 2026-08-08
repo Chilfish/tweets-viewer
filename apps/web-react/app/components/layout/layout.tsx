@@ -42,7 +42,14 @@ export async function clientLoader({ params, request }: ClientLoaderFunctionArgs
   }
 
   // Tweet 路线：获取 Twitter 用户列表
-  const { users, isInitialized, setUsers, setInitialized, setActiveUser } = useUserStore.getState()
+  const {
+    users,
+    isInitialized,
+    setUsers,
+    setInitialized,
+    setActiveUser,
+    pushRecentUser,
+  } = useUserStore.getState()
   let allUsers = users
   if (!isInitialized || allUsers.length === 0) {
     const usersRes = await apiClient.get<EnrichedUser[]>(`/users/all`)
@@ -53,6 +60,9 @@ export async function clientLoader({ params, request }: ClientLoaderFunctionArgs
 
   const activeUser = allUsers.find(user => user.userName === name) || null
   setActiveUser(activeUser)
+  // 记录最近浏览（首页「最近浏览/继续浏览」入口依赖此数据）
+  if (activeUser)
+    pushRecentUser(activeUser.userName ?? '')
 
   return { activeUser, allUsers, igUser: null }
 }

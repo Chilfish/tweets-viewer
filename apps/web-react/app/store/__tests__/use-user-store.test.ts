@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { useUserStore } from '../use-user-store'
 
 describe('useUserStore', () => {
@@ -26,5 +26,32 @@ describe('useUserStore', () => {
   it('should set initialized', () => {
     useUserStore.getState().setInitialized(true)
     expect(useUserStore.getState().isInitialized).toBe(true)
+  })
+})
+
+describe('useUserStore pushRecentUser', () => {
+  beforeEach(() => {
+    useUserStore.setState({ recentUserNames: [] })
+  })
+
+  it('should prepend new user names', () => {
+    useUserStore.getState().pushRecentUser('alice')
+    useUserStore.getState().pushRecentUser('bob')
+    expect(useUserStore.getState().recentUserNames).toEqual(['bob', 'alice'])
+  })
+
+  it('should dedupe and move existing name to front', () => {
+    useUserStore.getState().pushRecentUser('alice')
+    useUserStore.getState().pushRecentUser('bob')
+    useUserStore.getState().pushRecentUser('alice')
+    expect(useUserStore.getState().recentUserNames).toEqual(['alice', 'bob'])
+  })
+
+  it('should cap the recent list at MAX_RECENT_USERS', () => {
+    const names = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+    names.forEach(name => useUserStore.getState().pushRecentUser(name))
+    const recent = useUserStore.getState().recentUserNames
+    expect(recent).toEqual(['g', 'f', 'e', 'd', 'c', 'b'])
+    expect(recent).toHaveLength(6)
   })
 })
