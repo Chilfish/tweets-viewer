@@ -98,7 +98,7 @@
 |---|---|---|
 | P2-1 | 统一 `react-tweet` fork 与自研 Tweet 渲染 | ✅ 已完成 |
 | P2-2 | 清理未使用的 UI 组件 | ✅ 已完成 |
-| P2-3 | 补 web UI 测试（Storybook + 组件测试） | 🔄 进行中 |
+| P2-3 | 补 web UI 测试（Storybook + 组件测试） | ✅ 已完成 |
 
 #### P2-1 统一 Tweet 渲染 — 分析与处置范围
 
@@ -125,6 +125,8 @@
 - **清 vite `optimizeDeps` 残留**：`@base-ui/react/{accordion,checkbox,select,switch,toast,toggle,tooltip}`
 
 #### P2-3 补 web UI 测试 — 处置范围
+
+> ✅ **已完成（2026-08-09）**：装 @testing-library/react + jest-dom + user-event + jsdom；vitest 拆两项目（`unit` 常规测试 / `stories` addon-vitest portable stories，因 storybookTest 插件会覆盖 `test.include` 必须分项目）；根级 v8 coverage；补 `MyTweet`（正文/作者/转推/媒体/链接卡/引用推）与首页入口（user-entry / memo-entry）组件测试。web 测试 **19 → 38**（unit 32 + stories 6）。验证：typecheck ✅ lint ✅ 38 tests ✅ build ✅
 
 现有 19 用例全为纯逻辑测试（store/lib），0 组件渲染测试、6 个路由页面零覆盖。Storybook 已配 4 addon 但 addon-vitest 未接入 vitest。
 
