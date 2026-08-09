@@ -56,3 +56,5 @@ cache*/
 .env*.local
 wrangler.json
 .alma-snapshots
+coverage
+coverage/
