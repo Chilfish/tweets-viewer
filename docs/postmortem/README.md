@@ -9,6 +9,7 @@
 | 编号 | 主题 | 根因归类 | 一句话教训 | 状态 |
 |---|---|---|---|---|
 | [001](001-windows-symlink-mode-sticky.md) | Windows 下符号链接改普通文件后 index mode 残留 symlink | 工具反馈滞后 | symlink→file 迁移必须 `git rm --cached` + `git add` 刷新 mode，提交后核对 `git ls-files -s` | 已沉淀 |
+| [002](002-vitest-component-test-infra.md) | Storybook addon-vitest 接入吞掉 test.include + Vitest 4 projects 配置踩坑 | 工具反馈滞后 | 会接管 include 的测试插件必须用 vitest projects 拆分，跑完核对 Test Files 数量防静默吞测试 | 已沉淀 |
 
 ## 高频雷区（写码前自查）
 
@@ -28,6 +29,7 @@
 | 只写浅色 | 所有组件必须兼容 `.dark` 模式 |
 | 字符串拼类名 | 用 `cn()` |
 | `@/` 导入 | 用 `~/` 前缀 |
+| 测试插件接管 include | `storybookTest()` 会覆盖 `test.include` → 用 vitest `test.projects` 拆分 story 与常规测试；子项目不继承 tsconfig paths / coverage 仅根级；RTL 自动 cleanup 依赖全局 `afterEach`，关 globals 时在 setup 显式 `afterEach(cleanup)`；跑完核对 Test Files 数量（见 [002](002-vitest-component-test-infra.md)） |
 
 ### 3. 流程（非代码，简要记录）
 
