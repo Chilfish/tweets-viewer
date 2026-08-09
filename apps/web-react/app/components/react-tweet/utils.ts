@@ -1,10 +1,5 @@
 import type { MediaAnimatedGif, MediaDetails, MediaVideo } from '@tweets-viewer/rettiwt-api'
 
-export interface TweetCoreProps {
-  id: string
-  onError?: (error: any) => any
-}
-
 export function getMediaUrl(media: MediaDetails, size: 'small' | 'medium' | 'large'): string {
   const url = new URL(media.media_url_https)
   const extension = url.pathname.split('.').pop()
@@ -80,43 +75,4 @@ export function formatDate(
     .replace('HH', hours)
     .replace('mm', minutes)
     .replace('ss', seconds)
-}
-
-const DATE_KEYS = [
-  'createdAt',
-  'updatedAt',
-  'date',
-  'time',
-  'timestamp',
-  'created_at',
-  'updated_at',
-  'date_time',
-  'time_stamp',
-  'startDate',
-  'endDate',
-  'start_date',
-  'end_date',
-]
-
-export function convertDate(obj: Record<string, any>, keys: string[] = DATE_KEYS) {
-  for (const [key, value] of Object.entries(obj)) {
-    if (value === null) {
-      continue
-    }
-    if (typeof value === 'object') {
-      convertDate(value)
-      continue
-    }
-    if (!keys.includes(key)) {
-      continue
-    }
-    if (typeof value !== 'string') {
-      continue
-    }
-
-    const date = new Date(value)
-    if (!Number.isNaN(date.getTime())) {
-      obj[key] = date
-    }
-  }
 }
