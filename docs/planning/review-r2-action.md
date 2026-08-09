@@ -96,11 +96,13 @@
 
 | # | 任务 | 状态 |
 |---|---|---|
-| P2-1 | 统一 `react-tweet` fork 与自研 Tweet 渲染 | 🔄 进行中 |
-| P2-2 | 清理未使用的 UI 组件 | 🔄 进行中 |
+| P2-1 | 统一 `react-tweet` fork 与自研 Tweet 渲染 | ✅ 已完成 |
+| P2-2 | 清理未使用的 UI 组件 | ✅ 已完成 |
 | P2-3 | 补 web UI 测试（Storybook + 组件测试） | 🔄 进行中 |
 
 #### P2-1 统一 Tweet 渲染 — 分析与处置范围
+
+> ✅ **已完成（2026-08-09）**：修 `is_inline_meida` → `is_inline_media` 拼写 bug（含删类型 typo 字段）；删 fork 死文件（tweet-not-found / fork tweet-skeleton / skeleton.tsx）+ barrel 修剪；删 utils 死导出（TweetCoreProps / convertDate）；删自研死组件 `TweetPagination`。验证：typecheck ✅ lint ✅ 19 tests ✅
 
 **分析结论**：主线本就单链（所有页面统一 `MyTweet → TweetNode → fork 子组件`），不存在真并行渲染线。真实债是合并残留的**死代码 + 一个字段拼写 bug**。
 
@@ -111,6 +113,8 @@
 - **工具函数重复（记录不处理）**：`formatDate` 3 份（fork/shared/lib）、`snowId2millis/pubTime` 2 份、视频代理 URL 拼接 3 处 —— 行为耦合且跨包，不属本次清扫，另行评估
 
 #### P2-2 清理未用 UI 组件 — 处置范围（用户已确认「全部删除」）
+
+> ✅ **已完成（2026-08-09）**：删除全部 33 个未用组件 + P2-1 连锁的 `ui/pagination` + 孤儿 `hooks/use-infinite-scroll`；移除 12 个僵尸 npm 依赖；修剪 6 个 optimizeDeps 条目；同步设计文档（`OVERVIEW.md` §7 索引收敛到实际 15 个组件、`GENERAL.md` 删 Card/Dialog/Toast 段、删 `SETTINGS.md` 与 `select-best-practices.md`——两者描述的 settings-layout 从未实现且 Switch/Select 已删）。验证：typecheck ✅ lint ✅ 19 tests ✅ build ✅
 
 `ui/` 下 48 个组件，**33 个无人引用**（14 个在用 + 2 个仅作内部依赖 input/textarea 保留）：
 
