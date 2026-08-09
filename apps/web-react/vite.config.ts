@@ -56,7 +56,6 @@ export default defineConfig({
     include: [
       // base-ui
       '@base-ui/react/avatar',
-      '@base-ui/react/checkbox',
       '@base-ui/react/dialog',
       '@base-ui/react/field',
       '@base-ui/react/input',
@@ -64,12 +63,7 @@ export default defineConfig({
       '@base-ui/react/merge-props',
       '@base-ui/react/popover',
       '@base-ui/react/scroll-area',
-      '@base-ui/react/select',
-      '@base-ui/react/switch',
       '@base-ui/react/tabs',
-      '@base-ui/react/toast',
-      '@base-ui/react/toggle',
-      '@base-ui/react/tooltip',
       '@base-ui/react/use-render',
       // utilities
       'axios',
