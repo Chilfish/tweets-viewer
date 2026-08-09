@@ -96,9 +96,38 @@
 
 | # | 任务 | 状态 |
 |---|---|---|
-| P2-1 | 统一 `react-tweet` fork 与自研 Tweet 渲染 | ⬜ |
-| P2-2 | 清理未使用的 UI 组件 | ⬜ |
-| P2-3 | 补 web UI 测试（Storybook + 组件测试） | ⬜ |
+| P2-1 | 统一 `react-tweet` fork 与自研 Tweet 渲染 | 🔄 进行中 |
+| P2-2 | 清理未使用的 UI 组件 | 🔄 进行中 |
+| P2-3 | 补 web UI 测试（Storybook + 组件测试） | 🔄 进行中 |
+
+#### P2-1 统一 Tweet 渲染 — 分析与处置范围
+
+**分析结论**：主线本就单链（所有页面统一 `MyTweet → TweetNode → fork 子组件`），不存在真并行渲染线。真实债是合并残留的**死代码 + 一个字段拼写 bug**。
+
+- **修 bug**：`react-tweet/tweet-media.tsx:36` 读 `tweet.is_inline_meida`（typo），数据源写 `is_inline_media`；类型 `packages/rettiwt-api/types/enriched/index.ts:45-46` 两个字段**都声明了**，typecheck 漏过 → inline 媒体布局分支（`flex flex-col gap-0`）永不触发。修读端 + 删 typo 字段
+- **删 fork 死文件**：`react-tweet/tweet-not-found.tsx`（零引用）、`react-tweet/tweet-skeleton.tsx`（与自研 `tweet/tweet-skeleton.tsx` 重复且后者活）、`react-tweet/skeleton.tsx`（未进 barrel，整文件死）
+- **清 utils 死导出**：`TweetCoreProps`（接口，零引用）、`convertDate`（与 `@tweets-viewer/shared` 逐行相同，零引用）
+- **删自研死组件**：`tweet/TweetPagination.tsx`（零引用，与活着的 `TweetNavigation` 功能重复）→ 连锁使 `ui/pagination.tsx` 变为死代码，归入 P2-2
+- **工具函数重复（记录不处理）**：`formatDate` 3 份（fork/shared/lib）、`snowId2millis/pubTime` 2 份、视频代理 URL 拼接 3 处 —— 行为耦合且跨包，不属本次清扫，另行评估
+
+#### P2-2 清理未用 UI 组件 — 处置范围（用户已确认「全部删除」）
+
+`ui/` 下 48 个组件，**33 个无人引用**（14 个在用 + 2 个仅作内部依赖 input/textarea 保留）：
+
+- **删 4 个仅文档引用**：`card` / `dialog` / `select` / `switch`（`docs/ui-design/components/GENERAL.md`、`SETTINGS.md`、`select-best-practices.md` 提及）→ 同步更新文档
+- **删 29 个零引用**：accordion / alert-dialog / alert / autocomplete / breadcrumb / checkbox / checkbox-group / collapsible / empty / field / fieldset / form / frame / group / kbd / label / meter / preview-card / progress / radio-group / slider / spinner / table / toast / toggle / toolbar / tooltip / waterfall（`alert` 仅被未用的 `waterfall` 引用，连锁删）
+- **删重复实现**：`menu`（≈ `dropdown-menu`，后者在用）、`ui/spinner`（≈ `components/spinner`，后者在用）、`ui/pagination`（P2-1 连锁）
+- **删 12 个僵尸 npm 依赖**（web-react 源码零 import）：cmdk / input-otp / vaul / recharts / react-resizable-panels / embla-carousel-react / sonner / next-themes / react-hook-form / @hookform/resolvers / yet-another-react-lightbox / zod
+- **清 vite `optimizeDeps` 残留**：`@base-ui/react/{accordion,checkbox,select,switch,toast,toggle,tooltip}`
+
+#### P2-3 补 web UI 测试 — 处置范围
+
+现有 19 用例全为纯逻辑测试（store/lib），0 组件渲染测试、6 个路由页面零覆盖。Storybook 已配 4 addon 但 addon-vitest 未接入 vitest。
+
+- 装 `@testing-library/react` + `@testing-library/jest-dom` + `jsdom`（或复用 workspace 已有 happy-dom）
+- `vitest.config.ts` 扩展 DOM environment + setupFiles + coverage
+- 接入 Storybook addon-vitest portable stories（现有 6 story → 自动变测试）
+- 补关键组件测试：`MyTweet`/`TweetNode`（核心内容组件）、首页入口（user-entry / memo-entry）等
 
 ## 五、执行纪律
 
