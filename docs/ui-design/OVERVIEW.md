@@ -213,14 +213,13 @@
 
 ## 7. 组件文件索引（Component Index）
 
-所有 UI 组件位于 `~/components/ui/`（即 `app/components/ui/`）。
+所有 UI 组件位于 `~/components/ui/`（即 `app/components/ui/`）。以下为**实际存在的组件**（未列出的组件尚未实现，使用时需先按需创建或复用 Base UI 原语）。
 
 ### 布局与导航
 
-- `sidebar.tsx` — 完整侧边栏系统
-- `breadcrumb.tsx` — 面包屑导航
 - `tabs.tsx` — 标签页（default / underline 变体）
 - `scroll-area.tsx` — 自定义滚动条
+- `separator.tsx` — 分割线
 
 ### 表单与输入
 
@@ -228,59 +227,19 @@
 - `input.tsx` — 输入框（sm / default / lg 尺寸）
 - `input-group.tsx` — 带前缀/后缀的输入组
 - `textarea.tsx` — 文本域
-- `select.tsx` — 选择器（需 `getLabel`）
-- `combobox.tsx` — 组合框（多选支持）
-- `autocomplete.tsx` — 自动完成
-- `checkbox.tsx` / `checkbox-group.tsx` — 复选框
-- `radio-group.tsx` — 单选组
-- `switch.tsx` — 开关
-- `slider.tsx` — 滑块
-- `number-field.tsx` — 数字输入
-- `otp-field.tsx` — OTP 验证码输入
-- `toggle.tsx` / `toggle-group.tsx` — 切换按钮
-- `calendar.tsx` — 日期选择器
-- `field.tsx` / `fieldset.tsx` / `form.tsx` — 表单结构
+- `calendar.tsx` — 日期选择器（基于 @daypicker/react）
 
 ### 浮层与反馈
 
-- `dialog.tsx` — 模态对话框（带 backdrop-blur）
-- `drawer.tsx` — 抽屉（4 方向 + 手势关闭）
-- `sheet.tsx` — 侧面板
-- `alert-dialog.tsx` — 确认对话框
-- `toast.tsx` — Toast 通知系统
-- `tooltip.tsx` — 工具提示
-- `popover.tsx` — 弹出框
-- `preview-card.tsx` — 悬停预览卡
+- `sheet.tsx` — 侧面板（移动端底部抽屉）
 - `dropdown-menu.tsx` — 下拉菜单
-- `command.tsx` — 命令面板
+- `popover.tsx` — 弹出框
 
 ### 数据展示
 
-- `card.tsx` — 卡片容器
-- `table.tsx` — 表格
 - `badge.tsx` — 徽章
 - `avatar.tsx` — 头像
-- `kbd.tsx` — 键盘快捷键
-- `progress.tsx` — 进度条
-- `meter.tsx` — 计量表
 - `skeleton.tsx` — 骨架屏
-- `empty.tsx` — 空状态
-- `alert.tsx` — 提示横幅
-- `pagination.tsx` — 分页
-
-### 特殊组件
-
-- `settings-layout.tsx` — **设置页面专用**（SettingsGroup + SettingsItem）
-- `image-previewer.tsx` — 图片/视频预览器
 - `media.tsx` — 媒体加载状态
-- `frame.tsx` — 通用面板布局
-- `group.tsx` — 按钮组
-- `separator.tsx` — 分割线
-- `collapsible.tsx` — 折叠面板
-- `accordion.tsx` — 手风琴
 
-> **具体组件的使用规范请参考：**
->
-> - **[GENERAL.md](./components/GENERAL.md)** — 按钮、输入框、卡片等通用原子组件规范
-> - **[SETTINGS.md](./components/SETTINGS.md)** — 设置页面的强制布局模式
-> - **[select-best-practices.md](./components/select-best-practices.md)** — Select 组件 API 规范
+> **具体组件的使用规范请参考：[GENERAL.md](./components/GENERAL.md)** — 按钮、输入框、图标等通用原子组件规范。

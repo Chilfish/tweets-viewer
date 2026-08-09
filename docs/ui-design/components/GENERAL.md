@@ -18,7 +18,7 @@
 // ✅ 正确
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
-import { Card, CardHeader, CardContent } from '~/components/ui/card'
+import { InputGroup, InputGroupAddon } from '~/components/ui/input-group'
 
 // ❌ 错误
 import { Button } from '@/components/ui/button'  // 不要用 @/
@@ -150,79 +150,15 @@ import { SearchIcon } from 'lucide-react'
 
 ---
 
-## 3. 卡片（Card）
-
-导入路径：`~/components/ui/card`
-
-### 3.1 使用规则
-
-```tsx
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '~/components/ui/card'
-
-<Card>
-  <CardHeader>
-    <CardTitle>标题</CardTitle>
-    <CardDescription>描述文字</CardDescription>
-  </CardHeader>
-  <CardContent>
-    {/* 主要内容 */}
-  </CardContent>
-  <CardFooter>
-    <Button variant="outline">取消</Button>
-    <Button>确认</Button>
-  </CardFooter>
-</Card>
-```
-
-### 3.2 禁止事项
-
-- **禁止在 SettingsGroup 内嵌套 Card** — 设置列表使用 SettingsGroup
-- **禁止在 CardContent 内再嵌套独立 Card** — 如需分区，使用 `Frame` 或多 Card 并列
-
----
-
 ## 4. 浮层（Overlays）
 
-### 4.1 Dialog（模态框）
+### 4.1 Sheet（移动端底部面板 / 桌面侧面板）
 
-导入路径：`~/components/ui/dialog`
-
-```tsx
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '~/components/ui/dialog'
-
-<Dialog open={open} onOpenChange={setOpen}>
-  <DialogContent>
-    <DialogHeader>
-      <DialogTitle>确认删除</DialogTitle>
-      <DialogDescription>此操作不可撤销。</DialogDescription>
-    </DialogHeader>
-    {/* 内容 */}
-  </DialogContent>
-</Dialog>
-```
-
-**特性：**
-
-- 默认已含 `backdrop-blur-sm` 背景模糊
-- 默认已含进出动画
-- 移动端可使用 `bottomStickOnMobile` 属性使其固定在底部
-
-### 4.2 Drawer / Sheet（移动端底部面板）
-
-导入路径：`~/components/ui/drawer` 或 `~/components/ui/sheet`
+导入路径：`~/components/ui/sheet`
 
 - **移动端优先：** 在 `<768px` 下自动展示为底部抽屉，支持拖拽关闭
 - **Grabber：** 顶部有灰色短横线指示可拖拽
-
-### 4.3 Toast（通知）
-
-导入路径：`~/components/ui/toast`
-
-应用已在 `root.tsx` 中全局挂载 `<ToastProvider>` 和 `<AnchoredToastProvider>`，组件内直接使用 hook 即可。
-
-- **桌面端：** 默认右下角
-- **移动端：** 顶部居中（避免遮挡键盘）
-- **样式预设：** `bg-background border shadow-lg rounded-xl`
+- 媒体查看器、日期范围筛选等场景已使用 `Sheet`
 
 ---
 
@@ -293,7 +229,6 @@ const isTouch = useMediaQuery({ pointer: 'coarse' })  // 触摸设备
 | --------------------------------------------------------------- | ---------------------------------------------------------------------- |
 | `<button className="bg-blue-500 text-white rounded px-4 py-2">` | `<Button>`                                                             |
 | `<div className="absolute left-2 top-1/2"><Icon /></div>`       | `<InputGroup><InputGroupAddon><Icon /></InputGroupAddon></InputGroup>` |
-| `<div className="bg-white rounded-xl shadow p-6">`              | `<Card><CardContent>...</CardContent></Card>`                          |
 | `className="border-b border-gray-200"` 在设置列表               | 使用 `SettingsItem`，自动处理分割线                                    |
 | `text-black dark:text-white`                                    | `text-foreground`                                                      |
 | `bg-white dark:bg-gray-900`                                     | `bg-background` 或 `bg-card`                                           |
