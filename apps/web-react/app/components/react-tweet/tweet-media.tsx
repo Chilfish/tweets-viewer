@@ -33,7 +33,7 @@ interface Props {
 
 export function TweetMedia({ tweet, quoted, onMediaClick }: Props) {
   const length = tweet.media_details?.length ?? 0
-  const isInlineMedia = !!tweet.is_inline_meida
+  const isInlineMedia = !!tweet.is_inline_media
 
   // 只有一个图片，且是竖屏
   const onlyHasOnePhotoPortrait = length === 1

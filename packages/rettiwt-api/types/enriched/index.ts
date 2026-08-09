@@ -42,7 +42,6 @@ export type EnrichedTweet = Omit<Tweet, OmitTypes> & {
   quoted_tweet?: EnrichedTweet
   card?: LinkPreviewCard
   retweeted_original_id?: string
-  is_inline_meida?: boolean
   is_inline_media?: boolean
   reply_count?: number
   like_count?: number
