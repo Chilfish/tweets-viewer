@@ -105,6 +105,8 @@ export async function getInsPosts({ db, username, page, pageSize = PAGE_SIZE }: 
   page: number
   pageSize?: number
 }): Promise<PaginatedResponse<IGPost>> {
+  // 设计决策：ins_posts 量级小（数千级），保持 OFFSET 分页即可，不引入 keyset 游标。
+  // 与 tweets 流（万级 + 无限滚动深翻页）不同，IG 帖子列表无需深翻页优化。
   const offset = (page - 1) * pageSize
 
   const [totalResult, rows] = await Promise.all([

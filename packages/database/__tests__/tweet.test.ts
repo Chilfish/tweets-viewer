@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { mapToEnrichedTweet } from '../modules/tweet'
+import { extractTweetSortKey, mapToEnrichedTweet } from '../modules/tweet'
 
 const mockTweet = {
   id: 1,
@@ -29,5 +29,20 @@ describe('mapToEnrichedTweet', () => {
   it('should preserve tweet id', () => {
     const result = mapToEnrichedTweet(mockTweet as any)
     expect(result.id).toBe('1234567890')
+  })
+})
+
+describe('extractTweetSortKey', () => {
+  it('should fall back to tweetId when no retweet', () => {
+    const row = { tweetId: '1234567890', jsonData: { retweeted_original_id: undefined } }
+    expect(extractTweetSortKey(row as any)).toBe('1234567890')
+  })
+
+  it('should prefer retweeted_original_id (retweets follow original timeline)', () => {
+    const row = {
+      tweetId: '2222222222',
+      jsonData: { retweeted_original_id: '1111111111' },
+    }
+    expect(extractTweetSortKey(row as any)).toBe('1111111111')
   })
 })
