@@ -152,13 +152,17 @@ export default function SearchPage({ loaderData, params }: Route.ComponentProps)
 
     return (
       <>
-        <div className="flex flex-col gap-3">
+        <div
+          key={searchParams.toString()}
+          className="flex flex-col gap-3 animate-in fade-in duration-300"
+        >
           {username
             ? items.map(tweet => (
                 <MyTweet
                   tweet={tweet}
                   tweetAuthorName={user?.fullName ?? username ?? ''}
                   key={tweet.id}
+                  containerClassName="animate-in slide-in-from-bottom-2 duration-300"
                 />
               ))
             : (
@@ -175,6 +179,7 @@ export default function SearchPage({ loaderData, params }: Route.ComponentProps)
                         tweet={tweet}
                         tweetAuthorName={group.displayName ?? group.userName}
                         key={tweet.id}
+                        containerClassName="animate-in slide-in-from-bottom-2 duration-300"
                       />
                     ))}
                   </section>

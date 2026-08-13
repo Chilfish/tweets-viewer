@@ -131,7 +131,10 @@ export default function LastYearsTodayPage({ loaderData, params }: Route.Compone
 
     return (
       <>
-        <div className="flex flex-col gap-3">
+        <div
+          key={searchParams.toString()}
+          className="flex flex-col gap-3 animate-in fade-in duration-300"
+        >
           {yearGroups.map((group, idx) => (
             <section key={`${group.year}-${idx}`}>
               <YearDivider year={group.year} className={idx === 0 ? 'mt-2' : 'mt-8'} />
@@ -140,6 +143,7 @@ export default function LastYearsTodayPage({ loaderData, params }: Route.Compone
                   tweet={tweet}
                   tweetAuthorName={user?.fullName ?? params.name ?? ''}
                   key={tweet.id}
+                  containerClassName="animate-in slide-in-from-bottom-2 duration-300"
                 />
               ))}
             </section>

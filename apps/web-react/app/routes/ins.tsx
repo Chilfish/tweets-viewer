@@ -139,9 +139,17 @@ export default function InsPage({ loaderData, params }: Route.ComponentProps) {
       </div>
 
       <div className="w-full max-w-3xl flex flex-col gap-4 mb-16">
-        <div className="flex flex-col gap-4">
+        <div
+          key={searchParams.toString()}
+          className="flex flex-col gap-4 animate-in fade-in duration-300"
+        >
           {items.map(post => (
-            <InstagramPostCard key={post.id} post={post} />
+            <div
+              key={post.id}
+              className="animate-in slide-in-from-bottom-2 duration-300"
+            >
+              <InstagramPostCard post={post} />
+            </div>
           ))}
         </div>
 

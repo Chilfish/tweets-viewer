@@ -116,12 +116,18 @@ export default function TweetsPage({ loaderData, params }: Route.ComponentProps)
       </div>
 
       <div className="w-full max-w-3xl flex flex-col gap-4 mb-16">
-        <div className="flex flex-col gap-3">
+        {/* 5B-3：URL 驱动的跳页/筛选变化 → 整页内容淡入（key 随 search 变化重挂载）；
+            滚动续载不写 URL → key 不变，仅新追加的推文触发各自的入场动画，避免整屏闪动 */}
+        <div
+          key={searchParams.toString()}
+          className="flex flex-col gap-3 animate-in fade-in duration-300"
+        >
           {items.map(tweet => (
             <MyTweet
               tweet={tweet}
               tweetAuthorName={user?.fullName ?? params.name ?? ''}
               key={tweet.id}
+              containerClassName="animate-in slide-in-from-bottom-2 duration-300"
             />
           ))}
         </div>

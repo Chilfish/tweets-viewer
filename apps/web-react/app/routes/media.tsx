@@ -106,11 +106,14 @@ export default function MediaPage({ loaderData, params }: Route.ComponentProps) 
       </div>
 
       <div className="w-full max-w-6xl mt-4 mb-16">
-        <MediaWall
-          items={items}
-          isLoading={status === 'fetching' && items.length === 0}
-          isEmpty={status !== 'fetching' && items.length === 0}
-        />
+        {/* 5B-3：跳页/筛选变化 → 媒体墙整体淡入；滚动续载追加的卡片各自入场 */}
+        <div key={searchParams.toString()} className="animate-in fade-in duration-300">
+          <MediaWall
+            items={items}
+            isLoading={status === 'fetching' && items.length === 0}
+            isEmpty={status !== 'fetching' && items.length === 0}
+          />
+        </div>
 
         <div className="mt-8 mb-10">
           <TweetFeedStatus
