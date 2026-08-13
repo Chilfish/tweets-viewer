@@ -9,7 +9,8 @@
 | Phase 1 | 基础阅读器（时间线/媒体/搜索/那年今日） | ✅ 已完成 |
 | Phase 2 | IG 归档整合（`/v3/ins/*` + ins_posts + 每日同步） | ✅ 已完成 |
 | Phase 3 | 体验打磨与数据补全 | ✅ 已完成 |
-| Phase 4 | 地基 → 架构一致 → 产品纵深（见 `roadmap.md`） | 🔄 当前 |
+| Phase 4 | 地基 → 架构一致 → 产品纵深（见 `roadmap.md`） | ✅ 已完成 |
+| Phase 5 | UI/UX 打磨：Apple 原生感 × 状态/路由切换流畅感（见 `roadmap-phase5.md`） | 🔄 当前 |
 
 ## Phase 3 — 当前阶段
 
@@ -44,6 +45,18 @@
 
 > 注：Fukuoka 抓取（T1/T2）确认为**临时研究脚本，不会入库**，原"数据清洗/去重入库"计划取消，详见 `roadmap.md` §二。
 > Phase 4 全部任务（4A×4 / 4B×3 / 4C×5 / 4D×3）已于 2026-08-13 完成并各自原子 commit。
+
+## Phase 5 — UI/UX 打磨：Apple 原生感 × 状态/路由切换流畅感（当前，见 `docs/planning/roadmap-phase5.md`）
+
+### 目标（用户定调：主要追求 Apple 的原生感，各种状态、路由切换之间的流畅感）
+
+1. **Token 与一致性地基（5A）**：`app.css` 去重、Tweet 系硬编码色 → token、ProfileHeader 独立容器、文案统一
+2. **路由切换流畅感（5B，核心）**：View Transitions API 接入、页面进入动画统一、列表追加动画、骨架→内容过渡
+3. **状态切换流畅感（5C）**：列表四态视觉统一、按压反馈全覆盖、`prefers-reduced-motion` 降级、触控目标/键盘体验
+4. **平台原生感（5D）**：iOS 滚动/safe-area 细节、滚动位置记忆、桌面快捷键
+5. **阅读体验深化（5E，后置）**：Tweet 卡片视觉决策（流式）、时间线日期分隔线、媒体墙体验、首页质感
+
+> 不动清单：不改功能行为、不新增组件库依赖（View Transitions 用平台原生 API）、不扩路由。
 
 ## 约定
 

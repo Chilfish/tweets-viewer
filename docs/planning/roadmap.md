@@ -100,3 +100,9 @@
 - 每项任务一个原子 commit（`docs/engineering/git-workflow.md`）
 - 文档先行：先更新本文档 / Specification / API 文档，再动代码
 - 完成一项勾一项，回归 `bun lint` + 各包 test 确认绿
+
+---
+
+## 下一阶段
+
+- **Phase 5（UI/UX 打磨：Apple 原生感 × 状态/路由切换流畅感）** 见 [`roadmap-phase5.md`](roadmap-phase5.md)（2026-08-13 登记）。
