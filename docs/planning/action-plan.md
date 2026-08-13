@@ -10,7 +10,7 @@
 | Phase 2 | IG 归档整合（`/v3/ins/*` + ins_posts + 每日同步） | ✅ 已完成 |
 | Phase 3 | 体验打磨与数据补全 | ✅ 已完成 |
 | Phase 4 | 地基 → 架构一致 → 产品纵深（见 `roadmap.md`） | ✅ 已完成 |
-| Phase 5 | UI/UX 打磨：Apple 原生感 × 状态/路由切换流畅感（见 `roadmap-phase5.md`） | 🔄 当前 |
+| Phase 5 | UI/UX 打磨：Apple 原生感 × 状态/路由切换流畅感（见 `roadmap-phase5.md`） | ✅ 已完成 |
 
 ## Phase 3 — 当前阶段
 

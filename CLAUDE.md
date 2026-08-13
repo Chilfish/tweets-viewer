@@ -174,7 +174,11 @@ ins_posts: id(serial PK), post_id(UQ), username(FK→users.userName), created_at
 
 **Phase 2 — IG 归档整合**: ✅ 已完成（`/v3/ins/:name` + `ins_posts` 表 + 每日同步）。
 
-**Phase 3 — 体验打磨与数据补全（当前）**: 新增 Fukuoka 归档抓取（`fetchSearchFukuoka.ts` + `apps/scripts/src/fukuoka/`）、日期范围筛选（DateRangeFilter）、Calendar 迁移到 @daypicker/react v10。
+**Phase 3 — 体验打磨与数据补全**: ✅ 已完成（Fukuoka 归档抓取、日期范围筛选、Calendar 迁移 @daypicker/react v10）。
+
+**Phase 4 — 地基 → 架构一致 → 产品纵深**: ✅ 已完成（pg_trgm 全文索引、keyset 分页转正、统一分页流 hook、SSR 诚实化、时间导航、全局搜索、PWA）。
+
+**Phase 5 — UI/UX 打磨（当前）**: ✅ 已完成（Apple 原生感 × 状态/路由切换流畅感）——`app.css` token 去重 + `--font-sans` 定稿、Tweet 系硬编码色 → token、ProfileHeader 独立容器、文案统一中文化；View Transitions 文档级路由过渡（共享 chrome 稳定 + reduced-motion 降级）、页面进入动画协调、列表追加动画、骨架→内容过渡；列表四态统一 `FeedStatus`、按压反馈全覆盖、触控目标 ≥44px、`/` 与 `⌘K` 搜索快捷键；iOS 滚动/safe-area/状态栏细节、刷新滚动位置记忆、sidebar hover 质感；Tweet 卡片沉浸流式（分隔线去边框）、跨天日期分隔线、媒体 blur-up + 灯箱滑动手势、首页 hero/features/memo 质感。详见 `docs/planning/roadmap-phase5.md`。
 
 ## GitHub CLI Flow
 
