@@ -1,4 +1,4 @@
-import { Calendar, Home, ImageIcon, Info, Search } from 'lucide-react'
+import { Calendar, Home, ImageIcon, Search } from 'lucide-react'
 import { useLocation } from 'react-router'
 import { InsIcon } from '../ins/InsLogo'
 
@@ -8,8 +8,6 @@ export interface NavItem {
   href: string
   isActive: boolean
   disabled?: boolean
-  /** 只在桌面侧边栏显示（移动底栏保持 5 tab 上限） */
-  hideOnMobile?: boolean
 }
 
 export function useNavItems(currentUser?: string): NavItem[] {
@@ -59,13 +57,6 @@ export function useNavItems(currentUser?: string): NavItem[] {
       isActive: currentUser
         ? location.pathname === `/search/${currentUser}`
         : location.pathname.startsWith('/search'),
-    },
-    {
-      label: '关于',
-      icon: Info,
-      href: '/about',
-      isActive: location.pathname === '/about',
-      hideOnMobile: true,
     },
   ]
 }
