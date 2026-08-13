@@ -206,7 +206,7 @@ app.get('/search', async (c) => {
     return c.json({ error: 'keyword is required (1-200 chars)' }, 400)
   }
 
-  const { keyword, name } = normalizeSearchParams(searchResult)
+  const { keyword, name } = normalizeSearchParams(searchResult.data)
   const pagination = getPaginationParams(c)
   if (isError(pagination))
     return c.json({ error: `invalid pagination: ${pagination}` }, 400)
