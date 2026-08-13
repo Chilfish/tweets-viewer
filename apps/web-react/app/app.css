@@ -49,6 +49,12 @@
   --font-sans:
     -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     'Noto Sans SC', sans-serif;
+
+  /* --- Physics & Motion (单一事实来源，供 var() 引用) --- */
+  /* iOS Spring: Quick response, gentle settle */
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  /* iOS Standard: Smooth ease-out */
+  --ease-apple: cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 .dark {
@@ -97,11 +103,10 @@
   /* 单一事实来源在 :root，这里只做映射（inline 展开为 var() 引用） */
   --font-sans: var(--font-sans);
 
-  /* --- Physics & Motion (Crucial for Native Feel) --- */
-  /* iOS Spring: Quick response, gentle settle */
-  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  /* iOS Standard: Smooth ease-out */
-  --ease-apple: cubic-bezier(0.25, 0.1, 0.25, 1);
+  /* --- Physics & Motion --- */
+  /* 单一事实来源在 :root，映射保留 ease-* utility 可用性 */
+  --ease-spring: var(--ease-spring);
+  --ease-apple: var(--ease-apple);
 
   /* --- Extended Colors Mappings --- */
   --color-sidebar-ring: var(--sidebar-ring);
@@ -257,14 +262,15 @@
 }
 
 @layer components {
-  /* 5E-1：沉浸流式（Twitter 原生）——去边框/去卡片阴影/去圆角，
-     列表内以分隔线（divide-*）切分，推文本身透明背景融入页面 */
+  /* 推文卡片：bg-card + 边框 + 圆角，与页面背景明确区分（用户反馈：流式去边框后分不清边界）。
+     保留 hover 高亮（5E-2）与 token 化颜色（5A-2）。 */
   .tweet-container {
     @apply w-full min-w-[250px] max-w-[720px] overflow-hidden;
     @apply text-foreground;
-    @apply font-sans font-normal box-border;
+    @apply font-sans font-normal border rounded-xl box-border;
+    @apply border-border bg-card;
     @apply transition-colors duration-200 p-[0.7rem];
-    /* 5E-2：列表项 hover 高亮（桌面），流式下保留可读的悬浮反馈 */
+    /* 5E-2：列表项 hover 高亮（桌面），卡片上保留可读的悬浮反馈 */
     @apply md:hover:bg-accent/40;
   }
 

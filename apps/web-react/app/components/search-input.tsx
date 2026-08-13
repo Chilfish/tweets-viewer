@@ -2,7 +2,7 @@ import type { EnrichedUser } from '@tweets-viewer/rettiwt-api'
 import type { FormEvent } from 'react'
 import { SearchIcon, XIcon } from 'lucide-react'
 import { useState } from 'react'
-import { useNavigate } from 'react-router'
+import { useNavigate, useSearchParams } from 'react-router'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '~/components/ui/input-group'
 import { cn } from '~/lib/utils'
 
