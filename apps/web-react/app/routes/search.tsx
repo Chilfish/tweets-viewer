@@ -235,7 +235,7 @@ export default function SearchPage({ loaderData, params }: Route.ComponentProps)
               »
             </span>
             <span className="text-xs text-muted-foreground">
-              ·
+              共
               {' '}
               {total ?? 0}
               {' '}

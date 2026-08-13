@@ -117,8 +117,7 @@ export function YearNavigator({ name, className }: YearNavigatorProps) {
             -
             {' '}
             {maxYear}
-            {' '}
-            · 按年浏览归档
+            ，按年浏览归档
           </DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
