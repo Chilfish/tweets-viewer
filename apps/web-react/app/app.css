@@ -224,6 +224,11 @@
   .tweet-skeleton {
     @apply animate-pulse bg-muted rounded;
   }
+
+  /* Profile 头部独立容器（语义归位，不再复用 tweet-container） */
+  .profile-container {
+    @apply w-full min-w-[250px] max-w-[720px] overflow-hidden rounded-xl border border-border bg-card text-foreground font-sans;
+  }
 }
 
 a,

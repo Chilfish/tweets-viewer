@@ -22,7 +22,7 @@ export function ProfileHeader({ user, children }: ProfileHeaderProps) {
     : ''
 
   return (
-    <div className="tweet-container p-0 rounded">
+    <div className="profile-container">
       {/* Banner */}
       <div className="relative aspect-3/1 w-full bg-muted overflow-hidden">
         {user.profileBanner ? (
@@ -32,7 +32,7 @@ export function ProfileHeader({ user, children }: ProfileHeaderProps) {
             className="w-full h-full object-cover rounded-t"
           />
         ) : (
-          <div className="w-full h-full bg-slate-200 dark:bg-slate-800" />
+          <div className="w-full h-full bg-muted" />
         )}
       </div>
 

@@ -2,7 +2,7 @@ import { Skeleton } from '~/components/ui/skeleton'
 
 export function InsProfileHeaderSkeleton() {
   return (
-    <div className="tweet-container p-0 rounded w-full bg-card border-2 border-border/50 overflow-hidden min-h-fit">
+    <div className="profile-container min-h-fit">
       <div className="px-4 sm:px-5 py-5 sm:py-6">
         {/* Avatar + Stats row */}
         <div className="flex items-start gap-4 sm:gap-6 mb-4">
