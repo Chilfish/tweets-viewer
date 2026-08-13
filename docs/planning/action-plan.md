@@ -58,6 +58,31 @@
 
 > 不动清单：不改功能行为、不新增组件库依赖（View Transitions 用平台原生 API）、不扩路由。
 
+### 任务清单（每项一个原子 commit，见 `roadmap-phase5.md`）
+
+| 任务 | 说明 | 状态 |
+|---|---|---|
+| 5A-1 | `app.css` 去重：token/`@theme`/`@layer base` 收敛一份；`--font-sans` 定稿（系统栈优先 + 中文回退），删多余 Noto Sans Variable 加载 | ⬜ |
+| 5A-2 | Tweet 系硬编码颜色 → token（`bg-card`/`text-foreground`/`border-border` 等），删 `dark:` 补丁 | ⬜ |
+| 5A-3 | ProfileHeader 独立容器（不再套 `tweet-container`）+ banner 空态 token 化 | ⬜ |
+| 5A-4 | 文案统一：空态/错误态/尾部状态全中文化、语气统一；emoji → lucide 图标 + aria-label | ⬜ |
+| 5A-5 | 设计文档同步：删幽灵 hook 引用、核对组件索引 | ⬜ |
+| 5B-1 | View Transitions API 接入（文档级过渡 + `prefers-reduced-motion` 降级） | ⬜ |
+| 5B-2 | 页面进入动画统一：route `handle` 定义过渡类型，与 ViewTransition 协调 | ⬜ |
+| 5B-3 | 列表追加动画：新推文淡入（`slide-in-from-bottom`）、跳页替换淡入 | ⬜ |
+| 5B-4 | 骨架 → 内容平滑过渡（ProfileHeader/列表，防 CLS） | ⬜ |
+| 5C-1 | 列表四态视觉切换统一（TweetFeedStatus / ins / media 收敛为一个状态组件） | ⬜ |
+| 5C-2 | 按压反馈全覆盖：移动端可点元素统一 `active:scale` | ⬜ |
+| 5C-3 | `prefers-reduced-motion` 全局降级（动画/骨架/过渡关闭或减弱） | ⬜ |
+| 5C-4 | 触控目标 ≥44px + 键盘体验（`/` 聚焦搜索、Esc 关闭浮层） | ⬜ |
+| 5D-1 | iOS 滚动细节：`overscroll-behavior`、safe-area、状态栏/PWA 核查 | ⬜ |
+| 5D-2 | 滚动位置记忆：sessionStorage 记忆上次滚动位置（可选） | ⬜ |
+| 5D-3 | 桌面细节：sidebar hover 质感、`⌘K` 全局搜索（加分项） | ⬜ |
+| 5E-1 | Tweet 卡片视觉决策：沉浸流式（分隔线、去边框），配合 5A-2 一次做完 | ⬜ |
+| 5E-2 | 时间线细节：跨天日期分隔线（iOS 消息分组范式）、列表项 hover 高亮 | ⬜ |
+| 5E-3 | 媒体体验：`MediaImage` 懒加载/模糊占位核查、灯箱手势（滑动切换） | ⬜ |
+| 5E-4 | 首页质感：hero 入场动效、features 卡片 hover、memo 入口强化 | ⬜ |
+
 ## 约定
 
 - 已完成阶段的规划文档归档于 `docs/archive/`，不主动读取

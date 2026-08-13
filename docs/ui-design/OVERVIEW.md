@@ -102,10 +102,12 @@
 
 ```
 -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI',
-'Noto Sans Variable', sans-serif
+'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+'Noto Sans SC', sans-serif
 ```
 
-通过 `font-sans` 使用。优先级：系统字体 > SF Pro > Segoe > Noto Sans（中日韩回退）。
+通过 `font-sans` 使用。优先级：系统字体 > SF Pro > Segoe > 中文回退（PingFang / Hiragino / 微软雅黑 / Noto Sans SC）。
+**单一事实来源**：`--font-sans` 只在 `app.css` 的 `:root` 定义一份，`@theme inline` 里以 `var(--font-sans)` 映射；组件 CSS 引用同一变量，禁止再手写字体栈（如 `p.tweet-body` 的 emoji 扩展只需在变量后追加 emoji 字体回退）。
 
 ### 3.2 层级体系
 
