@@ -47,7 +47,7 @@ export function Sidebar({ currentUser }: SidebarProps) {
               to={item.href}
               viewTransition
               className={cn(
-                'group flex items-center justify-start gap-4 p-3 xl:px-4 rounded-full transition-all duration-200',
+                'group flex items-center justify-start gap-4 p-3 xl:px-4 rounded-full transition-all duration-200 active:scale-[0.98]',
                 item.disabled && 'pointer-events-none opacity-40',
                 item.isActive
                   ? 'bg-accent/80 text-accent-foreground font-semibold'

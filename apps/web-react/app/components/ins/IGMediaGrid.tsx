@@ -165,7 +165,7 @@ function PhotoStack({
 
   return (
     <div
-      className="relative aspect-square overflow-visible group/stack cursor-pointer select-none rounded-sm"
+      className="relative aspect-square overflow-visible group/stack cursor-pointer select-none rounded-sm active:scale-[0.98] transition-transform"
       onClick={onClick}
       role="button"
       tabIndex={0}

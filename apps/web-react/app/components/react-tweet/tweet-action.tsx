@@ -57,7 +57,7 @@ export function TweetAction({ tweet, className }: TweetActionProps) {
         <div
           key={index}
           className={cn(
-            'flex items-center gap-1 group transition-colors cursor-pointer rounded-full',
+            'flex items-center gap-1 group transition-colors cursor-pointer rounded-full active:scale-95',
           )}
           title={action.label}
         >
@@ -78,7 +78,7 @@ export function TweetAction({ tweet, className }: TweetActionProps) {
       ))}
 
       <button
-        className="flex items-center group transition-colors cursor-pointer p-2 -mr-2 rounded-full hover:text-sky-500 hover:bg-sky-500/10"
+        className="flex items-center group transition-colors cursor-pointer p-2 -mr-2 rounded-full hover:text-sky-500 hover:bg-sky-500/10 active:scale-95"
         title="分享"
       >
         <div className="p-1">

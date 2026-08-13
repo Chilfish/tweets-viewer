@@ -65,7 +65,7 @@ export function UserSelector() {
             {userList.map(user => (
               <DropdownMenuItem
                 key={user.fullName}
-                className="flex items-center gap-3 p-2 cursor-pointer"
+                className="flex items-center gap-3 p-2 cursor-pointer active:scale-[0.98] transition-transform"
                 render={<NavLink to={`/${curPath}/${user.userName}`} viewTransition />}
               >
                 <Avatar className="size-8">

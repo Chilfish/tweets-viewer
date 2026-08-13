@@ -15,7 +15,7 @@ export const MediaCard = memo(({ item, onClick }: MediaCardProps) => {
   return (
     <div
       onClick={onClick}
-      className="relative group cursor-pointer overflow-hidden rounded-lg bg-muted/30 border border-border/30 transition-all hover:shadow-lg hover:border-primary/30 hover:scale-[1.02]"
+      className="relative group cursor-pointer overflow-hidden rounded-lg bg-muted/30 border border-border/30 transition-all hover:shadow-lg hover:border-primary/30 hover:scale-[1.02] active:scale-[0.98]"
       style={{
         aspectRatio: `${item.width} / ${item.height}`,
       }}
