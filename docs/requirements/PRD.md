@@ -1,6 +1,6 @@
 # 产品需求文档 (PRD)
 
-**项目**: Tweets Viewer | **最后更新**: 2026-08-09
+**项目**: Tweets Viewer | **最后更新**: 2026-08-13
 
 ---
 
@@ -41,12 +41,17 @@
 | IG 每日同步 | `fetch-ins-daily.ts`，GitHub Actions cron | P0 |
 | ins→twitter 映射 | `mapping.ts` 维护 | P1 |
 
-### 3.3 规划中
+### 3.3 规划中（Phase 4，详见 `docs/planning/roadmap.md`）
 
 | 功能 | 说明 | 优先级 |
 |---|---|---|
-| Fukuoka 归档补全 | `fetchSearchFukuoka.ts` 关键词抓取（福岡公演） | P1 |
-| 数据清洗/去重 | 合并抓取结果，去重入库 | P1 |
+| 全文检索升级 | `pg_trgm` GIN 索引，支撑万条级检索 | P1 |
+| 时间维度导航 | 跳转年份、媒体按年分组浏览（时间定位是归档阅读器核心承诺） | P1 |
+| 全局搜索 | `/search` 不带 `name` 时全库检索，结果按用户分组 | P1 |
+| 档案完整性指示 | 覆盖年份范围、每年推文数、数据缺口提示 | P2 |
+| PWA 补课 | manifest + apple-touch-icon + theme-color，兑现"iOS PWA 原生感"承诺 | P2 |
+
+> 已取消：~~Fukuoka 归档补全 / 数据清洗去重入库~~ —— `apps/scripts` 下 Fukuoka 抓取为**临时研究脚本，不入库**（2026-08-13 确认）。
 
 ## 4. 非功能需求
 
