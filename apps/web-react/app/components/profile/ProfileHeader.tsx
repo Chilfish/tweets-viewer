@@ -21,8 +21,13 @@ export function ProfileHeader({ user, children }: ProfileHeaderProps) {
     ? format(new Date(user.createdAt), 'yyyy年M月', { locale: zhCN })
     : ''
 
+  // 5B-4：骨架 → 内容平滑过渡。key 随 userName 变化，切换用户时重放入场动画；
+  // 高度结构（banner/信息区）与 ProfileHeaderSkeleton 一致，避免 CLS。
   return (
-    <div className="profile-container">
+    <div
+      key={user.userName}
+      className="profile-container animate-in fade-in duration-300"
+    >
       {/* Banner */}
       <div className="relative aspect-3/1 w-full bg-muted overflow-hidden">
         {user.profileBanner ? (

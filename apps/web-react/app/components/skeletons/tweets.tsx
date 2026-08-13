@@ -3,7 +3,7 @@ import { Skeleton } from '../ui/skeleton'
 
 export function TweetsHydrateFallback() {
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center animate-in fade-in duration-300">
       <div className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-xl border-b border-border/40 transition-all">
         <div className="w-full max-w-2xl mx-auto px-4 h-[45px] flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
