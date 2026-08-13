@@ -8,10 +8,12 @@ import { TweetsHydrateFallback } from '~/components/skeletons/tweets'
 import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
 import { MyTweet } from '~/components/tweet/Tweet'
 import { FeedStatus } from '~/components/feed-status'
+import { DateDivider } from '~/components/tweet/date-divider'
 import { TweetNavigation } from '~/components/tweet/TweetNavigation'
 import { TweetsToolbarActions } from '~/components/tweet/tweets-toolbar-actions'
 import { YearNavigator } from '~/components/tweet/year-navigator'
 import { useUrlPaginatedStream } from '~/hooks/use-url-paginated-stream'
+import { groupTweetsByDay } from '~/lib/group-tweets-by-day'
 import { apiClient } from '~/lib/utils'
 
 export function meta({ params }: Route.MetaArgs) {
@@ -102,6 +104,7 @@ export default function TweetsPage({ loaderData, params }: Route.ComponentProps)
 
   const totalCount = total ?? user?.statusesCount ?? 0
   const totalPages = Math.ceil(totalCount / PAGE_SIZE)
+  const dayGroups = groupTweetsByDay(items)
 
   return (
     <>
@@ -118,18 +121,25 @@ export default function TweetsPage({ loaderData, params }: Route.ComponentProps)
       <div className="w-full max-w-3xl flex flex-col gap-4 mb-16">
         {/* 5B-3：URL 驱动的跳页/筛选变化 → 整页内容淡入（key 随 search 变化重挂载）；
             滚动续载不写 URL → key 不变，仅新追加的推文触发各自的入场动画，避免整屏闪动。
-            5E-1：流式布局用分隔线切分推文（去卡片边框） */}
+            5E-1：流式布局去卡片边框；5E-2：跨天日期分隔线（iOS 消息分组范式） */}
         <div
           key={searchParams.toString()}
-          className="flex flex-col divide-y divide-border/40 animate-in fade-in duration-300"
+          className="flex flex-col animate-in fade-in duration-300"
         >
-          {items.map(tweet => (
-            <MyTweet
-              tweet={tweet}
-              tweetAuthorName={user?.fullName ?? params.name ?? ''}
-              key={tweet.id}
-              containerClassName="animate-in slide-in-from-bottom-2 duration-300"
-            />
+          {dayGroups.map((group, idx) => (
+            <section key={`${group.dateKey}-${idx}`}>
+              <DateDivider dateKey={group.dateKey} className={idx === 0 ? 'pt-1' : 'pt-3'} />
+              <div className="flex flex-col divide-y divide-border/40">
+                {group.tweets.map(tweet => (
+                  <MyTweet
+                    tweet={tweet}
+                    tweetAuthorName={user?.fullName ?? params.name ?? ''}
+                    key={tweet.id}
+                    containerClassName="animate-in slide-in-from-bottom-2 duration-300"
+                  />
+                ))}
+              </div>
+            </section>
           ))}
         </div>
 
