@@ -1,6 +1,8 @@
-import { contextStorage } from 'hono/context-storage'
+import * as db from '@tweets-viewer/database'
 import { Hono } from 'hono'
+import { contextStorage } from 'hono/context-storage'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import tweetsApp from '../routes/tweets'
 
 // mock database 模块：路由的查询函数全部替换为可控 stub，断言参数传递与响应契约
@@ -15,12 +17,12 @@ vi.mock('@tweets-viewer/database', () => ({
   getTweetsYearStats: vi.fn(),
 }))
 
-import * as db from '@tweets-viewer/database'
-
-const page = (data: unknown[], hasMore = false) => ({
-  data,
-  meta: { total: data.length, page: 1, pageSize: 10, hasMore },
-})
+function page(data: unknown[], hasMore = false) {
+  return {
+    data,
+    meta: { total: data.length, page: 1, pageSize: 10, hasMore },
+  }
+}
 
 function buildApp() {
   const app = new Hono()
