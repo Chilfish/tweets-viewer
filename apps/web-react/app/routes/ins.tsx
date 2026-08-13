@@ -2,13 +2,13 @@ import type { IGPost, IGUserInfo, PaginatedResponse } from '@tweets-viewer/share
 import type { Route } from './+types/ins'
 import { PAGE_SIZE } from '@tweets-viewer/shared'
 import { isAxiosError } from 'axios'
-import { Inbox, TriangleAlert } from 'lucide-react'
+import { Inbox } from 'lucide-react'
 import { useRevalidator, useSearchParams } from 'react-router'
+import { FeedStatus } from '~/components/feed-status'
 import { IGPostSkeleton } from '~/components/ins/IGPostSkeleton'
 import { InstagramPostCard } from '~/components/ins/InstagramPostCard'
 import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
 import { TweetNavigation } from '~/components/tweet/TweetNavigation'
-import { Button } from '~/components/ui/button'
 import { useUrlPaginatedStream } from '~/hooks/use-url-paginated-stream'
 import { apiClient } from '~/lib/utils'
 
@@ -93,19 +93,13 @@ export default function InsPage({ loaderData, params }: Route.ComponentProps) {
   // --- Error state: loader 显式标记的加载失败（区别于 404 空态）
   if (error) {
     return (
-      <div className="w-full max-w-3xl mx-auto flex flex-col items-center justify-center py-20 gap-3 text-center">
-        <div className="flex size-16 items-center justify-center rounded-full bg-muted/60">
-          <TriangleAlert className="size-8 text-destructive" aria-hidden="true" />
-        </div>
-        <p className="text-lg font-semibold">加载失败</p>
-        <p className="text-sm text-muted-foreground max-w-md">{error}</p>
-        <Button
-          variant="secondary"
-          className="mt-2"
-          onClick={() => revalidator.revalidate()}
-        >
-          重新加载
-        </Button>
+      <div className="w-full max-w-3xl mx-auto">
+        <FeedStatus
+          status="error"
+          hasItems={false}
+          onRetry={() => revalidator.revalidate()}
+          errorMessage={error}
+        />
       </div>
     )
   }
@@ -113,17 +107,15 @@ export default function InsPage({ loaderData, params }: Route.ComponentProps) {
   // --- Empty state (defensive: server should 404 in this case, but just in case)
   if (!paginatedPosts.meta.total && paginatedPosts.data.length === 0) {
     return (
-      <div className="w-full max-w-3xl mx-auto flex flex-col items-center justify-center py-20 gap-3 text-center">
-        <div className="flex size-16 items-center justify-center rounded-full bg-muted/60">
-          <Inbox className="size-8 text-muted-foreground/60" aria-hidden="true" />
-        </div>
-        <p className="text-lg font-semibold">暂无 Instagram 归档</p>
-        <p className="text-sm text-muted-foreground max-w-md">
-          @
-          {params.name}
-          {' '}
-          的 Instagram 数据未归档
-        </p>
+      <div className="w-full max-w-3xl mx-auto">
+        <FeedStatus
+          status="ready"
+          hasItems={false}
+          onRetry={() => revalidator.revalidate()}
+          emptyIcon={<Inbox className="size-8 text-muted-foreground/60" aria-hidden="true" />}
+          emptyTitle="暂无 Instagram 归档"
+          emptyDescription={`@${params.name} 的 Instagram 数据未归档`}
+        />
       </div>
     )
   }
@@ -153,37 +145,19 @@ export default function InsPage({ loaderData, params }: Route.ComponentProps) {
           ))}
         </div>
 
-        {items.length === 0 && status === 'ready' && (
-          <div className="text-center py-20 text-muted-foreground">
-            <p className="text-base font-medium">暂无帖子</p>
-            <p className="text-sm opacity-70">
-              @
-              {params.name}
-              {' '}
-              还没有归档帖子
-            </p>
-          </div>
-        )}
-
-        {status === 'error' && (
-          <div className="flex flex-col items-center gap-2 py-8">
-            <p className="text-sm text-destructive font-medium">加载失败</p>
-            <Button variant="secondary" size="sm" onClick={retry}>
-              点击重试
-            </Button>
-          </div>
-        )}
+        <FeedStatus
+          status={status}
+          hasItems={items.length > 0}
+          onRetry={retry}
+          emptyTitle="暂无帖子"
+          emptyDescription={`@${params.name} 还没有归档帖子`}
+          tailText="已加载全部帖子"
+        />
 
         <InfiniteScrollTrigger
           onIntersect={loadMore}
           disabled={status !== 'ready'}
         />
-
-        {status === 'exhausted' && items.length > 0 && (
-          <p className="text-center text-sm text-muted-foreground py-4 italic">
-            已加载全部帖子
-          </p>
-        )}
       </div>
     </>
   )

@@ -8,7 +8,7 @@ import { useSearchParams } from 'react-router'
 import { MediaWall } from '~/components/media/MediaWall'
 import { MediaHydrateFallback } from '~/components/skeletons/media'
 import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
-import { TweetFeedStatus } from '~/components/tweet/TweetFeedStatus'
+import { FeedStatus } from '~/components/feed-status'
 import { TweetNavigation } from '~/components/tweet/TweetNavigation'
 import { TweetsToolbarActions } from '~/components/tweet/tweets-toolbar-actions'
 import { YearNavigator } from '~/components/tweet/year-navigator'
@@ -116,10 +116,12 @@ export default function MediaPage({ loaderData, params }: Route.ComponentProps) 
         </div>
 
         <div className="mt-8 mb-10">
-          <TweetFeedStatus
+          <FeedStatus
             status={status}
-            hasTweets={items.length > 0}
+            hasItems={items.length > 0}
             onRetry={retry}
+            emptyTitle="本页没有发现媒体内容"
+            tailText="已加载全部媒体"
           />
           {/* 触底触发器 */}
           <InfiniteScrollTrigger

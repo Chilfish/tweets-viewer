@@ -8,7 +8,7 @@ import { SearchInput } from '~/components/search-input'
 import { TweetsHydrateFallback } from '~/components/skeletons/tweets'
 import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
 import { MyTweet } from '~/components/tweet/Tweet'
-import { TweetFeedStatus } from '~/components/tweet/TweetFeedStatus'
+import { FeedStatus } from '~/components/feed-status'
 import { useUrlPaginatedStream } from '~/hooks/use-url-paginated-stream'
 import { groupTweetsByUser } from '~/lib/group-tweets-by-user'
 import { apiClient } from '~/lib/utils'
@@ -187,10 +187,13 @@ export default function SearchPage({ loaderData, params }: Route.ComponentProps)
               )}
         </div>
 
-        <TweetFeedStatus
+        <FeedStatus
           status={status}
-          hasTweets={items.length > 0}
+          hasItems={items.length > 0}
           onRetry={retry}
+          emptyTitle="没有找到匹配的推文"
+          emptyDescription="换个关键词试试"
+          tailText="已加载全部搜索结果"
         />
 
         <InfiniteScrollTrigger

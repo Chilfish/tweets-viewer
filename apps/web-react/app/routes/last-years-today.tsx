@@ -8,7 +8,7 @@ import { useRouteLoaderData, useSearchParams } from 'react-router'
 import { TweetsHydrateFallback } from '~/components/skeletons/tweets'
 import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
 import { MyTweet } from '~/components/tweet/Tweet'
-import { TweetFeedStatus } from '~/components/tweet/TweetFeedStatus'
+import { FeedStatus } from '~/components/feed-status'
 import { TweetNavigation } from '~/components/tweet/TweetNavigation'
 import { TweetsToolbarActions } from '~/components/tweet/tweets-toolbar-actions'
 import { useUrlPaginatedStream } from '~/hooks/use-url-paginated-stream'
@@ -150,10 +150,11 @@ export default function LastYearsTodayPage({ loaderData, params }: Route.Compone
           ))}
         </div>
 
-        <TweetFeedStatus
+        <FeedStatus
           status={status}
-          hasTweets={items.length > 0}
+          hasItems={items.length > 0}
           onRetry={retry}
+          tailText="已加载全部回忆"
         />
 
         <InfiniteScrollTrigger

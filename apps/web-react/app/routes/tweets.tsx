@@ -7,7 +7,7 @@ import { useRouteLoaderData, useSearchParams } from 'react-router'
 import { TweetsHydrateFallback } from '~/components/skeletons/tweets'
 import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
 import { MyTweet } from '~/components/tweet/Tweet'
-import { TweetFeedStatus } from '~/components/tweet/TweetFeedStatus'
+import { FeedStatus } from '~/components/feed-status'
 import { TweetNavigation } from '~/components/tweet/TweetNavigation'
 import { TweetsToolbarActions } from '~/components/tweet/tweets-toolbar-actions'
 import { YearNavigator } from '~/components/tweet/year-navigator'
@@ -132,10 +132,13 @@ export default function TweetsPage({ loaderData, params }: Route.ComponentProps)
           ))}
         </div>
 
-        <TweetFeedStatus
+        <FeedStatus
           status={status}
-          hasTweets={items.length > 0}
+          hasItems={items.length > 0}
           onRetry={retry}
+          emptyTitle="该用户暂无推文归档"
+          emptyDescription="归档中还没有任何推文。"
+          tailText="已加载全部归档推文"
         />
 
         <InfiniteScrollTrigger
