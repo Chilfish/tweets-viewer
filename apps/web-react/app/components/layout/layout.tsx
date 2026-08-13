@@ -102,7 +102,7 @@ export function HydrateFallback() {
       <Sidebar currentUser={undefined} />
 
       <main className={cn(
-        'flex-1 flex flex-col items-center justify-start gap-4 pt-2 mx-auto min-w-0 border-r border-border/40 transition-all duration-300',
+        'flex-1 flex flex-col items-center justify-start gap-4 pt-2 mx-auto min-w-0 border-r border-border/40 transition-[max-width] duration-300',
         currentHandle.isWide ? 'sm:max-w-6xl' : 'sm:max-w-[600px]',
       )}
       >
@@ -199,7 +199,7 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
 
       {/* Main Content */}
       <main className={cn(
-        'flex-1 flex flex-col items-center justify-start gap-4 pt-2 mx-auto min-w-0 border-r border-border/40 transition-all duration-300',
+        'flex-1 flex flex-col items-center justify-start gap-4 pt-2 mx-auto min-w-0 border-r border-border/40 transition-[max-width] duration-300',
         isWide ? 'sm:max-w-6xl' : 'sm:max-w-[600px]',
       )}
       >

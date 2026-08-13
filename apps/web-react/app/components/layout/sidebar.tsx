@@ -23,7 +23,7 @@ export function Sidebar({ currentUser }: SidebarProps) {
   }
 
   return (
-    <aside className="sidebar-chrome hidden md:flex sticky top-0 z-40 h-screen w-auto xl:w-[260px] flex-col justify-between p-2 xl:p-4 bg-background/90 backdrop-blur-xl border-r border-border/40 transition-all duration-200">
+    <aside className="hidden md:flex sticky top-0 z-40 h-screen w-auto xl:w-[260px] flex-col justify-between p-2 xl:p-4 bg-background/90 backdrop-blur-xl border-r border-border/40 transition-[width] duration-300">
       {/* Logo & Title */}
       <header className="flex items-center justify-center xl:justify-start gap-3 px-2 py-4 mb-2">
         <img

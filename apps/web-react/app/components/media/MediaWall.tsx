@@ -107,17 +107,6 @@ export function MediaWall({ items, isLoading, isEmpty }: MediaWallProps) {
     }
   }, [items.length])
 
-  // 打开时锁定背景滚动（灯箱为全屏浮层）
-  useEffect(() => {
-    if (!open)
-      return
-    const prevOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.body.style.overflow = prevOverflow
-    }
-  }, [open])
-
   const handleOpen = useCallback((originalIndex: number) => {
     setLightboxOpen(true, originalIndex)
     // pushState：产生历史条目，后退一次即关闭灯箱
