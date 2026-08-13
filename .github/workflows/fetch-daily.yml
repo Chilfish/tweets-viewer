@@ -8,6 +8,8 @@ on:
 jobs:
   update-data:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     steps:
       - uses: actions/checkout@v4
 
@@ -26,3 +28,17 @@ jobs:
           INSTAGRAM_COOKIES: ${{ secrets.INSTAGRAM_COOKIES }}
           FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
         run: bun run apps/scripts/src/dailyUpdate.ts
+
+      # 4D-1：cron 健康通知 —— 失败时开 issue，避免静默断更
+      - name: Notify on failure
+        if: failure()
+        run: |
+          gh issue create \
+            --title "Daily data update failed" \
+            --body "The scheduled daily update workflow failed on $(date -u +%Y-%m-%dT%H:%M:%SZ).
+
+            - Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            - Check: IG Cookie 是否过期、TWEET_KEYS 速率限制、DATABASE_URL 连接" \
+            --repo ${{ github.repository }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
