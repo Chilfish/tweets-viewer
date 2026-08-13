@@ -10,6 +10,7 @@ import { MyTweet } from '~/components/tweet/Tweet'
 import { TweetFeedStatus } from '~/components/tweet/TweetFeedStatus'
 import { TweetNavigation } from '~/components/tweet/TweetNavigation'
 import { TweetsToolbarActions } from '~/components/tweet/tweets-toolbar-actions'
+import { YearNavigator } from '~/components/tweet/year-navigator'
 import { useUrlPaginatedStream } from '~/hooks/use-url-paginated-stream'
 import { apiClient } from '~/lib/utils'
 
@@ -106,7 +107,10 @@ export default function TweetsPage({ loaderData, params }: Route.ComponentProps)
       <div className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-xl border-b border-border/40 transition-all">
         <div className="w-full max-w-2xl mx-auto px-4 flex items-center justify-between gap-4">
           <TweetNavigation totalPages={totalPages} />
-          <TweetsToolbarActions />
+          <div className="flex min-w-0 items-center gap-1">
+            <YearNavigator name={params.name} />
+            <TweetsToolbarActions />
+          </div>
         </div>
       </div>
 

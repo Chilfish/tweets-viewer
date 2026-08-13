@@ -10,6 +10,7 @@ import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
 import { MyTweet } from '~/components/tweet/Tweet'
 import { TweetFeedStatus } from '~/components/tweet/TweetFeedStatus'
 import { useUrlPaginatedStream } from '~/hooks/use-url-paginated-stream'
+import { groupTweetsByUser } from '~/lib/group-tweets-by-user'
 import { apiClient } from '~/lib/utils'
 
 export const handle = {
@@ -53,6 +54,32 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
   }
 
   return { paginatedTweets, q }
+}
+
+/** 全局搜索结果按用户分组的组头（作者分隔线） */
+function UserDivider({ userName, displayName, avatarUrl }: { userName: string, displayName?: string, avatarUrl?: string }) {
+  return (
+    <div className="mb-2 flex items-center gap-2 px-1">
+      {avatarUrl && (
+        <img
+          src={avatarUrl}
+          alt=""
+          className="size-5 rounded-full object-cover bg-muted"
+          loading="lazy"
+        />
+      )}
+      <span className="text-sm font-semibold tracking-wide text-foreground/80">
+        {displayName || `@${userName}`}
+      </span>
+      {displayName && (
+        <span className="text-xs text-muted-foreground">
+          @
+          {userName}
+        </span>
+      )}
+      <div className="h-px flex-1 bg-border/60" />
+    </div>
+  )
 }
 
 export default function SearchPage({ loaderData, params }: Route.ComponentProps) {
@@ -125,13 +152,33 @@ export default function SearchPage({ loaderData, params }: Route.ComponentProps)
     return (
       <>
         <div className="flex flex-col gap-3">
-          {items.map(tweet => (
-            <MyTweet
-              tweet={tweet}
-              tweetAuthorName={user?.fullName ?? username ?? ''}
-              key={tweet.id}
-            />
-          ))}
+          {username
+            ? items.map(tweet => (
+                <MyTweet
+                  tweet={tweet}
+                  tweetAuthorName={user?.fullName ?? username ?? ''}
+                  key={tweet.id}
+                />
+              ))
+            : (
+              // 全局搜索：按用户分组展示（连续段分组，保持时间线顺序）
+                groupTweetsByUser(items).map(group => (
+                  <section key={group.userName}>
+                    <UserDivider
+                      userName={group.userName}
+                      displayName={group.displayName}
+                      avatarUrl={group.avatarUrl}
+                    />
+                    {group.tweets.map(tweet => (
+                      <MyTweet
+                        tweet={tweet}
+                        tweetAuthorName={group.displayName ?? group.userName}
+                        key={tweet.id}
+                      />
+                    ))}
+                  </section>
+                ))
+              )}
         </div>
 
         <TweetFeedStatus

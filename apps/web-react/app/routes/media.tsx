@@ -11,6 +11,7 @@ import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
 import { TweetFeedStatus } from '~/components/tweet/TweetFeedStatus'
 import { TweetNavigation } from '~/components/tweet/TweetNavigation'
 import { TweetsToolbarActions } from '~/components/tweet/tweets-toolbar-actions'
+import { YearNavigator } from '~/components/tweet/year-navigator'
 import { useUrlPaginatedStream } from '~/hooks/use-url-paginated-stream'
 import { extractMediaFromTweets } from '~/lib/media'
 import { apiClient } from '~/lib/utils'
@@ -96,7 +97,10 @@ export default function MediaPage({ loaderData, params }: Route.ComponentProps) 
       <div className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-xl border-b border-border/40 transition-all">
         <div className="w-full max-w-6xl mx-auto px-4 h-11 flex items-center justify-between gap-4">
           <TweetNavigation totalPages={totalPages} />
-          <TweetsToolbarActions hideComments />
+          <div className="flex min-w-0 items-center gap-1">
+            <YearNavigator name={params.name} />
+            <TweetsToolbarActions hideComments />
+          </div>
         </div>
       </div>
 
