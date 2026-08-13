@@ -201,25 +201,19 @@ import { cn } from '~/lib/utils'
 )} />
 ```
 
-### 6.2 useMediaQuery — 响应式检测
+### 6.2 响应式检测
+
+项目**没有** `useMediaQuery` 通用 hook（勿引用 `~/hooks/use-media-query`，不存在）。移动端判断使用：
 
 ```tsx
-import { useMediaQuery } from '~/hooks/use-media-query'
+import { useIsMobile } from '~/hooks/use-mobile'
 
-const isMobile = useMediaQuery('(max-width: 767px)')
-// 或使用命名断点
-const isDesktop = useMediaQuery('lg')
+const isMobile = useIsMobile()   // < 768px
 ```
 
-### 6.3 useMediaQuery / useIsMobile — 响应式检测
-
-```tsx
-import { useMediaQuery, useIsMobile } from '~/hooks/use-media-query'
-
-const isMobile = useIsMobile()            // < 800px
-const isDesktop = useMediaQuery('lg')     // >= 1024px
-const isTouch = useMediaQuery({ pointer: 'coarse' })  // 触摸设备
-```
+- `useIsMobile` 基于 `window.innerWidth < 768`，SSR 首帧返回 `false`，水合后校准
+- 桌面端布局（`md:` 及以上）不需要额外检测，Tailwind 断点类即可
+- 触摸设备判断（`pointer: coarse`）：用 Tailwind 变体 `pointer-coarse:`（如按钮触控目标），无需 JS
 
 ---
 
