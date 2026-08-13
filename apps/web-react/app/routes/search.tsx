@@ -208,7 +208,7 @@ export default function SearchPage({ loaderData, params }: Route.ComponentProps)
     <>
       {/* 搜索工具栏：与时间线/媒体同一 sticky glass 材质，滚动不消失 */}
       <div className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-xl border-b border-border/40 transition-all">
-        <div className="w-full max-w-2xl mx-auto px-4 py-2 flex items-center gap-3">
+        <div className="w-full max-w-2xl mx-auto px-3 sm:px-4 py-2 flex items-center gap-3">
           <SearchInput
             user={user ?? undefined}
             defaultValue={q || serverQ}

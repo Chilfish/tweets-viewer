@@ -84,7 +84,7 @@ export function HydrateFallback() {
       <div className="min-h-screen bg-background transition-colors duration-200">
         <TopNav />
 
-        <main className="flex-1 flex flex-col items-center justify-start gap-4 pt-2 mx-auto min-w-0 border-r border-border/40">
+        <main className="flex-1 flex flex-col items-center justify-start gap-4 pt-2 px-3 mx-auto min-w-0 border-r border-border/40">
 
           {isInsRoute ? <InsProfileHeaderSkeleton /> : <ProfileHeader user={null} />}
           <div className="w-full">
@@ -177,7 +177,7 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
       <div className="min-h-screen bg-background transition-colors duration-200">
         <TopNav title={curUserName ? `@${curUserName}` : 'Tweets Viewer'} />
 
-        <main className="flex-1 flex flex-col items-center justify-start gap-4 pt-2 mx-auto min-w-0 border-r border-border/40">
+        <main className="flex-1 flex flex-col items-center justify-start gap-4 pt-2 px-3 mx-auto min-w-0 border-r border-border/40">
 
           {!isHome && (
             isInsRoute

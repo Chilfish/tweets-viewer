@@ -125,7 +125,7 @@ export default function InsPage({ loaderData, params }: Route.ComponentProps) {
   return (
     <>
       <div className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-xl border-b border-border/40 transition-all">
-        <div className="w-full max-w-2xl mx-auto px-4 flex items-center justify-between gap-4">
+        <div className="w-full max-w-2xl mx-auto px-3 sm:px-4 flex items-center justify-between gap-4">
           <TweetNavigation totalPages={totalPages} />
         </div>
       </div>

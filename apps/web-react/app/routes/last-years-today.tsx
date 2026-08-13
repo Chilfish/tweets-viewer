@@ -168,9 +168,9 @@ export default function LastYearsTodayPage({ loaderData, params }: Route.Compone
   return (
     <>
       <div className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-xl border-b border-border/40 transition-all">
-        <div className="w-full max-w-2xl mx-auto px-4 flex items-center justify-between gap-4">
-          <TweetNavigation totalPages={totalPages} />
-          <TweetsToolbarActions hideComments hideDateRange />
+        <div className="w-full max-w-2xl mx-auto px-3 sm:px-4 flex items-center justify-between gap-2 sm:gap-4 overflow-x-auto">
+          <TweetNavigation totalPages={totalPages} className="shrink-0" />
+          <TweetsToolbarActions hideComments hideDateRange className="shrink-0" />
         </div>
       </div>
 

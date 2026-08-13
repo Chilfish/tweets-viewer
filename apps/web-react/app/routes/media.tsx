@@ -96,9 +96,9 @@ export default function MediaPage({ loaderData, params }: Route.ComponentProps) 
   return (
     <>
       <div className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-xl border-b border-border/40 transition-all">
-        <div className="w-full max-w-6xl mx-auto px-4 h-11 flex items-center justify-between gap-4">
-          <TweetNavigation totalPages={totalPages} />
-          <div className="flex min-w-0 items-center gap-1">
+        <div className="w-full max-w-6xl mx-auto px-3 sm:px-4 h-11 flex items-center justify-between gap-2 sm:gap-4 overflow-x-auto">
+          <TweetNavigation totalPages={totalPages} className="shrink-0" />
+          <div className="flex min-w-0 items-center gap-1 shrink-0">
             <YearNavigator name={params.name} />
             <TweetsToolbarActions hideComments />
           </div>

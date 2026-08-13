@@ -109,9 +109,10 @@ export default function TweetsPage({ loaderData, params }: Route.ComponentProps)
   return (
     <>
       <div className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-xl border-b border-border/40 transition-all">
-        <div className="w-full max-w-2xl mx-auto px-4 flex items-center justify-between gap-4">
-          <TweetNavigation totalPages={totalPages} />
-          <div className="flex min-w-0 items-center gap-1">
+        {/* 移动端工具栏空间紧张：允许内部横向滚动，避免按钮被挤压/溢出 */}
+        <div className="w-full max-w-2xl mx-auto px-3 sm:px-4 flex items-center justify-between gap-2 sm:gap-4 overflow-x-auto">
+          <TweetNavigation totalPages={totalPages} className="shrink-0" />
+          <div className="flex min-w-0 items-center gap-1 shrink-0">
             <YearNavigator name={params.name} />
             <TweetsToolbarActions />
           </div>
