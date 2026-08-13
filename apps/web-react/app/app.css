@@ -233,6 +233,11 @@
 .bottom-nav-chrome {
   view-transition-name: bottom-nav;
 }
+/* ProfileHeader 也是跨路由共享元素（同用户下 tweets/media/memo/ins 一致），稳定不跳。
+   切换用户时内容变化，由浏览器对同名元素做平滑 morph。 */
+.profile-container {
+  view-transition-name: profile;
+}
 
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(root),
