@@ -53,7 +53,7 @@ export function TweetHeader({ tweet, avatarSize, className }: Props) {
           </a>
           <a
             href={`https://x.com/${user.screen_name}`}
-            className="text-[#536471] dark:text-[#71767b] no-underline truncate text-sm shrink min-w-[3rem]"
+            className="text-muted-foreground no-underline truncate text-sm shrink min-w-[3rem]"
             target="_blank"
             rel="noopener noreferrer"
             title={`@${user.screen_name}`}
@@ -63,7 +63,7 @@ export function TweetHeader({ tweet, avatarSize, className }: Props) {
           </a>
         </div>
 
-        <div className="text-[#536471] dark:text-[#71767b] flex items-center gap-1 text-[0.85rem]">
+        <div className="text-muted-foreground flex items-center gap-1 text-[0.85rem]">
           <TweetInfoCreatedAt tweet={tweet} />
         </div>
       </div>

@@ -178,10 +178,10 @@
 @layer components {
   .tweet-container {
     @apply w-full min-w-[250px] max-w-[720px] overflow-hidden;
-    @apply text-[rgb(15,20,25)] dark:text-[rgb(247,249,249)];
+    @apply text-foreground;
     @apply font-sans font-normal border rounded-xl box-border;
-    @apply border-[rgb(207,217,222)] dark:border-[rgb(66,83,100)];
-    @apply bg-white dark:bg-[#080808];
+    @apply border-border;
+    @apply bg-card;
     @apply transition-[background-color,box-shadow] duration-200 p-[0.7rem];
   }
 
@@ -202,7 +202,7 @@
   }
 
   .tweet-author-handle {
-    @apply text-[rgb(83,100,113)] dark:text-[#71767b] text-sm truncate;
+    @apply text-muted-foreground text-sm truncate;
   }
 
   .tweet-verified-badge {
@@ -214,15 +214,15 @@
   }
 
   .tweet-link {
-    @apply text-[#1d9bf0] no-underline hover:underline;
+    @apply text-primary no-underline hover:underline;
   }
 
   .tweet-info {
-    @apply text-[rgb(83,100,113)] dark:text-[#71767b] flex items-center gap-1 text-[0.85rem];
+    @apply text-muted-foreground flex items-center gap-1 text-[0.85rem];
   }
 
   .tweet-skeleton {
-    @apply animate-pulse bg-gray-200 dark:bg-gray-800 rounded;
+    @apply animate-pulse bg-muted rounded;
   }
 }
 
@@ -248,14 +248,15 @@ select {
   @apply bg-muted-foreground/40;
 }
 
+/* 字体栈单一事实来源是 :root 的 --font-sans；这里只追加 emoji/符号字体回退，不再手写整套栈 */
 p.tweet-body {
-  font-family: 'Inter', 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Sans', 'UnifontEX', sans-serif;
+  font-family: var(--font-sans), 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Sans', 'UnifontEX', sans-serif;
 }
 
 p.tweet-body[lang='ja'] {
-  font-family: 'Inter', 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Sans JP', 'UnifontEX', sans-serif;
+  font-family: var(--font-sans), 'Noto Sans JP', 'Apple Color Emoji', 'Segoe UI Emoji', 'UnifontEX', sans-serif;
 }
 
 p.tweet-body[lang='zh'] {
-  font-family: 'Inter', 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Sans SC', 'UnifontEX', sans-serif;
+  font-family: var(--font-sans), 'Noto Sans SC', 'Apple Color Emoji', 'Segoe UI Emoji', 'UnifontEX', sans-serif;
 }

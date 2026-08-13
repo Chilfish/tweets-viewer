@@ -49,7 +49,7 @@ export function TweetAction({ tweet, className }: TweetActionProps) {
   return (
     <div
       className={cn(
-        'flex items-center justify-between mt-1 text-[#536471] dark:text-[#71767b] max-w-[425px]',
+        'flex items-center justify-between mt-1 text-muted-foreground max-w-[425px]',
         className,
       )}
     >

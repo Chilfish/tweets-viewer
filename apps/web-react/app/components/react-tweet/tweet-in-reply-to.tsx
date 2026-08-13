@@ -13,7 +13,7 @@ export function TweetInReplyTo({ tweet, className }: TweetInReplyToProps) {
     return null
 
   return (
-    <div className={cn('text-[#536471] dark:text-[#71767b] text-[0.93rem] mb-1 leading-5', className)}>
+    <div className={cn('text-muted-foreground text-[0.93rem] mb-1 leading-5', className)}>
       回复
       {' '}
       <a

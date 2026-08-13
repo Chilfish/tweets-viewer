@@ -49,7 +49,7 @@ export function TweetMedia({ tweet, quoted, onMediaClick }: Props) {
     <div
       className={cn(
         'mt-3 overflow-hidden relative',
-        !quoted && 'border border-[rgb(207,217,222)] dark:border-[rgb(66,83,100)] rounded-xl',
+        !quoted && 'border border-border rounded-xl',
         onlyHasOnePhotoPortrait && 'max-w-[85%]',
         isOnlyOneVideoPortrait && 'sm:max-w-[72%]',
       )}

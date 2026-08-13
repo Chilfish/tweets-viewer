@@ -33,7 +33,7 @@ export function TweetMediaVideo({ media, showCoverOnly }: Props) {
     setShowPlayButton(false)
   }
 
-  const videoButtonClasses = 'absolute flex w-12 h-12 items-center justify-center bg-[#1d9bf0] hover:bg-[#1a8cd8] focus-visible:bg-[#1a8cd8] transition-colors duration-200 border-4 border-white rounded-full cursor-pointer'
+  const videoButtonClasses = 'absolute flex w-12 h-12 items-center justify-center bg-primary hover:bg-primary/90 focus-visible:bg-primary/90 transition-colors duration-200 border-4 border-white rounded-full cursor-pointer'
   const imageClasses = 'absolute inset-0 m-0 object-cover object-center w-full h-full'
 
   if (showCoverOnly) {
