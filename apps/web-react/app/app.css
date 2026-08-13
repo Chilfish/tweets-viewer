@@ -215,6 +215,25 @@
   }
 }
 
+/* --- 5C-3：prefers-reduced-motion 全局降级 ---
+   Apple a11y 必查：动画/过渡/骨架屏全部关闭或减弱 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .animate-in,
+  .animate-out {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
 @layer components {
   .tweet-container {
     @apply w-full min-w-[250px] max-w-[720px] overflow-hidden;

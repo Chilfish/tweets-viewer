@@ -48,7 +48,9 @@ export const TweetNavigation = memo(({ totalPages, className, currentPage: propP
         { replace: false },
       )
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    // 5C-3：prefers-reduced-motion 下禁用平滑滚动
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' })
   }
 
   return (
