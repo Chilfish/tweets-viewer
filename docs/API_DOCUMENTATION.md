@@ -18,10 +18,20 @@ interface PaginatedResponse<T> {
     page: number
     pageSize: number
     hasMore: boolean
-    nextCursor?: number | string
+    nextCursor?: number | string  // keyset 游标（滚动续载用，见下）
   }
 }
 ```
+
+> **分页协议（keyset 转正，2026-08-13）**：
+> - `meta.nextCursor` 在 `hasMore` 为 true 时返回（tweets 系列端点）。无限滚动用 `?cursor=<值>` 续载下一页，
+>   深翻页不随页码退化；分页器跳页仍用 `?page=N`（offset 定位）。
+> - 排序键 = `COALESCE(jsonData->>'retweeted_original_id', "tweetId")`（snowflake，时间有序）。
+> - IG 帖子量级小，保持 offset 分页，`nextCursor` 不返回。
+
+### 缓存头
+
+归档数据每日一变，所有 `/v3/tweets/*`、`/v3/ins/*` 响应带 `Cache-Control: public, max-age=300, s-maxage=3600`（浏览器 5 分钟 + CDN 1 小时）；`/v3/users/*` 带 `s-maxage=86400`（24h）。
 
 ### EnrichedTweet
 
@@ -50,6 +60,7 @@ interface PaginatedResponse<T> {
   - `page` (number, default: 1): 页码
   - `pageSize` (number, default: 10): 每页数量
   - `reverse` (boolean, default: false): 是否按时间倒序排列 (true 为旧 -> 新, false 为新 -> 旧)
+  - `cursor` (string, optional): keyset 游标，滚动续载下一页（优先于 `page`）
   - `start` (string, ISO Date, optional): 筛选开始日期
   - `end` (string, ISO Date, optional): 筛选结束日期
   - `noReplies` (boolean, default: false): 是否排除回复推文
@@ -64,10 +75,11 @@ interface PaginatedResponse<T> {
 
 - **Query Parameters**:
   - `q` (string, **required**): 搜索关键词
-  - `name` (string, optional): 指定用户的 Screen Name；若不填则返回空
+  - `name` (string, optional): 指定用户的 Screen Name；**不填时全库检索**（跨用户全局搜索）
   - `page` (number, default: 1): 页码
   - `pageSize` (number, default: 10): 每页数量
   - `reverse` (boolean): 排序方向
+  - `cursor` (string, optional): keyset 游标
 
 - **Response**: `PaginatedResponse<EnrichedTweet>`
 
@@ -87,6 +99,36 @@ interface PaginatedResponse<T> {
   - `page` (number, default: 1)
   - `pageSize` (number, default: 10)
   - `reverse` (boolean)
+  - `cursor` (string, optional): keyset 游标
+
+- **Response**: `PaginatedResponse<EnrichedTweet>`
+
+### 4. 获取用户推文按年统计
+
+用户推文按年分布（档案完整性指示：覆盖年份范围 + 每年条数）。
+
+- **Endpoint**: `GET /v3/tweets/stats/:name`
+
+- **Params**:
+  - `name` (string): 用户 Screen Name
+
+- **Response**: `{ year: number, count: number }[]`（按年份降序）
+
+### 5. 获取媒体推文列表
+
+获取指定用户所有含图片/视频附件的推文（排除转推）。
+
+- **Endpoint**: `GET /v3/tweets/medias/:name`
+
+- **Params**:
+  - `name` (string): 用户 Screen Name
+
+- **Query Parameters**:
+  - `page` (number, default: 1): 页码
+  - `pageSize` (number, default: 10): 每页数量
+  - `reverse` (boolean): 排序方向
+  - `cursor` (string, optional): keyset 游标
+  - `start` / `end` (string, ISO Date, optional): 日期范围（媒体按年/日期段浏览，可单独提供）
 
 - **Response**: `PaginatedResponse<EnrichedTweet>`
 
@@ -114,24 +156,6 @@ interface PaginatedResponse<T> {
 
 - **Error Response**:
   - 404 Not Found: `{ "error": "User not found" }`
-
----
-
-### 4. 获取媒体推文列表
-
-获取指定用户所有含图片/视频附件的推文（排除转推）。
-
-- **Endpoint**: `GET /v3/tweets/medias/:name`
-
-- **Params**:
-  - `name` (string): 用户 Screen Name
-
-- **Query Parameters**:
-  - `page` (number, default: 1): 页码
-  - `pageSize` (number, default: 10): 每页数量
-  - `reverse` (boolean): 排序方向
-
-- **Response**: `PaginatedResponse<EnrichedTweet>`
 
 ---
 
