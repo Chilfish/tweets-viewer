@@ -175,6 +175,46 @@
   }
 }
 
+/* --- View Transitions（5B-1）：路由切换旧页淡出/新页淡入 + 轻微位移 --- */
+::view-transition-old(root) {
+  animation: view-fade-out 160ms var(--ease-apple) both;
+}
+::view-transition-new(root) {
+  animation: view-fade-in 220ms var(--ease-apple) both;
+}
+
+@keyframes view-fade-out {
+  to {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+@keyframes view-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/* 共享 chrome 元素不参与 root 交叉淡入（同一元素在新旧快照中位置稳定，不跳动） */
+.top-nav-chrome {
+  view-transition-name: top-nav;
+}
+.sidebar-chrome {
+  view-transition-name: sidebar;
+}
+.bottom-nav-chrome {
+  view-transition-name: bottom-nav;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root),
+  ::view-transition-group(*) {
+    animation: none !important;
+  }
+}
+
 @layer components {
   .tweet-container {
     @apply w-full min-w-[250px] max-w-[720px] overflow-hidden;

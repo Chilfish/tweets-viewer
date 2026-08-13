@@ -8,6 +8,7 @@ function UserCard({ user }: { user: EnrichedUser }) {
   return (
     <Link
       to={`/tweets/${user.userName}`}
+      viewTransition
       className="group flex items-center gap-3 rounded-2xl border bg-card/50 p-3 transition-all hover:bg-card hover:shadow-lg active:scale-[0.98]"
     >
       <Avatar className="size-11 shrink-0">
@@ -39,6 +40,7 @@ export function HomeUserEntry() {
       {activeUser && (
         <Link
           to={`/tweets/${activeUser.userName}`}
+          viewTransition
           className="group relative flex items-center gap-4 rounded-2xl border bg-card/50 p-4 transition-all hover:bg-card hover:shadow-lg active:scale-[0.98]"
         >
           <Avatar className="size-12 shrink-0">

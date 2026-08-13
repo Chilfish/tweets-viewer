@@ -31,7 +31,7 @@ export function UserTabs({ user }: UserTabsProps) {
         onValueChange={(val) => {
           const target = tabs.find(t => t.value === val)
           if (target)
-            navigate(target.href)
+            navigate(target.href, { viewTransition: true })
         }}
       >
         <div className="border-b border-border/40">

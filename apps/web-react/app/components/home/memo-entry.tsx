@@ -20,6 +20,7 @@ export function HomeMemoEntry() {
   return (
     <Link
       to={`/memo/${memoUser.userName}`}
+      viewTransition
       className="group relative flex w-full max-w-3xl flex-col items-center gap-1 overflow-hidden rounded-2xl border bg-card/50 px-6 py-8 text-center transition-all hover:bg-card hover:shadow-lg active:scale-[0.98] animate-in fade-in slide-in-from-bottom-3 duration-500 delay-150 fill-mode-both"
     >
       {/* 顶部柔光，营造"回忆滤镜" */}

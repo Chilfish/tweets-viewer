@@ -23,7 +23,7 @@ export function Sidebar({ currentUser }: SidebarProps) {
   }
 
   return (
-    <aside className="hidden md:flex sticky top-0 z-40 h-screen w-auto xl:w-[260px] flex-col justify-between p-2 xl:p-4 bg-background/90 backdrop-blur-xl border-r border-border/40 transition-all duration-200">
+    <aside className="sidebar-chrome hidden md:flex sticky top-0 z-40 h-screen w-auto xl:w-[260px] flex-col justify-between p-2 xl:p-4 bg-background/90 backdrop-blur-xl border-r border-border/40 transition-all duration-200">
       {/* Logo & Title */}
       <header className="flex items-center justify-center xl:justify-start gap-3 px-2 py-4 mb-2">
         <img
@@ -45,6 +45,7 @@ export function Sidebar({ currentUser }: SidebarProps) {
             <Link
               key={item.label}
               to={item.href}
+              viewTransition
               className={cn(
                 'group flex items-center justify-start gap-4 p-3 xl:px-4 rounded-full transition-all duration-200',
                 item.disabled && 'pointer-events-none opacity-40',

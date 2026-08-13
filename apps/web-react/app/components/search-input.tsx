@@ -25,7 +25,7 @@ export function SearchInput({ user, className, placeholder, defaultValue }: Sear
       const url = user
         ? `/search/${user.userName}?q=${encodeURIComponent(trimmed)}`
         : `/search?q=${encodeURIComponent(trimmed)}`
-      navigate(url)
+      navigate(url, { viewTransition: true })
     }
   }
 
