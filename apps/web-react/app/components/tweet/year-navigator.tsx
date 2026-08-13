@@ -5,6 +5,7 @@ import { Button } from '~/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -109,15 +110,17 @@ export function YearNavigator({ name, className }: YearNavigatorProps) {
         <span className="hidden sm:inline text-xs font-medium">{triggerLabel}</span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="max-h-80 overflow-y-auto min-w-[160px]">
-        <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground">
-          {minYear}
-          {' '}
-          -
-          {' '}
-          {maxYear}
-          {' '}
-          · 按年浏览归档
-        </DropdownMenuLabel>
+        <DropdownMenuGroup>
+          <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground">
+            {minYear}
+            {' '}
+            -
+            {' '}
+            {maxYear}
+            {' '}
+            · 按年浏览归档
+          </DropdownMenuLabel>
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
         {allYears.map(({ year, count }) => (
           <DropdownMenuItem
