@@ -15,7 +15,6 @@ function formatDateLabel(dateKey: string): string {
   if (!y || !m || !d)
     return dateKey
 
-  const date = new Date(y, m - 1, d)
   const today = new Date()
   const isToday = y === today.getFullYear() && m === today.getMonth() + 1 && d === today.getDate()
   if (isToday)

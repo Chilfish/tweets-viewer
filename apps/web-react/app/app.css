@@ -46,7 +46,9 @@
 
   /* --- Typography (单一事实来源) --- */
   /* Priority: System > SF Pro > Segoe > PingFang/Hiragino/YaHei/Noto Sans SC (中文回退) */
-  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+    'Noto Sans SC', sans-serif;
 }
 
 .dark {

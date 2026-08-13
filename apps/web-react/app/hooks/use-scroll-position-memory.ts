@@ -54,7 +54,7 @@ export function useScrollPositionMemory() {
       if (timer)
         clearTimeout(timer)
       // 节流：滚动停止后 150ms 写入
-      timer = setTimeout(() => writeEntry(window.scrollY), 150)
+      timer = setTimeout(writeEntry, 150, window.scrollY)
     }
 
     // 刷新后恢复：下一帧执行，确保 loader 内容已挂载
