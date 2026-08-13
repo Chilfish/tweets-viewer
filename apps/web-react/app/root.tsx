@@ -86,20 +86,20 @@ export default function App() {
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  let message = 'Oops! Something went wrong.'
-  let details = 'An unexpected error occurred. Please try again later.'
+  let message = '出错了'
+  let details = '发生意外错误，请稍后重试。'
   let stack: string | undefined
 
   if (isRouteErrorResponse(error)) {
-    message = error.status === 404 ? 'Page Not Found' : 'An Error Occurred'
+    message = error.status === 404 ? '页面不存在' : '发生错误'
     details
       = error.status === 404
-        ? 'The page you\'re looking for doesn\'t exist.'
+        ? '你访问的页面不存在。'
         : error.data?.message || error.statusText
   }
   else if (import.meta.env.DEV && error && error instanceof Error) {
     message = error.message
-    details = 'Something went wrong.'
+    details = '出错了。'
     stack = error.stack
   }
 
@@ -117,7 +117,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
           </pre>
         )}
         <Button render={<a href="/" />}>
-          Go back to Home
+          返回首页
         </Button>
       </div>
     </div>

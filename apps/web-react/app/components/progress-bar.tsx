@@ -40,7 +40,7 @@ function ProgressBar({ showSpinner = false }: ProgressBarProps) {
   return (
     <div
       aria-hidden={delayedPending ? undefined : true}
-      aria-valuetext={delayedPending ? 'Loading' : undefined}
+      aria-valuetext={delayedPending ? '加载中' : undefined}
       className="fixed inset-x-0 top-0 left-0 z-[99999] h-[3px] animate-pulse"
     >
       <div

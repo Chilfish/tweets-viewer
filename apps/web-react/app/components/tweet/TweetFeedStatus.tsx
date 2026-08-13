@@ -44,7 +44,7 @@ export function TweetFeedStatus({ status, hasTweets, onRetry }: TweetFeedStatusP
       {!hasTweets && status === 'ready' && (
         <div className="text-center p-12 text-muted-foreground animate-in fade-in">
           <p className="text-base font-medium">该用户暂无推文归档。</p>
-          <p className="text-sm opacity-70">Archive appears to be empty.</p>
+          <p className="text-sm opacity-70">归档中还没有任何推文。</p>
         </div>
       )}
     </div>

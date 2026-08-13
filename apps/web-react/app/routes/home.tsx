@@ -44,7 +44,7 @@ export default function HomePage() {
       <div className="mb-8 flex flex-col items-center gap-2">
         <div className="h-px w-8 bg-border" />
         <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/40">
-          Core Features
+          核心功能
         </span>
       </div>
 

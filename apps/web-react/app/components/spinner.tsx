@@ -6,9 +6,9 @@ export function Spinner({ className }: { className?: string }) {
       className={cn('animate-spin', className)}
       viewBox="0 0 24 24"
       xmlns="http://www.w3.org/2000/svg"
-      aria-label="Loading..."
+      aria-label="加载中..."
     >
-      <title>Loading...</title>
+      <title>加载中...</title>
       <circle
         className="opacity-25"
         cx="12"

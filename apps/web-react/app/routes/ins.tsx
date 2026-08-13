@@ -2,6 +2,7 @@ import type { IGPost, IGUserInfo, PaginatedResponse } from '@tweets-viewer/share
 import type { Route } from './+types/ins'
 import { PAGE_SIZE } from '@tweets-viewer/shared'
 import { isAxiosError } from 'axios'
+import { Inbox, TriangleAlert } from 'lucide-react'
 import { useRevalidator, useSearchParams } from 'react-router'
 import { IGPostSkeleton } from '~/components/ins/IGPostSkeleton'
 import { InstagramPostCard } from '~/components/ins/InstagramPostCard'
@@ -21,8 +22,8 @@ interface InsLoaderData {
 export function meta({ params }: Route.MetaArgs) {
   const { name } = params
   return [
-    { title: `@${name} on Instagram` },
-    { name: 'description', content: `Instagram posts from @${name}` },
+    { title: `@${name} 的 Instagram` },
+    { name: 'description', content: `查看 @${name} 的 Instagram 帖子` },
   ]
 }
 
@@ -92,7 +93,9 @@ export default function InsPage({ loaderData, params }: Route.ComponentProps) {
   if (error) {
     return (
       <div className="w-full max-w-3xl mx-auto flex flex-col items-center justify-center py-20 gap-3 text-center">
-        <div className="text-5xl mb-2">⚠️</div>
+        <div className="flex size-16 items-center justify-center rounded-full bg-muted/60">
+          <TriangleAlert className="size-8 text-destructive" aria-hidden="true" />
+        </div>
         <p className="text-lg font-semibold">加载失败</p>
         <p className="text-sm text-muted-foreground max-w-md">{error}</p>
         <Button
@@ -110,8 +113,10 @@ export default function InsPage({ loaderData, params }: Route.ComponentProps) {
   if (!paginatedPosts.meta.total && paginatedPosts.data.length === 0) {
     return (
       <div className="w-full max-w-3xl mx-auto flex flex-col items-center justify-center py-20 gap-3 text-center">
-        <div className="text-5xl mb-2">📭</div>
-        <p className="text-lg font-semibold">No Instagram Data</p>
+        <div className="flex size-16 items-center justify-center rounded-full bg-muted/60">
+          <Inbox className="size-8 text-muted-foreground/60" aria-hidden="true" />
+        </div>
+        <p className="text-lg font-semibold">暂无 Instagram 归档</p>
         <p className="text-sm text-muted-foreground max-w-md">
           @
           {params.name}
@@ -141,12 +146,12 @@ export default function InsPage({ loaderData, params }: Route.ComponentProps) {
 
         {items.length === 0 && status === 'ready' && (
           <div className="text-center py-20 text-muted-foreground">
-            <p className="text-base font-medium">No posts found</p>
+            <p className="text-base font-medium">暂无帖子</p>
             <p className="text-sm opacity-70">
               @
               {params.name}
               {' '}
-              has no archived posts yet.
+              还没有归档帖子
             </p>
           </div>
         )}
@@ -167,7 +172,7 @@ export default function InsPage({ loaderData, params }: Route.ComponentProps) {
 
         {status === 'exhausted' && items.length > 0 && (
           <p className="text-center text-sm text-muted-foreground py-4 italic">
-            All posts loaded
+            已加载全部帖子
           </p>
         )}
       </div>

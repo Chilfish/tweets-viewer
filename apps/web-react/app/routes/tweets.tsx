@@ -17,8 +17,8 @@ import { apiClient } from '~/lib/utils'
 export function meta({ params }: Route.MetaArgs) {
   const { name } = params
   return [
-    { title: `@${name}'s Tweets` },
-    { name: 'description', content: `See all tweets from @${name}` },
+    { title: `@${name} 的推文` },
+    { name: 'description', content: `查看 @${name} 的全部归档推文` },
   ]
 }
 
