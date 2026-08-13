@@ -32,6 +32,7 @@ app.get('/:name', async (c) => {
     return c.json({ user: null, posts } satisfies InsPageResponse, 404)
   }
 
+  c.header('Cache-Control', 'public, max-age=300, s-maxage=3600')
   return c.json({ user, posts } satisfies InsPageResponse)
 })
 

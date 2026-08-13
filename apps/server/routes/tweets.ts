@@ -10,6 +10,7 @@ import {
   getTweetsByDateRange,
   getTweetsByKeyword,
   getTweetsCount,
+  getTweetsYearStats,
 } from '@tweets-viewer/database'
 import { Hono } from 'hono'
 import { getContext } from 'hono/context-storage'
@@ -21,10 +22,17 @@ const app = new Hono<AppType>()
 const tweetCountCache = new SimpleLRUCache<string, number>(1000)
 const mediaTweetCountCache = new SimpleLRUCache<string, number>(1000)
 
+/** 归档数据每日一变：浏览器 5 分钟 + CDN 1 小时（4A-3） */
+const CACHE_CONTROL = 'public, max-age=300, s-maxage=3600'
+/** 用户列表变化极低频：CDN 缓存 24h */
+const USERS_CACHE_CONTROL = 'public, max-age=300, s-maxage=86400'
+
 const paginationSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(100).default(10),
   reverse: z.enum(['true', 'false']).default('false').transform(v => v === 'true'),
+  /** keyset 游标（滚动续载用，见 Specification §4.1） */
+  cursor: z.string().min(1).max(64).optional(),
 })
 
 function getPaginationParams(c: Context) {
@@ -56,10 +64,26 @@ const dateRangeSchema = z.object({
   noReplies: z.enum(['true', 'false']).default('false').transform(v => v === 'true'),
 })
 
+/** 解析 start/end（可单独提供，与 getTweets 的"必须成对"不同——媒体按年浏览只需 start） */
+function parseOptionalDateRange(c: Context) {
+  const start = c.req.query('start')
+  const end = c.req.query('end')
+  return {
+    startDate: start ? new Date(start) : undefined,
+    endDate: end ? new Date(end) : undefined,
+  }
+}
+
 const searchSchema = z.object({
   q: z.string().min(1).max(200),
-  name: z.string().min(1).max(50).regex(/^\w+$/).default(''),
+  /** 可选：为空时全库检索（全局搜索） */
+  name: z.string().min(1).max(50).regex(/^\w+$/).optional(),
 })
+
+function normalizeSearchParams(searchResult: z.infer<typeof searchSchema>) {
+  const { q: keyword, name = '' } = searchResult
+  return { keyword, name }
+}
 
 app.get('/get/:name', async (c) => {
   const name = getName(c)
@@ -74,7 +98,7 @@ app.get('/get/:name', async (c) => {
   if (!dateResult.success)
     return c.json({ error: 'invalid date range' }, 400)
 
-  const { page, pageSize, reverse } = pagination
+  const { page, pageSize, reverse, cursor } = pagination
   const { start, end, noReplies } = dateResult.data
 
   const startDate = start ? new Date(start) : null
@@ -98,6 +122,7 @@ app.get('/get/:name', async (c) => {
       pageSize,
       reverse,
       noReplies,
+      cursor,
     })
   }
   else {
@@ -118,9 +143,11 @@ app.get('/get/:name', async (c) => {
       reverse,
       total,
       noReplies,
+      cursor,
     })
   }
 
+  c.header('Cache-Control', CACHE_CONTROL)
   return c.json(tweets)
 })
 
@@ -133,7 +160,8 @@ app.get('/medias/:name', async (c) => {
   if (isError(pagination))
     return c.json({ error: `invalid pagination: ${pagination}` }, 400)
 
-  const { page, pageSize, reverse } = pagination
+  const { page, pageSize, reverse, cursor } = pagination
+  const { startDate, endDate } = parseOptionalDateRange(c)
   const { db } = getContext<AppType>().var
 
   let total = mediaTweetCountCache.get(name)
@@ -150,10 +178,26 @@ app.get('/medias/:name', async (c) => {
     page,
     pageSize,
     reverse,
+    cursor,
+    startDate,
+    endDate,
     total,
   })
 
+  c.header('Cache-Control', CACHE_CONTROL)
   return c.json(tweets)
+})
+
+app.get('/stats/:name', async (c) => {
+  const name = getName(c)
+  if (!name)
+    return c.json({ error: 'invalid name' }, 400)
+
+  const { db } = getContext<AppType>().var
+  const stats = await getTweetsYearStats(db, name)
+
+  c.header('Cache-Control', CACHE_CONTROL)
+  return c.json(stats)
 })
 
 app.get('/search', async (c) => {
@@ -162,12 +206,12 @@ app.get('/search', async (c) => {
     return c.json({ error: 'keyword is required (1-200 chars)' }, 400)
   }
 
-  const { q: keyword, name } = searchResult.data
+  const { keyword, name } = normalizeSearchParams(searchResult)
   const pagination = getPaginationParams(c)
   if (isError(pagination))
     return c.json({ error: `invalid pagination: ${pagination}` }, 400)
 
-  const { page, pageSize, reverse } = pagination
+  const { page, pageSize, reverse, cursor } = pagination
   const { db } = getContext<AppType>().var
   const tweets = await getTweetsByKeyword({
     db,
@@ -176,7 +220,9 @@ app.get('/search', async (c) => {
     reverse,
     page,
     pageSize,
+    cursor,
   })
+  c.header('Cache-Control', CACHE_CONTROL)
   return c.json(tweets)
 })
 
@@ -189,7 +235,7 @@ app.get('/get/:name/last-years-today', async (c) => {
   if (isError(pagination))
     return c.json({ error: `invalid pagination: ${pagination}` }, 400)
 
-  const { page, pageSize, reverse } = pagination
+  const { page, pageSize, reverse, cursor } = pagination
   const { db } = getContext<AppType>().var
 
   const tweets = await getLastYearsTodayTweets({
@@ -198,8 +244,11 @@ app.get('/get/:name/last-years-today', async (c) => {
     reverse,
     page,
     pageSize,
+    cursor,
   })
+  c.header('Cache-Control', CACHE_CONTROL)
   return c.json(tweets)
 })
 
+export { USERS_CACHE_CONTROL }
 export default app

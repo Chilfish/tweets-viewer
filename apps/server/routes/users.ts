@@ -4,6 +4,7 @@ import type { AppType } from '../common'
 import { getAllUsers, getUserByName } from '@tweets-viewer/database'
 import { Hono } from 'hono'
 import { getContext } from 'hono/context-storage'
+import { USERS_CACHE_CONTROL } from './tweets'
 
 const app = new Hono<AppType>()
 
@@ -12,6 +13,7 @@ app.get('/all', async (c) => {
 
   const users: EnrichedUser[] = await getAllUsers(db)
 
+  c.header('Cache-Control', USERS_CACHE_CONTROL)
   return c.json(users)
 })
 
@@ -23,6 +25,7 @@ app.get('/get/:name', async (c) => {
   const user: EnrichedUser | null = await getUserByName(db, name)
   if (!user)
     return c.json({ error: 'User not found' }, 404)
+  c.header('Cache-Control', USERS_CACHE_CONTROL)
   return c.json(user)
 })
 
