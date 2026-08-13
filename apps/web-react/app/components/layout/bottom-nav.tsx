@@ -10,7 +10,7 @@ export function BottomNav({ currentUser }: BottomNavProps) {
   const navItems = useNavItems(currentUser)
 
   return (
-    <div className="bottom-nav-chrome fixed bottom-0 left-0 right-0 z-50 bg-background/85 backdrop-blur-xl border-t border-border/40 transition-colors duration-200 pb-[env(safe-area-inset-bottom)] md:hidden">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/85 backdrop-blur-xl border-t border-border/40 transition-colors duration-200 pb-[env(safe-area-inset-bottom)] md:hidden">
       <div className="flex items-center justify-around h-14 px-2">
         {navItems.map(item => (
           <Link

@@ -17,7 +17,7 @@ export function TopNav({ title }: { title?: string }) {
   }
 
   return (
-    <div className="top-nav-chrome sticky top-0 z-50 bg-background/60 backdrop-blur-lg border-b border-border transition-colors duration-200">
+    <div className="sticky top-0 z-50 bg-background/60 backdrop-blur-lg border-b border-border transition-colors duration-200">
       <div className="flex items-center gap-2 py-1 px-4">
         {/* 有活跃用户时，用户名上下文由 UserSelector 完整版承载（头像+用户名合并），
             不再显示独立 @user 标题，避免用户名重复；无用户时（首页）显示站点名 */}

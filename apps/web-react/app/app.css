@@ -202,7 +202,10 @@
   }
 }
 
-/* --- View Transitions（5B-1）：路由切换旧页淡出/新页淡入 + 轻微位移 --- */
+/* --- View Transitions（5B-1）：路由切换整页淡入淡出 ---
+   Apple 式：chrome（sidebar/topnav/bottomnav/header）留在 root 快照跟随整体 crossfade，
+   不单独打 view-transition-name——持久元素打 name 会让浏览器对变化内容做 morph 插值（漂移/变形）。
+   共享元素过渡（hero）只用于真正跨状态的元素（媒体缩略图 ↔ 灯箱大图，见 MediaWall）。 */
 ::view-transition-old(root) {
   animation: view-fade-out 160ms var(--ease-apple) both;
 }
@@ -213,30 +216,12 @@
 @keyframes view-fade-out {
   to {
     opacity: 0;
-    transform: translateY(-4px);
   }
 }
 @keyframes view-fade-in {
   from {
     opacity: 0;
-    transform: translateY(6px);
   }
-}
-
-/* 共享 chrome 元素不参与 root 交叉淡入（同一元素在新旧快照中位置稳定，不跳动） */
-.top-nav-chrome {
-  view-transition-name: top-nav;
-}
-.sidebar-chrome {
-  view-transition-name: sidebar;
-}
-.bottom-nav-chrome {
-  view-transition-name: bottom-nav;
-}
-/* ProfileHeader 也是跨路由共享元素（同用户下 tweets/media/memo/ins 一致），稳定不跳。
-   切换用户时内容变化，由浏览器对同名元素做平滑 morph。 */
-.profile-container {
-  view-transition-name: profile;
 }
 
 @media (prefers-reduced-motion: reduce) {

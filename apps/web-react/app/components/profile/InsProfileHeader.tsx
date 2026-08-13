@@ -15,7 +15,10 @@ export function InsProfileHeader({ user, children }: InsProfileHeaderProps) {
   }
 
   return (
-    <div className="profile-container min-h-fit">
+    <div
+      key={user.username}
+      className="profile-container min-h-fit animate-in fade-in duration-300"
+    >
       <div className="px-4 sm:px-5 py-5 sm:py-6">
         {/* Top row: Avatar + Stats */}
         <div className="flex items-start gap-4 sm:gap-6 mb-4">
