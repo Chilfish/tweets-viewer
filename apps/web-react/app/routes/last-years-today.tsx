@@ -17,6 +17,7 @@ import { apiClient, cn } from '~/lib/utils'
 
 export const handle = {
   isWide: false,
+  pageTransition: 'fade',
   skeleton: <TweetsHydrateFallback />,
 }
 export function meta({ params }: Route.MetaArgs) {

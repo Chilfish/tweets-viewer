@@ -18,6 +18,7 @@ import { apiClient } from '~/lib/utils'
 
 export const handle = {
   isWide: true,
+  pageTransition: 'slide',
   skeleton: <MediaHydrateFallback />,
 }
 

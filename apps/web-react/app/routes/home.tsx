@@ -16,6 +16,7 @@ export function meta() {
 
 export const handle = {
   isHome: true,
+  pageTransition: 'fade',
 }
 
 export default function HomePage() {

@@ -24,6 +24,7 @@ export function meta({ params }: Route.MetaArgs) {
 
 export const handle = {
   isWide: false,
+  pageTransition: 'slide',
   skeleton: <TweetsHydrateFallback />,
 }
 

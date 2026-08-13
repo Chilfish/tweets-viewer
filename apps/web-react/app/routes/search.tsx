@@ -15,6 +15,7 @@ import { apiClient } from '~/lib/utils'
 
 export const handle = {
   isWide: false,
+  pageTransition: 'fade',
   skeleton: <TweetsHydrateFallback />,
 }
 

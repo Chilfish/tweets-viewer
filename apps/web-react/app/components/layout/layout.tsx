@@ -3,7 +3,7 @@ import type { IGUserInfo } from '@tweets-viewer/shared'
 import type { ClientLoaderFunctionArgs, ShouldRevalidateFunctionArgs } from 'react-router'
 import type { Route } from './+types/layout'
 import { isAxiosError } from 'axios'
-import { Outlet, useLocation, useMatches, useParams } from 'react-router'
+import { Outlet, useLocation, useMatches, useParams, useViewTransitionState } from 'react-router'
 import { TopNav } from '~/components/layout/top-nav'
 import { InsProfileHeader } from '~/components/profile/InsProfileHeader'
 import { InsProfileHeaderSkeleton } from '~/components/skeletons/ins-profile'
@@ -143,10 +143,26 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
   // 渲染时优先使用 store 中的最新数据，loader 数据作为降级
   const displayActiveUser = storeActiveUser || loaderActiveUser
 
+  // 5B-2：页面进入动画与 ViewTransition 协调。
+  // - 有活跃 ViewTransition 时（route handle 定义 transition 类型的导航），交给文档级过渡，
+  //   不再叠加 CSS 进入动画（避免双重动画）；
+  // - 无 VT（不支持/降级/浏览器前进后退）时，按 route handle 的 pageTransition 类型播放进入动画。
+  const isViewTransitioning = useViewTransitionState(location.pathname)
+  const currentHandle = matches[matches.length - 1]?.handle as
+    | { pageTransition?: 'default' | 'fade' | 'slide' }
+    | undefined
+  const pageTransition = currentHandle?.pageTransition ?? 'default'
+
+  const enterAnimation = {
+    default: 'animate-in fade-in-0 duration-300',
+    fade: 'animate-in fade-in-0 duration-500',
+    slide: 'animate-in fade-in-0 slide-in-from-right-4 duration-300',
+  }[pageTransition]
+
   const outletWrapper = (
     <div
       key={location.pathname}
-      className="animate-in fade-in-0 duration-300 w-full"
+      className={cn('w-full', !isViewTransitioning && enterAnimation)}
     >
       <Outlet />
     </div>
