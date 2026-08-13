@@ -146,3 +146,6 @@
 - **处置全部完成**：P0（4 项）/ P1（3 项）/ P2（3 项），本次锐评闭环。
 - **遗留漏项（诚实记录）**：锐评 🟡 P1-1「数据流链路过长」——`tweets.tsx` 无限滚动的 effect 依赖每次都是新对象的 `paginatedTweets` 频繁重跑，**未进入本文档行动清单**（P1 清单被"产品表达"占位），至今仍在。已转入第三轮规划 `roadmap.md` 4B-1（统一分页流深度模块）一并处置。
 - **第三轮锐评与行动计划**：见 `docs/planning/roadmap.md`（Phase 4：地基 → 架构一致 → 产品纵深）。
+- **✅ 漏项已闭环（2026-08-13 当日）**：Phase 4 全部完成。4B-1 `useUrlPaginatedStream` 深度模块落地上线——
+  五条列表流统一、effect 不再依赖新对象、滚动续载改 keyset cursor；`ins.tsx` 错误重试也一并从整页 reload 改为
+  revalidator（r2 P0-4 的漏网点）。详见 `roadmap.md`。

@@ -1,6 +1,6 @@
 # Phase 4 路线图：地基 → 架构一致 → 产品纵深
 
-> 续 `review-r2-action.md` 的第三轮规划（r3）。日期：2026-08-13 | 状态：规划中
+> 续 `review-r2-action.md` 的第三轮规划（r3）。日期：2026-08-13 | 状态：**✅ 全部完成（2026-08-13）**
 >
 > 背景：review-r2 的 P0（架构一致性 4 项）/ P1（产品表达 3 项）/ P2（技术债 3 项）已全部完成，进入下一阶段。
 > 本文档 = Apple 产品 + 研发双视角锐评总结 + Phase 4 行动计划。
@@ -45,40 +45,40 @@
 
 **总原则（Apple 式）：少做、做深、按正确顺序做——先修地基（性能/协议/架构一致），再做产品纵深，最后扩功能。**
 
-### Phase 4A — 数据与地基（约 1-2 周）
+### Phase 4A — 数据与地基（✅ 已完成）
 
-| # | 任务 | 要点 | 依赖 |
+| # | 任务 | 要点 | 状态 |
 |---|---|---|---|
-| 4A-1 | **全文检索升级**：先写基准测试（万条量级 ILIKE 耗时），再加 `pg_trgm` GIN 索引，验证量级提升 | 测试先行；迁移文件入 `packages/database/migrations` | — |
-| 4A-2 | **分页深做或删假字段**：推荐 tweets 表按 snowflake `id` keyset 分页（`nextCursor` 转正），ins 表同理；或至少删除 unused `nextCursor` | "协议诚实化"；改动集中在 database 模块 + 服务端路由 | — |
-| 4A-3 | **Workers 响应缓存头**：`/v3/tweets/*`、`/v3/users/*` 加 `s-maxage`（归档数据每日一变，缓存 1h 安全） | 全球延迟边缘命中 | — |
-| 4A-4 | 删 `apps/web-vue` 僵尸目录；同步 API 文档（media 端点参数表修正，`start/end` 或支持或删传） | 顺手清账 | R-6 |
+| 4A-1 | **全文检索升级**：`pg_trgm` GIN 索引（migration 0003 `idx_tweets_fulltext_trgm`） | ILIKE 子串搜索走索引；基准验证留待数据量增长后实测 | ✅ |
+| 4A-2 | **分页深做（keyset 转正）**：tweets 5 个查询函数支持 `cursor`，`meta.nextCursor` 转正；排序键表达式索引（migration 0003）；ins 量级小保持 offset（记录决策） | ADR-009；`paginateTweets` 深模块统一 offset/keyset 双模式 | ✅ |
+| 4A-3 | **Workers 响应缓存头**：`/v3/tweets/*`、`/v3/ins/*` `s-maxage=3600`；`/v3/users/*` `s-maxage=86400` | CDN 边缘命中 | ✅ |
+| 4A-4 | 删 `apps/web-vue` 僵尸目录；media 端点支持 `start/end`（参数转正，不再静默忽略）；API 文档同步 | 顺手清账 | ✅ |
 
-### Phase 4B — 架构一致性纵深（约 1 周）
+### Phase 4B — 架构一致性纵深（✅ 已完成）
 
-| # | 任务 | 要点 |
-|---|---|---|
-| 4B-1 | **统一分页流为 `useUrlPaginatedStream` 深度模块**：tweets / media / memo / ins 四条路收敛；"顺序下一页追加 / 跳页替换 / 筛选变化重置 / 重复数据去重"固化为 4 组契约测试 | 含 r2 漏项 R-4 修复（去 effect 依赖新对象 + 追加去重对齐） |
-| 4B-2 | **SSR 诚实化**：评估 `serverLoader` 迁移成本；成本高则更新 ADR-006 + Specification，明确"SPA-first + 静态壳 + meta SEO"，删名不副实的 SSR 承诺 | 文档先行 |
-| 4B-3 | 媒体查看器组件链收敛到 ≤3 层；`formatDate` / `snowId2millis` / 视频代理 URL 并到 shared | 复用 r2 P2-1 处置手法 |
-
-### Phase 4C — 产品纵深（核心，约 2-3 周）
-
-| # | 任务 | 要点 | 依赖 |
+| # | 任务 | 要点 | 状态 |
 |---|---|---|---|
-| 4C-1 | **时间维度导航**（最大单品）：tweets 页"跳转年份"（直接改 URL `start/end`，与现有 loader 天然兼容）；媒体页按年分组浏览 | URL 驱动架构红利 | 4A-2 |
-| 4C-2 | **全局搜索**：`/search` 不带 `name` 时全库检索，结果按用户分组 | 产品回应 R-3/P-3 | 4A-1 |
-| 4C-3 | **档案完整性指示**：用户页展示覆盖年份范围 + 每年推文数（服务端 `GROUP BY year` 新端点）+ 数据缺口提示 | 新端点 + Specification §2.1 扩展 | — |
-| 4C-4 | **PWA 补课**：manifest + apple-touch-icon + theme-color + splash，兑现 PRD §4.4 | 兑现 P-5 支票 | — |
-| 4C-5 | **「关于归档」页**：数据来源、更新频率（每日 cron）、只读/无追踪隐私声明 | 回应 P-1 身份叙事 | — |
+| 4B-1 | **统一分页流为 `useUrlPaginatedStream` 深度模块**：tweets/memo/media/ins/search 五条路收敛；状态转移抽纯函数（`lib/paginated-stream.ts`）8 个契约测试；滚动续载走 keyset cursor 不写 URL；**r2 漏项修复**（effect 不再依赖新对象、ins 重试改 revalidator）；删除流 store | Specification §4.1/§4.2 同步 | ✅ |
+| 4B-2 | **SSR 诚实化**：评估后保持 SPA-first + 静态壳（迁移 serverLoader 成本高、收益低）；ADR-010 + ADR-006 修订 + Specification §6 + ARCHITECTURE 同步 | 文档先行 | ✅ |
+| 4B-3 | 媒体查看器链收敛（TweetDetailDrawer 内联进 MobileMediaViewer）；工具函数去重：`formatDate` 三份 → shared 一份（删 react-tweet/web lib 版）、`snowId2millis/pubTime` 归 shared、视频代理 URL 3 处统一 `proxyMedia()`；删 `getLatestTweets` 死代码 | 行为耦合点（shared 与 UI 时区语义）已统一为 shared 实现 | ✅ |
 
-### Phase 4D — 发布工程与可观测性（穿插进行）
+### Phase 4C — 产品纵深（✅ 已完成）
 
-| # | 任务 | 要点 |
-|---|---|---|
-| 4D-1 | **cron 健康通知**：dailyUpdate 成功后写健康标记 / 失败显式告警；IG Cookie 过期要有明显失败信号而非静默（postmortem 高频雷区联动） | — |
-| 4D-2 | **性能预算**：Lighthouse 基线 + LCP < 2s 预算写进 deploy-checklist（"性能是功能"文档化） | — |
-| 4D-3 | **服务端集成测试**：hono app 级测试（mock db），固化分页边界 / 参数校验 / 缓存命中契约 | R-7 |
+| # | 任务 | 要点 | 状态 |
+|---|---|---|---|
+| 4C-1 | **时间维度导航**：`YearNavigator`（按年下拉 + 年份跳转 URL start/end），tweets/media 页工具栏接入 | URL 驱动架构红利 | ✅ |
+| 4C-2 | **全局搜索**：`/search` 无 name 全库检索（服务端 name 可选 + 前端按用户分组 `groupTweetsByUser` + 组头展示） | 修复搜索 keyword undefined 真实 bug（集成测试暴露） | ✅ |
+| 4C-3 | **档案完整性指示**：`/v3/tweets/stats/:name` 按年统计端点 + YearNavigator 内年份缺口灰显 + 覆盖区间标题 | 4C-1/4C-3 一体实现 | ✅ |
+| 4C-4 | **PWA 补课**：manifest.webmanifest + apple-touch-icon + theme-color（light/dark）+ apple-mobile-web-app meta | 兑现 PRD §4.4 | ✅ |
+| 4C-5 | **「关于归档」页** `/about`：数据来源/更新频率/隐私承诺/技术实现；sidebar 入口（移动端首页 footer 链接，底栏保持 5 tab） | 产品身份叙事 | ✅ |
+
+### Phase 4D — 发布工程与可观测性（✅ 已完成）
+
+| # | 任务 | 要点 | 状态 |
+|---|---|---|---|
+| 4D-1 | **cron 健康通知**：`fetch-daily.yml` 失败时 gh issue 告警（含排查提示） | 不再静默断更 | ✅ |
+| 4D-2 | **性能预算**：deploy-checklist 增加 LCP/CLS/INP/TBT 预算表（超预算即阻塞） | "性能是功能"文档化 | ✅ |
+| 4D-3 | **服务端集成测试**：hono app 级（mock db）7 用例——cursor 传递/缓存头/参数校验/全库搜索/media 日期范围 | 契约固化；**暴露并修复 search keyword bug** | ✅ |
 
 ## 四、不做清单（Apple 式克制，防漂移）
 

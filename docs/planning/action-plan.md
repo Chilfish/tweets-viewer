@@ -33,15 +33,17 @@
 | T8 | postmortem 001：Windows symlink mode 残留 | ✅ 已沉淀 |
 | T9 | **Apple 视角设计锐评与处置**（P0 架构一致性 ✅ → P1 产品表达 ✅ → P2 技术债） | ✅ **全部完成**（P0 4 项 / P1 3 项 / P2 3 项，见 `review-r2-action.md`） |
 
-## Phase 4 — 当前阶段（见 `docs/planning/roadmap.md`）
+## Phase 4 — 地基 → 架构一致 → 产品纵深（✅ 已完成，见 `docs/planning/roadmap.md`）
 
 ### 目标
 
-1. 数据与地基：全文检索索引（pg_trgm）、分页深做（keyset）或删假字段、Workers 缓存头
-2. 架构一致：统一分页流为深度模块 hook、SSR 诚实化、媒体链收敛
-3. 产品纵深：时间维度导航、全局搜索、档案完整性指示、PWA 补课
+1. 数据与地基：全文检索索引（pg_trgm）、分页深做（keyset 转正）、Workers 缓存头
+2. 架构一致：统一分页流为深度模块 hook、SSR 诚实化、媒体链收敛 + 工具去重
+3. 产品纵深：时间维度导航、全局搜索、档案完整性指示、PWA 补课、关于归档页
+4. 发布工程：cron 健康通知、性能预算文档、服务端集成测试（暴露并修复 search keyword bug）
 
 > 注：Fukuoka 抓取（T1/T2）确认为**临时研究脚本，不会入库**，原"数据清洗/去重入库"计划取消，详见 `roadmap.md` §二。
+> Phase 4 全部任务（4A×4 / 4B×3 / 4C×5 / 4D×3）已于 2026-08-13 完成并各自原子 commit。
 
 ## 约定
 
