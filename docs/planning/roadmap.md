@@ -1,6 +1,6 @@
 # Phase 4 路线图：地基 → 架构一致 → 产品纵深
 
-> 续 `review-r2-action.md` 的第三轮规划（r3）。日期：2026-08-13 | 状态：**✅ 全部完成（2026-08-13）**
+> 续 `review-r2-action.md` 的第三轮规划（r3）。日期：2026-08-13 | 状态：**✅ 全部完成（2026-08-13，4C-5 按反馈撤销）**
 >
 > 背景：review-r2 的 P0（架构一致性 4 项）/ P1（产品表达 3 项）/ P2（技术债 3 项）已全部完成，进入下一阶段。
 > 本文档 = Apple 产品 + 研发双视角锐评总结 + Phase 4 行动计划。
@@ -70,7 +70,7 @@
 | 4C-2 | **全局搜索**：`/search` 无 name 全库检索（服务端 name 可选 + 前端按用户分组 `groupTweetsByUser` + 组头展示） | 修复搜索 keyword undefined 真实 bug（集成测试暴露） | ✅ |
 | 4C-3 | **档案完整性指示**：`/v3/tweets/stats/:name` 按年统计端点 + YearNavigator 内年份缺口灰显 + 覆盖区间标题 | 4C-1/4C-3 一体实现 | ✅ |
 | 4C-4 | **PWA 补课**：manifest.webmanifest + apple-touch-icon + theme-color（light/dark）+ apple-mobile-web-app meta | 兑现 PRD §4.4 | ✅ |
-| 4C-5 | **「关于归档」页** `/about`：数据来源/更新频率/隐私承诺/技术实现；sidebar 入口（移动端首页 footer 链接，底栏保持 5 tab） | 产品身份叙事 | ✅ |
+| 4C-5 | **「关于归档」页** `/about`：数据来源/更新频率/隐私承诺/技术实现；sidebar 入口 | ~~已实施后撤销~~（2026-08-13 用户反馈"无人在意"）——路由/组件/导航入口全部移除；产品身份叙事改由首页 hero 承担 | ⏹ 撤销 |
 
 ### Phase 4D — 发布工程与可观测性（✅ 已完成）
 
