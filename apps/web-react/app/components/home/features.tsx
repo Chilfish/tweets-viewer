@@ -9,8 +9,8 @@ interface FeatureProps {
 
 function FeatureItem({ icon: Icon, title, description }: FeatureProps) {
   return (
-    <div className="group relative overflow-hidden rounded-2xl border bg-card/50 p-6 transition-all hover:bg-card hover:shadow-lg">
-      <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+    <div className="group relative overflow-hidden rounded-2xl border bg-card/50 p-6 transition-all duration-300 hover:bg-card hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98]">
+      <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:scale-110">
         <Icon className="h-5 w-5" />
       </div>
       <h3 className="mb-2 font-bold text-base">{title}</h3>

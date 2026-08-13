@@ -23,15 +23,15 @@ export function HomeMemoEntry() {
       viewTransition
       className="group relative flex w-full max-w-3xl flex-col items-center gap-1 overflow-hidden rounded-2xl border bg-card/50 px-6 py-8 text-center transition-all hover:bg-card hover:shadow-lg active:scale-[0.98] animate-in fade-in slide-in-from-bottom-3 duration-500 delay-150 fill-mode-both"
     >
-      {/* 顶部柔光，营造"回忆滤镜" */}
-      <div className="pointer-events-none absolute -top-12 left-1/2 size-44 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" />
+      {/* 顶部柔光，营造"回忆滤镜"；hover 时增强呼吸感 */}
+      <div className="pointer-events-none absolute -top-12 left-1/2 size-44 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl transition-all duration-500 group-hover:bg-primary/20 group-hover:scale-125" />
 
       <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/50">
         <CalendarDays className="size-3.5" />
         那年今日
       </div>
 
-      <h2 className="mt-1 text-5xl font-bold tracking-tight text-foreground">
+      <h2 className="mt-1 text-5xl font-bold tracking-tight text-foreground transition-transform duration-300 group-hover:scale-[1.02]">
         {dateLabel}
       </h2>
 
@@ -44,7 +44,7 @@ export function HomeMemoEntry() {
 
       <span className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-primary">
         翻开今天
-        <ChevronRight className="size-3 transition-transform group-hover:translate-x-0.5" />
+        <ChevronRight className="size-3 transition-transform duration-300 group-hover:translate-x-1" />
       </span>
     </Link>
   )
