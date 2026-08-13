@@ -3,15 +3,14 @@ import type { PaginatedResponse } from '@tweets-viewer/shared'
 import type { Route } from './+types/search'
 import { PAGE_SIZE } from '@tweets-viewer/shared'
 import { Search, SearchX } from 'lucide-react'
-import { useEffect, useRef } from 'react'
-import { useRevalidator, useRouteLoaderData, useSearchParams } from 'react-router'
+import { useRouteLoaderData, useSearchParams } from 'react-router'
 import { SearchInput } from '~/components/search-input'
 import { TweetsHydrateFallback } from '~/components/skeletons/tweets'
 import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
 import { MyTweet } from '~/components/tweet/Tweet'
 import { TweetFeedStatus } from '~/components/tweet/TweetFeedStatus'
+import { useUrlPaginatedStream } from '~/hooks/use-url-paginated-stream'
 import { apiClient } from '~/lib/utils'
-import { useTweetStore } from '~/store/use-tweet-store'
 
 export const handle = {
   isWide: false,
@@ -58,58 +57,40 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
 
 export default function SearchPage({ loaderData, params }: Route.ComponentProps) {
   const { paginatedTweets, q: serverQ } = loaderData
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams] = useSearchParams()
 
   const q = searchParams.get('q') || ''
   const page = Number(searchParams.get('page')) || 1
   const username = params.name
 
-  const { tweets, status, setStatus, appendTweets, resetStream } = useTweetStore()
-  const revalidator = useRevalidator()
   const layoutData = useRouteLoaderData('rootLayout') as { activeUser: EnrichedUser | null }
   const user = layoutData?.activeUser
 
-  const prevFilterKey = useRef<string>('')
-  const filterKey = `${q}-${username}`
-
-  useEffect(() => {
-    let shouldReset = false
-    if (prevFilterKey.current !== filterKey) {
-      shouldReset = true
-      prevFilterKey.current = filterKey
-    }
-
-    if (shouldReset || page === 1) {
-      resetStream()
-    }
-
-    if (paginatedTweets.data.length > 0) {
-      appendTweets(paginatedTweets.data)
-    }
-
-    if (!q) {
-      setStatus('ready')
-    }
-    else {
-      if (!paginatedTweets.meta.hasMore) {
-        setStatus('exhausted')
+  const { items, status, total, loadMore, retry } = useUrlPaginatedStream<EnrichedTweet>({
+    pageData: paginatedTweets,
+    extract: data => data.data,
+    filterKey: `${q}-${username}`,
+    page,
+    fetchNextPage: async ({ cursor }) => {
+      if (!q)
+        return null
+      try {
+        const { data } = await apiClient.get<PaginatedResponse<EnrichedTweet>>(`/tweets/search`, {
+          params: {
+            q,
+            name: username,
+            page: page + 1,
+            pageSize: PAGE_SIZE,
+            cursor,
+          },
+        })
+        return data
       }
-      else {
-        setStatus('ready')
+      catch {
+        return null
       }
-    }
-  }, [paginatedTweets, filterKey, page, resetStream, appendTweets, setStatus, q])
-
-  const handleLoadMore = () => {
-    if (status === 'fetching' || status === 'exhausted' || status === 'error')
-      return
-
-    setSearchParams((prev) => {
-      const currentP = Number(prev.get('page')) || 1
-      prev.set('page', (currentP + 1).toString())
-      return prev
-    }, { replace: true })
-  }
+    },
+  })
 
   const renderContent = () => {
     if (!q) {
@@ -126,7 +107,7 @@ export default function SearchPage({ loaderData, params }: Route.ComponentProps)
       )
     }
 
-    if (tweets.length === 0 && status !== 'fetching' && status !== 'error') {
+    if (items.length === 0 && status !== 'fetching' && status !== 'error') {
       return (
         <div className="flex flex-col items-center justify-center py-20 text-center gap-3">
           <div className="flex size-16 items-center justify-center rounded-full bg-muted/60">
@@ -144,7 +125,7 @@ export default function SearchPage({ loaderData, params }: Route.ComponentProps)
     return (
       <>
         <div className="flex flex-col gap-3">
-          {tweets.map(tweet => (
+          {items.map(tweet => (
             <MyTweet
               tweet={tweet}
               tweetAuthorName={user?.fullName ?? username ?? ''}
@@ -155,13 +136,13 @@ export default function SearchPage({ loaderData, params }: Route.ComponentProps)
 
         <TweetFeedStatus
           status={status}
-          hasTweets={tweets.length > 0}
-          onRetry={() => revalidator.revalidate()}
+          hasTweets={items.length > 0}
+          onRetry={retry}
         />
 
         <InfiniteScrollTrigger
-          onIntersect={handleLoadMore}
-          disabled={status === 'fetching' || status === 'exhausted' || status === 'error'}
+          onIntersect={loadMore}
+          disabled={status !== 'ready'}
         />
       </>
     )
@@ -190,17 +171,17 @@ export default function SearchPage({ loaderData, params }: Route.ComponentProps)
       </div>
 
       <div className="w-full max-w-3xl flex flex-col gap-4 mt-4 mb-16">
-        {q && tweets.length > 0 && (
+        {q && items.length > 0 && (
           <div className="flex items-baseline gap-2 px-1">
             <span className="text-sm font-semibold text-foreground">
               「
               {q}
-              」
+              »
             </span>
             <span className="text-xs text-muted-foreground">
               ·
               {' '}
-              {paginatedTweets.meta?.total ?? 0}
+              {total ?? 0}
               {' '}
               条结果
             </span>

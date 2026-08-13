@@ -4,17 +4,16 @@ import type { Route } from './+types/last-years-today'
 import { PAGE_SIZE } from '@tweets-viewer/shared'
 import { isAxiosError } from 'axios'
 import { History } from 'lucide-react'
-import { useEffect, useRef } from 'react'
-import { useRevalidator, useRouteLoaderData, useSearchParams } from 'react-router'
+import { useRouteLoaderData, useSearchParams } from 'react-router'
 import { TweetsHydrateFallback } from '~/components/skeletons/tweets'
 import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
 import { MyTweet } from '~/components/tweet/Tweet'
 import { TweetFeedStatus } from '~/components/tweet/TweetFeedStatus'
 import { TweetNavigation } from '~/components/tweet/TweetNavigation'
 import { TweetsToolbarActions } from '~/components/tweet/tweets-toolbar-actions'
+import { useUrlPaginatedStream } from '~/hooks/use-url-paginated-stream'
 import { groupTweetsByYear } from '~/lib/group-tweets-by-year'
 import { apiClient, cn } from '~/lib/utils'
-import { useTweetStore } from '~/store/use-tweet-store'
 
 export const handle = {
   isWide: false,
@@ -85,59 +84,42 @@ function RitualHeader({ totalCount }: { totalCount: number }) {
 
 export default function LastYearsTodayPage({ loaderData, params }: Route.ComponentProps) {
   const { paginatedTweets } = loaderData
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams] = useSearchParams()
 
   const page = Number(searchParams.get('page')) || 1
   const reverse = searchParams.get('reverse') === 'true'
 
-  const { tweets, status, setStatus, appendTweets, resetStream } = useTweetStore()
-  const revalidator = useRevalidator()
   const layoutData = useRouteLoaderData('rootLayout') as { activeUser: EnrichedUser | null }
   const user = layoutData?.activeUser
 
-  const prevFilterKey = useRef<string>('')
-  const filterKey = `${params.name}-${reverse}`
+  const { items, status, total, loadMore, retry } = useUrlPaginatedStream<EnrichedTweet>({
+    pageData: paginatedTweets,
+    extract: data => data.data,
+    filterKey: `${params.name}-${reverse}`,
+    page,
+    fetchNextPage: async ({ cursor }) => {
+      try {
+        const { data } = await apiClient.get<PaginatedResponse<EnrichedTweet>>(`/tweets/get/${params.name}/last-years-today`, {
+          params: {
+            page: page + 1,
+            pageSize: PAGE_SIZE,
+            reverse,
+            cursor,
+          },
+        })
+        return data
+      }
+      catch {
+        return null
+      }
+    },
+  })
 
-  useEffect(() => {
-    let shouldReset = false
-    if (prevFilterKey.current !== filterKey) {
-      shouldReset = true
-      prevFilterKey.current = filterKey
-    }
-
-    if (shouldReset || page === 1) {
-      resetStream()
-    }
-
-    if (paginatedTweets.data.length > 0) {
-      appendTweets(paginatedTweets.data)
-    }
-
-    if (!paginatedTweets.meta.hasMore) {
-      setStatus('exhausted')
-    }
-    else {
-      setStatus('ready')
-    }
-  }, [paginatedTweets, filterKey, page, resetStream, appendTweets, setStatus])
-
-  const totalCount = paginatedTweets.meta?.total ?? 0
-  const totalPages = Math.ceil(totalCount / PAGE_SIZE)
-  const yearGroups = groupTweetsByYear(tweets)
-
-  const handleLoadMore = () => {
-    if (status === 'fetching' || status === 'exhausted' || status === 'error')
-      return
-
-    setSearchParams((prev) => {
-      const currentP = Number(prev.get('page')) || 1
-      prev.set('page', (currentP + 1).toString())
-      return prev
-    }, { replace: true })
-  }
+  const totalPages = Math.ceil(total / PAGE_SIZE)
+  const yearGroups = groupTweetsByYear(items)
 
   const renderTweets = () => {
-    if (status !== 'fetching' && tweets.length === 0) {
+    if (status !== 'fetching' && items.length === 0) {
       return (
         <div className="py-12 text-center flex flex-col gap-2 items-center justify-center text-muted-foreground">
           <History className="size-12 opacity-20" />
@@ -165,13 +147,13 @@ export default function LastYearsTodayPage({ loaderData, params }: Route.Compone
 
         <TweetFeedStatus
           status={status}
-          hasTweets={tweets.length > 0}
-          onRetry={() => revalidator.revalidate()}
+          hasTweets={items.length > 0}
+          onRetry={retry}
         />
 
         <InfiniteScrollTrigger
-          onIntersect={handleLoadMore}
-          disabled={status === 'fetching' || status === 'exhausted' || status === 'error'}
+          onIntersect={loadMore}
+          disabled={status !== 'ready'}
         />
       </>
     )
@@ -187,7 +169,7 @@ export default function LastYearsTodayPage({ loaderData, params }: Route.Compone
       </div>
 
       <div className="w-full max-w-3xl flex flex-col gap-4 mt-4 mb-16">
-        <RitualHeader totalCount={totalCount} />
+        <RitualHeader totalCount={total} />
         {renderTweets()}
       </div>
     </>

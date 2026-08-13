@@ -2,15 +2,14 @@ import type { IGPost, IGUserInfo, PaginatedResponse } from '@tweets-viewer/share
 import type { Route } from './+types/ins'
 import { PAGE_SIZE } from '@tweets-viewer/shared'
 import { isAxiosError } from 'axios'
-import { useEffect, useRef } from 'react'
-import { useSearchParams } from 'react-router'
+import { useRevalidator, useSearchParams } from 'react-router'
 import { IGPostSkeleton } from '~/components/ins/IGPostSkeleton'
 import { InstagramPostCard } from '~/components/ins/InstagramPostCard'
 import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
 import { TweetNavigation } from '~/components/tweet/TweetNavigation'
 import { Button } from '~/components/ui/button'
+import { useUrlPaginatedStream } from '~/hooks/use-url-paginated-stream'
 import { apiClient } from '~/lib/utils'
-import { useIGStore } from '~/store/use-ig-store'
 
 interface InsLoaderData {
   user: IGUserInfo | null
@@ -65,35 +64,29 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
 
 export default function InsPage({ loaderData, params }: Route.ComponentProps) {
   const { posts: paginatedPosts, error } = loaderData
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams] = useSearchParams()
+  const revalidator = useRevalidator()
 
   const page = Number(searchParams.get('page')) || 1
-  const { posts, status, setStatus, appendPosts, resetStream } = useIGStore()
-  const prevFilterKey = useRef<string>('')
-  const filterKey = params.name
 
-  useEffect(() => {
-    let shouldReset = false
-    if (prevFilterKey.current !== filterKey) {
-      shouldReset = true
-      prevFilterKey.current = filterKey
-    }
-
-    if (shouldReset || page === 1) {
-      resetStream()
-    }
-
-    if (paginatedPosts.data.length > 0) {
-      appendPosts(paginatedPosts.data)
-    }
-
-    if (!paginatedPosts.meta.hasMore) {
-      setStatus('exhausted')
-    }
-    else {
-      setStatus('ready')
-    }
-  }, [paginatedPosts, filterKey, page, resetStream, appendPosts, setStatus])
+  const { items, status, total, loadMore, retry } = useUrlPaginatedStream<IGPost>({
+    pageData: paginatedPosts,
+    extract: data => data.data,
+    filterKey: params.name,
+    page,
+    // ins_posts 量级小，服务端无 cursor：回退 page 续载（offset）
+    fetchNextPage: async () => {
+      try {
+        const { data } = await apiClient.get<InsLoaderData>(`/ins/${params.name}`, {
+          params: { page: page + 1 },
+        })
+        return data.posts
+      }
+      catch {
+        return null
+      }
+    },
+  })
 
   // --- Error state: loader 显式标记的加载失败（区别于 404 空态）
   if (error) {
@@ -105,7 +98,7 @@ export default function InsPage({ loaderData, params }: Route.ComponentProps) {
         <Button
           variant="secondary"
           className="mt-2"
-          onClick={() => window.location.reload()}
+          onClick={() => revalidator.revalidate()}
         >
           重新加载
         </Button>
@@ -129,17 +122,7 @@ export default function InsPage({ loaderData, params }: Route.ComponentProps) {
     )
   }
 
-  const totalPages = Math.ceil(paginatedPosts.meta.total / PAGE_SIZE)
-
-  const handleLoadMore = () => {
-    if (status === 'fetching' || status === 'exhausted' || status === 'error')
-      return
-    setSearchParams((prev) => {
-      const currentP = Number(prev.get('page')) || 1
-      prev.set('page', (currentP + 1).toString())
-      return prev
-    }, { replace: true })
-  }
+  const totalPages = Math.ceil(total / PAGE_SIZE)
 
   return (
     <>
@@ -151,12 +134,12 @@ export default function InsPage({ loaderData, params }: Route.ComponentProps) {
 
       <div className="w-full max-w-3xl flex flex-col gap-4 mb-16">
         <div className="flex flex-col gap-4">
-          {posts.map(post => (
+          {items.map(post => (
             <InstagramPostCard key={post.id} post={post} />
           ))}
         </div>
 
-        {posts.length === 0 && status === 'ready' && (
+        {items.length === 0 && status === 'ready' && (
           <div className="text-center py-20 text-muted-foreground">
             <p className="text-base font-medium">No posts found</p>
             <p className="text-sm opacity-70">
@@ -168,12 +151,21 @@ export default function InsPage({ loaderData, params }: Route.ComponentProps) {
           </div>
         )}
 
+        {status === 'error' && (
+          <div className="flex flex-col items-center gap-2 py-8">
+            <p className="text-sm text-destructive font-medium">加载失败</p>
+            <Button variant="secondary" size="sm" onClick={retry}>
+              点击重试
+            </Button>
+          </div>
+        )}
+
         <InfiniteScrollTrigger
-          onIntersect={handleLoadMore}
-          disabled={status === 'fetching' || status === 'exhausted' || status === 'error'}
+          onIntersect={loadMore}
+          disabled={status !== 'ready'}
         />
 
-        {status === 'exhausted' && posts.length > 0 && (
+        {status === 'exhausted' && items.length > 0 && (
           <p className="text-center text-sm text-muted-foreground py-4 italic">
             All posts loaded
           </p>

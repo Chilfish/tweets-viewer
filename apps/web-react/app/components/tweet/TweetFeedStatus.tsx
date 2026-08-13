@@ -1,4 +1,4 @@
-import type { StreamStatus } from '~/store/use-tweet-store'
+import type { StreamStatus } from '~/hooks/use-url-paginated-stream'
 import { Loader2 } from 'lucide-react'
 
 interface TweetFeedStatusProps {
