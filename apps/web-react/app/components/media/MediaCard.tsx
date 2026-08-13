@@ -20,17 +20,18 @@ export const MediaCard = memo(({ item, onClick }: MediaCardProps) => {
         aspectRatio: `${item.width} / ${item.height}`,
       }}
     >
-      {/* 图片/封面 */}
+      {/* 图片/封面 —— 5E-3：加载中模糊占位，加载后清晰淡入（blur-up） */}
       <img
         src={item.url}
         alt="media"
         className={cn(
-          'w-full h-full object-cover transition-opacity duration-300',
-          isLoaded ? 'opacity-100' : 'opacity-0',
+          'w-full h-full object-cover transition-all duration-500',
+          isLoaded
+            ? 'opacity-100 blur-0 scale-100'
+            : 'opacity-100 blur-md scale-[1.03]',
         )}
         onLoad={() => setIsLoaded(true)}
         loading="lazy"
-        // Key prop isn't needed here, but decoding="async" helps with main thread
         decoding="async"
       />
 

@@ -1,6 +1,6 @@
 import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
 import type { FlatMediaItem } from '~/lib/media'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { MyTweet } from '~/components/tweet/Tweet'
 import { ScrollArea } from '~/components/ui/scroll-area'
 import { Sheet, SheetContent } from '~/components/ui/sheet'
@@ -30,10 +30,27 @@ export function MobileMediaViewer({
 }: MobileMediaViewerProps) {
   const [showTweetDetails, setShowTweetDetails] = useState(false)
   const [showControls, setShowControls] = useState(true)
+  // 5E-3：灯箱滑动切换手势（横向滑动阈值 50px）
+  const touchStartX = useRef<number | null>(null)
 
   const toggleControls = useCallback(() => {
     setShowControls(prev => !prev)
   }, [])
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0]?.clientX ?? null
+  }, [])
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (touchStartX.current == null)
+      return
+    const deltaX = (e.changedTouches[0]?.clientX ?? 0) - touchStartX.current
+    touchStartX.current = null
+    // 只处理明显横向滑动（> 50px），纵向滚动不受影响
+    if (Math.abs(deltaX) < 50)
+      return
+    onNavigateMedia(deltaX < 0 ? 'next' : 'prev')
+  }, [onNavigateMedia])
 
   useEffect(() => {
     if (open) {
@@ -62,6 +79,8 @@ export function MobileMediaViewer({
           tabIndex={0}
           onClick={toggleControls}
           onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && toggleControls()}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
         >
           {isVideo && mp4Video ? (
             <MediaVideo
