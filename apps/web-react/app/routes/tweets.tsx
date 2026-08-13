@@ -117,10 +117,11 @@ export default function TweetsPage({ loaderData, params }: Route.ComponentProps)
 
       <div className="w-full max-w-3xl flex flex-col gap-4 mb-16">
         {/* 5B-3：URL 驱动的跳页/筛选变化 → 整页内容淡入（key 随 search 变化重挂载）；
-            滚动续载不写 URL → key 不变，仅新追加的推文触发各自的入场动画，避免整屏闪动 */}
+            滚动续载不写 URL → key 不变，仅新追加的推文触发各自的入场动画，避免整屏闪动。
+            5E-1：流式布局用分隔线切分推文（去卡片边框） */}
         <div
           key={searchParams.toString()}
-          className="flex flex-col gap-3 animate-in fade-in duration-300"
+          className="flex flex-col divide-y divide-border/40 animate-in fade-in duration-300"
         >
           {items.map(tweet => (
             <MyTweet

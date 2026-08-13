@@ -133,7 +133,7 @@ export default function LastYearsTodayPage({ loaderData, params }: Route.Compone
       <>
         <div
           key={searchParams.toString()}
-          className="flex flex-col gap-3 animate-in fade-in duration-300"
+          className="flex flex-col divide-y divide-border/40 animate-in fade-in duration-300"
         >
           {yearGroups.map((group, idx) => (
             <section key={`${group.year}-${idx}`}>

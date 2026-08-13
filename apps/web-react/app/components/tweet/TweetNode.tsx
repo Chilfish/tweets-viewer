@@ -53,9 +53,10 @@ export const TweetNode = forwardRef<HTMLDivElement, TweetNodeProps>(({
   const avatarSize = isQuoted ? 'small' : 'medium'
 
   // 样式映射表，替代混乱的 cn
+  // 5E-1：主推文流式（无边框）；引用推文保留轻量卡片盒，保持嵌套层级可读
   const styles = useMemo(() => ({
     container: cn('relative', {
-      'p-3 rounded-2xl mt-2': isQuoted,
+      'p-3 rounded-2xl mt-2 border border-border/50 bg-card/40': isQuoted,
     }),
   }), [isQuoted, variant])
 

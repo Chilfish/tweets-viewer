@@ -154,7 +154,7 @@ export default function SearchPage({ loaderData, params }: Route.ComponentProps)
       <>
         <div
           key={searchParams.toString()}
-          className="flex flex-col gap-3 animate-in fade-in duration-300"
+          className="flex flex-col divide-y divide-border/40 animate-in fade-in duration-300"
         >
           {username
             ? items.map(tweet => (

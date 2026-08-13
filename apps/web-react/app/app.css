@@ -255,13 +255,15 @@
 }
 
 @layer components {
+  /* 5E-1：沉浸流式（Twitter 原生）——去边框/去卡片阴影/去圆角，
+     列表内以分隔线（divide-*）切分，推文本身透明背景融入页面 */
   .tweet-container {
     @apply w-full min-w-[250px] max-w-[720px] overflow-hidden;
     @apply text-foreground;
-    @apply font-sans font-normal border rounded-xl box-border;
-    @apply border-border;
-    @apply bg-card;
-    @apply transition-[background-color,box-shadow] duration-200 p-[0.7rem];
+    @apply font-sans font-normal box-border;
+    @apply transition-colors duration-200 p-[0.7rem];
+    /* 5E-2：列表项 hover 高亮（桌面），流式下保留可读的悬浮反馈 */
+    @apply md:hover:bg-accent/40;
   }
 
   .tweet-header {
