@@ -10,6 +10,12 @@ interface MediaPreviewModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onNavigate: (index: number) => void
+  /**
+   * 共享元素过渡名（hero transition）：与触发缩略图同名时，
+   * 浏览器自动在新旧快照间做位移/缩放 morph（"从哪里来回哪里去"）。
+   * 不传则灯箱图不带 view-transition-name（普通淡入淡出）。
+   */
+  heroName?: string
 }
 
 export function MediaPreviewModal({
@@ -18,6 +24,7 @@ export function MediaPreviewModal({
   open,
   onOpenChange,
   onNavigate,
+  heroName,
 }: MediaPreviewModalProps) {
   const isMobile = useIsMobile()
   const currentItem = items[currentIndex]
@@ -118,6 +125,7 @@ export function MediaPreviewModal({
           tweetMediaItems={tweetMediaItems}
           currentMediaIndexInTweet={currentMediaIndexInTweet}
           onNavigateMedia={navigateMedia}
+          heroName={heroName}
         />
       )
     : (
@@ -131,6 +139,7 @@ export function MediaPreviewModal({
           currentIndex={currentIndex}
           totalItems={items.length}
           onNavigateMedia={navigateMedia}
+          heroName={heroName}
         />
       )
 }

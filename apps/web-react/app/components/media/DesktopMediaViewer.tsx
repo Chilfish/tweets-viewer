@@ -19,6 +19,8 @@ interface DesktopMediaViewerProps {
   currentIndex: number
   totalItems: number
   onNavigateMedia: (direction: 'next' | 'prev') => void
+  /** 共享元素过渡名（hero transition），与触发缩略图同名 */
+  heroName?: string
 }
 
 export function DesktopMediaViewer({
@@ -29,6 +31,7 @@ export function DesktopMediaViewer({
   tweetMediaItems,
   currentMediaIndexInTweet,
   onNavigateMedia,
+  heroName,
 }: DesktopMediaViewerProps) {
   const [showControls, setShowControls] = useState(true)
 
@@ -70,6 +73,7 @@ export function DesktopMediaViewer({
                   playsInline
                   loop={currentItem.type === 'animated_gif'}
                   onClick={e => e.stopPropagation()}
+                  style={heroName ? { viewTransitionName: heroName } : undefined}
                 >
                   <source src={proxyMedia(mp4Video.url)} type={mp4Video.content_type} />
                 </MediaVideo>
@@ -79,6 +83,7 @@ export function DesktopMediaViewer({
                   alt="preview"
                   className="max-w-full max-h-full object-contain"
                   containerClassName="w-auto h-auto"
+                  style={heroName ? { viewTransitionName: heroName } : undefined}
                 />
               )}
 

@@ -17,6 +17,8 @@ interface MobileMediaViewerProps {
   tweetMediaItems: FlatMediaItem[]
   currentMediaIndexInTweet: number
   onNavigateMedia: (direction: 'next' | 'prev') => void
+  /** 共享元素过渡名（hero transition），与触发缩略图同名 */
+  heroName?: string
 }
 
 export function MobileMediaViewer({
@@ -27,6 +29,7 @@ export function MobileMediaViewer({
   tweetMediaItems,
   currentMediaIndexInTweet,
   onNavigateMedia,
+  heroName,
 }: MobileMediaViewerProps) {
   const [showTweetDetails, setShowTweetDetails] = useState(false)
   const [showControls, setShowControls] = useState(true)
@@ -91,6 +94,7 @@ export function MobileMediaViewer({
               playsInline
               loop={currentItem.type === 'animated_gif'}
               onClick={e => e.stopPropagation()}
+              style={heroName ? { viewTransitionName: heroName } : undefined}
             >
               <source src={proxyMedia(mp4Video.url)} type={mp4Video.content_type} />
             </MediaVideo>
@@ -100,6 +104,7 @@ export function MobileMediaViewer({
               alt="preview"
               className="max-w-full max-h-full object-contain"
               draggable={false}
+              style={heroName ? { viewTransitionName: heroName } : undefined}
             />
           )}
         </div>
