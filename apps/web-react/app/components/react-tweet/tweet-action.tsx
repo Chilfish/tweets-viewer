@@ -63,7 +63,8 @@ export function TweetAction({ tweet, className }: TweetActionProps) {
         >
           <div className={
             cn(
-              'flex items-center justify-center group-active:bg-current/10 rounded-full transition-colors p-2',
+              // 5C-4：触控目标 ≥44px（移动端通过 padding 扩张点击区）
+              'flex items-center justify-center group-active:bg-current/10 rounded-full transition-colors p-2 pointer-coarse:p-3.5',
               action.hoverColor,
               action.hoverBg,
             )
@@ -78,7 +79,7 @@ export function TweetAction({ tweet, className }: TweetActionProps) {
       ))}
 
       <button
-        className="flex items-center group transition-colors cursor-pointer p-2 -mr-2 rounded-full hover:text-sky-500 hover:bg-sky-500/10 active:scale-95"
+        className="flex items-center group transition-colors cursor-pointer p-2 -mr-2 rounded-full hover:text-sky-500 hover:bg-sky-500/10 active:scale-95 pointer-coarse:p-3.5 pointer-coarse:-mr-3.5"
         title="分享"
       >
         <div className="p-1">

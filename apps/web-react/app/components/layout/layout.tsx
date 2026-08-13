@@ -8,6 +8,7 @@ import { TopNav } from '~/components/layout/top-nav'
 import { InsProfileHeader } from '~/components/profile/InsProfileHeader'
 import { InsProfileHeaderSkeleton } from '~/components/skeletons/ins-profile'
 import { useIsMobile } from '~/hooks/use-mobile'
+import { useGlobalShortcuts } from '~/hooks/use-global-shortcuts'
 import { apiClient, cn } from '~/lib/utils'
 import { useUserStore } from '~/store/use-user-store'
 import { ProfileHeader } from '../profile/ProfileHeader'
@@ -131,6 +132,7 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
   const location = useLocation()
   const isMobile = useIsMobile()
   const curUserName = params.name
+  useGlobalShortcuts()
 
   const matches = useMatches()
   const isWide = matches.some((m: any) => m.handle?.isWide)

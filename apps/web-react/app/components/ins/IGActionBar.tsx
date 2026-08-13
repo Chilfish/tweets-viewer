@@ -22,17 +22,17 @@ export function IGActionBar({ className, postUrl }: IGActionBarProps) {
   return (
     <div className={cn('flex items-center justify-between px-4 my-2', className)}>
       <div className="flex items-center gap-4">
-        <button aria-label="点赞" className="p-1 -m-1 active:scale-90 transition-transform">
+        <button aria-label="点赞" className="p-1 -m-1 active:scale-90 transition-transform pointer-coarse:p-2.5 pointer-coarse:-m-2.5">
           <Heart className="size-6 text-[#FF3040] fill-[#FF3040]" />
         </button>
-        <button aria-label="评论" className="p-1 -m-1 active:scale-90 transition-transform">
+        <button aria-label="评论" className="p-1 -m-1 active:scale-90 transition-transform pointer-coarse:p-2.5 pointer-coarse:-m-2.5">
           <MessageCircle className="size-6" />
         </button>
         {postUrl
           ? (
               <a
                 aria-label="分享"
-                className="p-1 -m-1 inline-flex active:scale-90 transition-transform"
+                className="p-1 -m-1 inline-flex active:scale-90 transition-transform pointer-coarse:p-2.5 pointer-coarse:-m-2.5"
                 href={postUrl}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -41,13 +41,13 @@ export function IGActionBar({ className, postUrl }: IGActionBarProps) {
               </a>
             )
           : (
-              <button aria-label="分享" className="p-1 -m-1 active:scale-90 transition-transform">
+              <button aria-label="分享" className="p-1 -m-1 active:scale-90 transition-transform pointer-coarse:p-2.5 pointer-coarse:-m-2.5">
                 {ShareIcon}
               </button>
             )}
       </div>
 
-      <button aria-label="收藏" className="p-1 -m-1 active:scale-90 transition-transform">
+      <button aria-label="收藏" className="p-1 -m-1 active:scale-90 transition-transform pointer-coarse:p-2.5 pointer-coarse:-m-2.5">
         <Bookmark className="size-6 text-[#262626] fill-[#262626] dark:text-[#f5f5f5] dark:fill-[#f5f5f5]" />
       </button>
     </div>

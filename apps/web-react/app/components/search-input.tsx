@@ -16,7 +16,10 @@ interface SearchInputProps {
 /** 原生风（rounded-full）搜索框：左侧放大镜 + 可清空，回车/点击提交。 */
 export function SearchInput({ user, className, placeholder, defaultValue }: SearchInputProps) {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [keyword, setKeyword] = useState(defaultValue || '')
+  // 5C-4：键盘快捷键 `/`/⌘K 跳转而来时（URL 带 focus=search）自动聚焦
+  const shouldAutoFocus = searchParams.get('focus') === 'search'
 
   const handleSearch = (e?: FormEvent) => {
     e?.preventDefault()
@@ -40,10 +43,12 @@ export function SearchInput({ user, className, placeholder, defaultValue }: Sear
         </InputGroupAddon>
 
         <InputGroupInput
+          id="global-search-input"
           aria-label="搜索归档推文"
           placeholder={placeholder || '搜索归档推文'}
           type="search"
           autoComplete="off"
+          autoFocus={shouldAutoFocus}
           value={keyword}
           onChange={e => setKeyword(e.target.value)}
         />
