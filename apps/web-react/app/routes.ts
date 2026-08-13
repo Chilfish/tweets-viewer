@@ -13,5 +13,6 @@ export default [
     route('/search/:name?', 'routes/search.tsx'),
     route('/media/:name', 'routes/media.tsx'),
     route('/ins/:name', 'routes/ins.tsx'),
+    route('/about', 'routes/about.tsx'),
   ]),
 ] satisfies RouteConfig

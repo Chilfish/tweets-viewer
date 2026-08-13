@@ -1,4 +1,5 @@
 import { formatDate } from '@tweets-viewer/shared'
+import { Link } from 'react-router'
 import { Separator } from '~/components/ui/separator'
 
 interface LinkProps {
@@ -58,6 +59,9 @@ export function HomeFooter() {
             <span className="hidden md:inline">•</span>
           </>
         )}
+        <Link to="/about" className="hover:text-primary transition-colors">
+          关于这个归档
+        </Link>
         <div className="flex items-center gap-1.5 px-2 py-0.5 bg-muted/30 rounded-full border border-border/50">
           <span className="w-1.5 h-1.5 bg-green-500/50 rounded-full animate-pulse" />
           <span>{__GIT_HASH__}</span>

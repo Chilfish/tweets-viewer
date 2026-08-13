@@ -7,7 +7,7 @@ interface BottomNavProps {
 }
 
 export function BottomNav({ currentUser }: BottomNavProps) {
-  const navItems = useNavItems(currentUser)
+  const navItems = useNavItems(currentUser).filter(item => !item.hideOnMobile)
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/85 backdrop-blur-xl border-t border-border/40 transition-colors duration-200 pb-[env(safe-area-inset-bottom)] md:hidden">
