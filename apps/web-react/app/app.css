@@ -173,6 +173,26 @@
   html {
     @apply font-sans;
   }
+
+  /* --- 5D-1：iOS 滚动细节 ---
+     - overscroll-behavior：阻止滚动链穿透（下拉刷新/边缘回弹不带动页面外）
+     - -webkit-tap-highlight 已在下方统一透明处理 */
+  html,
+  body {
+    overscroll-behavior-y: none;
+  }
+
+  /* iOS 触摸回弹保持原生手感（默认即为 auto，这里显式声明意图） */
+  main {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* 底部安全区：给 fixed 底栏之外的内容预留空间，避免被 Home Indicator 遮挡 */
+  @supports (padding-bottom: env(safe-area-inset-bottom)) {
+    body {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+  }
 }
 
 /* --- View Transitions（5B-1）：路由切换旧页淡出/新页淡入 + 轻微位移 --- */

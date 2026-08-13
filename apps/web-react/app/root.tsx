@@ -41,11 +41,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <link rel="icon" type="image/jpeg" href="/icon.jpg" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="theme-color" content="#f5f9fb" media="(prefers-color-scheme: light)" />
         <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="推文存档" />
         <Meta />
         <Links />
         <script
