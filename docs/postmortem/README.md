@@ -10,6 +10,7 @@
 |---|---|---|---|---|
 | [001](001-windows-symlink-mode-sticky.md) | Windows 下符号链接改普通文件后 index mode 残留 symlink | 工具反馈滞后 | symlink→file 迁移必须 `git rm --cached` + `git add` 刷新 mode，提交后核对 `git ls-files -s` | 已沉淀 |
 | [002](002-vitest-component-test-infra.md) | Storybook addon-vitest 接入吞掉 test.include + Vitest 4 projects 配置踩坑 | 工具反馈滞后 | 会接管 include 的测试插件必须用 vitest projects 拆分，跑完核对 Test Files 数量防静默吞测试 | 已沉淀 |
+| [003](003-view-transition-persistent-chrome-morph.md) | View Transitions 的 `view-transition-name` 误用在持久 chrome 元素上 → morph 漂移；灯箱滚动锁 + `transition-all` 布局跳动 | API 契约未核实 | `view-transition-name` 是共享元素过渡（缩略图↔大图），持久元素打 name 会 morph 内容变形；modal 滚动锁不手动加 | 已沉淀 |
 
 ## 高频雷区（写码前自查）
 
@@ -30,6 +31,9 @@
 | 字符串拼类名 | 用 `cn()` |
 | `@/` 导入 | 用 `~/` 前缀 |
 | 测试插件接管 include | `storybookTest()` 会覆盖 `test.include` → 用 vitest `test.projects` 拆分 story 与常规测试；子项目不继承 tsconfig paths / coverage 仅根级；RTL 自动 cleanup 依赖全局 `afterEach`，关 globals 时在 setup 显式 `afterEach(cleanup)`；跑完核对 Test Files 数量（见 [002](002-vitest-component-test-infra.md)） |
+| `view-transition-name` 误用 | 该属性是**共享元素过渡**：只用于同一视觉对象在两个快照中的**不同 DOM 元素**（如媒体缩略图 ↔ 灯箱大图）；**持久布局元素**（sidebar/nav/header）打 name 会让浏览器对变化内容做 morph 插值 → 漂移变形。持久元素留在 root 快照跟随整体 crossfade，root 动画保持纯 opacity 不位移（见 [003](003-view-transition-persistent-chrome-morph.md)） |
+| modal 滚动锁重复 | Base UI Dialog/Sheet `modal` 自带 body 滚动锁，**不要手动加** `body.style.overflow`（重复锁恢复时序混乱） |
+| `transition-all` 滥用 | 滚动条消失/视口宽度变化会触发 `transition-all` 动画化布局位移 → 用 `transition-[具体属性]`（如 `transition-[max-width]`） |
 
 ### 3. 流程（非代码，简要记录）
 
