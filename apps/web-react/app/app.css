@@ -263,15 +263,13 @@
 
 @layer components {
   /* 推文卡片：bg-card + 边框 + 圆角，与页面背景明确区分（用户反馈：流式去边框后分不清边界）。
-     保留 hover 高亮（5E-2）与 token 化颜色（5A-2）。 */
+     卡片本身不做 hover 变色（用户反馈：变色很丑）；交互反馈交给卡片内链接/按钮。 */
   .tweet-container {
     @apply w-full min-w-[250px] max-w-[720px] overflow-hidden;
     @apply text-foreground;
     @apply font-sans font-normal border rounded-xl box-border;
     @apply border-border bg-card;
     @apply transition-colors duration-200 p-[0.7rem];
-    /* 5E-2：列表项 hover 高亮（桌面），卡片上保留可读的悬浮反馈 */
-    @apply md:hover:bg-accent/40;
   }
 
   .tweet-header {
