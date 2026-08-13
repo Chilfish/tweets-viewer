@@ -47,6 +47,7 @@ export function Sidebar({ currentUser }: SidebarProps) {
               to={item.href}
               viewTransition
               className={cn(
+                // 5D-3：桌面 hover 质感——背景过渡 + 图标轻微位移
                 'group flex items-center justify-start gap-4 p-3 xl:px-4 rounded-full transition-all duration-200 active:scale-[0.98]',
                 item.disabled && 'pointer-events-none opacity-40',
                 item.isActive
@@ -55,7 +56,7 @@ export function Sidebar({ currentUser }: SidebarProps) {
               )}
             >
               <item.icon className={cn(
-                'size-4 shrink-0 transition-transform group-hover:scale-110',
+                'size-4 shrink-0 transition-transform duration-200 group-hover:scale-110 group-hover:-translate-x-0.5',
                 item.isActive && 'fill-current',
               )}
               />
