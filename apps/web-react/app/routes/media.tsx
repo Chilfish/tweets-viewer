@@ -120,7 +120,8 @@ export default function MediaPage({ loaderData, params }: Route.ComponentProps) 
             status={status}
             hasItems={items.length > 0}
             onRetry={retry}
-            emptyTitle="本页没有发现媒体内容"
+            // MediaWall 内置空态，FeedStatus 只负责尾部加载/错误/已全部
+            hideEmptyState
             tailText="已加载全部媒体"
           />
           {/* 触底触发器 */}

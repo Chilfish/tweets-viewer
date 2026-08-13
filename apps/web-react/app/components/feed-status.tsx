@@ -19,6 +19,8 @@ interface FeedStatusProps {
   errorMessage?: string
   /** 尾部"已全部加载"文案 */
   tailText?: string
+  /** 隐藏空态（由宿主组件自己渲染空态，如 MediaWall 内置空态） */
+  hideEmptyState?: boolean
   className?: string
 }
 
@@ -42,10 +44,17 @@ export function FeedStatus({
   emptyDescription,
   errorMessage = '网络开小差了，请稍后重试。',
   tailText = '已加载全部内容',
+  hideEmptyState = false,
   className,
 }: FeedStatusProps) {
   if (status === 'idle')
     return null
+
+  // 空态由宿主组件渲染时，FeedStatus 只负责尾部状态
+  if (hideEmptyState && !hasItems) {
+    if (status === 'ready' || status === 'exhausted')
+      return null
+  }
 
   // ── 尾部状态（已有内容时的加载/错误/已全部加载）──
   if (hasItems) {
@@ -86,6 +95,10 @@ export function FeedStatus({
   }
 
   // ── 空态 / 全页错误态（无内容）──
+  // fetching 且无内容时：骨架/加载态由宿主或 handle.skeleton 负责，这里不重复渲染空态
+  if (status === 'fetching')
+    return null
+
   return (
     <div
       className={cn(
