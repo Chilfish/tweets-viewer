@@ -49,6 +49,8 @@
 - **背景**: 需要 SEO 友好 + 流畅交互
 - **理由**: 首屏 SSR 提供可分享/可索引的初始渲染，SPA 提供无刷新交互
 - **后果**: 服务端需处理加载器（loader）数据获取；客户端 Hydration 后接管
+- **修订 (2026-08-13, 见 ADR-010)**: 实现为全路由 `clientLoader` + HydrateFallback 骨架屏，
+  动态内容由客户端渲染（SPA-first）。本文档"首屏 SSR 渲染内容"的表述**已废弃**，以 ADR-010 为准。
 
 ## ADR-007: IG 用户信息并入 users 表
 
@@ -65,6 +67,27 @@
 - **背景**: Hono v4 + Drizzle + Neon Postgres (Serverless) 需要 Serverless 部署
 - **理由**: Nitro 提供 Workers 友好的构建链；Hono 轻量适配
 - **后果**: 部署命令 `bun run deploy`；限流在 Workers 层 (200 req/60s) + 应用层 (hono-rate-limiter)
+
+## ADR-009: Keyset 分页（nextCursor 转正）
+
+- **日期**: 2026-08-13
+- **决策**: tweets 系列端点支持 `cursor` 参数做 keyset 续载；`meta.nextCursor` 转正为滚动协议
+- **背景**: 原协议声明 `nextCursor` 字段但全仓库零使用，所有分页为 OFFSET；深翻页（page 5000）随页码退化
+- **理由**: snowflake id 时间有序（排序键 = `COALESCE(retweeted_original_id, tweetId)`），keyset 零额外索引成本
+  （migration 0003 补表达式索引）；无限滚动（流动）与分页器（定位）各用其长
+- **后果**: 滚动续载不写 URL（见 Specification §4.1/§4.2 修订）；分页器跳页仍走 offset；
+  `ins_posts` 量级小，保持 offset 不引入 keyset（见 `modules/ins.ts` 注释）
+
+## ADR-010: SSR 诚实化（SPA-first + 静态壳）
+
+- **日期**: 2026-08-13
+- **决策**: 保持全路由 `clientLoader`（SPA-first），不再宣称"首屏 SSR 渲染内容"
+- **背景**: ADR-006 宣称首屏 SSR（SEO 友好），但实现为 `clientLoader` + HydrateFallback，
+  首屏是静态壳 + 骨架屏，动态内容由客户端请求渲染，爬虫拿到的是空壳
+- **理由**: 迁移 `serverLoader` 需重构全部 loader + 服务端缓存/水合/持久化适配，收益（动态内容 SEO）
+  对个人归档项目有限；路由 `meta()` 已覆盖主要 SEO 表面（title/description）
+- **后果**: 首屏 = 静态壳 + 骨架屏，内容客户端渲染；URL 驱动状态保证可分享/可书签；
+  Specification §6 更新渲染模型表述
 
 ## 技术栈总览
 

@@ -94,9 +94,12 @@
   interface Meta {
     total: number // 归档总数（用于计算总页数）
     hasMore: boolean // 是否存在下一页（用于控制触发器）
-    nextCursor?: string // (可选) 游标
+    nextCursor?: string // keyset 游标（滚动续载用）
   }
   ```
+- **keyset 续载（nextCursor 转正）**: 当 `meta.hasMore` 为 `true` 时，服务端返回 `meta.nextCursor`
+  （排序键 = `COALESCE(retweeted_original_id, tweetId)`，snowflake 时间有序）。探索模式（无限滚动）
+  用 `?cursor=<nextCursor>` 续载下一页，深翻页不随页码退化。IG 帖子流（量级小）不返回游标，保持 page 分页。
 - **守卫逻辑**: 只有当 `meta.hasMore` 为 `true` 且当前不处于 `Fetching/Error` 状态时，才允许发起下一页请求。
 
 ### 4.2 混合导航模式 (Hybrid Navigation Model)
@@ -105,12 +108,15 @@
 
 1.  **探索模式 (Infinite Scroll)**:
     - **行为**: 向下滚动到底部时，自动加载下一页并 _追加 (Append)_ 到列表末尾。
-    - **目的**: 提供沉浸式的连续阅读体验。
+    - **状态载体**: **keyset 游标续载，不写 URL**（滚动进度是流动态，URL 保持定位锚点）；服务端不返回游标时
+      回退为 URL `page` 递增。
+    - **目的**: 提供沉浸式的连续阅读体验，深翻页性能不退化。
 
 2.  **定位模式 (Discrete Pagination)**:
     - **行为**: 通过分页器跳转到特定页码。
-    - **副作用**: 触发 _列表替换 (Replace)_ 而非追加，并重置滚动位置到顶部。
-    - **目的**: 允许用户快速访问归档的特定部分（如最早的内容）。
+    - **状态载体**: URL `page` 参数（`setSearchParams`），触发 loader 重新拉取并 _替换 (Replace)_ 列表，
+      重置滚动位置到顶部。
+    - **目的**: 允许用户快速访问归档的特定部分（如最早的内容），并可通过 URL 分享/书签定位。
 
 ### 4.3 首页入口 (Home Entry)
 
@@ -195,3 +201,6 @@
 1. **SRP 原则**: 组件只负责渲染和 URL 修改，不负责数据获取逻辑。
 2. **SEO 友好**: 所有分页和筛选状态都反映在 URL 中，支持分享和书签。
 3. **错误恢复**: 网络请求失败时，必须在列表底部提供“点击重试”机制。
+4. **渲染模型（SPA-first + 静态壳，见 ADR-010）**: 首屏为静态壳 + 骨架屏，动态内容由
+   `clientLoader` 在客户端渲染；路由 `meta()` 提供 title/description 覆盖主要 SEO 表面。
+   不承诺服务端渲染动态内容。

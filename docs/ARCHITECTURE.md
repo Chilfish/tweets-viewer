@@ -29,8 +29,8 @@ tweets-viewer/
 ### 2.1 `apps/web-react` — 前端
 
 - **职责**：推文归档的沉浸式阅读终端（只读）
-- **技术栈**：React 19 + React Router v7 (SSR mode) + Tailwind CSS v4 + shadcn/ui
-- **状态管理**：Zustand (全局持久化) + Jotai (原子化) + useState (组件局部)
+- **技术栈**：React 19 + React Router v7 (SPA-first + 静态壳，见 ADR-010) + Tailwind CSS v4 + Base UI/COSS
+- **状态管理**：Zustand (全局持久化) + useState (组件局部)；分页/筛选状态在 URL query params
 - **关键路由**（定义于 `app/routes.ts`）：
   | URL | 视图 |
   |-----|------|
@@ -212,5 +212,5 @@ tweets-viewer/
 3. **URL 驱动状态**：前后端分页/筛选状态统一由 URL 管理，支持书签和分享
 4. **服务端驱动分页**：`PaginatedResponse.meta.hasMore` 精确控制列表末尾行为
 5. **双层持久化**：Zustand `persist` (localStorage) 缓存用户/设置；axios-cache-interceptor 缓存 API 响应
-6. **SSR + SPA 混合**：React Router v7 SSR mode 提供 SEO 友好的初始渲染 + SPA 流畅交互
+6. **SSR 诚实化（SPA-first + 静态壳）**：全路由 `clientLoader`，首屏静态壳 + 骨架屏，动态内容客户端渲染；SEO 由路由 `meta()` 覆盖（见 ADR-010）
 7. **碳基读取 + 离线写入**：前端纯读库/读静态，抓取入库独立运行，互不干扰
