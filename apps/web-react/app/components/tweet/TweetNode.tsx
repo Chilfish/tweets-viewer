@@ -1,10 +1,10 @@
 import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
+import { formatDate, pubTime } from '@tweets-viewer/shared'
 import { Repeat2Icon } from 'lucide-react'
 import { forwardRef, useMemo } from 'react'
-import { cn, pubTime } from '~/lib/utils'
+import { cn } from '~/lib/utils'
 import { useMediaViewer } from '~/store/use-media-viewer'
 import {
-  formatDate,
   TweetAction,
   TweetBody,
   TweetContainer,
@@ -81,7 +81,7 @@ export const TweetNode = forwardRef<HTMLDivElement, TweetNodeProps>(({
             {' '}
             转推于
             {' '}
-            {formatDate(pubTime(retweetedId))}
+            {formatDate(pubTime(retweetedId), { timezone: 'beijing', fmt: 'yyyy年MM月dd日 HH:mm:ss' })}
           </a>
         )
       }

@@ -1,6 +1,7 @@
 import type { EnrichedTweet, MediaAnimatedGif, MediaVideo as TMediaVideo } from '@tweets-viewer/rettiwt-api'
 import { useRef, useState } from 'react'
 import { MediaImage, MediaVideo } from '~/components/ui/media'
+import { proxyMedia } from '~/lib/utils'
 import {
   getMediaUrl,
   getMp4Video,
@@ -74,7 +75,7 @@ export function TweetMediaVideo({ media, showCoverOnly }: Props) {
         tabIndex={showPlayButton ? -1 : 0}
       >
         <source
-          src={`https://proxy.chilfish.top/${mp4Video.url}`}
+          src={proxyMedia(mp4Video.url)}
           type={mp4Video.content_type}
         />
       </MediaVideo>

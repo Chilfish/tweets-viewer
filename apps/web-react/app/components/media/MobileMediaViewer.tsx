@@ -1,11 +1,13 @@
 import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
 import type { FlatMediaItem } from '~/lib/media'
 import { useCallback, useEffect, useState } from 'react'
+import { MyTweet } from '~/components/tweet/Tweet'
+import { ScrollArea } from '~/components/ui/scroll-area'
 import { Sheet, SheetContent } from '~/components/ui/sheet'
+import { proxyMedia } from '~/lib/utils'
 import { getMp4Video } from '../react-tweet/utils'
 import { MediaImage, MediaVideo } from '../ui/media'
 import { MediaViewerOverlay } from './MediaViewerOverlay'
-import { TweetDetailDrawer } from './TweetDetailDrawer'
 
 interface MobileMediaViewerProps {
   open: boolean
@@ -71,7 +73,7 @@ export function MobileMediaViewer({
               loop={currentItem.type === 'animated_gif'}
               onClick={e => e.stopPropagation()}
             >
-              <source src={`https://proxy.chilfish.top/${mp4Video.url}`} type={mp4Video.content_type} />
+              <source src={proxyMedia(mp4Video.url)} type={mp4Video.content_type} />
             </MediaVideo>
           ) : (
             <MediaImage
@@ -93,11 +95,25 @@ export function MobileMediaViewer({
           onNavigate={onNavigateMedia}
         />
 
-        <TweetDetailDrawer
-          open={showTweetDetails}
-          onOpenChange={setShowTweetDetails}
-          currentTweet={currentTweet}
-        />
+        {/* 推文详情抽屉（内联，原 TweetDetailDrawer） */}
+        <Sheet open={showTweetDetails} onOpenChange={setShowTweetDetails}>
+          <SheetContent
+            side="bottom"
+            className="max-h-[82vh] rounded-t-xl transition-all duration-200 ease-out"
+          >
+            <div className="overflow-y-auto h-full">
+              <ScrollArea>
+                {currentTweet && (
+                  <MyTweet
+                    tweet={currentTweet}
+                    tweetAuthorName={currentTweet.user.name}
+                    hideMedia
+                  />
+                )}
+              </ScrollArea>
+            </div>
+          </SheetContent>
+        </Sheet>
       </SheetContent>
     </Sheet>
   )

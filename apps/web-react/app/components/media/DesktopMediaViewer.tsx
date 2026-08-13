@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { MyTweet } from '~/components/tweet/Tweet'
 import { MediaImage, MediaVideo } from '~/components/ui/media'
 import { ScrollArea } from '~/components/ui/scroll-area'
+import { proxyMedia } from '~/lib/utils'
 import { getMp4Video } from '../react-tweet/utils'
 import { MediaViewerOverlay } from './MediaViewerOverlay'
 
@@ -70,7 +71,7 @@ export function DesktopMediaViewer({
                   loop={currentItem.type === 'animated_gif'}
                   onClick={e => e.stopPropagation()}
                 >
-                  <source src={`https://proxy.chilfish.top/${mp4Video.url}`} type={mp4Video.content_type} />
+                  <source src={proxyMedia(mp4Video.url)} type={mp4Video.content_type} />
                 </MediaVideo>
               ) : (
                 <MediaImage

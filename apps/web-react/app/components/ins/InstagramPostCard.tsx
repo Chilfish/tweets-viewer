@@ -1,6 +1,7 @@
 import type { IGPost } from '@tweets-viewer/shared'
+import { formatDate } from '@tweets-viewer/shared'
 import { forwardRef } from 'react'
-import { cn, formatDate } from '~/lib/utils'
+import { cn } from '~/lib/utils'
 import { IGActionBar } from './IGActionBar'
 import { IGCaption } from './IGCaption'
 import { IGCardHeader } from './IGCardHeader'
@@ -59,7 +60,7 @@ export const InstagramPostCard = forwardRef<HTMLElement, InstagramPostCardProps>
         {/* 时间戳 — action 和 caption 之间 */}
         {post.created_at && (
           <p className="px-4 text-xs font-medium tabular-nums pb-1">
-            {formatDate(post.created_at)}
+            {formatDate(post.created_at, { fmt: 'yyyy-MM-dd' })}
           </p>
         )}
 

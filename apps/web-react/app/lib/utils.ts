@@ -3,7 +3,6 @@ import { apiUrl } from '@tweets-viewer/shared'
 import Axios from 'axios'
 import { buildMemoryStorage, buildWebStorage, setupCache } from 'axios-cache-interceptor'
 import { clsx } from 'clsx'
-import { format, parseISO } from 'date-fns'
 import { twMerge } from 'tailwind-merge'
 
 export const apiClient = Axios.create({
@@ -39,20 +38,4 @@ export function callAll<Args extends Array<unknown>>(
       fn?.(...args)
     }
   }
-}
-
-export function snowId2millis(id: string) {
-  return (BigInt(id) >> BigInt(22)) + BigInt(1288834974657)
-}
-
-export function pubTime(id: string) {
-  return new Date(Number(snowId2millis(id)))
-}
-
-export function formatDate(
-  date: Date | string,
-  formatString = 'yyyy-MM-dd',
-): string {
-  const dateObj = typeof date === 'string' ? parseISO(date) : date
-  return format(dateObj, formatString)
 }
