@@ -65,3 +65,5 @@ coverage/
 
 # vitest 附件产物（截图 diff/actual 等临时输出）
 .vitest-attachments
+# Local harness memory state
+.mnemon/
