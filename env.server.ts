@@ -17,6 +17,10 @@ const serverEnvSchema = z.object({
   ENVIRONMENT: z.enum(['development', 'production']).default('development'),
   TWEET_KEYS: z.string().min(1),
   DATABASE_URL: z.url(),
+  // 前端 web-react 的 API 基址（不含 `/v3`，`/v3` 由客户端拼接）。
+  // 由 vite.config.ts 注入到客户端 bundle（`import.meta.env.VITE_API_URL`），
+  // 也用于 dev server 的 `/api` 反向代理。
+  API_URL: z.url().default('https://tweet-api.chilfish.top'),
 })
 
 /**
@@ -49,7 +53,8 @@ export const isProduction = env.ENVIRONMENT === 'production'
  */
 export function getPublicEnv() {
   return {
-    // Add other public variables here that are safe to expose...
+    // 暴露给客户端的公共变量（均非敏感信息）
+    API_URL: env.API_URL,
   }
 }
 
