@@ -36,10 +36,7 @@ const gitInfo = getGitInfo()
 const mode = process.env.NODE_ENV ?? 'production'
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const loadedEnv = loadEnv(mode, repoRoot, '')
-const isDevServer = mode === 'development' || !process.env.NODE_ENV
-const resolvedApiUrl = isDevServer
-  ? 'http://localhost:3000'
-  : (loadedEnv.API_URL ?? 'https://tweet-api.chilfish.top')
+const resolvedApiUrl = loadedEnv.API_URL ?? 'https://tweet-api.chilfish.top'
 
 const babelInclude = /\.[jt]sx?$/
 const ReactCompilerConfig = { /* ... */ }

@@ -20,9 +20,7 @@ const app = new Hono<AppType>()
 app
   .use(contextStorage())
   .use(cors({
-    origin: isDev
-      ? '*'
-      : ['https://tweet.chilfish.top', 'https://tweets-viewer.pages.dev'],
+    origin: '*',
     allowMethods: ['GET', 'HEAD', 'OPTIONS'],
     maxAge: 86400,
   }))
