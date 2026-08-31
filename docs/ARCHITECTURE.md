@@ -202,6 +202,7 @@ tweets-viewer/
 | `TWEET_KEYS`   | Twitter API Key 列表（逗号分隔）  | `.env`, `wrangler.toml`, GitHub Secrets |
 | `INSTAGRAM_COOKIES` | Instagram 登录 Cookie       | `.env`, GitHub Secrets                  |
 | `ENVIRONMENT`  | 运行环境 (development/production) | `env.server.ts` (Zod 验证)              |
+| `API_URL`      | 前端 API 基址（不含 `/v3`），由 `vite.config.ts` 注入客户端 bundle | `.env` / 平台环境变量，`env.server.ts` (Zod 验证) |
 
 ---
 
