@@ -19,6 +19,19 @@
 | [API 接口文档](./API_DOCUMENTATION.md) | REST API 完整说明：`/v3/tweets/*`, `/v3/users/*`, `/v3/image/*`, `/v3/ins/*` |
 | [UI 设计系统](./ui-design/OVERVIEW.md) | Apple 风格 Glass 材质、圣杯布局、响应式断点、组件规范索引 |
 
+## 新项目规格（unified-sns/）
+
+> **Unified SNS Viewer**：基于本项目脚手架搭建的「多平台 SNS 帖子统一归档阅读器」新项目（前端 UI + 类型接口规格）。
+> 完整规格见 [Unified SNS Viewer 文档索引](unified-sns/README.md)。
+
+| 文档 | 说明 |
+|---|---|
+| [数据模型 (DATA-MODEL)](unified-sns/DATA-MODEL.md) | UnifiedPost 统一帖子类型、清洗规范、Adapter 接口、DB Schema 草案 |
+| [UI 设计 (UI-DESIGN)](unified-sns/UI-DESIGN.md) | 前端组件库与页面设计（继承本项目设计系统） |
+| [API 契约 (API)](unified-sns/API.md) | REST API 接口定义（PaginatedResponse + keyset 游标） |
+| [平台调研 (RESEARCH)](unified-sns/RESEARCH.md) | 各平台第三方抓取/导出工具评估与适配策略 |
+| [脚手架 (SCAFFOLD)](unified-sns/SCAFFOLD.md) | 从本项目复制清单、初始化步骤、踩坑表、Milestone |
+
 ## 规划（planning/）
 
 | 文档 | 说明 |
