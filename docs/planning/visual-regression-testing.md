@@ -90,7 +90,7 @@ Phase 5 完成后，UI 的视觉表现（token 化配色、`.dark` 双主题、�
 
 ## 五、CI 接入
 
-1. `ci.yml` 新增独立 **`visual` job**（不塞进现有 test job）：checkout → bun install → `bunx playwright install --with-deps --only-shell` → `apt-get install -y fonts-noto-cjk`（否则 CJK 文本在 ubuntu 渲染为豆腐块；基线与比对同环境则一致，但真字形才有意义）→ `bun --cwd apps/web-react run test:visual`
+1. `ci.yml` 新增独立 **`visual` job**（不塞进现有 test job）：checkout → bun install → `bunx playwright install --with-deps --only-shell` → `apt-get install -y fonts-noto-cjk`（否则 CJK 文本在 ubuntu 渲染为豆腐块；基线与比对同环境则一致，但真字形才有意义）→ `working-directory: apps/web-react` + `bun run test:visual`（**不能写 `bun --cwd X run <script>`：该形式无效——打 usage 且 exit 0 假绿**，CI 门禁会静默空转；隐式 `bun --cwd X <script>` 或 working-directory 才有效，详见 postmortem 004）
 2. 新建 `.github/workflows/update-screenshots.yml`：双触发（`workflow_dispatch` + `pull_request` labeled `update-screenshots`），ubuntu 上 `--update` 后 commit 回分支，附 PR summary（参照 Vitest 官方模板裁剪）
 
 ## 六、维护守则
