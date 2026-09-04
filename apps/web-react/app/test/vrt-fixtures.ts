@@ -1,4 +1,6 @@
 import type { EnrichedTweet, EnrichedUser, MediaDetails } from '@tweets-viewer/rettiwt-api'
+import type { IGMedia, IGPost } from '@tweets-viewer/shared'
+import type { FlatMediaItem } from '~/lib/media'
 
 /**
  * 视觉回归 fixture 的确定性图片源：内联 SVG data URL。
@@ -85,4 +87,58 @@ export function makeUser(overrides: Partial<EnrichedUser> = {}): EnrichedUser {
     isVerified: true,
     ...overrides,
   } as EnrichedUser
+}
+
+/** IG 媒体 fixture：缩略图用内联 SVG data URL，尺寸字段驱动网格布局 */
+export function makeIGMedia(count: number, overrides: Partial<IGMedia> = {}): IGMedia[] {
+  const urls = [fixturePhotoA, fixturePhotoB]
+  return Array.from({ length: count }, (_, i) => ({
+    num: i + 1,
+    media_id: `fixture-ig-media-${i}`,
+    display_url: urls[i % urls.length]!,
+    width: 1080,
+    height: 1080,
+    width_original: 1920,
+    height_original: 1080,
+    type: 'photo',
+    ...overrides,
+  }) as IGMedia)
+}
+
+/** IG 帖子 fixture：认证头像/多图/时间戳全分支可渲染 */
+export function makeIGPost(overrides: Partial<IGPost> = {}): IGPost {
+  return {
+    id: 'DFxYz12',
+    post_id: '3620000000000000000',
+    url: 'https://www.instagram.com/p/DFxYz12/',
+    username: 'chilfish',
+    fullname: 'Chilfish',
+    description: '週末の東京散歩 📷 #tokyowalk',
+    tags: ['#tokyowalk'],
+    likes: 1234,
+    type: 'post',
+    media: makeIGMedia(3),
+    avatar_url: fixtureAvatarUrl,
+    created_at: '2025-11-02T10:30:00.000Z',
+    verified: true,
+    ...overrides,
+  }
+}
+
+/** 媒体墙 FlatMediaItem fixture */
+export function makeFlatMediaItem(overrides: Partial<FlatMediaItem> = {}): FlatMediaItem {
+  const tweet = makeTweet()
+  return {
+    id: `${tweet.id}-0`,
+    tweetId: tweet.id,
+    mediaIndex: 0,
+    url: fixturePhotoA,
+    type: 'photo',
+    width: 1920,
+    height: 1080,
+    aspectRatio: 1080 / 1920,
+    createdAt: tweet.created_at,
+    tweet,
+    ...overrides,
+  }
 }
