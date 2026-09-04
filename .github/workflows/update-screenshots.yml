@@ -1,0 +1,75 @@
+# 视觉回归基线更新（CI-only 生成）
+#
+# 触发方式：
+# 1. PR 打 `update-screenshots` label（主要方式：故意改 UI 后重生成基线并 commit 回 PR 分支）
+# 2. workflow_dispatch（workflow 上 main 后可手动指定分支触发；禁止在 main 上直接跑）
+#
+# 环境必须与 ci.yml 的 visual job 严格同构（runner / playwright / CJK 字体），
+# 否则生成的基线与门禁环境不匹配 → visual job 永久红。
+# 本地 Windows 生成的 win32 基线对 CI 无效（系统字体栈渲染不同），已 gitignore。
+
+name: Update Visual Regression Screenshots
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [labeled]
+
+jobs:
+  update-screenshots:
+    # 不在默认分支上直接跑（安全阀，参照 Vitest 官方模板）；fork PR 无法 push 回分支
+    if: >-
+      (github.event_name == 'workflow_dispatch' && github.ref_name != github.event.repository.default_branch) ||
+      (github.event_name == 'pull_request' && github.event.label.name == 'update-screenshots' && github.event.pull_request.head.repo.fork == false)
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    concurrency:
+      group: update-screenshots-${{ github.event.pull_request.head.ref || github.ref_name }}
+      cancel-in-progress: true
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install
+
+      - name: Install Playwright browsers
+        run: bunx playwright install --with-deps --only-shell
+
+      - name: Install CJK fonts
+        run: sudo apt-get update && sudo apt-get install -y fonts-noto-cjk
+
+      - name: Regenerate baselines
+        run: bun --cwd apps/web-react run test:visual --update
+
+      - name: Verify against fresh baselines
+        run: bun --cwd apps/web-react run test:visual
+
+      - name: Commit and push baselines
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- 'apps/web-react/app/**/__screenshots__'
+          if git diff --cached --quiet; then
+            echo "### ℹ️ No screenshot updates required" >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+          git commit -m "test(web): update visual regression baselines
+
+          Co-authored-by: ${{ github.actor }} <${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com>"
+          git push
+          echo "### 📸 Visual regression baselines updated" >> $GITHUB_STEP_SUMMARY
+          echo "Updated files:" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          git diff --name-only HEAD~1 >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
