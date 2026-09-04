@@ -105,4 +105,5 @@
 
 ## 下一阶段
 
-- **Phase 5（UI/UX 打磨：Apple 原生感 × 状态/路由切换流畅感）** 见 [`roadmap-phase5.md`](roadmap-phase5.md)（2026-08-13 登记）。
+- **Phase 5（UI/UX 打磨：Apple 原生感 × 状态/路由切换流畅感）** 见 [`roadmap-phase5.md`](roadmap-phase5.md)（2026-08-13 登记）。✅ 已完成
+- **Phase 6（测试纵深 × 数据洞察 × 阅读新体验）** 见 [`roadmap-phase6.md`](roadmap-phase6.md)（2026-09-04 登记）。

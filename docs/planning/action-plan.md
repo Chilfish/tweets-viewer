@@ -11,6 +11,7 @@
 | Phase 3 | 体验打磨与数据补全 | ✅ 已完成 |
 | Phase 4 | 地基 → 架构一致 → 产品纵深（见 `roadmap.md`） | ✅ 已完成 |
 | Phase 5 | UI/UX 打磨：Apple 原生感 × 状态/路由切换流畅感（见 `roadmap-phase5.md`） | ✅ 已完成 |
+| Phase 6 | 测试纵深 × 数据洞察 × 阅读新体验（见 `roadmap-phase6.md`） | 🚧 进行中 |
 
 ## Phase 3 — 当前阶段
 
@@ -115,6 +116,31 @@
 | V4 | CI `visual` job（playwright + fonts-noto-cjk） | ✅ |
 | V5 | `update-screenshots` workflow（PR label `update-screenshots` 触发，CI-only 基线生成） | ✅ |
 | V6 | PR 打 label 播种 linux 基线 → CI 全绿 → 合并 | ✅ |
+
+## Phase 6 — 测试纵深 × 数据洞察 × 阅读新体验（当前，见 `roadmap-phase6.md`）
+
+### 目标（用户定调，三线全选）
+
+1. **测试纵深（6A）**：VRT 基线扩覆盖 + Playwright E2E 用户流程（含今日「URL 页码同步」修复的回归钉子）
+2. **数据洞察（6B）**：`/insights/:name` 洞察页——趋势/热力图/构成/高频词，手写 SVG 零新依赖
+3. **阅读新体验（6C）**：随机回顾（掷骰子）+ 时间密度条（按月巡航）
+
+### 任务清单（每项一个原子 commit）
+
+| 任务 | 说明 | 状态 |
+|---|---|---|
+| 6A-1 | VRT 基线扩覆盖：MediaCard / InstagramPostCard / TweetSkeleton / DateDivider ×双主题 | 🚧 |
+| 6A-2 | E2E 地基：@playwright/test + 本地 mock API server（SSR loader 也命中 fixture） | ⬜ |
+| 6A-3 | E2E 核心流程：滚动续载 URL 同步 / 跳页 / 日期筛选 / 搜索 / 主题持久化 | ⬜ |
+| 6A-4 | CI e2e job 接入（全量 chromium，日志可见真实统计） | ⬜ |
+| 6B-1 | Specification 洞察页规格修订 + 登记 | ⬜ |
+| 6B-2 | `user_stats` 物化表 schema + 计算模块（测试先行）：compute/refresh/getUserStats，月/日计数、构成、hashtag 榜单 | ⬜ |
+| 6B-3 | 刷新链路（dailyUpdate 末尾 refresh + 回填脚本 + 惰性兜底）+ API `GET /v3/stats/:name` 表读 + API_DOCUMENTATION | ⬜ |
+| 6B-4 | 前端 `/insights/:name`：统计卡片 + 趋势面积图 + 热力图 + 占比条 + hashtag 榜单（d3 纯函数，不做词云）+ VRT 基线 | ⬜ |
+| 6B-5 | 导航集成（nav item + 首页入口 + 骨架态） | ⬜ |
+| 6C-1 | 随机回顾：`/v3/tweets/random/:name` + `/random/:name` 掷骰子交互 | ⬜ |
+| 6C-2 | 时间密度条：按月 sparkline 点击巡航（吃 6B-2 月度计数） | ⬜ |
+| 6C-3 | 收尾：Specification / API 文档 / E2E 流程补充 | ⬜ |
 
 ## 约定
 
