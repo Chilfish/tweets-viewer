@@ -11,6 +11,7 @@
 | [001](001-windows-symlink-mode-sticky.md) | Windows 下符号链接改普通文件后 index mode 残留 symlink | 工具反馈滞后 | symlink→file 迁移必须 `git rm --cached` + `git add` 刷新 mode，提交后核对 `git ls-files -s` | 已沉淀 |
 | [002](002-vitest-component-test-infra.md) | Storybook addon-vitest 接入吞掉 test.include + Vitest 4 projects 配置踩坑 | 工具反馈滞后 | 会接管 include 的测试插件必须用 vitest projects 拆分，跑完核对 Test Files 数量防静默吞测试 | 已沉淀 |
 | [003](003-view-transition-persistent-chrome-morph.md) | View Transitions 的 `view-transition-name` 误用在持久 chrome 元素上 → morph 漂移；灯箱滚动锁 + `transition-all` 布局跳动 | API 契约未核实 | `view-transition-name` 是共享元素过渡（缩略图↔大图），持久元素打 name 会 morph 内容变形；modal 滚动锁不手动加 | 已沉淀 |
+| [004](004-bun-cwd-run-false-green.md) | `bun --cwd X run <script>` 无效语法打 usage 且 exit 0 → CI 步骤假绿空转（VRT 门禁失效两轮） | 工具反馈滞后 | workflow 调 bun 脚本只用隐式 `bun --cwd X <script>` 或 `working-directory:` + `bun run`；CI 的绿必须在日志里看到真实产物，不能只信退出码 | 已沉淀 |
 
 ## 高频雷区（写码前自查）
 
@@ -39,6 +40,7 @@
 
 - **文档滞后**：改功能先更新 Specification/API 文档再动代码，避免文档与实现漂移
 - **commit 过大**：>10 文件或 >200 行主动拆分，见 `docs/engineering/git-workflow.md`
+- **bun CI 调用形式**：workflow 里只用 `bun --cwd <pkg> <script>`（隐式 run）或 `working-directory:` + `bun run <script>`；`bun --cwd <pkg> run <script>` 会打 usage 且 **exit 0 假绿**；CI 的绿必须在日志看到真实产物（测试统计/构建产物），不能只信退出码（见 [004](004-bun-cwd-run-false-green.md)）
 - **Windows symlink 迁移**：`core.symlinks=false` 时把已跟踪符号链接改为普通文件，仅 `git add` 不会刷新 index mode（仍 `120000`）；必须 `git rm --cached <file> && git add <file>` 强制重算，提交后核对 `git ls-files -s`（见 [001](001-windows-symlink-mode-sticky.md)）
 
 ## 如何新增一条 postmortem
