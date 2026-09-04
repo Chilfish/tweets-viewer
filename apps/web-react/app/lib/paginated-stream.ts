@@ -7,6 +7,12 @@ export interface StreamState<T extends { id: string }> {
   status: StreamStatus
   total: number
   nextCursor?: string
+  /**
+   * 已并入流的 API 页数（阅读进度）。
+   * loader 吸收（applyLoaderPage）后恒对齐 URL `page`；滚动续载（applyFetchedPage）成功后 `+1`。
+   * hook 据此把 URL `page` 同步为已加载页数（replace，见 Specification §4.2）。
+   */
+  loadedPages: number
 }
 
 /** 规范化 meta.nextCursor（number 时转 string，保持游标为字符串协议） */
@@ -64,13 +70,15 @@ export function applyLoaderPage<TPage, TItem extends { id: string }>(
       status: pageData.meta.hasMore ? 'ready' : 'exhausted',
       total: pageData.meta.total,
       nextCursor: normalizeCursor(pageData.meta.nextCursor),
+      // URL page 是当前流的锚点：替换或顺序追加后，已加载页数恒对齐 URL page
+      loadedPages: page,
     },
     prevFilterKey: filterKey,
     prevPage: page,
   }
 }
 
-/** 滚动续载结果吸收（纯函数）：extract 转换 + 追加去重 + 更新游标/总数/状态 */
+/** 滚动续载结果吸收（纯函数）：extract 转换 + 追加去重 + 更新游标/总数/状态/已加载页数 */
 export function applyFetchedPage<TPage, TItem extends { id: string }>(
   current: StreamState<TItem>,
   pageData: PaginatedResponse<TPage>,
@@ -81,5 +89,6 @@ export function applyFetchedPage<TPage, TItem extends { id: string }>(
     status: pageData.meta.hasMore ? 'ready' : 'exhausted',
     total: pageData.meta.total,
     nextCursor: normalizeCursor(pageData.meta.nextCursor),
+    loadedPages: current.loadedPages + 1,
   }
 }

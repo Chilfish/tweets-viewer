@@ -131,8 +131,9 @@ export default function InsPage({ loaderData, params }: Route.ComponentProps) {
       </div>
 
       <div className="w-full max-w-3xl flex flex-col gap-4 mb-16">
+        {/* 5B-3：跳页/筛选变化 → 整页内容淡入（key = 用户名变化重挂载）；滚动续载同步 URL page 不触发 */}
         <div
-          key={searchParams.toString()}
+          key={params.name}
           className="flex flex-col gap-4 animate-in fade-in duration-300"
         >
           {items.map(post => (

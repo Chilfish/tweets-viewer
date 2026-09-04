@@ -94,10 +94,13 @@ export default function SearchPage({ loaderData, params }: Route.ComponentProps)
   const layoutData = useRouteLoaderData('rootLayout') as { activeUser: EnrichedUser | null }
   const user = layoutData?.activeUser
 
+  // 流身份签名（不含 page）：q/用户变化时换 key 重挂载淡入；滚动续载同步 URL page 不触发
+  const filterKey = `${q}-${username}`
+
   const { items, status, total, loadMore, retry } = useUrlPaginatedStream<EnrichedTweet>({
     pageData: paginatedTweets,
     extract: data => data.data,
-    filterKey: `${q}-${username}`,
+    filterKey,
     page,
     fetchNextPage: async ({ cursor }) => {
       if (!q)
@@ -153,7 +156,7 @@ export default function SearchPage({ loaderData, params }: Route.ComponentProps)
     return (
       <>
         <div
-          key={searchParams.toString()}
+          key={filterKey}
           className="flex flex-col gap-3 animate-in fade-in duration-300"
         >
           {username

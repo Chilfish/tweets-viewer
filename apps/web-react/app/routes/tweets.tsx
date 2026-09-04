@@ -76,10 +76,13 @@ export default function TweetsPage({ loaderData, params }: Route.ComponentProps)
   const layoutData = useRouteLoaderData('rootLayout') as { activeUser: EnrichedUser | null }
   const user = layoutData?.activeUser
 
+  // 流身份签名（不含 page）：筛选变化时换 key 重挂载淡入；滚动续载同步 URL page 不触发
+  const filterKey = `${params.name}-${reverse}-${start}-${end}-${noReplies}`
+
   const { items, status, total, loadMore, retry } = useUrlPaginatedStream<EnrichedTweet>({
     pageData: paginatedTweets,
     extract: data => data.data,
-    filterKey: `${params.name}-${reverse}-${start}-${end}-${noReplies}`,
+    filterKey,
     page,
     fetchNextPage: async ({ cursor }) => {
       try {
@@ -120,11 +123,12 @@ export default function TweetsPage({ loaderData, params }: Route.ComponentProps)
       </div>
 
       <div className="w-full max-w-3xl flex flex-col gap-4 mb-16">
-        {/* 5B-3：URL 驱动的跳页/筛选变化 → 整页内容淡入（key 随 search 变化重挂载）；
-            滚动续载不写 URL → key 不变，仅新追加的推文触发各自的入场动画，避免整屏闪动。
+        {/* 5B-3：跳页/筛选变化 → 整页内容淡入（key = filterKey 变化重挂载）；
+            滚动续载把 URL page 同步为已加载页数但 key 不含 page → 不整屏闪动，
+            仅新追加的推文触发各自的入场动画。
             5E-1：流式布局去卡片边框；5E-2：跨天日期分隔线（iOS 消息分组范式） */}
         <div
-          key={searchParams.toString()}
+          key={filterKey}
           className="flex flex-col animate-in fade-in duration-300"
         >
           {dayGroups.map((group, idx) => (

@@ -93,10 +93,13 @@ export default function LastYearsTodayPage({ loaderData, params }: Route.Compone
   const layoutData = useRouteLoaderData('rootLayout') as { activeUser: EnrichedUser | null }
   const user = layoutData?.activeUser
 
+  // 流身份签名（不含 page）：筛选变化时换 key 重挂载淡入；滚动续载同步 URL page 不触发
+  const filterKey = `${params.name}-${reverse}`
+
   const { items, status, total, loadMore, retry } = useUrlPaginatedStream<EnrichedTweet>({
     pageData: paginatedTweets,
     extract: data => data.data,
-    filterKey: `${params.name}-${reverse}`,
+    filterKey,
     page,
     fetchNextPage: async ({ cursor }) => {
       try {
@@ -132,7 +135,7 @@ export default function LastYearsTodayPage({ loaderData, params }: Route.Compone
     return (
       <>
         <div
-          key={searchParams.toString()}
+          key={filterKey}
           className="flex flex-col gap-3 animate-in fade-in duration-300"
         >
           {yearGroups.map((group, idx) => (

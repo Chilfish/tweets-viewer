@@ -65,10 +65,13 @@ export default function MediaPage({ loaderData, params }: Route.ComponentProps) 
   const start = searchParams.get('start') || undefined
   const end = searchParams.get('end') || undefined
 
+  // 流身份签名（不含 page）：筛选变化时换 key 重挂载淡入；滚动续载同步 URL page 不触发
+  const filterKey = `${params.name}-${reverse}-${start}-${end}`
+
   const { items, status, total, loadMore, retry } = useUrlPaginatedStream<EnrichedTweet, FlatMediaItem>({
     pageData,
     extract: data => extractMediaFromTweets(data.data),
-    filterKey: `${params.name}-${reverse}-${start}-${end}`,
+    filterKey,
     page,
     fetchNextPage: async ({ cursor }) => {
       try {
@@ -106,8 +109,8 @@ export default function MediaPage({ loaderData, params }: Route.ComponentProps) 
       </div>
 
       <div className="w-full max-w-6xl mt-4 mb-16">
-        {/* 5B-3：跳页/筛选变化 → 媒体墙整体淡入；滚动续载追加的卡片各自入场 */}
-        <div key={searchParams.toString()} className="animate-in fade-in duration-300">
+        {/* 5B-3：跳页/筛选变化 → 媒体墙整体淡入（key = filterKey 变化重挂载）；滚动续载同步 URL page 不触发 */}
+        <div key={filterKey} className="animate-in fade-in duration-300">
           <MediaWall
             items={items}
             isLoading={status === 'fetching' && items.length === 0}

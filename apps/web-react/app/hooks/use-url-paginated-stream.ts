@@ -1,6 +1,7 @@
 import type { PaginatedResponse } from '@tweets-viewer/shared'
 import type { StreamState } from '~/lib/paginated-stream'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router'
 import { applyFetchedPage, applyLoaderPage } from '~/lib/paginated-stream'
 
 export type { StreamStatus } from '~/lib/paginated-stream'
@@ -12,7 +13,7 @@ interface UseUrlPaginatedStreamOptions<TPage, TItem extends { id: string }> {
   extract: (data: PaginatedResponse<TPage>) => TItem[]
   /** 过滤器键：变化时整流（重置 + 替换），如 `${name}-${reverse}-${start}-${end}` */
   filterKey: string
-  /** 当前 URL page（定位锚点；滚动续载不写 URL） */
+  /** 当前 URL page（定位锚点；滚动续载成功后会把 URL page 同步为已加载页数） */
   page: number
   /**
    * 拉取下一页（滚动续载用，keyset 优先）。
@@ -28,7 +29,8 @@ interface UseUrlPaginatedStreamOptions<TPage, TItem extends { id: string }> {
  * - **loader 数据吸收**：委托纯函数 `applyLoaderPage`（状态转移逻辑全部可单测）；
  *   用 latest-ref 读取 extract/fetchNextPage，effect 不再依赖每次新对象的 loader 数据（修复 r2 漏项）。
  * - **滚动续载**：`loadMore()` 显式调 `fetchNextPage`（keyset cursor 优先，无游标回退 page），
- *   不写 URL、不重跑 loader；结果经 `applyFetchedPage` 转换并追加去重。
+ *   结果经 `applyFetchedPage` 转换并追加去重；成功后把 URL `page` 同步为已加载页数
+ *   （`replace`，不产生历史记录，见 Specification §4.2；续载期间 URL 被跳页/筛选接管则丢弃本次结果）。
  * - **定位**：分页器跳页由 URL page 变化 → loader 重跑 → 替换。
  *
  * 泛型：`TPage` = loader/API 返回的原始条目类型（如 EnrichedTweet / IGPost）；
@@ -41,11 +43,14 @@ export function useUrlPaginatedStream<TPage, TItem extends { id: string } = TPag
   page,
   fetchNextPage,
 }: UseUrlPaginatedStreamOptions<TPage, TItem>) {
+  const [, setSearchParams] = useSearchParams()
+
   const [state, setState] = useState<StreamState<TItem>>(() => ({
     items: extract(pageData),
     status: pageData.meta.hasMore ? 'ready' : 'exhausted',
     total: pageData.meta.total,
     nextCursor: pageData.meta.nextCursor == null ? undefined : String(pageData.meta.nextCursor),
+    loadedPages: page,
   }))
 
   // latest-ref：避免 effect 依赖每次新对象的回调/数据引用
@@ -56,6 +61,12 @@ export function useUrlPaginatedStream<TPage, TItem extends { id: string } = TPag
 
   const stateRef = useRef(state)
   stateRef.current = state
+  /** 最新 URL page（续载 resolve 时判断 URL 是否已被跳页/筛选接管） */
+  const pageRef = useRef(page)
+  pageRef.current = page
+  /** 最新 filterKey（续载发起后筛选被改 → 丢弃过期续载） */
+  const filterKeyRef = useRef(filterKey)
+  filterKeyRef.current = filterKey
 
   const fetchingRef = useRef(false)
   const isFirstRender = useRef(true)
@@ -82,7 +93,7 @@ export function useUrlPaginatedStream<TPage, TItem extends { id: string } = TPag
     setState(next)
   }, [pageData, filterKey, page])
 
-  // ── 滚动续载：keyset cursor 优先，失败进入 error 态 ──
+  // ── 滚动续载：keyset cursor 优先，失败进入 error 态；成功后把 URL page 同步为已加载页数 ──
   const loadMore = useCallback(async () => {
     if (fetchingRef.current)
       return
@@ -91,6 +102,9 @@ export function useUrlPaginatedStream<TPage, TItem extends { id: string } = TPag
 
     fetchingRef.current = true
     setState(prev => ({ ...prev, status: 'fetching' }))
+    // 续载发起时的 URL page / filterKey：resolve 时若 URL 已被跳页/筛选接管，则丢弃过期的续载结果
+    const startPage = page
+    const startFilterKey = filterKey
     try {
       const res = await fetchNextPageRef.current({
         page: page + 1,
@@ -100,7 +114,25 @@ export function useUrlPaginatedStream<TPage, TItem extends { id: string } = TPag
         setState(prev => ({ ...prev, status: 'error' }))
         return
       }
-      setState(prev => applyFetchedPage(prev, res, extractRef.current))
+      // URL 已在续载期间被用户改动（分页器跳页 / 筛选变化）：不追加旧游标数据、不抢写 URL，
+      // 交由 loader 吸收的结果（replace）接管
+      if (pageRef.current !== startPage || filterKeyRef.current !== startFilterKey)
+        return
+
+      const next = applyFetchedPage(stateRef.current, res, extractRef.current)
+      setState(next)
+
+      // URL page 同步为已加载页数（replace，不产生历史记录）
+      if (next.loadedPages !== pageRef.current) {
+        setSearchParams(
+          (prev) => {
+            const updated = new URLSearchParams(prev)
+            updated.set('page', String(next.loadedPages))
+            return updated
+          },
+          { replace: true },
+        )
+      }
     }
     catch {
       setState(prev => ({ ...prev, status: 'error' }))
@@ -108,7 +140,7 @@ export function useUrlPaginatedStream<TPage, TItem extends { id: string } = TPag
     finally {
       fetchingRef.current = false
     }
-  }, [page])
+  }, [page, setSearchParams])
 
   /** 重试上一次失败的滚动续载（TweetFeedStatus 的"点击重试"） */
   const retry = useCallback(async () => {
@@ -122,6 +154,8 @@ export function useUrlPaginatedStream<TPage, TItem extends { id: string } = TPag
     status: state.status,
     total: state.total,
     nextCursor: state.nextCursor,
+    /** 已并入流的 API 页数（阅读进度；URL page 同步后的值） */
+    loadedPages: state.loadedPages,
     /** 是否还有更多（status === 'ready'） */
     hasMore: state.status === 'ready',
     loadMore,
