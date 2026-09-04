@@ -1,6 +1,6 @@
 # 行动计划 (Action Plan)
 
-**项目**: Tweets Viewer | **最后更新**: 2026-08-13
+**项目**: Tweets Viewer | **最后更新**: 2026-09-04
 
 ## 里程碑
 
@@ -82,6 +82,24 @@
 | 5E-2 | 时间线细节：跨天日期分隔线（iOS 消息分组范式）、列表项 hover 高亮 | ✅ |
 | 5E-3 | 媒体体验：`MediaImage` 懒加载/模糊占位核查、灯箱手势（滑动切换） | ✅ |
 | 5E-4 | 首页质感：hero 入场动效、features 卡片 hover、memo 入口强化 | ✅ |
+
+## Phase 5 收尾修复 — URL 页码随滚动续载同步（2026-09-04，用户实测反馈）
+
+### 问题
+
+滚动续载（无限滚动追加）走 keyset cursor 拉取下一页，但 URL `page` 不更新——翻到很后面了 URL 还停留在
+前一页（如始终 `?page=1`），分页器显示也停留在锚点页，刷新/分享无法定位当前阅读进度。
+
+### 任务清单
+
+| 任务 | 说明 | 状态 |
+|---|---|---|
+| B1 | Specification §4.2 探索模式状态载体修订：滚动续载成功后 `replace` 同步 URL `page` = 已加载页数 | ✅ |
+| B2 | `lib/paginated-stream.ts` 状态机增加 `loadedPages`（loader 吸收对齐 URL page，续载 +1） | ✅ |
+| B3 | `useUrlPaginatedStream` 滚动续载成功后同步 URL `page`（replace，无历史记录；跳页/筛选期间不抢写） | ✅ |
+| B4 | 五条路由容器 key 从 `searchParams` 改为 filterKey（滚动同步页码不触发整屏重挂载闪动） | ✅ |
+| B5 | 契约测试补 `loadedPages` 断言；跑绿测试（typecheck ✅ lint ✅ build ✅） | ✅ |
+| B6 | 开发日志 + 本登记 | ✅ |
 
 ## 约定
 

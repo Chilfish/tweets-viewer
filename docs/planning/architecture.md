@@ -75,7 +75,8 @@
 - **背景**: 原协议声明 `nextCursor` 字段但全仓库零使用，所有分页为 OFFSET；深翻页（page 5000）随页码退化
 - **理由**: snowflake id 时间有序（排序键 = `COALESCE(retweeted_original_id, tweetId)`），keyset 零额外索引成本
   （migration 0003 补表达式索引）；无限滚动（流动）与分页器（定位）各用其长
-- **后果**: 滚动续载不写 URL（见 Specification §4.1/§4.2 修订）；分页器跳页仍走 offset；
+- **后果**: 滚动续载走 keyset 游标、成功后 `replace` 同步 URL `page` = 已加载页数（2026-09-04 修订，
+  原"不写 URL"见 Specification §4.2 与 development-log/2026-09-04.md）；分页器跳页仍走 offset；
   `ins_posts` 量级小，保持 offset 不引入 keyset（见 `modules/ins.ts` 注释）
 
 ## ADR-010: SSR 诚实化（SPA-first + 静态壳）
