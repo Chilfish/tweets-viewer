@@ -6,7 +6,7 @@
 
 | 日期 | 主题 |
 |---|---|
-| [2026-09-04](2026-09-04.md) | 滚动续载同步 URL 页码（page × cursor 双机制收敛） |
+| [2026-09-04](2026-09-04.md) | 滚动续载同步 URL 页码（page × cursor 双机制收敛）；视觉回归测试地基（VRT） |
 | [2026-08-31](2026-08-31.md) | web-react `apiUrl` 去硬编码，改为从 `env.server.ts` / `.env` 环境变量读取（经 `vite.config.ts` 注入 bundle） |
 | [2026-08-13](2026-08-13.md) | Phase 4 路线图规划（Apple 锐评续篇 r3）：roadmap 落盘、Fukuoka 确认为研究脚本不入库 |
 | [2026-08-09](2026-08-09.md) | 流程规范化：对标 Float 建立文档体系（ADR/开发日志/postmortem/工程规范）；Fukuoka 归档抓取启动；日期范围筛选 + Calendar 迁移收尾 |
