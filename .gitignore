@@ -58,3 +58,10 @@ wrangler.json
 .alma-snapshots
 coverage
 coverage/
+
+# VRT 视觉回归基线：只在 CI(ubuntu) 生成（--font-sans 是系统字体栈，win32/linux 渲染必然不同，
+# 本地 win32 基线对 CI 门禁无效），防止误提交；linux 基线由 update-screenshots workflow 提交
+**/__screenshots__/**/*-win32.png
+
+# vitest 附件产物（截图 diff/actual 等临时输出）
+.vitest-attachments
