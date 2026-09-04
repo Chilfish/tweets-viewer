@@ -40,8 +40,8 @@ jsonData 里沉淀的媒体/hashtag/回复构成全是现成原料。
 | # | 任务 | 要点 |
 |---|---|---|
 | 6B-1 | 规格先行：Specification 修订（洞察页行为）+ 本 roadmap + action-plan 登记 | SDD 铁律 |
-| 6B-2 | schema + 计算模块（测试先行，`packages/database`）：新表 `user_stats` migration；`modules/stats.ts` = `computeUserStats`（月/日计数、构成、hashtag 榜单——时间序列 GROUP BY 走 SQL，hashtag 从 `fullText` 提取走 TS）+ `refreshUserStats`（compute+upsert）+ `getUserStats`（纯表读） | 热力图日计数用稀疏对（仅非零日）控制 payload 体积；既有 `/v3/tweets/stats/:name`（按年）保持实时聚合不动，避免行为漂移 |
-| 6B-3 | 刷新链路 + API：`dailyUpdate` 末尾 refresh 全部用户；一次性回填脚本；`GET /v3/stats/:name` = 表读 + LRU，**表无行时惰性 compute+upsert 兜底（自愈，不依赖回填跑全）**；`API_DOCUMENTATION.md` 同步 | 请求路径零聚合 |
+| 6B-2 | schema + 计算模块（测试先行，`packages/database`）：新表 `user_stats` migration；`modules/stats.ts` = `computeUserStats`（月/日计数、构成、hashtag 榜单——**聚合与 hashtag 提取全部 SQL 侧**，`regexp_matches` 拉平计数，数据不过应用层）+ `refreshUserStats`（compute+upsert）+ `getUserStats`（纯表读） | 热力图日计数用稀疏对（仅非零日）控制 payload 体积；既有 `/v3/tweets/stats/:name`（按年）保持实时聚合不动，避免行为漂移 |
+| 6B-3 | 刷新链路 + API：**`POST /v3/stats/refresh` webhook**（Bearer `STATS_REFRESH_TOKEN` 鉴权，env 未配置即拒绝；`?name=` 单用户）——`fetch-daily.yml` 抓取成功后 curl 触发（token 进 GitHub Secrets）；**webhook 兼任回填入口**（部署后手动 curl 一次全量重算）；`GET /v3/stats/:name` = 表读 + LRU，**表无行时惰性 compute+upsert 兜底（自愈）**；`API_DOCUMENTATION.md` 同步 | 请求读取路径零聚合 |
 | 6B-4 | 前端 `/insights/:name` 路由：统计卡片区 + 月度趋势面积图 + GitHub 式活动热力图 + 构成占比条 + **hashtag 榜单（比例条，不做词云——2026-09-04 用户定调）**——图表技术 **d3 纯函数模块**（`d3-scale` + `d3-shape`，~15KB）：坐标/路径借 D3 数学，渲染为自有 JSX（SSR 完整、token/动效/VRT 全链路吃现有体系）；双主题 + VRT 基线 | 不引 recharts/visx 等带渲染体系的库（`ResponsiveContainer` 客户端测量与 SSR 诚实化冲突） |
 | 6B-5 | 导航集成：nav item「洞察」+ 首页 features 入口 + 骨架态 | 与既有五视图并列的第六视图 |
 

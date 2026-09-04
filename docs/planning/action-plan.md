@@ -135,7 +135,7 @@
 | 6A-4 | CI e2e job 接入（全量 chromium，日志可见真实统计） | ⬜ |
 | 6B-1 | Specification 洞察页规格修订 + 登记 | ⬜ |
 | 6B-2 | `user_stats` 物化表 schema + 计算模块（测试先行）：compute/refresh/getUserStats，月/日计数、构成、hashtag 榜单 | ⬜ |
-| 6B-3 | 刷新链路（dailyUpdate 末尾 refresh + 回填脚本 + 惰性兜底）+ API `GET /v3/stats/:name` 表读 + API_DOCUMENTATION | ⬜ |
+| 6B-3 | 刷新链路：`POST /v3/stats/refresh` webhook（Bearer token 鉴权）← fetch-daily.yml 抓取后 curl；webhook 兼任回填入口 + `GET /v3/stats/:name` 表读 + 惰性兜底 + API_DOCUMENTATION | ⬜ |
 | 6B-4 | 前端 `/insights/:name`：统计卡片 + 趋势面积图 + 热力图 + 占比条 + hashtag 榜单（d3 纯函数，不做词云）+ VRT 基线 | ⬜ |
 | 6B-5 | 导航集成（nav item + 首页入口 + 骨架态） | ⬜ |
 | 6C-1 | 随机回顾：`/v3/tweets/random/:name` + `/random/:name` 掷骰子交互 | ⬜ |
