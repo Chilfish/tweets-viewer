@@ -80,6 +80,10 @@ export class TwitterAPIClient {
 
       await this.onFetchedresponse(`${ResourceType.USER_DETAILS_BY_ID}-${id}`, response)
       const data = Extractors[resource](response) as unknown as EnrichedUser
+
+      if (data?.profileImage) {
+        data.profileImage = data.profileImage.replace('_normal', '')
+      }
       return data || null
     })
   }
@@ -179,10 +183,10 @@ export class TwitterAPIClient {
 
       const instructions = response.data
         .search_by_raw_query
-        .search_timeline
-        .timeline
-        .instructions
-        .filter(t => t.type === 'TimelineAddEntries')
+        ?.search_timeline
+        ?.timeline
+        ?.instructions
+        ?.filter(t => t.type === 'TimelineAddEntries') || []
 
       const tweets = this.extractSearchTweets(instructions)
 

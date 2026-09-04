@@ -19,7 +19,7 @@ export class TwitterError extends Error implements ITwitterError {
    */
   public constructor(error: AxiosError<IRawErrorData | IRawErrorDetails>) {
     super(error.message)
-    // console.error(error)
+    console.error('TwitterError: ', error?.response?.statusText)
 
     // 网络层错误（如证书验证失败、DNS 解析失败等）：error.response 为 undefined
     if (!error.response) {
