@@ -114,7 +114,7 @@
 | V3 | 核心组件 vrt 用例：FeedStatus 四态 / MyTweet 三形态 / ProfileHeader（× light/dark，共 18 基线） | ✅ |
 | V4 | CI `visual` job（playwright + fonts-noto-cjk） | ✅ |
 | V5 | `update-screenshots` workflow（PR label `update-screenshots` 触发，CI-only 基线生成） | ✅ |
-| V6 | PR 打 label 播种 linux 基线 → CI 全绿 → 合并 | ⏳ |
+| V6 | PR 打 label 播种 linux 基线 → CI 全绿 → 合并 | ✅ |
 
 ## 约定
 

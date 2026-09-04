@@ -112,8 +112,8 @@ Phase 5 完成后，UI 的视觉表现（token 化配色、`.dark` 双主题、�
 - [x] `bun --cwd apps/web-react run test:visual` 本地跑通（chromium headless，18 用例 4.7s 全绿；像素级程序化核验：light 背景 = `#f5f9fb` 精确命中 token、dark 近黑、fixture 图正确渲染、dark/light 基线哈希不同）
 - [x] `bun --cwd apps/web-react test`（unit+stories）数量不变：11 files / 61 用例，vrt 文件未被误吞；13 项失败与既有基线完全一致（zustand persist localStorage 环境问题，pre-existing，见 2026-09-04 日志）
 - [x] 本地 `bun lint` + typecheck 绿
-- [ ] CI `visual` job 绿（基线播种后，V6）
-- [ ] update-screenshots workflow 可用（label 触发 + 手动触发，V6 验证）
+- [x] CI `visual` job 绿（基线播种后，V6）
+- [x] update-screenshots workflow 可用（label 触发 + 手动触发，V6 验证：run 33851429906 真实重生成 18 基线 → 同环境 verify 18 passed → bot commit cb6acef 回分支）
 
 ## 九、commit 规划（原子提交，先于代码备案）
 
