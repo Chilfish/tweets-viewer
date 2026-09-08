@@ -4,7 +4,6 @@ import type { Route } from './+types/last-years-today'
 import { PAGE_SIZE } from '@tweets-viewer/shared'
 import { isAxiosError } from 'axios'
 import { History } from 'lucide-react'
-import { useMemo } from 'react'
 import { useRouteLoaderData, useSearchParams } from 'react-router'
 import { FeedStatus } from '~/components/feed-status'
 import { TweetsHydrateFallback } from '~/components/skeletons/tweets'
@@ -12,12 +11,9 @@ import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
 import { MyTweet } from '~/components/tweet/Tweet'
 import { TweetNavigation } from '~/components/tweet/TweetNavigation'
 import { TweetsToolbarActions } from '~/components/tweet/tweets-toolbar-actions'
-import { UserDivider } from '~/components/tweet/UserDivider'
 import { useUrlPaginatedStream } from '~/hooks/use-url-paginated-stream'
 import { groupTweetsByYear } from '~/lib/group-tweets-by-year'
-import { groupTweetsByYearThenUser } from '~/lib/group-tweets-by-year-user'
 import { apiClient, cn } from '~/lib/utils'
-import { useUserStore } from '~/store/use-user-store'
 
 export const handle = {
   isWide: false,
@@ -104,17 +100,6 @@ export default function LastYearsTodayPage({ loaderData, params }: Route.Compone
   const layoutData = useRouteLoaderData('rootLayout') as { activeUser: EnrichedUser | null }
   const user = layoutData?.activeUser
 
-  // 全量模式下，用户头像/显示名优先取自已归档用户列表（比推文内嵌 user 字段更可靠）
-  const storeUsers = useUserStore(s => s.users)
-  const userByName = useMemo(() => {
-    const map = new Map<string, EnrichedUser>()
-    for (const u of storeUsers) {
-      if (u.userName)
-        map.set(u.userName, u)
-    }
-    return map
-  }, [storeUsers])
-
   const isGlobal = !name
   const endpoint = name ? `/tweets/get/${name}/last-years-today` : '/tweets/last-years-today'
 
@@ -145,8 +130,8 @@ export default function LastYearsTodayPage({ loaderData, params }: Route.Compone
   })
 
   const totalPages = Math.ceil(total / PAGE_SIZE)
+  // 全量模式与单用户模式统一按年分组、组内按时间平铺；作者信息由推文内嵌 tweet.user 渲染
   const yearGroups = groupTweetsByYear(items)
-  const yearUserGroups = isGlobal ? groupTweetsByYearThenUser(items) : null
 
   const renderTweets = () => {
     if (status !== 'fetching' && items.length === 0) {
@@ -164,47 +149,19 @@ export default function LastYearsTodayPage({ loaderData, params }: Route.Compone
           key={filterKey}
           className="flex flex-col gap-3 animate-in fade-in duration-300"
         >
-          {isGlobal && yearUserGroups
-            ? yearUserGroups.map((group, idx) => (
-                <section key={`${group.year}-${idx}`}>
-                  <YearDivider year={group.year} className={idx === 0 ? 'mt-2' : 'mt-8'} />
-                  {group.users.map((sub) => {
-                    const author = userByName.get(sub.userName)
-                    const displayName = author?.fullName ?? sub.displayName
-                    const avatarUrl = author?.profileImage ?? sub.avatarUrl
-                    return (
-                      <div key={sub.userName}>
-                        <UserDivider
-                          userName={sub.userName}
-                          displayName={displayName}
-                          avatarUrl={avatarUrl}
-                        />
-                        {sub.tweets.map(tweet => (
-                          <MyTweet
-                            tweet={tweet}
-                            tweetAuthorName={displayName ?? sub.userName}
-                            key={tweet.id}
-                            containerClassName="animate-in slide-in-from-bottom-2 duration-300"
-                          />
-                        ))}
-                      </div>
-                    )
-                  })}
-                </section>
-              ))
-            : yearGroups.map((group, idx) => (
-                <section key={`${group.year}-${idx}`}>
-                  <YearDivider year={group.year} className={idx === 0 ? 'mt-2' : 'mt-8'} />
-                  {group.tweets.map(tweet => (
-                    <MyTweet
-                      tweet={tweet}
-                      tweetAuthorName={user?.fullName ?? name ?? ''}
-                      key={tweet.id}
-                      containerClassName="animate-in slide-in-from-bottom-2 duration-300"
-                    />
-                  ))}
-                </section>
+          {yearGroups.map((group, idx) => (
+            <section key={`${group.year}-${idx}`}>
+              <YearDivider year={group.year} className={idx === 0 ? 'mt-2' : 'mt-8'} />
+              {group.tweets.map(tweet => (
+                <MyTweet
+                  tweet={tweet}
+                  tweetAuthorName={user?.fullName ?? name ?? ''}
+                  key={tweet.id}
+                  containerClassName="animate-in slide-in-from-bottom-2 duration-300"
+                />
               ))}
+            </section>
+          ))}
         </div>
 
         <FeedStatus
