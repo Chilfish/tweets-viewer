@@ -44,11 +44,11 @@ export function useNavItems(currentUser?: string): NavItem[] {
     {
       label: '那年今日',
       icon: Calendar,
-      href: currentUser ? `/memo/${currentUser}` : '/',
+      href: currentUser ? `/memo/${currentUser}` : '/memo',
       isActive: currentUser
         ? location.pathname === `/memo/${currentUser}`
-        : false,
-      disabled: !currentUser,
+        : location.pathname === '/memo',
+      disabled: false,
     },
     {
       label: '搜索',

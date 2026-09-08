@@ -74,6 +74,7 @@ export function HydrateFallback() {
   const location = useLocation()
   const isMobile = useIsMobile()
   const isInsRoute = location.pathname.startsWith('/ins/')
+  const isGlobalView = location.pathname === '/memo' || location.pathname === '/search'
   const currentHandle = matches[matches.length - 1]?.handle as {
     skeleton?: React.ReactNode
     isWide?: boolean
@@ -86,7 +87,7 @@ export function HydrateFallback() {
 
         <main className="flex-1 flex flex-col items-center justify-start gap-4 pt-2 px-3 mx-auto min-w-0 border-r border-border/40">
 
-          {isInsRoute ? <InsProfileHeaderSkeleton /> : <ProfileHeader user={null} />}
+          {!isGlobalView && (isInsRoute ? <InsProfileHeaderSkeleton /> : <ProfileHeader user={null} />)}
           <div className="w-full">
             {currentHandle?.skeleton || <Outlet />}
           </div>
@@ -106,7 +107,7 @@ export function HydrateFallback() {
         currentHandle.isWide ? 'sm:max-w-6xl' : 'sm:max-w-[600px]',
       )}
       >
-        {isInsRoute ? <InsProfileHeaderSkeleton /> : <ProfileHeaderSkeleton />}
+        {!isGlobalView && (isInsRoute ? <InsProfileHeaderSkeleton /> : <ProfileHeaderSkeleton />)}
 
         <div className="w-full">
           {currentHandle?.skeleton || <Outlet />}
@@ -147,6 +148,9 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
   // 渲染时优先使用 store 中的最新数据，loader 数据作为降级
   const displayActiveUser = storeActiveUser || loaderActiveUser
 
+  // 全局视图（/memo、/search 无 name）是跨用户视图，不显示任何单一用户的 ProfileHeader
+  const showProfileHeader = !isHome && Boolean(curUserName)
+
   // 5B-2：页面进入动画与 ViewTransition 协调。
   // - 有活跃 ViewTransition 时（route handle 定义 transition 类型的导航），交给文档级过渡，
   //   不再叠加 CSS 进入动画（避免双重动画）；
@@ -179,7 +183,7 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
 
         <main className="flex-1 flex flex-col items-center justify-start gap-4 pt-2 px-3 mx-auto min-w-0 border-r border-border/40">
 
-          {!isHome && (
+          {showProfileHeader && (
             isInsRoute
               ? <InsProfileHeader user={loaderIgUser} />
               : <ProfileHeader user={displayActiveUser} isWide={isWide} />
@@ -203,7 +207,7 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
         isWide ? 'sm:max-w-6xl' : 'sm:max-w-[600px]',
       )}
       >
-        {!isHome && (
+        {showProfileHeader && (
           isInsRoute
             ? <InsProfileHeader user={loaderIgUser} />
             : <ProfileHeader user={displayActiveUser} isWide={isWide} />

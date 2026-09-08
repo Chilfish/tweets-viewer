@@ -4,6 +4,7 @@ import type { Route } from './+types/last-years-today'
 import { PAGE_SIZE } from '@tweets-viewer/shared'
 import { isAxiosError } from 'axios'
 import { History } from 'lucide-react'
+import { useMemo } from 'react'
 import { useRouteLoaderData, useSearchParams } from 'react-router'
 import { FeedStatus } from '~/components/feed-status'
 import { TweetsHydrateFallback } from '~/components/skeletons/tweets'
@@ -11,20 +12,24 @@ import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
 import { MyTweet } from '~/components/tweet/Tweet'
 import { TweetNavigation } from '~/components/tweet/TweetNavigation'
 import { TweetsToolbarActions } from '~/components/tweet/tweets-toolbar-actions'
+import { UserDivider } from '~/components/tweet/UserDivider'
 import { useUrlPaginatedStream } from '~/hooks/use-url-paginated-stream'
 import { groupTweetsByYear } from '~/lib/group-tweets-by-year'
+import { groupTweetsByYearThenUser } from '~/lib/group-tweets-by-year-user'
 import { apiClient, cn } from '~/lib/utils'
+import { useUserStore } from '~/store/use-user-store'
 
 export const handle = {
   isWide: false,
   pageTransition: 'fade',
   skeleton: <TweetsHydrateFallback />,
 }
+
 export function meta({ params }: Route.MetaArgs) {
   const { name } = params
   return [
-    { title: `那年今日 - @${name}` },
-    { name: 'description', content: `查看 @${name} 在往年今天的推文` },
+    { title: name ? `那年今日 - @${name}` : '那年今日 - 全部用户' },
+    { name: 'description', content: name ? `查看 @${name} 在往年今天的推文` : '查看所有归档用户在往年今天的推文' },
   ]
 }
 
@@ -33,8 +38,12 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
   const url = new URL(request.url)
   const page = Number(url.searchParams.get('page')) || 1
   const reverse = url.searchParams.get('reverse') === 'true'
+
+  // 全量（无 name）与单用户共用同一查询模块，仅端点不同
+  const endpoint = name ? `/tweets/get/${name}/last-years-today` : '/tweets/last-years-today'
+
   try {
-    const { data: paginatedTweets } = await apiClient.get<PaginatedResponse<EnrichedTweet>>(`/tweets/get/${name}/last-years-today`, {
+    const { data: paginatedTweets } = await apiClient.get<PaginatedResponse<EnrichedTweet>>(endpoint, {
       params: {
         page,
         reverse,
@@ -65,8 +74,8 @@ function YearDivider({ year, className }: { year: number, className?: string }) 
   )
 }
 
-/** 「那年今日」仪式感头部：大字日期 + 回忆总数（@name 不重复，上方已有 ProfileHeader）。 */
-function RitualHeader({ totalCount }: { totalCount: number }) {
+/** 「那年今日」仪式感头部：大字日期 + 回忆总数（全量模式下点明「所有归档用户」）。 */
+function RitualHeader({ totalCount, isGlobal }: { totalCount: number, isGlobal: boolean }) {
   const todayLabel = new Date().toLocaleDateString('zh-CN', { month: 'long', day: 'numeric' })
   return (
     <div className="flex flex-col items-center gap-1 px-4 pb-5 pt-6 text-center">
@@ -74,6 +83,7 @@ function RitualHeader({ totalCount }: { totalCount: number }) {
         {todayLabel}
       </h1>
       <p className="mt-1.5 text-sm text-muted-foreground">
+        {isGlobal ? '所有归档用户' : ''}
         往年今日，共
         <span className="mx-1 font-semibold text-foreground">{totalCount}</span>
         条回忆
@@ -85,6 +95,7 @@ function RitualHeader({ totalCount }: { totalCount: number }) {
 
 export default function LastYearsTodayPage({ loaderData, params }: Route.ComponentProps) {
   const { paginatedTweets } = loaderData
+  const { name } = params
   const [searchParams] = useSearchParams()
 
   const page = Number(searchParams.get('page')) || 1
@@ -93,8 +104,22 @@ export default function LastYearsTodayPage({ loaderData, params }: Route.Compone
   const layoutData = useRouteLoaderData('rootLayout') as { activeUser: EnrichedUser | null }
   const user = layoutData?.activeUser
 
+  // 全量模式下，用户头像/显示名优先取自已归档用户列表（比推文内嵌 user 字段更可靠）
+  const storeUsers = useUserStore(s => s.users)
+  const userByName = useMemo(() => {
+    const map = new Map<string, EnrichedUser>()
+    for (const u of storeUsers) {
+      if (u.userName)
+        map.set(u.userName, u)
+    }
+    return map
+  }, [storeUsers])
+
+  const isGlobal = !name
+  const endpoint = name ? `/tweets/get/${name}/last-years-today` : '/tweets/last-years-today'
+
   // 流身份签名（不含 page）：筛选变化时换 key 重挂载淡入；滚动续载同步 URL page 不触发
-  const filterKey = `${params.name}-${reverse}`
+  const filterKey = `${name ?? 'all'}-${reverse}`
 
   const { items, status, total, loadMore, retry } = useUrlPaginatedStream<EnrichedTweet>({
     pageData: paginatedTweets,
@@ -103,7 +128,7 @@ export default function LastYearsTodayPage({ loaderData, params }: Route.Compone
     page,
     fetchNextPage: async ({ cursor }) => {
       try {
-        const { data } = await apiClient.get<PaginatedResponse<EnrichedTweet>>(`/tweets/get/${params.name}/last-years-today`, {
+        const { data } = await apiClient.get<PaginatedResponse<EnrichedTweet>>(endpoint, {
           params: {
             page: page + 1,
             pageSize: PAGE_SIZE,
@@ -121,6 +146,7 @@ export default function LastYearsTodayPage({ loaderData, params }: Route.Compone
 
   const totalPages = Math.ceil(total / PAGE_SIZE)
   const yearGroups = groupTweetsByYear(items)
+  const yearUserGroups = isGlobal ? groupTweetsByYearThenUser(items) : null
 
   const renderTweets = () => {
     if (status !== 'fetching' && items.length === 0) {
@@ -138,19 +164,47 @@ export default function LastYearsTodayPage({ loaderData, params }: Route.Compone
           key={filterKey}
           className="flex flex-col gap-3 animate-in fade-in duration-300"
         >
-          {yearGroups.map((group, idx) => (
-            <section key={`${group.year}-${idx}`}>
-              <YearDivider year={group.year} className={idx === 0 ? 'mt-2' : 'mt-8'} />
-              {group.tweets.map(tweet => (
-                <MyTweet
-                  tweet={tweet}
-                  tweetAuthorName={user?.fullName ?? params.name ?? ''}
-                  key={tweet.id}
-                  containerClassName="animate-in slide-in-from-bottom-2 duration-300"
-                />
+          {isGlobal && yearUserGroups
+            ? yearUserGroups.map((group, idx) => (
+                <section key={`${group.year}-${idx}`}>
+                  <YearDivider year={group.year} className={idx === 0 ? 'mt-2' : 'mt-8'} />
+                  {group.users.map((sub) => {
+                    const author = userByName.get(sub.userName)
+                    const displayName = author?.fullName ?? sub.displayName
+                    const avatarUrl = author?.profileImage ?? sub.avatarUrl
+                    return (
+                      <div key={sub.userName}>
+                        <UserDivider
+                          userName={sub.userName}
+                          displayName={displayName}
+                          avatarUrl={avatarUrl}
+                        />
+                        {sub.tweets.map(tweet => (
+                          <MyTweet
+                            tweet={tweet}
+                            tweetAuthorName={displayName ?? sub.userName}
+                            key={tweet.id}
+                            containerClassName="animate-in slide-in-from-bottom-2 duration-300"
+                          />
+                        ))}
+                      </div>
+                    )
+                  })}
+                </section>
+              ))
+            : yearGroups.map((group, idx) => (
+                <section key={`${group.year}-${idx}`}>
+                  <YearDivider year={group.year} className={idx === 0 ? 'mt-2' : 'mt-8'} />
+                  {group.tweets.map(tweet => (
+                    <MyTweet
+                      tweet={tweet}
+                      tweetAuthorName={user?.fullName ?? name ?? ''}
+                      key={tweet.id}
+                      containerClassName="animate-in slide-in-from-bottom-2 duration-300"
+                    />
+                  ))}
+                </section>
               ))}
-            </section>
-          ))}
         </div>
 
         <FeedStatus
@@ -178,7 +232,7 @@ export default function LastYearsTodayPage({ loaderData, params }: Route.Compone
       </div>
 
       <div className="w-full max-w-3xl flex flex-col gap-4 mt-4 mb-16">
-        <RitualHeader totalCount={total} />
+        <RitualHeader totalCount={total} isGlobal={isGlobal} />
         {renderTweets()}
       </div>
     </>
