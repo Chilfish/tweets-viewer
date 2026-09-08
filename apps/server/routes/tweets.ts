@@ -250,5 +250,25 @@ app.get('/get/:name/last-years-today', async (c) => {
   return c.json(tweets)
 })
 
+app.get('/last-years-today', async (c) => {
+  const pagination = getPaginationParams(c)
+  if (isError(pagination))
+    return c.json({ error: `invalid pagination: ${pagination}` }, 400)
+
+  const { page, pageSize, reverse, cursor } = pagination
+  const { db } = getContext<AppType>().var
+
+  const tweets = await getLastYearsTodayTweets({
+    db,
+    name: '',
+    reverse,
+    page,
+    pageSize,
+    cursor,
+  })
+  c.header('Cache-Control', CACHE_CONTROL)
+  return c.json(tweets)
+})
+
 export { USERS_CACHE_CONTROL }
 export default app

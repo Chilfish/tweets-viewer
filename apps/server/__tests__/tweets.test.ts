@@ -74,4 +74,16 @@ describe('tweets API Routes', () => {
       expect([200, 500]).toContain(res.status)
     })
   })
+
+  describe('gET /v3/tweets/last-years-today', () => {
+    it('should accept a global (no name) request', async () => {
+      const res = await app.request('/v3/tweets/last-years-today?page=1')
+      expect([200, 500]).toContain(res.status)
+    })
+
+    it('should accept cursor for keyset pagination', async () => {
+      const res = await app.request('/v3/tweets/last-years-today?cursor=1234567890123456789')
+      expect([200, 500]).toContain(res.status)
+    })
+  })
 })
