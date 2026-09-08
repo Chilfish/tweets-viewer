@@ -203,7 +203,7 @@ export async function getLastYearsTodayTweets({
   const today = now('beijing')
 
   const whereClause = and(
-    eq(tweetsTable.userId, name),
+    name ? eq(tweetsTable.userId, name) : undefined,
     sql`EXTRACT(DAY FROM ${tweetsTable.createdAt}) = ${today.getDate()}`,
     sql`EXTRACT(MONTH FROM ${tweetsTable.createdAt}) = ${today.getMonth() + 1}`,
   )
