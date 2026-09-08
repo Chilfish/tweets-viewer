@@ -88,12 +88,12 @@ interface PaginatedResponse<T> {
 
 ### 3. 获取“那年今日”推文
 
-获取指定用户或全部用户在历史年份同一天的推文。
+获取指定用户或全部用户在历史年份同一天的推文。全量端点**排除转推**，指定用户端点保留转推。
 
-- **Endpoint**: `GET /v3/tweets/get/:name/last-years-today`（指定用户）/ `GET /v3/tweets/last-years-today`（全量，跨用户）
+- **Endpoint**: `GET /v3/tweets/get/:name/last-years-today`（指定用户，保留转推）/ `GET /v3/tweets/last-years-today`（全量，跨用户，排除转推）
 
 - **Params**:
-  - `name` (string, optional): 用户 Screen Name；**缺省时全库检索**（跨用户，用于全量「那年今日」页）
+  - `name` (string, optional): 用户 Screen Name；**缺省时全库检索**（跨用户，用于全量「那年今日」页，且排除转推）
 
 - **Query Parameters**:
   - `page` (number, default: 1)
