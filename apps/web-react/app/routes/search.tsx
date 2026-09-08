@@ -9,6 +9,7 @@ import { SearchInput } from '~/components/search-input'
 import { TweetsHydrateFallback } from '~/components/skeletons/tweets'
 import { InfiniteScrollTrigger } from '~/components/tweet/InfiniteScrollTrigger'
 import { MyTweet } from '~/components/tweet/Tweet'
+import { UserDivider } from '~/components/tweet/UserDivider'
 import { useUrlPaginatedStream } from '~/hooks/use-url-paginated-stream'
 import { groupTweetsByUser } from '~/lib/group-tweets-by-user'
 import { apiClient } from '~/lib/utils'
@@ -55,32 +56,6 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
   }
 
   return { paginatedTweets, q }
-}
-
-/** 全局搜索结果按用户分组的组头（作者分隔线） */
-function UserDivider({ userName, displayName, avatarUrl }: { userName: string, displayName?: string, avatarUrl?: string }) {
-  return (
-    <div className="mb-2 flex items-center gap-2 px-1">
-      {avatarUrl && (
-        <img
-          src={avatarUrl}
-          alt=""
-          className="size-5 rounded-full object-cover bg-muted"
-          loading="lazy"
-        />
-      )}
-      <span className="text-sm font-semibold tracking-wide text-foreground/80">
-        {displayName || `@${userName}`}
-      </span>
-      {displayName && (
-        <span className="text-xs text-muted-foreground">
-          @
-          {userName}
-        </span>
-      )}
-      <div className="h-px flex-1 bg-border/60" />
-    </div>
-  )
 }
 
 export default function SearchPage({ loaderData, params }: Route.ComponentProps) {
