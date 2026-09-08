@@ -78,14 +78,27 @@ export function TweetAction({ tweet, className }: TweetActionProps) {
         </div>
       ))}
 
-      <button
+      {/* 分享：语义上是原推文链接（右键复制/修饰键开新标签由原生 a 提供），普通左键渐进增强为系统分享 */}
+      <a
+        href={tweet.url}
+        target="_blank"
+        rel="noopener noreferrer"
         className="flex items-center group transition-colors cursor-pointer p-2 -mr-2 rounded-full hover:text-sky-500 hover:bg-sky-500/10 active:scale-95 pointer-coarse:p-3.5 pointer-coarse:-mr-3.5"
         title="分享"
+        onClick={(event) => {
+          // 仅拦截普通左键点击：修饰键/中键/右键留给原生链接行为
+          if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
+            return
+          if (!navigator.share)
+            return
+          event.preventDefault()
+          navigator.share({ url: tweet.url }).catch(() => {})
+        }}
       >
         <div className="p-1">
           <Share className="size-4" />
         </div>
-      </button>
+      </a>
     </div>
   )
 }
