@@ -42,6 +42,11 @@
 - **逻辑状态** (定义于 `useTweetStore`):
   - `status`: `'idle' | 'fetching' | 'ready' | 'exhausted' | 'error'`
 
+- **操作栏分享按钮**:
+  - 语义上是**指向原推文页的链接**（`a[href]`，新标签打开），右键复制链接/修饰键点开由原生链接行为提供。
+  - 普通点击渐进增强为 **Web Share**（`navigator.share({ url })`）；不支持 Web Share 时降级为新标签打开原推文。
+  - 分享目标为推文原链接 `tweet.url`。
+
 ### 2.3 过滤器 (Filters)
 
 过滤器是决定推文流内容的参数集合。
