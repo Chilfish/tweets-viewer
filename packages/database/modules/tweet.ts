@@ -204,6 +204,8 @@ export async function getLastYearsTodayTweets({
 
   const whereClause = and(
     name ? eq(tweetsTable.userId, name) : undefined,
+    // 全量（无 name）模式排除转推；指定用户模式保留转推
+    !name ? sql`${tweetsTable.jsonData}->>'retweeted_original_id' IS NULL` : undefined,
     sql`EXTRACT(DAY FROM ${tweetsTable.createdAt}) = ${today.getDate()}`,
     sql`EXTRACT(MONTH FROM ${tweetsTable.createdAt}) = ${today.getMonth() + 1}`,
   )
