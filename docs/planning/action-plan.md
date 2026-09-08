@@ -11,7 +11,7 @@
 | Phase 3 | 体验打磨与数据补全 | ✅ 已完成 |
 | Phase 4 | 地基 → 架构一致 → 产品纵深（见 `roadmap.md`） | ✅ 已完成 |
 | Phase 5 | UI/UX 打磨：Apple 原生感 × 状态/路由切换流畅感（见 `roadmap-phase5.md`） | ✅ 已完成 |
-| Phase 6 | 测试纵深 × 数据洞察 × 阅读新体验（见 `roadmap-phase6.md`） | 🚧 进行中 |
+| Phase 6 | 测试纵深 × 数据洞察 × 阅读新体验（见 `roadmap-phase6.md`） | ❌ 废弃（不做了） |
 
 ## Phase 3 — 当前阶段
 
@@ -141,6 +141,26 @@
 | 6C-1 | 随机回顾：`/v3/tweets/random/:name` + `/random/:name` 掷骰子交互 | ⬜ |
 | 6C-2 | 时间密度条：按月 sparkline 点击巡航（吃 6B-2 月度计数） | ⬜ |
 | 6C-3 | 收尾：Specification / API 文档 / E2E 流程补充 | ⬜ |
+
+> **Phase 6 已于 2026-09-08 废弃**（用户定调：不做了）。原 6A/6B/6C 三线任务全部归档搁置，不再作为当前工作。
+
+## 全量「那年今日」（2026-09-08，当前）
+
+### 目标
+
+搜索页已支持不选用户的全库搜索；同理，`/memo`（无 `name`）也按「**按年分组 → 组内按用户分小节**」两层结构，
+分组列出所有归档用户的同月同日回忆，兼容手机/PC（复用单列阅读流 + sticky glass 工具栏）。
+
+### 任务清单（每项一个原子 commit）
+
+| 任务 | 说明 | 状态 |
+|---|---|---|
+| M1 | 文档先行：Specification §4.4 / API_DOCUMENTATION / action-plan / 开发日志 | 🚧 |
+| M2 | 测试先行：`group-tweets-by-year-user` 分组工具 + 后端 `GET /v3/tweets/last-years-today` 路由 | ⬜ |
+| M3 | 后端：`getLastYearsTodayTweets` 的 `name` 改可选 + 新增全量路由 | ⬜ |
+| M4 | 前端：分组工具 + 提取共享 `UserDivider` + `last-years-today.tsx` 支持无 name + `/memo` 路由 + `search.tsx` 改用共享组件 + `nav.tsx` 去 disabled | ⬜ |
+| M5 | ProfileHeader 抑制：全量 `/memo` 与 `/search` 不显示 stale 单一用户头 | ⬜ |
+| M6 | 测试 + `build:client` 全绿 | ⬜ |
 
 ## 约定
 
