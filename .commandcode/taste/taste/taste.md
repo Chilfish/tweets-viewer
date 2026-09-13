@@ -16,3 +16,4 @@
 - When translating content, wants the original text preserved with the Simplified Chinese translation placed directly beneath it ("翻译成简体中文在原文下面"), not a translation-only replacement. Confidence: 0.7
 - Demands rigorous error handling: errors must propagate and be classified, never swallowed into an empty/success result; a fetch or job that returns zero items must not be conflated with success. Confidence: 0.75
 - Wants automated/scheduled jobs to fail loudly (non-zero exit code) when work is incomplete, so failures surface in CI/Actions instead of silently "succeeding". Confidence: 0.7
+- Actively tracks GitHub Actions / runner runtime deprecations (e.g. the Node 20 → 24 removal) and expects CI workflows to be audited and updated to stay compatible: bumping action versions to the current major, removing obsolete/misplaced flags like FORCE_JAVASCRIPT_ACTIONS_TO_NODE24, and verifying each action's runs.using runtime. Confidence: 0.7
