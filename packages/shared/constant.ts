@@ -20,7 +20,7 @@ export const apiUrl = injectedApiUrl
   ?? (isPreview
     ? 'https://tweet-api-dev.chill4fish.workers.dev'
     : isDev
-      ? 'http://localhost:3000'
+      ? 'http://localhost:8787'
       : 'https://tweet-api.chilfish.top')
 
 export const staticUrl = isDev ? '/static' : 'https://p.chilfish.top'
