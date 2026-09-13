@@ -102,7 +102,7 @@ ins_posts: id(serial PK), post_id(UQ), username(FK→users.userName), created_at
 | `GET /v3/tweets/stats/:name`                    | 归档统计（年份/计数）                               |
 | `GET /v3/users/all` · `GET /v3/users/get/:name` | 用户列表 / 单个用户                                 |
 | `GET /v3/ins/:name`                             | IG 用户信息 + 帖子（分页）                          |
-| `GET /v3/image/*`                               | 媒体代理                                            |
+| `GET /v3/image/get`                             | 随机归档图片（可选 `name` 按用户）                  |
 
 > 交互式文档：`GET /openapi.json`（OpenAPI 3.1）+ `GET /scalar`（Scalar UI），生产可访问；元数据在 `routes/*.ts` 的 `describeRoute`、复用 schema 在 `apps/server/utils/openapi.ts`。
 

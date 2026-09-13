@@ -63,6 +63,17 @@ export function nameParameter(name = 'name') {
   }
 }
 
+/** 可选 `name` query 参数（跨用户资源按用户限定） */
+export function optionalNameParameter(description = '限定用户 Screen Name；缺省为全库') {
+  return {
+    in: 'query' as const,
+    name: 'name',
+    required: false,
+    description,
+    schema: { type: 'string' as const, minLength: 1, maxLength: 50, pattern: '^\\w+$' },
+  }
+}
+
 export const dateParameters = [
   {
     in: 'query' as const,
@@ -243,25 +254,13 @@ const schemas: Record<string, SchemaObject> = {
     },
     required: ['user', 'posts'],
   },
-  ImageItem: {
-    type: 'object',
-    additionalProperties: true,
-    description: '图片归档条目（含 `urls` 数组）',
-  },
-  ImageList: { type: 'array', items: ref('ImageItem') },
-  ImageRandom: {
-    type: 'object',
-    additionalProperties: true,
-    description: '随机图片条目（含 `url`，`urls` 已移除）',
-  },
-  ImageUpdateResult: {
+  ImageEntry: {
     type: 'object',
     properties: {
-      success: { type: 'boolean' },
-      size: { type: 'integer' },
-      message: { type: 'string' },
+      url: { type: 'string', description: '媒体图片 URL（推文 `media_details[].media_url_https`）' },
+      tweet: ref('EnrichedTweet'),
     },
-    required: ['success'],
+    required: ['url', 'tweet'],
   },
   RootStatus: {
     type: 'object',

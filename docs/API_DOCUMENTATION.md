@@ -172,20 +172,20 @@ interface PaginatedResponse<T> {
 
 ## Image 模块 ( `/v3/image`)
 
+图片来源为归档推文中的媒体（`media_details`）。「含媒体图片」判定：**非转推**且至少一项媒体含非空 `media_url_https`（photo / video / animated_gif 均带该字段，视频/动图取其封面）。支持可选 `name` query 限定用户（缺省为全库）。
+
 ### 1. 获取随机图片
 
-- **Endpoint**: `GET /v3/image/get`
-- **Response**: `{ url: string, ... }` — 随机图片数据
+- **Endpoint**: `GET /v3/image/get?name={screenName?}`
+- **Query**:
+  - `name`（可选）：限定用户 Screen Name（`\w+`）
+- **Response**: `{ url: string, tweet: EnrichedTweet }` — 随机图片链接 + 来源推文完整 JSON
+- **Error Response**:
+  - 400 Bad Request: `{ "error": "invalid name" }`
+  - 404 Not Found: `{ "error": "no image available" }`
 
-### 2. 获取所有图片
-
-- **Endpoint**: `GET /v3/image/all`
-- **Response**: 图片数据数组
-
-### 3. 更新图片缓存
-
-- **Endpoint**: `GET /v3/image/update`
-- **Response**: `{ success: boolean, size?: number }`
+> 随机接口响应 `Cache-Control: no-store`，避免 CDN 缓存固定结果。
+> 选取走 snowflake `id` 主键锚点（非 `ORDER BY random()`），避免全表扫描。
 
 ---
 

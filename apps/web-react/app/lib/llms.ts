@@ -43,7 +43,7 @@ export const apiEndpoints: ApiEndpointLink[] = [
   { label: 'GET /v3/users/all', href: `${API_BASE}/users/all`, description: '全部归档用户（EnrichedUser[]）' },
   { label: 'GET /v3/users/get/{name}', href: `${API_BASE}/users/get/${EXAMPLE_USER}`, description: '单个归档用户' },
   { label: 'GET /v3/ins/{name}', href: `${API_BASE}/ins/${EXAMPLE_USER}`, description: 'Instagram 用户信息 + 帖子（分页；name 为 twitter userName）' },
-  { label: 'GET /v3/image/get', href: `${API_BASE}/image/get`, description: '随机归档图片；同模块 /all 返回全部、/update 刷新缓存' },
+  { label: 'GET /v3/image/get', href: `${API_BASE}/image/get`, description: '随机归档图片（图片链接 + 来源推文 JSON），可选 name 限定用户' },
 ]
 
 /** llms.txt markdown 构建（站点页面相对链接，API / 文档绝对链接） */

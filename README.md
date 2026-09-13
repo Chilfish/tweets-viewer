@@ -119,7 +119,7 @@ bun --cwd packages/database db:migrate
 - `GET /v3/tweets/get/:name/last-years-today` · `GET /v3/tweets/last-years-today`
 - `GET /v3/tweets/stats/:name`
 - `GET /v3/ins/:name`
-- `GET /v3/image/*`（媒体代理）
+- `GET /v3/image/get`（随机归档图片，可选 `name` 按用户）
 
 ## 常用命令
 

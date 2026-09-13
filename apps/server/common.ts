@@ -2,10 +2,6 @@ import type { DB } from '@tweets-viewer/database'
 import type { SelectUser } from '@tweets-viewer/database/schema'
 import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
 
-export const staticUrl
-  // = 'http://127.0.0.1:8080'
-  = 'https://p.chilfish.top'
-
 export interface AppType {
   Variables: {
     db: DB

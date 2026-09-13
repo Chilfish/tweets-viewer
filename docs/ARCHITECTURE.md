@@ -50,7 +50,7 @@ tweets-viewer/
 - **路由模块**：
   - `routes/tweets.ts` — 推文列表、媒体列表、搜索、那年今日（含 LRU 缓存）
   - `routes/users.ts` — 用户查询
-  - `routes/image.ts` — 随机图片（从静态 JSON 读取）
+  - `routes/image.ts` — 随机图片（从 `tweets` 表读取含媒体图片的推文，支持按用户筛选；主键锚点随机）
   - `routes/ins.ts` — Instagram 帖子查询（分页），从 users.ins_json_data + ins_posts 表读取
 - **缓存策略**：
   - 服务端 LRU 缓存推文总数 (Map-based SimpleLRUCache, 容量 1000)
