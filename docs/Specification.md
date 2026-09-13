@@ -86,6 +86,19 @@
 2. **序列化 (Serialization)** : 用户在 UI 上修改 filters 后，系统**仅更新 URL**（通过 `<Link>` / `useSearchParams`）。
 3. **响应式 (Reactivity)** : React Router loader 监听 URL 变化，自动触发重新获取数据。前端不手动调用 API，只负责操作 URL。
 
+### 3.3 机器可读端点 (Machine-Readable Endpoints)
+
+除 HTML 视图外，站点在根路径提供三个资源路由（React Router resource route：只导出 `loader`、返回 `Response`，不渲染 layout）。
+
+| 路径           | 内容                                                                       | Content-Type                     |
+| :------------- | :------------------------------------------------------------------------- | :------------------------------- |
+| `/robots.txt`  | 爬虫规则：全站 `Allow: /`（公开只读归档，无私有路径）+ Sitemap 声明        | `text/plain; charset=utf-8`      |
+| `/sitemap.xml` | 站点地图：首页 + 全局视图（`/memo`、`/search`）+ 各归档用户时间线/媒体页   | `application/xml; charset=utf-8` |
+| `/llms.txt`    | LLM 友好的站点索引（[llmstxt.org](https://llmstxt.org/) 规范，纯 markdown） | `text/markdown; charset=utf-8`   |
+
+- `robots.txt` / `sitemap.xml` 的域名取自请求（任意部署域名下可用）。`sitemap.xml` 的用户清单从 `/v3/users/all` 拉取，**拉取失败降级为仅静态页**，返回 200 而非 5xx——站点地图是辅助资源，可用性优先于完整性。
+- `llms.txt` 由 `app/lib/llms.ts` 的 `buildLlmsTxt()` 生成：H1 标题 → blockquote 简介 → `## ` 分区（Pages / Backend API / Machine Readable / Documentation）→ `- [文本](链接): 描述` 子弹列表。站点页面用相对链接，API 与仓库文档指向外部绝对地址（GitHub raw markdown）。后端端点清单变更时须同步 `apiEndpoints`，由 `app/lib/__tests__/llms.test.ts` 兜底校验。
+
 ---
 
 ## 4. 功能行为规格 (Functional Behaviors)

@@ -14,4 +14,9 @@ export default [
     route('/media/:name', 'routes/media.tsx'),
     route('/ins/:name', 'routes/ins.tsx'),
   ]),
+
+  // 机器可读资源路由（不套 layout，直接返回 Response）
+  route('robots.txt', 'routes/robots.txt.ts'),
+  route('sitemap.xml', 'routes/sitemap.xml.ts'),
+  route('llms.txt', 'routes/llms.txt.ts'),
 ] satisfies RouteConfig
