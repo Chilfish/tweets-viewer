@@ -6,11 +6,15 @@
   "packageManager": "bun@1.3.14",
   "scripts": {
     "dev": "concurrently \"bun run dev:server\" \"bun run dev:client\"",
-    "dev:server": "bun run --cwd ./apps/server dev",
-    "dev:client": "bun run --cwd ./apps/web-react dev",
-    "build:client": "bun run --cwd ./apps/web-react build",
-    "deploy": "bun run --cwd ./apps/server deploy",
-    "lint": "eslint . --fix"
+    "dev:server": "bun --cwd apps/server dev",
+    "dev:client": "bun --cwd apps/web-react dev",
+    "build:client": "bun --cwd apps/web-react build",
+    "deploy": "bun --cwd apps/server deploy",
+    "lint": "eslint . --fix",
+    "lint:check": "eslint . --max-warnings=0",
+    "typecheck": "bun --cwd apps/web-react typecheck",
+    "test": "bun --cwd packages/shared test && bun --cwd packages/database test && bun --cwd apps/server test && bun --cwd apps/web-react test",
+    "test:visual": "bun --cwd apps/web-react test:visual"
   },
   "workspaces": [
     "packages/*",
@@ -26,6 +30,7 @@
     "@types/bun": "^1.3.14",
     "@types/node": "^26.1.2",
     "concurrently": "^10.0.4",
+    "cross-env": "^10.1.0",
     "dotenv": "^17.4.2",
     "eslint": "^10.8.0",
     "eslint-plugin-format": "^2.0.1",

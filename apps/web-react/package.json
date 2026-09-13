@@ -4,16 +4,16 @@
   "private": true,
   "packageManager": "bun@1.3.14",
   "scripts": {
-    "build": "react-router build",
-    "dev": "react-router dev",
+    "build": "cross-env NODE_ENV=production react-router build",
+    "dev": "cross-env NODE_ENV=development react-router dev",
     "start": "react-router-serve ./build/server/index.js",
     "typecheck": "react-router typegen && tsc",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "test": "vitest run --project unit --project stories",
-    "test:watch": "vitest --project unit --project stories",
-    "test:visual": "vitest run --project vrt",
-    "test:visual:watch": "vitest --project vrt"
+    "test": "cross-env NODE_ENV=test vitest run --project unit --project stories",
+    "test:watch": "cross-env NODE_ENV=test vitest --project unit --project stories",
+    "test:visual": "cross-env NODE_ENV=test vitest run --project vrt",
+    "test:visual:watch": "cross-env NODE_ENV=test vitest --project vrt"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

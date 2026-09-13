@@ -7,8 +7,8 @@
   "main": "./index.ts",
   "module": "./index.ts",
   "scripts": {
-    "test": "vitest run",
-    "test:watch": "vitest"
+    "test": "cross-env NODE_ENV=test vitest run",
+    "test:watch": "cross-env NODE_ENV=test vitest"
   },
   "dependencies": {
     "date-fns": "^4.4.0",
