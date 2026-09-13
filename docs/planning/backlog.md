@@ -1,6 +1,6 @@
 # Backlog（任务清单）
 
-**项目**: Tweets Viewer | **最后更新**: 2026-09-13
+**项目**: Tweets Viewer | **最后更新**: 2026-09-14
 
 > 本清单**只保留当前关注的未决任务**，不累积已完成条目。规划下一阶段时从这里选任务；条目完成后移入归档。
 > 已完成里程碑见 [action-plan.md](action-plan.md)（历史记录）与 [../archive/](../archive/README.md)。
@@ -14,6 +14,7 @@
 
 ## 未决
 
+- [ ] [fix] 恢复 Instagram 每日抓取：刷新已过期的 `INSTAGRAM_COOKIES`（2026-06-21 起，13 个账号全部 `User not found`）后取消 `dailyUpdate.ts` 里的注释；顺带修 `fetch-ins-daily.ts:270` 吞掉用户级错误、不设退出码（job 假绿）的问题（前置：拿到新的 IG cookie；关联：`docs/development-log/2026-09-14.md`；风险：低）
 - [ ] [refactor] 补齐 `apps/server` / `packages/database` 的 `typecheck`，把根 `bun run typecheck` 扩到全仓（前置：先隔离 vendored `packages/rettiwt-api` 的历史类型错误；关联：`docs/INDEX.md` §四、CI `typecheck` job；风险：低）
 - [ ] [test] 视觉回归（VRT）覆盖扩面：MediaCard / InstagramPostCard / TweetSkeleton / DateDivider × 双主题（前置：CI linux 基线生成流程；关联：`planning/visual-regression-testing.md`；风险：中）
 
@@ -28,4 +29,5 @@
 
 | 日期 | 内容 | 去向 |
 | --- | --- | --- |
+| 2026-09-14 | 定时抓取全量 403 修复：出口改走 mihomo 代理 + `RettiwtPool` 错误分类硬化（401/403/429 轮换、类型化错误、明细日志） | 见 `../development-log/2026-09-14.md`、`../postmortem/006-x-403-datacenter-egress.md` |
 | 2026-09-13 | 工程规范对标：文档体系 + 门禁（INDEX / engineering / reviews / SECURITY / CODE_OF_CONDUCT / cross-env / pre-push 门禁） | 见 `../development-log/2026-09-13.md`、`../postmortem/005-host-node-env-leak.md` |

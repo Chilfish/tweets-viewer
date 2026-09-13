@@ -13,6 +13,7 @@
 | [003](003-view-transition-persistent-chrome-morph.md) | View Transitions 的 `view-transition-name` 误用在持久 chrome 元素上 → morph 漂移；灯箱滚动锁 + `transition-all` 布局跳动 | API 契约未核实 | `view-transition-name` 是共享元素过渡（缩略图↔大图），持久元素打 name 会 morph 内容变形；modal 滚动锁不手动加 | 已沉淀 |
 | [004](004-bun-cwd-run-false-green.md) | `bun --cwd X run <script>` 无效语法打 usage 且 exit 0 → CI 步骤假绿空转（VRT 门禁失效两轮） | 工具反馈滞后 | workflow 调 bun 脚本只用隐式 `bun --cwd X <script>` 或 `working-directory:` + `bun run`；CI 的绿必须在日志里看到真实产物，不能只信退出码 | 已沉淀 |
 | [005](005-host-node-env-leak.md) | 宿主 `NODE_ENV=production` 泄漏进 Vitest → React 加载 production 构建（`React.act` 缺失），组件测试全红；脚本内联 `NODE_ENV=` 在 Bun shell 下静默无效 | 工具反馈滞后 | 脚本 `NODE_ENV` 一律 `cross-env` 固定；改完用探针确认真实值，不能只看退出码 | 已沉淀 |
+| [006](006-x-403-datacenter-egress.md) | 定时抓取 18 个用户全量 403 —— 真实原因是 X 拒绝数据中心出口 IP；排查中又踩「本机 TUN/fake-ip 污染测量」得出过错误结论 | 工具反馈滞后 + 设计建模 | 外部 API 拒绝时先落错误明细再判断；跨环境链路验证必须在目标环境做；轮换策略要按错误类别分类 | 已沉淀 |
 
 ## 高频雷区（写码前自查）
 
@@ -23,6 +24,7 @@
 | `any` 泛滥 | 用明确类型或 `unknown` + 收窄；scripts 抓取脚本可放宽（数据来自外部 API） |
 | 日期边界 | 服务端接受 date-only 值（`2023-01-01`）与完整 ISO 时间戳；查询时统一归一化 |
 | 分页游标 | `searchTweetsRaw` 游标循环注意 429 速率限制（exit 129）与 404 空结果（exit 104） |
+| 外部 API 的错误只记 `status` | 「出口被拦」(403) 与「凭据失效」(401/`code 32`) 在日志上同形 → 把对方的错误明细（`TwitterError.details`）一并落盘再判断（见 [006](006-x-403-datacenter-egress.md)） |
 
 ### 2. 前端
 
@@ -50,6 +52,7 @@
 |---|---|
 | 宿主 `NODE_ENV` 泄漏 | 各包 `test`/`dev`/`build` 脚本一律 `cross-env NODE_ENV=...`；脚本内联 `NODE_ENV=foo cmd` 在 Bun shell 下静默无效，不要用（见 [005](005-host-node-env-leak.md)） |
 | 「改了但没生效」的脚本配置 | 用探针（临时用例 `console.log(process.env.NODE_ENV, typeof React.act)`）核对真实值，不能只看退出码 |
+| 本地有 TUN/系统代理时验证代理链路 | 出口 IP 与 DNS 都会被外层接管（fake-ip 会解析成 `198.18.x.x`）、出站被二次跳转 → 逐节点结论全部不可信；跨环境链路问题放到目标环境（runner）验证，或先证明进程实际解析/连接的目标（见 [006](006-x-403-datacenter-egress.md)） |
 | 测试假绿 | 断言必须能在「改坏行为」时变红；`test/expect-expect` 等 lint 规则 + 核对 Test Files 数量双重兜底 |
 
 
