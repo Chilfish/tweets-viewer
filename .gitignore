@@ -67,3 +67,4 @@ coverage/
 .vitest-attachments
 # Local harness memory state
 .mnemon/
+.commandcode/settings.json

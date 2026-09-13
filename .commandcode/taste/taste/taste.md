@@ -1,0 +1,15 @@
+# Taste
+- Documentation-first: before implementing or refactoring, inspect the project's current state and its docs/specs, and follow those conventions; repeatedly reminds "文档先行" and to align fully with the reference project's process and standards. Confidence: 0.9
+- Commit work following the project's documented git workflow (e.g. docs/engineering/git-workflow.md), splitting changes into logical batches rather than one blob; expects the agent to just proceed when told "直接干". Confidence: 0.85
+- Verify by actually running the code/scenario and confirming correct results before committing ("先跑一遍结果验证是否正确"). Confidence: 0.8
+- Prefers CLAUDE.md as the real, canonical agent-instructions file (regular file, not a symlink) and considers AGENTS.md deprecated; wants it kept in sync with /docs. Confidence: 0.8
+- When a decision depends on external/tooling behavior (e.g. whether a Vite plugin is still needed in vite@8), check the official docs instead of assuming. Confidence: 0.8
+- When the same code exists in more than one of his projects (e.g. tweets-viewer and anonTweet), apply the equivalent change to all affected projects ("两边都要改"). Confidence: 0.75
+- Cares about code style and separation of responsibilities; dislikes duplicated logic or overlapping responsibilities and expects such debt to be consolidated. Confidence: 0.8
+- Prefers targeted, minimally invasive fixes that integrate into existing flows rather than parallel standalone implementations (e.g. adding a patch flag inside the existing download logic). Confidence: 0.7
+- Favors the simpler consolidated design over a split/clever alternative (e.g. merging avatar + username in the mobile top bar per the original plan). Confidence: 0.6
+- Judges product/UI decisions from an Apple-style product and engineering perspective, and asks for blunt critique of the overall design; flags inconsistent-looking pages/sections and asks whether other UI areas need the same cleanup. Confidence: 0.75
+- Communicates in Chinese and expects Chinese responses. Confidence: 0.7
+- Wants analysis/research deliverables written up as a Markdown document in the repo (not just answered in chat), with the source data paths referenced. Confidence: 0.6
+- Encourages the agent to search externally for context when analyzing local data ("可以搜索相关的信息") rather than relying only on the provided files. Confidence: 0.55
+- When translating content, wants the original text preserved with the Simplified Chinese translation placed directly beneath it ("翻译成简体中文在原文下面"), not a translation-only replacement. Confidence: 0.7
