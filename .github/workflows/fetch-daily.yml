@@ -11,7 +11,7 @@ jobs:
     permissions:
       issues: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -26,15 +26,15 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           TWEET_KEYS: ${{ secrets.TWEET_KEYS }}
           INSTAGRAM_COOKIES: ${{ secrets.INSTAGRAM_COOKIES }}
-          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
         run: bun run apps/scripts/src/dailyUpdate.ts
 
-      # 4D-1：cron 健康通知 —— 失败时开 issue，避免静默断更
+      # 4D-1：cron 健康通知 —— 失败时开 issue 并指派维护者，避免静默断更
       - name: Notify on failure
         if: failure()
         run: |
           gh issue create \
             --title "Daily data update failed" \
+            --assignee Chilfish \
             --body "The scheduled daily update workflow failed on $(date -u +%Y-%m-%dT%H:%M:%SZ).
 
             - Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
