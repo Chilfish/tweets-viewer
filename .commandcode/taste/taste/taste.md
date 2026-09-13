@@ -1,5 +1,6 @@
 # Taste
 - Documentation-first: before implementing or refactoring, inspect the project's current state and its docs/specs, and follow those conventions; repeatedly reminds "文档先行" and to align fully with the reference project's process and standards. Confidence: 0.9
+- Treats conventions as things that must be enforced, not just documented: wants lint rules, git hooks and gate scripts (e.g. pre-push running lint/typecheck/test/build, aggregate root scripts) updated alongside the docs ("更新本项目的文档以及相关约束"). Confidence: 0.6
 - Commit work following the project's documented git workflow (e.g. docs/engineering/git-workflow.md), splitting changes into logical batches rather than one blob; expects the agent to just proceed when told "直接干". Confidence: 0.85
 - Verify by actually running the code/scenario and confirming correct results before committing ("先跑一遍结果验证是否正确"). Confidence: 0.8
 - Prefers CLAUDE.md as the real, canonical agent-instructions file (regular file, not a symlink) and considers AGENTS.md deprecated; wants it kept in sync with /docs. Confidence: 0.8
@@ -13,3 +14,5 @@
 - Wants analysis/research deliverables written up as a Markdown document in the repo (not just answered in chat), with the source data paths referenced. Confidence: 0.6
 - Encourages the agent to search externally for context when analyzing local data ("可以搜索相关的信息") rather than relying only on the provided files. Confidence: 0.55
 - When translating content, wants the original text preserved with the Simplified Chinese translation placed directly beneath it ("翻译成简体中文在原文下面"), not a translation-only replacement. Confidence: 0.7
+- Demands rigorous error handling: errors must propagate and be classified, never swallowed into an empty/success result; a fetch or job that returns zero items must not be conflated with success. Confidence: 0.75
+- Wants automated/scheduled jobs to fail loudly (non-zero exit code) when work is incomplete, so failures surface in CI/Actions instead of silently "succeeding". Confidence: 0.7
