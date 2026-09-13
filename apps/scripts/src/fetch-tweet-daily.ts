@@ -2,7 +2,7 @@ import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
 import { setTimeout as sleep } from 'node:timers/promises'
 import { neon } from '@neondatabase/serverless'
 import { createTweets, getDailyFetchUsers, schema } from '@tweets-viewer/database'
-import { RettiwtPool, RettiwtRateLimitError, TweetEnrichmentService, TwitterAPIClient } from '@tweets-viewer/rettiwt-api'
+import { RettiwtAuthError, RettiwtPool, RettiwtRateLimitError, TweetEnrichmentService, TwitterAPIClient } from '@tweets-viewer/rettiwt-api'
 import { drizzle } from 'drizzle-orm/neon-http'
 
 const KEYS = (process.env.TWEET_KEYS || '').split(',').filter(Boolean).map(key => key.trim())
@@ -33,6 +33,12 @@ function getErrorStatus(error: unknown): number | undefined {
 
 function formatError(error: unknown): string {
   return error instanceof Error ? error.message : String(error)
+}
+
+/** 取出 X 返回的错误明细（错误码/消息）；类型化错误把原始 TwitterError 挂在 cause 上 */
+function getErrorDetails(error: unknown): unknown {
+  const own = (error as { details?: unknown })?.details
+  return own ?? (error as { cause?: { details?: unknown } })?.cause?.details
 }
 
 /**
@@ -128,20 +134,30 @@ export async function fetchTweetDaily(): Promise<void> {
 
       catch (error: unknown) {
         lastError = error
+        const status = getErrorStatus(error)
+
         console.error({
           userId: user.id,
           username: user.fullName,
           action: 'fetch-timeline-error',
           attempt,
-          status: getErrorStatus(error),
+          status,
           message: formatError(error),
+          details: getErrorDetails(error),
         })
 
-        // 所有 Key 都因 429 耗尽：继续重试只会把限流打得更死，直接中止本轮抓取
-        if (error instanceof RettiwtRateLimitError || getErrorStatus(error) === 429) {
+        // key 级失败：一轮之内所有 Key 都被拒（401/403）或耗尽（429）。
+        // 再按用户重试只会把同一个失败重复 18 遍，直接中止本轮抓取。
+        let abortReason: string | undefined
+        if (error instanceof RettiwtAuthError || status === 401 || status === 403)
+          abortReason = 'all-keys-rejected'
+        else if (error instanceof RettiwtRateLimitError || status === 429)
+          abortReason = 'rate-limit-exhausted'
+
+        if (abortReason) {
           console.error({
             action: 'fetch-timeline-abort',
-            reason: 'rate-limit-exhausted',
+            reason: abortReason,
             message: formatError(error),
           })
           process.exitCode = 1
