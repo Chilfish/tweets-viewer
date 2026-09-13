@@ -1,9 +1,18 @@
-# 存档
+# 存档（Archive）
 
-已完成阶段的规划文档统一归档于此。**仅供历史查阅，不再主动读取**（避免污染上下文）。
+**项目**: Tweets Viewer
 
-## 规则
+> 已完成阶段的规划文档归档区。**存档不主动读取** —— 它们记录的是已经结束的上下文。
 
-- 阶段完成后，将 `docs/planning/` 中对应阶段 TODO / 规划文档移入此处
-- 存档 = 历史记录，不主动读取；活跃文档只留 `docs/planning/` 与 `docs/` 根
-- 当前无归档文档（Phase 1/2 文档仍在活跃区）
+## 约定
+
+- 阶段计划完成后，用 `git mv` 把计划文档移到本目录（保留历史）
+- 归档文档在文件名或开头注明「已完成」及完成日期
+- 关键结论（教训/决策）应已同步到 `CLAUDE.md` / `postmortem/` / `planning/architecture.md`（ADR），本目录只留原始计划供追溯
+- 不要在此堆活跃文档；活跃未决任务在 [../planning/backlog.md](../planning/backlog.md)，文档入口见 [../INDEX.md](../INDEX.md)
+
+## 目录
+
+| 文件 | 说明 | 归档日期 |
+| --- | --- | --- |
+| （暂无） | Phase 1~5 的详细记录仍以里程碑形式保留在 [../planning/action-plan.md](../planning/action-plan.md)；后续阶段完成后逐个 `git mv` 至此 | — |
