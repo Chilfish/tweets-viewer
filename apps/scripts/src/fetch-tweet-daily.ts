@@ -6,10 +6,11 @@ import { RettiwtPool, RettiwtRateLimitError, TweetEnrichmentService, TwitterAPIC
 import { drizzle } from 'drizzle-orm/neon-http'
 
 const KEYS = (process.env.TWEET_KEYS || '').split(',').filter(Boolean).map(key => key.trim())
+const PROXY = process.env.TWEET_PROXY?.trim() || undefined
 const SYNC_SINCE = process.env.SYNC_SINCE
   ? new Date(process.env.SYNC_SINCE)
   : new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
-const twitterPool = new RettiwtPool(KEYS)
+const twitterPool = new RettiwtPool(KEYS, { proxy: PROXY })
 
 const MAX_RETRIES = 5
 const BACKOFF_BASE_MS = 1000
@@ -73,6 +74,12 @@ export async function fetchTweetDaily(): Promise<void> {
   const client = neon(DATABASE_URL)
   const db = drizzle({ client, schema })
   const users = await getDailyFetchUsers(db)
+
+  console.log({
+    action: 'twitter-pool',
+    keysCount: KEYS.length,
+    proxy: PROXY ? 'enabled' : 'disabled',
+  })
 
   console.log({
     action: 'get-users',
