@@ -6,6 +6,8 @@
 - Prefers CLAUDE.md as the real, canonical agent-instructions file (regular file, not a symlink) and considers AGENTS.md deprecated; wants it kept in sync with /docs. Confidence: 0.8
 - When a decision depends on external/tooling behavior (e.g. whether a Vite plugin is still needed in vite@8), check the official docs instead of assuming. Confidence: 0.8
 - When the same code exists in more than one of his projects (e.g. tweets-viewer and anonTweet), apply the equivalent change to all affected projects ("两边都要改"). Confidence: 0.75
+- When requesting a new feature, points to an existing sibling/prior project as the reference implementation to mirror ("参考这个项目"), including the file paths to copy from, rather than designing it from scratch; expects the agent to read that reference (lib + tests + route registration) before implementing. Confidence: 0.6
+- Wants generated/index artifacts (e.g. llms.txt) to be authored from the project's own existing documentation/specs ("要结合本项目的文档来描述") instead of invented or generic content. Confidence: 0.6
 - Cares about code style and separation of responsibilities; dislikes duplicated logic or overlapping responsibilities and expects such debt to be consolidated. Confidence: 0.8
 - Prefers targeted, minimally invasive fixes that integrate into existing flows rather than parallel standalone implementations (e.g. adding a patch flag inside the existing download logic). Confidence: 0.7
 - Favors the simpler consolidated design over a split/clever alternative (e.g. merging avatar + username in the mobile top bar per the original plan). Confidence: 0.6
@@ -13,7 +15,10 @@
 - Communicates in Chinese and expects Chinese responses. Confidence: 0.7
 - Wants analysis/research deliverables written up as a Markdown document in the repo (not just answered in chat), with the source data paths referenced. Confidence: 0.6
 - Encourages the agent to search externally for context when analyzing local data ("可以搜索相关的信息") rather than relying only on the provided files. Confidence: 0.55
+- Prefers the `jina` skill (via activate_skill / its search script) for external web search and page reading when the built-in search is unavailable, prompting tersely ("jina search"). Confidence: 0.6
 - When translating content, wants the original text preserved with the Simplified Chinese translation placed directly beneath it ("翻译成简体中文在原文下面"), not a translation-only replacement. Confidence: 0.7
 - Demands rigorous error handling: errors must propagate and be classified, never swallowed into an empty/success result; a fetch or job that returns zero items must not be conflated with success. Confidence: 0.75
 - Wants automated/scheduled jobs to fail loudly (non-zero exit code) when work is incomplete, so failures surface in CI/Actions instead of silently "succeeding". Confidence: 0.7
 - Actively tracks GitHub Actions / runner runtime deprecations (e.g. the Node 20 → 24 removal) and expects CI workflows to be audited and updated to stay compatible: bumping action versions to the current major, removing obsolete/misplaced flags like FORCE_JAVASCRIPT_ACTIONS_TO_NODE24, and verifying each action's runs.using runtime. Confidence: 0.7
+- Wants developer-facing docs/spec endpoints (e.g. the OpenAPI spec and docs UI) accessible in production, not restricted to dev-only. Confidence: 0.55
+- Expects the site's machine-readable discovery artifacts (llms.txt, sitemap.xml) to stay complete: every publicly registered API endpoint/resource — including ones owned by another app in the monorepo (e.g. the server's /openapi.json) — should be listed, and he points out omissions himself. Confidence: 0.6
