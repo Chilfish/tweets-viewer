@@ -9,9 +9,28 @@ import { FetcherService } from '../services/public/FetcherService'
 export class RettiwtRateLimitError extends Error {
   public readonly status = 429
 
-  public constructor(message: string) {
-    super(message)
+  public constructor(message: string, options?: ErrorOptions) {
+    super(message, options)
     this.name = 'RettiwtRateLimitError'
+  }
+}
+
+/**
+ * 所有 API Key 都被 X 拒绝时抛出。
+ *
+ * - `401`：cookie 失效（X 返回 `code 32 Could not authenticate you`）
+ * - `403`：出口 IP 被判定为不可信（数据中心 IP 常见），或账号被限制
+ *
+ * 两种都是 key 级失败，换 key 可能有用；全部试完则抛出，让上层一次失败就中止，
+ * 而不是把每个用户都重试一遍。
+ */
+export class RettiwtAuthError extends Error {
+  public readonly status: number
+
+  public constructor(message: string, status: number = 401, options?: ErrorOptions) {
+    super(message, options)
+    this.name = 'RettiwtAuthError'
+    this.status = status
   }
 }
 
@@ -56,14 +75,19 @@ export class RettiwtPool {
       return await task(fetcher)
     }
     catch (error: any) {
-      // 3. 错误过滤：判断是否值得重试
-      if (this.shouldRetry(error)) {
-        // 防止无限递归：如果重试次数超过 Key 的总数，说明所有 Key 都挂了，直接抛出
+      const status = this.getErrorStatus(error)
+
+      // 3. 错误过滤：key 级失败就换 key 再试。401/403（key 被拒）与 429（限流）都属此列。
+      if (status === 401 || status === 403 || status === 429) {
+        // 防止无限递归：轮完所有 Key 还是失败，说明没有一把可用，直接抛出
         if (attempt >= this.keys.length) {
-          throw new RettiwtRateLimitError(`[RettiwtPool] All keys exhausted via Rate Limiting. Last Error: ${error.message}`)
+          const detail = `[RettiwtPool] All ${this.keys.length} keys exhausted (last: HTTP ${status}). Last Error: ${error.message}`
+          throw status === 429
+            ? new RettiwtRateLimitError(detail, { cause: error })
+            : new RettiwtAuthError(detail, status, { cause: error })
         }
 
-        console.warn(`[RettiwtPool] Key ending in ...${currentKey.slice(-10)} hit 429. Rotating...`)
+        console.warn(`[RettiwtPool] Key ending in ...${currentKey.slice(-10)} rejected with ${status}. Rotating...`)
 
         // 4. 轮询到下一个 Key
         this.rotateKey()
@@ -72,7 +96,7 @@ export class RettiwtPool {
         return this.run(task, attempt + 1)
       }
 
-      // 如果不是 429，或者是 404/401/500，直接抛出，不要换 Key 重试
+      // 其他错误（404/500 等）与 Key 无关，直接抛出，不要换 Key 重试
       throw error
     }
   }
@@ -97,11 +121,9 @@ export class RettiwtPool {
   }
 
   /**
-   * 策略判断：定义什么错误需要换 Key
-   * 这里你需要根据实际库抛出的 Error 结构进行调整
+   * 从 Axios / TwitterError / 自定义错误中提取 HTTP 状态码。
    */
-  private shouldRetry(error: any): boolean {
-    const status = error?.response?.status || error?.status || error?.statusCode
-    return status === 429
+  private getErrorStatus(error: any): number | undefined {
+    return error?.response?.status ?? error?.status ?? error?.statusCode
   }
 }
