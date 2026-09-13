@@ -4,6 +4,17 @@
 
 > 基础 URL：`https://tweet-api.chilfish.top` (生产) / `http://localhost:3000` (开发)
 
+## OpenAPI / 交互式文档
+
+服务端基于 [hono-openapi](https://github.com/rhinobase/hono-openapi) 从各路由的 `describeRoute` 元数据生成 OpenAPI 3.1 规范，并提供 Scalar 交互式文档（**生产环境同样可访问**）：
+
+| 端点             | 说明                                   |
+| ---------------- | -------------------------------------- |
+| `GET /openapi.json` | OpenAPI 3.1 规范（JSON）           |
+| `GET /scalar`       | Scalar API 参考 UI（CDN 加载渲染） |
+
+> 契约来源：复用 schema 与文档配置在 `apps/server/utils/openapi.ts`，各端点元数据在对应 `routes/*.ts` 的 `describeRoute`。修改端点签名时同步更新两处与本文件。
+
 ## 通用类型定义
 
 ### PaginatedResponse<T>

@@ -4,6 +4,7 @@ import { schema } from '@tweets-viewer/database'
 import { now } from '@tweets-viewer/shared'
 import { drizzle } from 'drizzle-orm/neon-http'
 import { Hono } from 'hono'
+import { describeRoute } from 'hono-openapi'
 import { contextStorage } from 'hono/context-storage'
 import { cors } from 'hono/cors'
 import { cachedData } from './common'
@@ -11,6 +12,7 @@ import imageApp from './routes/image'
 import insApp from './routes/ins'
 import tweetsApp from './routes/tweets'
 import usersApp from './routes/users'
+import { jsonResponse, registerOpenAPI } from './utils/openapi'
 import 'dotenv'
 
 const isDev = process.env.NODE_ENV === 'development'
@@ -32,7 +34,14 @@ app
   })
 
 app
-  .get('/', async (c) => {
+  .get('/', describeRoute({
+    tags: ['Meta'],
+    summary: '服务状态',
+    description: '返回当前时间与已缓存用户的推文条数。',
+    responses: {
+      200: jsonResponse('服务状态', 'RootStatus'),
+    },
+  }), async (c) => {
     const today = now()
     // name: size
     const tweetsSize: Record<string, number> = {}
@@ -50,6 +59,8 @@ app
   .route('/v3/users', usersApp)
   .route('/v3/image', imageApp)
   .route('/v3/ins', insApp)
+
+registerOpenAPI(app)
 
 app.onError((err, c) => {
   console.error(err)

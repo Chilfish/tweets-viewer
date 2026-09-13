@@ -13,9 +13,18 @@ import {
   getTweetsYearStats,
 } from '@tweets-viewer/database'
 import { Hono } from 'hono'
+import { describeRoute } from 'hono-openapi'
 import { getContext } from 'hono/context-storage'
 import { z } from 'zod'
 import { SimpleLRUCache } from '../utils/lru-cache'
+import {
+  dateParameters,
+  errorResponse,
+  jsonResponse,
+  nameParameter,
+  paginationParameters,
+  tweetQueryParameters,
+} from '../utils/openapi'
 
 const app = new Hono<AppType>()
 
@@ -85,7 +94,16 @@ function normalizeSearchParams(searchResult: z.infer<typeof searchSchema>) {
   return { keyword, name }
 }
 
-app.get('/get/:name', async (c) => {
+app.get('/get/:name', describeRoute({
+  tags: ['Tweets'],
+  summary: '获取用户推文列表',
+  description: '按用户 Screen Name 分页获取推文，支持日期范围、排除回复与 keyset 游标续载。',
+  parameters: [nameParameter(), ...tweetQueryParameters],
+  responses: {
+    200: jsonResponse('分页推文列表', 'PaginatedTweets'),
+    400: errorResponse,
+  },
+}), async (c) => {
   const name = getName(c)
   if (!name)
     return c.json({ error: 'invalid name' }, 400)
@@ -151,7 +169,16 @@ app.get('/get/:name', async (c) => {
   return c.json(tweets)
 })
 
-app.get('/medias/:name', async (c) => {
+app.get('/medias/:name', describeRoute({
+  tags: ['Tweets'],
+  summary: '获取用户媒体推文',
+  description: '获取指定用户所有含图片/视频附件的推文（排除转推）。',
+  parameters: [nameParameter(), ...paginationParameters, ...dateParameters],
+  responses: {
+    200: jsonResponse('分页媒体推文列表', 'PaginatedTweets'),
+    400: errorResponse,
+  },
+}), async (c) => {
   const name = getName(c)
   if (!name)
     return c.json({ error: 'invalid name' }, 400)
@@ -188,7 +215,16 @@ app.get('/medias/:name', async (c) => {
   return c.json(tweets)
 })
 
-app.get('/stats/:name', async (c) => {
+app.get('/stats/:name', describeRoute({
+  tags: ['Tweets'],
+  summary: '获取用户推文按年统计',
+  description: '归档完整性指示：覆盖年份范围 + 每年条数。',
+  parameters: [nameParameter()],
+  responses: {
+    200: jsonResponse('按年份降序的统计', 'TweetsYearStats'),
+    400: errorResponse,
+  },
+}), async (c) => {
   const name = getName(c)
   if (!name)
     return c.json({ error: 'invalid name' }, 400)
@@ -200,7 +236,32 @@ app.get('/stats/:name', async (c) => {
   return c.json(stats)
 })
 
-app.get('/search', async (c) => {
+app.get('/search', describeRoute({
+  tags: ['Tweets'],
+  summary: '搜索推文',
+  description: '在指定用户或全库范围按关键词搜索推文（`name` 缺省为跨用户全局搜索）。',
+  parameters: [
+    {
+      in: 'query',
+      name: 'q',
+      required: true,
+      description: '搜索关键词（1-200 字符）',
+      schema: { type: 'string', minLength: 1, maxLength: 200 },
+    },
+    {
+      in: 'query',
+      name: 'name',
+      required: false,
+      description: '限定用户 Screen Name；缺省为全库检索',
+      schema: { type: 'string', minLength: 1, maxLength: 50, pattern: '^\\w+$' },
+    },
+    ...paginationParameters,
+  ],
+  responses: {
+    200: jsonResponse('分页搜索结果', 'PaginatedTweets'),
+    400: errorResponse,
+  },
+}), async (c) => {
   const searchResult = searchSchema.safeParse(c.req.query())
   if (!searchResult.success) {
     return c.json({ error: 'keyword is required (1-200 chars)' }, 400)
@@ -226,7 +287,16 @@ app.get('/search', async (c) => {
   return c.json(tweets)
 })
 
-app.get('/get/:name/last-years-today', async (c) => {
+app.get('/get/:name/last-years-today', describeRoute({
+  tags: ['Tweets'],
+  summary: '获取单用户「那年今日」',
+  description: '指定用户历史年份同一天的推文（保留转推）。',
+  parameters: [nameParameter(), ...paginationParameters],
+  responses: {
+    200: jsonResponse('分页「那年今日」推文', 'PaginatedTweets'),
+    400: errorResponse,
+  },
+}), async (c) => {
   const name = getName(c)
   if (!name)
     return c.json({ error: 'invalid name' }, 400)
@@ -250,7 +320,16 @@ app.get('/get/:name/last-years-today', async (c) => {
   return c.json(tweets)
 })
 
-app.get('/last-years-today', async (c) => {
+app.get('/last-years-today', describeRoute({
+  tags: ['Tweets'],
+  summary: '获取全量「那年今日」',
+  description: '全部用户历史年份同一天的推文（跨用户，排除转推）。',
+  parameters: [...paginationParameters],
+  responses: {
+    200: jsonResponse('分页「那年今日」推文', 'PaginatedTweets'),
+    400: errorResponse,
+  },
+}), async (c) => {
   const pagination = getPaginationParams(c)
   if (isError(pagination))
     return c.json({ error: `invalid pagination: ${pagination}` }, 400)

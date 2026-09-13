@@ -1,5 +1,7 @@
 import { Hono } from 'hono'
+import { describeRoute } from 'hono-openapi'
 import { staticUrl } from '../common'
+import { errorResponse, jsonResponse } from '../utils/openapi'
 
 const app = new Hono()
 
@@ -26,7 +28,14 @@ function randomImg() {
 }
 
 // random
-app.get('/get', async (c) => {
+app.get('/get', describeRoute({
+  tags: ['Image'],
+  summary: '获取随机图片',
+  responses: {
+    200: jsonResponse('随机图片条目', 'ImageRandom'),
+    404: errorResponse,
+  },
+}), async (c) => {
   await fetchImgData()
   const data = randomImg()
   if (!data)
@@ -34,11 +43,23 @@ app.get('/get', async (c) => {
   return c.json(data)
 })
 
-app.get('/all', async (c) => {
+app.get('/all', describeRoute({
+  tags: ['Image'],
+  summary: '获取所有图片',
+  responses: {
+    200: jsonResponse('图片数据数组', 'ImageList'),
+  },
+}), async (c) => {
   await fetchImgData()
   return c.json(imgData)
 })
-app.get('/update', async (c) => {
+app.get('/update', describeRoute({
+  tags: ['Image'],
+  summary: '刷新图片缓存',
+  responses: {
+    200: jsonResponse('缓存刷新结果', 'ImageUpdateResult'),
+  },
+}), async (c) => {
   await fetchImgData()
 
   if (!imgData.length) {
