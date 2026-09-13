@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### 工程规范对标（2026-09-13）
+
+- **Added** `docs/INDEX.md`（文档唯一入口）、`docs/reviews/`、`docs/requirements/README.md`、`docs/planning/backlog.md`、`SECURITY.md`、`CODE_OF_CONDUCT.md`、`docs/engineering/release-checklist.md`（原 deploy-checklist 更名）
+- **Added** postmortem 005（宿主 `NODE_ENV=production` 泄漏进 Vitest / 脚本内联赋值失效）+ 高频雷区「构建与测试环境」
+- **Changed** 文档与门禁对标参考项目：`CLAUDE.md` 重写、`engineering/code-style.md` 与 `git-workflow.md` 重写、PR 模板 / CONTRIBUTING / README 修正事实（React Router v8、路由、命令、路径）
+- **Changed** 各包 `test` / `dev` / `build` 脚本经 `cross-env` 固定 `NODE_ENV`；根新增 `lint:check` / `typecheck` / `test` / `test:visual` 聚合脚本
+- **Changed** `lefthook.yml` pre-push 升级为真实门禁（`lint:check + typecheck + test + build:client`）；eslint 启用 `test/expect-expect` / `no-conditional-expect` / `no-standalone-expect`，忽略 `.commandcode/**`
+- **Fixed** `@vitest/browser-playwright` 缺失导致 web-react Vitest 配置加载失败；NODE_ENV 泄漏导致 22 个组件测试假红
+
 ### 体验与数据
 
 - **Added** `fetchSearchFukuoka.ts` — Fukuoka 归档关键词抓取（`福岡公演`），支持游标循环多页

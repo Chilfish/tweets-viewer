@@ -6,6 +6,7 @@
 
 | 日期 | 主题 |
 |---|---|
+| [2026-09-13](2026-09-13.md) | 工程规范对标：文档体系（INDEX / engineering / reviews / backlog / SECURITY / CODE_OF_CONDUCT）+ 门禁约束（cross-env NODE_ENV、聚合脚本、pre-push 真实门禁）+ postmortem 005 |
 | [2026-09-08](2026-09-08.md) | 全量「那年今日」：`/memo` 无用户模式（按年→按用户两层分组，跨用户回忆）；Phase 6 废弃 |
 | [2026-09-04](2026-09-04.md) | 滚动续载同步 URL 页码（page × cursor 双机制收敛）；视觉回归测试地基（VRT） |
 | [2026-08-31](2026-08-31.md) | web-react `apiUrl` 去硬编码，改为从 `env.server.ts` / `.env` 环境变量读取（经 `vite.config.ts` 注入 bundle） |
