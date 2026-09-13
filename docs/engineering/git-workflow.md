@@ -1,6 +1,6 @@
 # Git 开发流程
 
-**项目**: Tweets Viewer | **最后更新**: 2026-08-09
+**项目**: Tweets Viewer | **最后更新**: 2026-09-13
 
 ## 分支模型
 
@@ -13,7 +13,7 @@ feat/xxx ──●───●
 ```
 
 | 分支类型 | 命名格式 | 用途 | 生命周期 |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `main` | — | 稳定分支，始终可发布 | 永久 |
 | `feat/*` | `feat/date-range-filter` | 功能开发 | 合并后删除 |
 | `fix/*` | `fix/date-only-values` | Bug 修复 | 合并后删除 |
@@ -34,7 +34,7 @@ feat/xxx ──●───●
 ### Type
 
 | Type | 说明 | 示例 |
-|---|---|---|
+| --- | --- | --- |
 | `feat` | 新功能 | `feat(web): add DateRangeFilter` |
 | `fix` | Bug 修复 | `fix(server): accept date-only values for date range` |
 | `refactor` | 重构（不改变行为） | `refactor(web): migrate Calendar to @daypicker/react v10` |
@@ -42,6 +42,7 @@ feat/xxx ──●───●
 | `docs` | 文档 | `docs: sync architecture and API docs` |
 | `style` | 格式化 | `style: apply eslint fixes` |
 | `chore` | 构建/工具 | `chore: bump deps` |
+| `perf` | 性能优化 | `perf(web): memoize feed rows` |
 
 ### Scope
 
@@ -62,7 +63,7 @@ Scope 使用模块名或功能名：
 1. **写代码前**，先用 Conventional Commit 格式确定 commit message（如 `feat(web): add date range filter`）
 2. **围绕这个 message 的范围编写代码**，超出范围的工作留给下一个 commit
 3. **当 diff 变大时（>10 文件或 >200 行），主动拆分**为多个独立 commit
-4. 每个 commit 应能独立通过检查（lint + build + test）
+4. 每个 commit 应能独立通过检查（lint + typecheck + test + build）
 5. 模块创建、功能实现、配置修改、文档更新应分开 commit
 
 典型拆分示例：
@@ -77,37 +78,49 @@ git commit -m "fix(server): accept date-only values for the date range"
 git commit -m "docs: sync architecture and API docs with date range"
 ```
 
-### 示例
+## 验证门禁
+
+> **「看起来绿」不算绿**——改坏被测行为时门禁必须变红，否则等于没测。
+
+### 提交前本地门禁（= pre-push 同款）
 
 ```bash
-# 标准功能
-git commit -m "feat(web): add DateRangeFilter to tweets toolbar"
-
-# Bug 修复
-git commit -m "fix(server): accept date-only values for the tweet date range"
-
-# 迁移/重构
-git commit -m "refactor(web): migrate Calendar to @daypicker/react v10"
+bun run lint:check   # ESLint --max-warnings=0
+bun run typecheck    # react-router typegen + tsc（web-react）
+bun run test         # 全包 Vitest（shared + database + server + web-react）
+bun run build:client # 前端生产构建
 ```
+
+- **禁止 `--no-verify`**：门禁红就修门禁，不要绕过
+- 新功能/新纯函数先写测试再实现；断言必须能在「改坏行为」时失败，禁止静态源码字符串扫描冒充行为断言
+- `NODE_ENV` 一律经 `cross-env` 固定，不依赖宿主环境（见 [postmortem 005](../postmortem/005-host-node-env-leak.md)）
+- 新增测试后核对 `Test Files` 数量，防测试被静默吞掉（见 [postmortem 002](../postmortem/002-vitest-component-test-infra.md)）
+
+### CI
+
+`.github/workflows/ci.yml`：`lint` / `typecheck`（web-react）/ `build` / `test`（四包）/ `visual`（VRT）五个 job。
+`visual` 环境必须与 `update-screenshots.yml` 严格同构（runner / playwright / CJK 字体）。
 
 ## 代码审查
 
 ### PR 流程
 
-1. 创建 PR → 自动运行 CI（Lint + Build + Test）
+1. 创建 PR → 自动运行 CI（Lint + Typecheck + Build + Test + Visual）
 2. 至少 1 人 Approve（AI 辅助先进行自动化 Code Review）
 3. 所有 CI 检查通过
-4. Merge 到 `main`
+4. Create a Merge Commit 到 `main`
 
 ### 审查清单
 
 - [ ] 代码逻辑正确，覆盖边界情况
 - [ ] 测试充分（新功能有测试、改动无回归）
-- [ ] 遵循代码规范（ESLint / code-style）
-- [ ] 无硬编码、无 `any`、无未使用 import
-- [ ] UI 变更附带截图/录屏
-- [ ] 相关文档已更新（Specification / API / 开发日志）
+- [ ] 遵循代码规范（`bun run lint:check` 无 error/warning）
+- [ ] 无硬编码、无 `any`、无未使用 import、无硬编码颜色/URL/凭据
+- [ ] 行为符合 `docs/Specification.md`（URL 驱动状态 / 分页协议 / 渲染模型）
+- [ ] UI 变更附带截图/录屏，且考虑移动端与 `.dark`
+- [ ] 相关文档已更新（Specification / API / INDEX 导航 / 开发日志）
 - [ ] API 变更同步更新 `docs/API_DOCUMENTATION.md`
+- [ ] 新 Bug 模式已按 `docs/postmortem/TEMPLATE.md` 沉淀
 
 ### Merge 策略
 
@@ -121,38 +134,25 @@ git commit -m "refactor(web): migrate Calendar to @daypicker/react v10"
 ### gh CLI 常用操作
 
 ```bash
-# 查阅 Issue/PR
 gh issue list --state open
 gh pr list --state open
 gh pr view 1
-
-# 创建与管理
-gh issue create --title "feat: xxx" --body "..."
 gh pr create --title "feat: xxx" --body "..."
+gh pr checks 1
 gh pr merge 1 --merge --delete-branch   # Create a Merge Commit
 ```
 
 ### AI Code Review 流程
 
-1. **PR 创建后**，AI 自动执行：
-   ```bash
-   gh pr diff <PR_NUMBER>       # 获取 diff
-   gh pr view <PR_NUMBER> --json title,body,files
-   ```
+1. **PR 创建后**，AI 自动执行 `gh pr diff <N>` / `gh pr view <N> --json title,body,files`
 2. **AI 根据审查清单逐项检查**，在 PR 下添加 Review 评论
-3. **检测项**：
-   - 架构一致性（是否符合 ADR）
-   - 命名规范（是否符合 code-style）
-   - 测试覆盖（新增代码是否有对应测试）
-   - 安全（API Key 处理、环境变量）
-   - 边界情况处理（分页末尾、空数据、错误响应）
+3. **检测项**：架构一致性（ADR）、命名规范（code-style）、测试覆盖、安全（凭据/环境变量）、边界情况、文档同步
+4. **结论**：`--approve` / `--request-changes` / `--comment`
 
 ### PR 合并判断标准
 
-AI 辅助判断 PR 是否可合并，基于：
-- CI 全部通过（Lint + Build + Test）
-- AI Code Review 通过
-- 无未解决的 Review 评论
+- CI 全部通过（Lint + Typecheck + Build + Test + Visual）
+- AI Code Review 通过，无未解决的 Review 评论
 - Commit message 符合 Conventional Commits
 
 ## Issue 管理
@@ -168,4 +168,15 @@ AI 辅助判断 PR 是否可合并，基于：
 - API 变更 → 同步更新 `docs/API_DOCUMENTATION.md`
 - 架构决策 → 记录到 `docs/planning/architecture.md` (ADR)
 - 开发日志 → 按天记录到 `docs/development-log/`
-- 踩坑 → 沉淀到 `docs/postmortem/`
+- 踩坑 → 沉淀到 `docs/postmortem/`；审查 → `docs/reviews/`
+- 阶段计划完成 → `git mv` 到 `docs/archive/`
+- 文档入口见 `docs/INDEX.md`
+
+## Git Hooks（lefthook）
+
+`lefthook.yml` 由 `bun install` 时自动安装（postinstall）。
+
+- `pre-commit`：ESLint autofix（staged files）
+- `pre-push`：真实 gate — `lint:check + typecheck + test + build:client`
+
+手动运行：`bunx lefthook run pre-push`
