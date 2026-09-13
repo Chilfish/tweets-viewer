@@ -6,6 +6,10 @@ pre-commit:
       stage_fixed: true
 
 pre-push:
-  commands:
-    build:
-      run: bun run build:client
+  # 真实门禁：lint + typecheck + 全包测试 + 生产构建，全部通过才放行 push。
+  # 禁止 --no-verify 绕过（见 docs/engineering/git-workflow.md）。
+  jobs:
+    - run: bun run lint:check
+    - run: bun run typecheck
+    - run: bun run test
+    - run: bun run build:client
