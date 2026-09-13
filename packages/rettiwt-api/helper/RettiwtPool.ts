@@ -1,6 +1,20 @@
 import { RettiwtConfig } from '../models/RettiwtConfig'
 import { FetcherService } from '../services/public/FetcherService'
 
+/**
+ * 所有 API Key 都因 429 被耗尽时抛出。
+ *
+ * 保留明确的 `status`，让上层能够快速中止，而不是继续重试把限流打得更死。
+ */
+export class RettiwtRateLimitError extends Error {
+  public readonly status = 429
+
+  public constructor(message: string) {
+    super(message)
+    this.name = 'RettiwtRateLimitError'
+  }
+}
+
 // 定义业务函数的签名：接收一个 Fetcher，返回任意 Promise
 type Task<T> = (fetcher: FetcherService) => Promise<T>
 
@@ -35,7 +49,7 @@ export class RettiwtPool {
       if (this.shouldRetry(error)) {
         // 防止无限递归：如果重试次数超过 Key 的总数，说明所有 Key 都挂了，直接抛出
         if (attempt >= this.keys.length) {
-          throw new Error(`[RettiwtPool] All keys exhausted via Rate Limiting. Last Error: ${error.message}`)
+          throw new RettiwtRateLimitError(`[RettiwtPool] All keys exhausted via Rate Limiting. Last Error: ${error.message}`)
         }
 
         console.warn(`[RettiwtPool] Key ending in ...${currentKey.slice(-10)} hit 429. Rotating...`)
