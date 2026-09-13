@@ -5,6 +5,12 @@ on:
     - cron: '0 16 * * *'
   workflow_dispatch:
 
+env:
+  # X 会拒绝 GitHub runner 的出口 IP（403），所有抓取统一经 mihomo 转出去。
+  MIHOMO_VERSION: v1.19.30
+  PROXY_NODE: HK-A
+  TWEET_PROXY: http://127.0.0.1:7890
+
 jobs:
   update-data:
     runs-on: ubuntu-latest
@@ -21,12 +27,49 @@ jobs:
       - name: Install dependencies
         run: bun install
 
+      - name: Cache mihomo
+        uses: actions/cache@v6
+        with:
+          path: ~/mihomo
+          key: mihomo-${{ runner.os }}-${{ env.MIHOMO_VERSION }}
+
+      - name: Start mihomo
+        env:
+          MIHOMO_CONFIG_B64: ${{ secrets.MIHOMO_CONFIG_B64 }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/mihomo
+          if [ ! -x "$HOME/mihomo/core" ]; then
+            curl -sSL -o /tmp/core.gz \
+              "https://github.com/MetaCubeX/mihomo/releases/download/${MIHOMO_VERSION}/mihomo-linux-amd64-${MIHOMO_VERSION}.gz"
+            gunzip -f /tmp/core.gz
+            mkdir -p "$HOME/mihomo"
+            mv /tmp/core "$HOME/mihomo/core"
+            chmod +x "$HOME/mihomo/core"
+          fi
+          echo "$MIHOMO_CONFIG_B64" | base64 -d > /tmp/mihomo/config.yaml
+          nohup "$HOME/mihomo/core" -d /tmp/mihomo -f /tmp/mihomo/config.yaml > /tmp/mihomo/core.log 2>&1 &
+          for _ in $(seq 1 30); do
+            if curl -sf http://127.0.0.1:9099/version > /dev/null; then break; fi
+            sleep 1
+          done
+          # 起不来就让这几步失败：TWEET_PROXY 指向死端口时抓取会报 ECONNREFUSED，
+          # 绝不能静默跌回直连（那只会拿到同一个 403）。
+          curl -sf http://127.0.0.1:9099/version
+          curl -sf -X PUT -H 'Content-Type: application/json' \
+            -d "{\"name\":\"${PROXY_NODE}\"}" http://127.0.0.1:9099/proxies/PICK
+          echo "mihomo ready, egress via ${PROXY_NODE}"
+
       - name: Run fetch script
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           TWEET_KEYS: ${{ secrets.TWEET_KEYS }}
           INSTAGRAM_COOKIES: ${{ secrets.INSTAGRAM_COOKIES }}
         run: bun run apps/scripts/src/dailyUpdate.ts
+
+      - name: Dump mihomo log
+        if: failure() || cancelled()
+        run: tail -n 100 /tmp/mihomo/core.log || true
 
       # 4D-1：cron 健康通知 —— 失败时开 issue 并指派维护者，避免静默断更
       - name: Notify on failure
@@ -38,7 +81,11 @@ jobs:
             --body "The scheduled daily update workflow failed on $(date -u +%Y-%m-%dT%H:%M:%SZ).
 
             - Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-            - Check: IG Cookie 是否过期、TWEET_KEYS 速率限制、DATABASE_URL 连接" \
+            - Check: mihomo / MIHOMO_CONFIG_B64 是否正常、IG Cookie 是否过期、TWEET_KEYS 速率限制、DATABASE_URL 连接" \
             --repo ${{ github.repository }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Stop mihomo
+        if: always()
+        run: pkill -f "$HOME/mihomo/core" || true

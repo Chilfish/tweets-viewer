@@ -18,16 +18,27 @@ export class RettiwtRateLimitError extends Error {
 // 定义业务函数的签名：接收一个 Fetcher，返回任意 Promise
 type Task<T> = (fetcher: FetcherService) => Promise<T>
 
+export interface RettiwtPoolOptions {
+  /**
+   * 代理地址（`http(s)://` 或 `socks://`），透传给 RettiwtConfig；不传则直连。
+   *
+   * 用于绕开数据中心出口 IP 被 X 拒绝（403）的情况。
+   */
+  proxy?: string
+}
+
 export class RettiwtPool {
   private keys: string[]
   private currentIndex: number = 0
   // 缓存实例，避免重复 new Config 的开销
   private instanceCache: Map<string, FetcherService> = new Map()
+  private proxy?: string
 
-  constructor(keys: string[]) {
+  constructor(keys: string[], options: RettiwtPoolOptions = {}) {
     if (!keys.length)
       throw new Error('API Keys cannot be empty')
     this.keys = keys
+    this.proxy = options.proxy
   }
 
   /**
@@ -78,9 +89,7 @@ export class RettiwtPool {
     if (!this.instanceCache.has(key)) {
       const config = new RettiwtConfig({
         apiKey: key,
-        // proxyUrl: typeof process !== 'undefined' && !!process.env.http_proxy
-        //   ? new URL(process.env.http_proxy)
-        //   : undefined,
+        proxy: this.proxy,
       })
       this.instanceCache.set(key, new FetcherService(config))
     }
