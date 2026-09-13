@@ -45,7 +45,7 @@
 ## ADR-006: SSR + SPA 混合
 
 - **日期**: 2026-06
-- **决策**: React Router v7 (SSR mode)，首屏服务端渲染，后续交互纯客户端
+- **决策**: React Router v8 (SSR mode)，首屏服务端渲染，后续交互纯客户端
 - **背景**: 需要 SEO 友好 + 流畅交互
 - **理由**: 首屏 SSR 提供可分享/可索引的初始渲染，SPA 提供无刷新交互
 - **后果**: 服务端需处理加载器（loader）数据获取；客户端 Hydration 后接管
@@ -95,8 +95,8 @@
 | 层 | 技术 |
 |---|---|
 | 运行时 | Bun 1.3+ (packageManager) |
-| 前端 | React 19, React Router v7 (SSR), Tailwind CSS v4, Base UI/COSS, Zustand v5 |
+| 前端 | React 19, React Router v8 (SPA-first + 静态壳，见 ADR-010), Tailwind CSS v4, Base UI/COSS, Zustand v5 |
 | 后端 | Hono v4, Drizzle ORM, Neon Postgres (Serverless), Nitro v3 |
 | 部署 | Vercel (前端) + Cloudflare Workers (API) |
-| 测试 | Vitest (50 tests) |
-| 质量 | ESLint (@antfu/eslint-config), lefthook (pre-commit) |
+| 测试 | Vitest（unit / stories / vrt 三 project，按包独立运行） |
+| 质量 | ESLint (@antfu/eslint-config), lefthook (pre-commit autofix + pre-push 门禁) |

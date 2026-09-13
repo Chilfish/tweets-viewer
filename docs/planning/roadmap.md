@@ -77,7 +77,7 @@
 | # | 任务 | 要点 | 状态 |
 |---|---|---|---|
 | 4D-1 | **cron 健康通知**：`fetch-daily.yml` 失败时 gh issue 告警（含排查提示） | 不再静默断更 | ✅ |
-| 4D-2 | **性能预算**：deploy-checklist 增加 LCP/CLS/INP/TBT 预算表（超预算即阻塞） | "性能是功能"文档化 | ✅ |
+| 4D-2 | **性能预算**：release-checklist 增加 LCP/CLS/INP/TBT 预算表（超预算即阻塞） | "性能是功能"文档化 | ✅ |
 | 4D-3 | **服务端集成测试**：hono app 级（mock db）7 用例——cursor 传递/缓存头/参数校验/全库搜索/media 日期范围 | 契约固化；**暴露并修复 search keyword bug** | ✅ |
 
 ## 四、不做清单（Apple 式克制，防漂移）

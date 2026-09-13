@@ -65,7 +65,7 @@ tweets-viewer/
 ```
 unified-sns/
 ├── apps/
-│   ├── web/                  # 前端（React Router v7 SPA-first + Tailwind v4 + Base UI）
+│   ├── web/                  # 前端（React Router v8 SPA-first + Tailwind v4 + Base UI）
 │   ├── server/               # API（Hono + Neon/SQLite，见 DATA-MODEL §8）
 │   └── scripts/              # 抓取导入（第一阶段：import-<platform>.ts）
 ├── packages/
@@ -90,7 +90,7 @@ unified-sns/
 4. **导入脚本**：`apps/scripts/import-<platform>.ts` 读 fixtures/导出目录 → adapter.normalize → 入库（SQLite 起步）。
 5. **前端卡片**：按 UI-DESIGN §8 顺序开发；先用「导入的本地 JSON + clientLoader 读静态」跑通 UI（不依赖后端）。
 6. **API**：Hono 路由按 API.md 实现，前端切换为 axios 请求。
-7. **部署**：前端 Vercel + API Cloudflare Workers（本项目双端部署模式，`engineering/deploy-checklist.md` 对照）。
+7. **部署**：前端 Vercel + API Cloudflare Workers（本项目双端部署模式，`engineering/release-checklist.md` 对照）。
 
 ---
 

@@ -39,7 +39,7 @@
 
 | # | 任务 | 要点 |
 |---|---|---|
-| 5B-1 | **View Transitions API 接入**：React Router v7 的文档级 ViewTransition——路由切换旧页淡出/新页淡入 + 轻微位移；toolbar 等共享元素稳定不跳；`prefers-reduced-motion` 自动降级 | 原生感的最大单点 |
+| 5B-1 | **View Transitions API 接入**：React Router v8 的文档级 ViewTransition——路由切换旧页淡出/新页淡入 + 轻微位移；toolbar 等共享元素稳定不跳；`prefers-reduced-motion` 自动降级 | 原生感的最大单点 |
 | 5B-2 | 页面进入动画统一：现有 `fade-in duration-300`（layout outlet）升级为与 ViewTransition 协调的进入动画；各 route `handle` 定义过渡类型（默认/淡入/侧滑） | 动效有"来处" |
 | 5B-3 | 列表追加动画：无限滚动新推文淡入（`slide-in-from-bottom`）、跳页替换内容淡入；追加不整屏闪动 | 状态切换流畅 |
 | 5B-4 | 骨架 → 内容过渡：ProfileHeader/列表骨架到实体的平滑切换（核查现有 `animate-in` + 防 CLS） | 加载体验连贯 |

@@ -7,7 +7,7 @@
 ```
 tweets-viewer/
 ├── apps/
-│   ├── web-react/   # 前端 (React Router v7 SSR)
+│   ├── web-react/   # 前端 (React Router v8, SPA-first + 静态壳)
 │   ├── server/      # API 服务端 (Cloudflare Workers + Hono)
 │   └── scripts/     # 离线归档脚本 (抓取→合并→入库)
 ├── packages/
@@ -20,7 +20,7 @@ tweets-viewer/
 └── bunfig.toml      # Bun 配置 (hoisted 安装模式)
 ```
 
-**包管理器**：Bun 1.3.13 (Workspaces 模式)，配置于根 `package.json#workspaces: ["packages/*", "apps/*"]`
+**包管理器**：Bun 1.3+（`packageManager: bun@1.3.14`），Workspaces 模式，配置于根 `package.json#workspaces: ["packages/*", "apps/*"]`
 
 ---
 
@@ -29,7 +29,7 @@ tweets-viewer/
 ### 2.1 `apps/web-react` — 前端
 
 - **职责**：推文归档的沉浸式阅读终端（只读）
-- **技术栈**：React 19 + React Router v7 (SPA-first + 静态壳，见 ADR-010) + Tailwind CSS v4 + Base UI/COSS
+- **技术栈**：React 19 + React Router v8 (SPA-first + 静态壳，见 ADR-010) + Tailwind CSS v4 + Base UI/COSS
 - **状态管理**：Zustand (全局持久化) + useState (组件局部)；分页/筛选状态在 URL query params
 - **关键路由**（定义于 `app/routes.ts`）：
   | URL | 视图 |
@@ -38,10 +38,10 @@ tweets-viewer/
   | `/tweets/:name` | 主时间线（无限滚动 + 分页器 + 日期/排序筛选） |
   | `/media/:name` | 媒体墙（图片/视频网格，瀑布流布局） |
   | `/search/:name?` | 搜索视图（关键词全文检索） |
-  | `/memo/:name` | "那年今日"视图（历史同天推文） |
+  | `/memo/:name?` | "那年今日"视图（`name` 缺省时为全量：所有用户的同月同日回忆，按年分组） |
   | `/ins/:name` | Instagram 帖子浏览（无限滚动 + 分页器） |
 - **状态同步协议**：URL 作为唯一真值来源——前端不直接调用 API，只修改 URL；React Router 的 loader 监听 URL 变化后自动发起请求。
-- **部署**：Vercel (React Router v7 preset)，域名为 `tweet.chilfish.top`
+- **部署**：Vercel (React Router v8 preset)，域名为 `tweet.chilfish.top`
 
 ### 2.2 `apps/server` — API 服务端
 
@@ -164,7 +164,7 @@ tweets-viewer/
                   │ JSON
                   ▼
          ┌────────────────────┐
-         │  apps/web-react    │  (React Router v7 SSR)
+         │  apps/web-react    │  (React Router v8, SPA-first)
          │  浏览器            │
          │  /tweets/:name     │
          │  /ins/:name        │

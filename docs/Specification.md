@@ -82,7 +82,7 @@
 
 前端状态必须与 URL 查询参数 (Query Params) 保持双向强一致性。
 
-1. **初始化 (Hydration)** : React Router v7 loader 在页面加载时读取 URL 参数，调用 API 获取数据。
+1. **初始化 (Hydration)** : React Router v8 loader 在页面加载时读取 URL 参数，调用 API 获取数据。
 2. **序列化 (Serialization)** : 用户在 UI 上修改 filters 后，系统**仅更新 URL**（通过 `<Link>` / `useSearchParams`）。
 3. **响应式 (Reactivity)** : React Router loader 监听 URL 变化，自动触发重新获取数据。前端不手动调用 API，只负责操作 URL。
 
