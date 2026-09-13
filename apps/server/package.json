@@ -5,7 +5,7 @@
   "private": true,
   "packageManager": "bun@1.4.2",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development wrangler dev",
+    "dev": "cross-env NODE_ENV=development vite build; wrangler dev",
     "build": "cross-env NODE_ENV=production vite build",
     "deploy": "bun run build; nitro deploy --prebuilt",
     "test": "cross-env NODE_ENV=test vitest run",
