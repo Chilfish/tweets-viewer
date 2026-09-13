@@ -1,11 +1,11 @@
 # @tweets-viewer/web-react
 
-Tweets Viewer 的前端应用（React Router v7）。
+Tweets Viewer 的前端应用（React Router v8，SPA-first + 静态壳）。
 
 项目级文档与开发说明在仓库根目录：
 
-- `H:/tweets-viewer/README.md`
-- `H:/tweets-viewer/docs/README.md`
+- [`README.md`](../../README.md)
+- [`docs/INDEX.md`](../../docs/INDEX.md)（文档唯一入口）
 
 ## 常用命令
 
@@ -19,4 +19,8 @@ bun run dev:client
 
 ```bash
 bun dev
+bun run test         # Vitest unit + stories
+bun run test:visual  # Vitest vrt（视觉回归）
+bun run typecheck
+bun run build
 ```
