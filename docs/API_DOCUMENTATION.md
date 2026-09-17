@@ -38,7 +38,17 @@ interface PaginatedResponse<T> {
 > - `meta.nextCursor` 在 `hasMore` 为 true 时返回（tweets 系列端点）。无限滚动用 `?cursor=<值>` 续载下一页，
 >   深翻页不随页码退化；分页器跳页仍用 `?page=N`（offset 定位）。
 > - 排序键 = `COALESCE(jsonData->>'retweeted_original_id', "tweetId")`（snowflake，时间有序）。
+> - `cursor` 必须是 1-19 位十进制数字（snowflake id，超出 BIGINT 范围无意义）；非法游标返回 **400**，不会透传到数据库。
 > - IG 帖子量级小，保持 offset 分页，`nextCursor` 不返回。
+
+### 参数校验与错误语义
+
+- 所有 query 参数在进入数据库前校验。失败时返回 **400**，`error` 文案**逐字段**给出原因，格式为
+  `"<字段>: <原因>[, <字段>: <原因>...]"`；非法 `cursor` 不再触发 `500`。
+- 布尔类 query（`reverse` / `noReplies`）接受 `true` / `false` / `1` / `0`，其余取值 400。
+- 未归档用户（`name` 不在归档中）的语义：
+  - 单资源端点 `GET /v3/users/get/:name` → **404** `{ "error": "User not found" }`（存在性判定以此为准）；
+  - 集合 / 统计端点（`/v3/tweets/get/:name`、`/v3/tweets/medias/:name`、`/v3/tweets/stats/:name`、`/v3/tweets/get/:name/last-years-today`）→ **200** + 空结果，不报错。
 
 ### 缓存头
 
@@ -70,11 +80,11 @@ interface PaginatedResponse<T> {
 - **Query Parameters**:
   - `page` (number, default: 1): 页码
   - `pageSize` (number, default: 10): 每页数量
-  - `reverse` (boolean, default: false): 是否按时间倒序排列 (true 为旧 -> 新, false 为新 -> 旧)
-  - `cursor` (string, optional): keyset 游标，滚动续载下一页（优先于 `page`）
-  - `start` (string, ISO Date, optional): 筛选开始日期
-  - `end` (string, ISO Date, optional): 筛选结束日期
-  - `noReplies` (boolean, default: false): 是否排除回复推文
+  - `reverse` (boolean, default: false): 排序方向（true 为旧 -> 新，false 为新 -> 旧）；接受 `true` / `false` / `1` / `0`
+  - `cursor` (string, optional): keyset 游标（1-19 位十进制 snowflake 排序键），滚动续载下一页（优先于 `page`）
+  - `start` (string, ISO Date, optional): 筛选开始日期（与 `end` 成对提供）
+  - `end` (string, ISO Date, optional): 筛选结束日期（与 `start` 成对提供）
+  - `noReplies` (boolean, default: false): 是否排除回复推文；接受 `true` / `false` / `1` / `0`
 
 - **Response**: `PaginatedResponse<EnrichedTweet>`
 
@@ -85,17 +95,19 @@ interface PaginatedResponse<T> {
 - **Endpoint**: `GET /v3/tweets/search`
 
 - **Query Parameters**:
-  - `q` (string, **required**): 搜索关键词
-  - `name` (string, optional): 指定用户的 Screen Name；**不填时全库检索**（跨用户全局搜索）
+  - `q` (string, **required**): 搜索关键词（1-200 字符）
+  - `name` (string, optional): 指定用户的 Screen Name（`\w+`）；**不填时全库检索**（跨用户全局搜索）
   - `page` (number, default: 1): 页码
   - `pageSize` (number, default: 10): 每页数量
-  - `reverse` (boolean): 排序方向
-  - `cursor` (string, optional): keyset 游标
+  - `reverse` (boolean): 排序方向；接受 `true` / `false` / `1` / `0`
+  - `cursor` (string, optional): keyset 游标（1-19 位十进制 snowflake 排序键）
 
 - **Response**: `PaginatedResponse<EnrichedTweet>`
 
 - **Error Response**:
-  - 400 Bad Request: `{ "error": "keyword is required" }` (当缺少 `q` 参数时)
+  - 400 Bad Request: `{ "error": "q: keyword is required (1-200 chars)" }`（缺少 `q`）
+  - 400 Bad Request: `{ "error": "q: keyword is too long (max 200 chars)" }`（`q` 超长）
+  - 400 Bad Request: `{ "error": "name: invalid name" }`（`name` 非法）
 
 ### 3. 获取“那年今日”推文
 
@@ -137,11 +149,13 @@ interface PaginatedResponse<T> {
 - **Query Parameters**:
   - `page` (number, default: 1): 页码
   - `pageSize` (number, default: 10): 每页数量
-  - `reverse` (boolean): 排序方向
-  - `cursor` (string, optional): keyset 游标
-  - `start` / `end` (string, ISO Date, optional): 日期范围（媒体按年/日期段浏览，可单独提供）
+  - `reverse` (boolean): 排序方向；接受 `true` / `false` / `1` / `0`
+  - `cursor` (string, optional): keyset 游标（1-19 位十进制 snowflake 排序键）
+  - `start` / `end` (string, ISO Date, optional): 日期范围；**需同时提供才生效**
 
 - **Response**: `PaginatedResponse<EnrichedTweet>`
+  - 无日期范围：`meta.total` = 该用户媒体总数（命中服务端 count 缓存）；
+  - **带日期范围**：`meta.total` = **该范围内**的媒体数，`meta.hasMore` 随实际数据收敛（与 `/tweets/get/:name` 一致，不再复用未过滤的缓存总数）。
 
 ---
 
