@@ -6,6 +6,7 @@
 
 | 日期 | 主题 |
 |---|---|
+| [2026-09-17](2026-09-17.md) | API 加固（issue #8 / #9）：`noReplies`/`cursor`/`search` 字段级校验（非法游标 400 不再 500）、medias 日期范围下 total/hasMore 收敛、媒体 partial index（migration 0004） |
 | [2026-09-14](2026-09-14.md) | 定时抓取全量 403 排查与修复（出口改走 mihomo 代理、`RettiwtPool` 错误分类硬化 + 明细日志、postmortem 006）；IG 抓取暂缓（cookie 过期） |
 | [2026-09-13](2026-09-13.md) | 工程规范对标：文档体系（INDEX / engineering / reviews / backlog / SECURITY / CODE_OF_CONDUCT）+ 门禁约束（cross-env NODE_ENV、聚合脚本、pre-push 真实门禁）+ postmortem 005；定时任务异常处理修正（`fetch-tweet-daily` 静默 0 数据）＋ CI Node 24 对齐与失败通知 |
 | [2026-09-08](2026-09-08.md) | 全量「那年今日」：`/memo` 无用户模式（按年→按用户两层分组，跨用户回忆）；Phase 6 废弃 |

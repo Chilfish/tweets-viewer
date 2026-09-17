@@ -29,5 +29,6 @@
 
 | 日期 | 内容 | 去向 |
 | --- | --- | --- |
+| 2026-09-17 | API 加固（issue #8 / #9）：字段级参数校验 + 非法游标 400 + medias 日期范围 total 收敛 + 媒体 partial index | 见 `../development-log/2026-09-17.md` |
 | 2026-09-14 | 定时抓取全量 403 修复：出口改走 mihomo 代理 + `RettiwtPool` 错误分类硬化（401/403/429 轮换、类型化错误、明细日志） | 见 `../development-log/2026-09-14.md`、`../postmortem/006-x-403-datacenter-egress.md` |
 | 2026-09-13 | 工程规范对标：文档体系 + 门禁（INDEX / engineering / reviews / SECURITY / CODE_OF_CONDUCT / cross-env / pre-push 门禁） | 见 `../development-log/2026-09-13.md`、`../postmortem/005-host-node-env-leak.md` |
