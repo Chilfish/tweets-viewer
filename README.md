@@ -87,6 +87,8 @@ bun --cwd packages/database db:generate   # 或生成迁移文件
 bun --cwd packages/database db:migrate
 ```
 
+> `schema.ts` 声明了全部查询索引，因此 `db:push` 不会删除它们；生产库变更优先走 `db:migrate`（迁移文件带 `--> statement-breakpoint`）。
+
 ## 归档 / 同步数据（scripts）
 
 `apps/scripts` 提供抓取与入库能力（依赖 `DATABASE_URL`、`TWEET_KEYS`、`INSTAGRAM_COOKIES`）。

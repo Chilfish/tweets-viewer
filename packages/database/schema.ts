@@ -1,7 +1,9 @@
 import type { EnrichedTweet, EnrichedUser } from '@tweets-viewer/rettiwt-api'
 import type { IGPost, IGUserInfo } from '@tweets-viewer/shared'
+import { sql } from 'drizzle-orm'
 import {
   boolean,
+  index,
   json,
   pgTable,
   serial,
@@ -37,6 +39,24 @@ export const tweetsTable = pgTable(
     createdAt: timestamp('createdAt').notNull(),
     jsonData: json('jsonData').$type<EnrichedTweet>().notNull(),
   },
+  t => [
+    // 主推文列表：userName + createdAt DESC（migration 0001）
+    index('idx_tweets_username_createdat').on(t.userId, t.createdAt.desc()),
+    // 那年今日 / 日期范围（migration 0001）
+    index('idx_tweets_createdat').on(t.createdAt),
+    // keyset 排序键：COALESCE(retweeted_original_id, tweetId)（snowflake，时间有序）
+    // （migration 0003；须与 modules/tweet.ts 的 sortKeyExpr 保持一致）
+    index('idx_tweets_username_sortkey')
+      .on(t.userId, sql`(CAST(COALESCE(${t.jsonData}->>'retweeted_original_id', ${t.tweetId}) AS BIGINT)) DESC`),
+    // 全文检索 ILIKE %kw%：pg_trgm GIN（migration 0003；需先 CREATE EXTENSION pg_trgm）
+    index('idx_tweets_fulltext_trgm').using('gin', sql`${t.fullText} gin_trgm_ops`),
+    // 媒体时间线：partial index，谓词与 modules/tweet.ts 的 getMediaTweets 对齐（migration 0004）
+    index('idx_tweets_media_sortkey')
+      .on(t.userId, sql`(CAST(COALESCE(${t.jsonData}->>'retweeted_original_id', ${t.tweetId}) AS BIGINT)) DESC`)
+      .where(sql`json_typeof(${t.jsonData}->'media_details') = 'array'
+        AND json_array_length(${t.jsonData}->'media_details') > 0
+        AND ${t.jsonData}->>'retweeted_original_id' IS NULL`),
+  ],
 )
 
 export type InsertUser = typeof usersTable.$inferInsert
