@@ -99,6 +99,83 @@ describe('tweets routes integration (mocked db)', () => {
     expect(db.getMediaTweets).toHaveBeenCalledWith(expect.objectContaining({ cursor: '999' }))
   })
 
+  it('reports the offending field for an invalid noReplies value', async () => {
+    const app = buildApp()
+    const res = await app.request('/v3/tweets/get/testuser?noReplies=yes')
+    expect(res.status).toBe(400)
+    expect((await res.json()).error).toContain('noReplies')
+    expect(db.getTweets).not.toHaveBeenCalled()
+  })
+
+  it('accepts boolean query params as true/false and 1/0', async () => {
+    const app = buildApp()
+
+    for (const value of ['true', '1']) {
+      const res = await app.request(`/v3/tweets/get/testuser?noReplies=${value}&reverse=${value}`)
+      expect(res.status).toBe(200)
+      expect(db.getTweets).toHaveBeenCalledWith(expect.objectContaining({
+        noReplies: true,
+        reverse: true,
+      }))
+    }
+
+    const res = await app.request('/v3/tweets/get/testuser?noReplies=0&reverse=0')
+    expect(res.status).toBe(200)
+    expect(db.getTweets).toHaveBeenCalledWith(expect.objectContaining({
+      noReplies: false,
+      reverse: false,
+    }))
+  })
+
+  it('rejects a non-numeric cursor with 400 instead of a database error', async () => {
+    const app = buildApp()
+    const res = await app.request('/v3/tweets/get/testuser?cursor=notarealcursor')
+    expect(res.status).toBe(400)
+    expect((await res.json()).error).toContain('cursor')
+    expect(db.getTweets).not.toHaveBeenCalled()
+  })
+
+  it('rejects a cursor beyond the BIGINT range', async () => {
+    const app = buildApp()
+    const res = await app.request(`/v3/tweets/get/testuser?cursor=${'9'.repeat(20)}`)
+    expect(res.status).toBe(400)
+    expect(db.getTweets).not.toHaveBeenCalled()
+  })
+
+  it('names the invalid search field instead of always blaming the keyword', async () => {
+    const app = buildApp()
+
+    const badName = await app.request('/v3/tweets/search?q=Morfonica&name=bad-name')
+    expect(badName.status).toBe(400)
+    expect((await badName.json()).error).toContain('name')
+
+    const tooLong = await app.request(`/v3/tweets/search?q=${'a'.repeat(201)}`)
+    expect(tooLong.status).toBe(400)
+    expect((await tooLong.json()).error).toContain('keyword is too long')
+
+    const missing = await app.request('/v3/tweets/search')
+    expect(missing.status).toBe(400)
+    expect((await missing.json()).error).toContain('keyword is required')
+
+    expect(db.getTweetsByKeyword).not.toHaveBeenCalled()
+  })
+
+  it('does not reuse the unfiltered media total when a date range is applied', async () => {
+    const app = buildApp()
+    const res = await app.request('/v3/tweets/medias/testuser?start=2026-09-14&end=2026-09-14')
+    expect(res.status).toBe(200)
+    expect(db.getMediaTweetsCount).not.toHaveBeenCalled()
+    expect(db.getMediaTweets).toHaveBeenCalledWith(expect.objectContaining({ total: undefined }))
+  })
+
+  it('reuses the media count for queries without a date range', async () => {
+    const app = buildApp()
+    const res = await app.request('/v3/tweets/medias/cacheduser')
+    expect(res.status).toBe(200)
+    expect(db.getMediaTweetsCount).toHaveBeenCalled()
+    expect(db.getMediaTweets).toHaveBeenCalledWith(expect.objectContaining({ total: 0 }))
+  })
+
   it('year stats endpoint returns stats with cache header', async () => {
     const app = buildApp()
     const res = await app.request('/v3/tweets/stats/testuser')

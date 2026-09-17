@@ -110,7 +110,7 @@
 - **协议**: 后端响应必须包含标准的 `PaginatedResponse` 包裹层：
   ```ts
   interface Meta {
-    total: number // 归档总数（用于计算总页数）
+    total: number // 当前查询范围内的总数（用于计算总页数）；带筛选时随筛选收敛
     hasMore: boolean // 是否存在下一页（用于控制触发器）
     nextCursor?: string // keyset 游标（滚动续载用）
   }
@@ -118,6 +118,9 @@
 - **keyset 续载（nextCursor 转正）**: 当 `meta.hasMore` 为 `true` 时，服务端返回 `meta.nextCursor`
   （排序键 = `COALESCE(retweeted_original_id, tweetId)`，snowflake 时间有序）。探索模式（无限滚动）
   用 `?cursor=<nextCursor>` 续载下一页，深翻页不随页码退化。IG 帖子流（量级小）不返回游标，保持 page 分页。
+- **游标校验**: `cursor` 是 1-19 位十进制 snowflake 排序键；非法游标在进入数据库前返回 **400**（不透传触发 SQL 类型错误）。
+- **筛选下的 total**: 带日期范围等筛选时，`total` 必须是**该范围内**的计数；`hasMore` 由 `offset + rows.length < total` 判定，
+  空页必须收敛为 `hasMore=false`（不得复用未过滤的缓存总数）。
 - **守卫逻辑**: 只有当 `meta.hasMore` 为 `true` 且当前不处于 `Fetching/Error` 状态时，才允许发起下一页请求。
 
 ### 4.2 混合导航模式 (Hybrid Navigation Model)

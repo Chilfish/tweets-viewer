@@ -36,19 +36,37 @@ const CACHE_CONTROL = 'public, max-age=300, s-maxage=3600'
 /** 用户列表变化极低频：CDN 缓存 24h */
 const USERS_CACHE_CONTROL = 'public, max-age=300, s-maxage=86400'
 
+/**
+ * 布尔 query 参数：接受 `true`/`false`/`1`/`0`（覆盖 OpenAPI boolean 的两种常见序列化），归一化为 boolean。
+ * 两类参数共用同一 schema，保证错误文案一致（见 #8）。
+ */
+const booleanQuerySchema = z
+  .enum(['true', 'false', '1', '0'])
+  .default('false')
+  .transform(v => v === 'true' || v === '1')
+
 const paginationSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(100).default(10),
-  reverse: z.enum(['true', 'false']).default('false').transform(v => v === 'true'),
-  /** keyset 游标（滚动续载用，见 Specification §4.1） */
-  cursor: z.string().min(1).max(64).optional(),
+  reverse: booleanQuerySchema,
+  /**
+   * keyset 游标（滚动续载用，见 Specification §4.1）：排序键是 snowflake id，
+   * 限制为 1-19 位十进制数字，避免非法值透传到 `CAST(... AS BIGINT)` 触发 500。
+   */
+  cursor: z.string().regex(/^\d{1,19}$/, 'expected a decimal snowflake id').optional(),
 })
+
+/** 把 zod 校验失败格式化为 `字段: 原因` 列表，错误文案精确到字段而非硬编码区域文案（见 #8） */
+function formatIssues(error: z.ZodError): string {
+  return error.issues
+    .map(issue => `${issue.path.join('.')}: ${issue.message}`)
+    .join(', ')
+}
 
 function getPaginationParams(c: Context) {
   const parsed = paginationSchema.safeParse(c.req.query())
   if (!parsed.success) {
-    const messages = parsed.error.issues.map(i => `${i.path}: ${i.message}`).join(', ')
-    return messages
+    return formatIssues(parsed.error)
   }
   return parsed.data
 }
@@ -67,13 +85,17 @@ function getName(c: Context) {
   return name
 }
 
-const dateRangeSchema = z.object({
+/**
+ * `/get/:name` 的完整 query：分页 + 日期范围 + 排除回复。
+ * 合并为一个 schema 以便一次性回传全部字段级错误（`noReplies` 不再混进日期范围校验，见 #8）。
+ */
+const tweetListQuerySchema = paginationSchema.extend({
   start: z.iso.date().optional(),
   end: z.iso.date().optional(),
-  noReplies: z.enum(['true', 'false']).default('false').transform(v => v === 'true'),
+  noReplies: booleanQuerySchema,
 })
 
-/** 解析 start/end（可单独提供，与 getTweets 的"必须成对"不同——媒体按年浏览只需 start） */
+/** 解析 start/end（媒体端点允许单独出现，但仅当两者都提供时才在查询中生效） */
 function parseOptionalDateRange(c: Context) {
   const start = c.req.query('start')
   const end = c.req.query('end')
@@ -84,9 +106,17 @@ function parseOptionalDateRange(c: Context) {
 }
 
 const searchSchema = z.object({
-  q: z.string().min(1).max(200),
+  q: z
+    .string('keyword is required (1-200 chars)')
+    .min(1, 'keyword is required (1-200 chars)')
+    .max(200, 'keyword is too long (max 200 chars)'),
   /** 可选：为空时全库检索（全局搜索） */
-  name: z.string().min(1).max(50).regex(/^\w+$/).optional(),
+  name: z
+    .string('invalid name')
+    .min(1, 'invalid name')
+    .max(50, 'invalid name')
+    .regex(/^\w+$/, 'invalid name')
+    .optional(),
 })
 
 function normalizeSearchParams(searchResult: z.infer<typeof searchSchema>) {
@@ -108,16 +138,11 @@ app.get('/get/:name', describeRoute({
   if (!name)
     return c.json({ error: 'invalid name' }, 400)
 
-  const pagination = getPaginationParams(c)
-  if (isError(pagination))
-    return c.json({ error: `invalid pagination: ${pagination}` }, 400)
+  const parsed = tweetListQuerySchema.safeParse(c.req.query())
+  if (!parsed.success)
+    return c.json({ error: formatIssues(parsed.error) }, 400)
 
-  const dateResult = dateRangeSchema.safeParse(c.req.query())
-  if (!dateResult.success)
-    return c.json({ error: 'invalid date range' }, 400)
-
-  const { page, pageSize, reverse, cursor } = pagination
-  const { start, end, noReplies } = dateResult.data
+  const { page, pageSize, reverse, cursor, start, end, noReplies } = parsed.data
 
   const startDate = start ? new Date(start) : null
   const endDate = end ? new Date(end) : null
@@ -185,18 +210,23 @@ app.get('/medias/:name', describeRoute({
 
   const pagination = getPaginationParams(c)
   if (isError(pagination))
-    return c.json({ error: `invalid pagination: ${pagination}` }, 400)
+    return c.json({ error: pagination }, 400)
 
   const { page, pageSize, reverse, cursor } = pagination
   const { startDate, endDate } = parseOptionalDateRange(c)
   const { db } = getContext<AppType>().var
 
-  let total = mediaTweetCountCache.get(name)
+  // 缓存的 total 是「该用户全部媒体」的未过滤值，只在查询不带日期范围时复用；
+  // 带范围时必须由 paginateTweets 按 whereClause 重新 count，否则 hasMore 恒为 true（见 #9）。
+  let total: number | undefined
+  if (!(startDate && endDate)) {
+    total = mediaTweetCountCache.get(name)
 
-  if (total === undefined) {
-    const [{ value }] = await getMediaTweetsCount(db, name)
-    total = value
-    mediaTweetCountCache.set(name, total)
+    if (total === undefined) {
+      const [{ value }] = await getMediaTweetsCount(db, name)
+      total = value
+      mediaTweetCountCache.set(name, total)
+    }
   }
 
   const tweets = await getMediaTweets({
@@ -264,13 +294,13 @@ app.get('/search', describeRoute({
 }), async (c) => {
   const searchResult = searchSchema.safeParse(c.req.query())
   if (!searchResult.success) {
-    return c.json({ error: 'keyword is required (1-200 chars)' }, 400)
+    return c.json({ error: formatIssues(searchResult.error) }, 400)
   }
 
   const { keyword, name } = normalizeSearchParams(searchResult.data)
   const pagination = getPaginationParams(c)
   if (isError(pagination))
-    return c.json({ error: `invalid pagination: ${pagination}` }, 400)
+    return c.json({ error: pagination }, 400)
 
   const { page, pageSize, reverse, cursor } = pagination
   const { db } = getContext<AppType>().var
@@ -303,7 +333,7 @@ app.get('/get/:name/last-years-today', describeRoute({
 
   const pagination = getPaginationParams(c)
   if (isError(pagination))
-    return c.json({ error: `invalid pagination: ${pagination}` }, 400)
+    return c.json({ error: pagination }, 400)
 
   const { page, pageSize, reverse, cursor } = pagination
   const { db } = getContext<AppType>().var
@@ -332,7 +362,7 @@ app.get('/last-years-today', describeRoute({
 }), async (c) => {
   const pagination = getPaginationParams(c)
   if (isError(pagination))
-    return c.json({ error: `invalid pagination: ${pagination}` }, 400)
+    return c.json({ error: pagination }, 400)
 
   const { page, pageSize, reverse, cursor } = pagination
   const { db } = getContext<AppType>().var
