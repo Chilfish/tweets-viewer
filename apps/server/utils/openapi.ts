@@ -40,15 +40,15 @@ export const paginationParameters = [
     in: 'query' as const,
     name: 'reverse',
     required: false,
-    description: '排序方向：true = 旧→新，false = 新→旧',
+    description: '排序方向：true = 旧→新，false = 新→旧（接受 true/false/1/0）',
     schema: { type: 'boolean' as const, default: false },
   },
   {
     in: 'query' as const,
     name: 'cursor',
     required: false,
-    description: 'keyset 游标（滚动续载，优先于 page）',
-    schema: { type: 'string' as const, minLength: 1, maxLength: 64 },
+    description: 'keyset 游标（1-19 位十进制 snowflake 排序键，滚动续载，优先于 page）',
+    schema: { type: 'string' as const, pattern: '^\\d{1,19}$' },
   },
 ]
 
@@ -79,7 +79,7 @@ export const dateParameters = [
     in: 'query' as const,
     name: 'start',
     required: false,
-    description: '起始日期（ISO date，与 end 成对提供；媒体端点可单独提供）',
+    description: '起始日期（ISO date；与 end 成对提供，两者同时存在时才在查询中生效）',
     schema: { type: 'string' as const, format: 'date' },
   },
   {
@@ -95,7 +95,7 @@ const noRepliesParameter = {
   in: 'query' as const,
   name: 'noReplies',
   required: false,
-  description: '是否排除回复推文',
+  description: '是否排除回复推文（接受 true/false/1/0）',
   schema: { type: 'boolean' as const, default: false },
 }
 
