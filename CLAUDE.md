@@ -119,14 +119,14 @@ ins_posts: id(serial PK), post_id(UQ), username(FK→users.userName), created_at
 
 ### Scripts（`apps/scripts/src/`）
 
-| 文件                                                           | 用途                                                   |
-| -------------------------------------------------------------- | ------------------------------------------------------ |
-| `dailyUpdate.ts`                                               | 每日增量同步（Twitter + IG），GitHub Actions cron 调用 |
-| `fetch-ins-daily.ts`                                           | 从 users 表读取已关联 IG 的用户，抓取最新帖子入库      |
-| `fetch-tweet-daily.ts` / `fetchTimeline.ts` / `fetchSearch.ts` | 推文增量抓取                                           |
-| `insertToDB.ts` / `mergeData.ts` / `import-ins-data.ts`        | 本地 JSON 批量入库 / 合并                              |
-| `mapping.ts`                                                   | IG username → twitter username 映射表                  |
-| `fukuoka/` + `fetchSearchFukuoka.ts`                           | 研究脚本，**不入库**                                   |
+| 文件                                                           | 用途                                                                                   |
+| -------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `dailyUpdate.ts`                                               | 每日增量同步（Twitter + IG），GitHub Actions cron 调用                                 |
+| `fetch-ins-daily.ts`                                           | 从 users 表读取已关联 IG 的用户，抓取最新帖子入库                                      |
+| `fetch-tweet-daily.ts` / `fetchTimeline.ts` / `fetchSearch.ts` | 推文增量抓取（`fetch-tweet-daily` 另刷新用户资料：粉丝/bio/推文数 → `users.jsonData`） |
+| `insertToDB.ts` / `mergeData.ts` / `import-ins-data.ts`        | 本地 JSON 批量入库 / 合并                                                              |
+| `mapping.ts`                                                   | IG username → twitter username 映射表                                                  |
+| `fukuoka/` + `fetchSearchFukuoka.ts`                           | 研究脚本，**不入库**                                                                   |
 
 ### 环境变量（`env.server.ts` 单源 Zod 校验）
 

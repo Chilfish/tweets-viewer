@@ -66,6 +66,7 @@ tweets-viewer/
   | 文件 | 用途 |
   |------|------|
   | `dailyUpdate.ts` | 每日增量同步入口（顺序执行 Twitter + IG） |
+  | `fetch-tweet-daily.ts` | Twitter 每日抓取：按 `daily_fetch` 读 users，先刷新用户资料（`createUser` upsert），再抓时间线 upsert 推文 |
   | `fetch-ins-daily.ts` | IG 每日抓取：从 users 表读取已关联 IG 的用户，SDK 抓取帖子，upsert 入库 |
   | `import-ins-data.ts` | IG 批量导入：读取本地 JSON，查 mapping.ts 映射，写入 users.ins_json_data + ins_posts |
   | `insertToDB.ts` | Twitter 批量导入：读取本地 JSON，写入 users + tweets |
