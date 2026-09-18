@@ -1,7 +1,7 @@
 import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
 import { setTimeout as sleep } from 'node:timers/promises'
 import { neon } from '@neondatabase/serverless'
-import { createTweets, getDailyFetchUsers, schema } from '@tweets-viewer/database'
+import { createTweets, createUser, getDailyFetchUsers, schema } from '@tweets-viewer/database'
 import { RettiwtAuthError, RettiwtPool, RettiwtRateLimitError, TweetEnrichmentService, TwitterAPIClient } from '@tweets-viewer/rettiwt-api'
 import { drizzle } from 'drizzle-orm/neon-http'
 
@@ -39,6 +39,21 @@ function formatError(error: unknown): string {
 function getErrorDetails(error: unknown): unknown {
   const own = (error as { details?: unknown })?.details
   return own ?? (error as { cause?: { details?: unknown } })?.cause?.details
+}
+
+/**
+ * Key 级失败判定：401/403（所有 Key 被拒）或 429（全部耗尽）。
+ *
+ * 这类失败换用户重试也是同样的结果，一次就要中止整轮抓取。
+ */
+function getAbortReason(error: unknown): string | undefined {
+  const status = getErrorStatus(error)
+
+  if (error instanceof RettiwtAuthError || status === 401 || status === 403)
+    return 'all-keys-rejected'
+  if (error instanceof RettiwtRateLimitError || status === 429)
+    return 'rate-limit-exhausted'
+  return undefined
 }
 
 /**
@@ -96,6 +111,56 @@ export async function fetchTweetDaily(): Promise<void> {
   const failedUsers: string[] = []
 
   for (const user of users) {
+    // ── Phase 0: refresh user profile ──
+    // 粉丝数 / bio / 推文总数等每天都在变，不能只留在入库时的那份快照里。
+    // 用 restId 定位（改名不影响），整份 EnrichedUser upsert 回 users.jsonData；
+    // upsert 只覆盖 restId + jsonData，daily_fetch / ins_* 三列不受影响。
+    // 失败不阻断推文抓取——资料是附带产出，推文才是主数据。
+    try {
+      const freshUser = await apiClient.fetchUserDetailsRaw(user.id)
+
+      if (freshUser) {
+        await createUser({ db, user: freshUser })
+        console.log({
+          userId: user.id,
+          username: freshUser.userName,
+          followersCount: freshUser.followersCount,
+          action: 'refresh-user',
+        })
+      }
+      else {
+        console.warn({
+          userId: user.id,
+          username: user.fullName,
+          action: 'refresh-user-empty',
+          message: 'User details returned empty, keeping stored profile',
+        })
+      }
+    }
+
+    catch (error: unknown) {
+      const abortReason = getAbortReason(error)
+
+      console.error({
+        userId: user.id,
+        username: user.fullName,
+        action: 'refresh-user-error',
+        status: getErrorStatus(error),
+        message: formatError(error),
+        details: getErrorDetails(error),
+      })
+
+      if (abortReason) {
+        console.error({
+          action: 'refresh-user-abort',
+          reason: abortReason,
+          message: formatError(error),
+        })
+        process.exitCode = 1
+        return
+      }
+    }
+
     // ── Phase 1: fetch timeline with retry ──
     let allTweets: EnrichedTweet[] = []
     let fetchOk = false
@@ -134,25 +199,20 @@ export async function fetchTweetDaily(): Promise<void> {
 
       catch (error: unknown) {
         lastError = error
-        const status = getErrorStatus(error)
 
         console.error({
           userId: user.id,
           username: user.fullName,
           action: 'fetch-timeline-error',
           attempt,
-          status,
+          status: getErrorStatus(error),
           message: formatError(error),
           details: getErrorDetails(error),
         })
 
         // key 级失败：一轮之内所有 Key 都被拒（401/403）或耗尽（429）。
         // 再按用户重试只会把同一个失败重复 18 遍，直接中止本轮抓取。
-        let abortReason: string | undefined
-        if (error instanceof RettiwtAuthError || status === 401 || status === 403)
-          abortReason = 'all-keys-rejected'
-        else if (error instanceof RettiwtRateLimitError || status === 429)
-          abortReason = 'rate-limit-exhausted'
+        const abortReason = getAbortReason(error)
 
         if (abortReason) {
           console.error({
