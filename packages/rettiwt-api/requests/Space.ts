@@ -1,72 +1,49 @@
 import type { AxiosRequestConfig } from 'axios'
 
 /**
- * Collection of requests related to spaces.
+ * Collection of requests related to Spaces.
  *
  * @public
  */
 export class SpaceRequests {
   /**
-   * @param id - The id of the space whose details are to be fetched.
-   * @param withReplays - Whether to include replay information.
-   * @param withListeners - Whether to include listeners information.
-   * @param isMetatagsQuery - Whether the request is a metatags query.
+   * @param id - The id of the Space whose details are to be fetched.
+   *
+   * @remarks
+   * - `withReplays: true` 是拿到已结束场次（`Ended` / `TimedOut`）元数据的前提，
+   *   缺省时 X 只返回进行中的场次。
+   * - 响应结构为 `data.audioSpace.{ metadata, participants }`，卡片所需字段全在
+   *   `metadata`（title / state / started_at / ended_at / total_*_listeners /
+   *   creator_results）。录音本身的 m3u8 不在此响应内（需再打 v1.1
+   *   `live_video_stream/status/{media_key}`），本期不做站内播放，故不请求。
    */
-  public static details(
-    id: string,
-    withReplays?: boolean,
-    withListeners?: boolean,
-    isMetatagsQuery?: boolean,
-  ): AxiosRequestConfig {
+  public static details(id: string): AxiosRequestConfig {
     return {
       method: 'get',
-      url: 'https://x.com/i/api/graphql/rR7CQrr8kxb6fatlUaB61Q/AudioSpaceById',
+      url: 'https://x.com/i/api/graphql/HPEisOmj1epUNLCWTYhUWw/AudioSpaceById',
       params: {
 
         variables: JSON.stringify({
           id,
-          isMetatagsQuery: isMetatagsQuery ?? false,
-          withReplays: withReplays ?? true,
-          withListeners: withListeners ?? false,
+          isMetatagsQuery: true,
+          withDownvotePerspective: false,
+          withReactionsMetadata: false,
+          withReactionsPerspective: false,
+          withReplays: true,
+          withSuperFollowsUserFields: true,
+          withSuperFollowsTweetFields: true,
         }),
         features: JSON.stringify({
-          spaces_2022_h2_spaces_communities: true,
-          spaces_2022_h2_clipping: true,
-          creator_subscriptions_tweet_preview_api_enabled: true,
-          profile_label_improvements_pcf_label_in_post_enabled: true,
-          responsive_web_profile_redirect_enabled: false,
-          rweb_tipjar_consumption_enabled: false,
-          verified_phone_label_enabled: false,
-          premium_content_api_read_enabled: false,
-          communities_web_enable_tweet_community_results_fetch: true,
-          c9s_tweet_anatomy_moderator_badge_enabled: true,
-          responsive_web_grok_analyze_button_fetch_trends_enabled: false,
-          responsive_web_grok_analyze_post_followups_enabled: true,
-          responsive_web_jetfuel_frame: true,
-          responsive_web_grok_share_attachment_enabled: true,
-          responsive_web_grok_annotations_enabled: false,
-          articles_preview_enabled: true,
-          responsive_web_graphql_skip_user_profile_image_extensions_enabled: false,
+          dont_mention_me_view_api_enabled: true,
+          interactive_text_enabled: true,
           responsive_web_edit_tweet_api_enabled: true,
-          graphql_is_translatable_rweb_tweet_is_translatable_enabled: true,
-          view_counts_everywhere_api_enabled: true,
-          longform_notetweets_consumption_enabled: true,
-          responsive_web_twitter_article_tweet_consumption_enabled: true,
-          tweet_awards_web_tipping_enabled: false,
-          responsive_web_grok_show_grok_translated_post: false,
-          responsive_web_grok_analysis_button_from_backend: true,
-          post_ctas_fetch_enabled: true,
-          creator_subscriptions_quote_tweet_preview_enabled: false,
-          freedom_of_speech_not_reach_fetch_enabled: true,
+          responsive_web_enhance_cards_enabled: true,
+          responsive_web_uc_gql_enabled: true,
+          spaces_2022_h2_clipping: true,
+          spaces_2022_h2_spaces_communities: false,
           standardized_nudges_misinfo: true,
-          tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled: true,
-          longform_notetweets_rich_text_read_enabled: true,
-          longform_notetweets_inline_media_enabled: true,
-          responsive_web_grok_image_annotation_enabled: true,
-          responsive_web_grok_imagine_annotation_enabled: true,
-          responsive_web_graphql_timeline_navigation_enabled: true,
-          responsive_web_grok_community_note_auto_translation_is_enabled: false,
-          responsive_web_enhance_cards_enabled: false,
+          tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled: false,
+          vibe_api_enabled: true,
         }),
 
       },

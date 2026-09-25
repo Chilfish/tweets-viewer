@@ -6,3 +6,9 @@ import type { IRawSpace } from '../base/Space'
  * @public
  */
 export interface ISpaceDetailsResponse extends IRawSpace {}
+
+/**
+ * The `data.audioSpace` node shape (canonical definition lives in `./AudioSpaceById`,
+ * re-exported here so the Space request/response types are available from one place).
+ */
+export type { IAudioSpace, IAudioSpaceByIdResponse } from './AudioSpaceById'

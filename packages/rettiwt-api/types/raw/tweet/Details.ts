@@ -32,6 +32,14 @@ interface Result {
   in_reply_to_status_id_str?: string
   quoted_status_result?: TweetResult
   card?: any
+  /**
+   * JetFuel（`responsive_web_jetfuel_frame`）附件：官方 Trending/topic 卡的压缩帧 payload。
+   * 仅当请求 features 打开该开关时上游才回传；由 parsers/jetfuel 解析。
+   */
+  jetfuel_attachment?: {
+    height: number
+    payload: string
+  }
   tombstone?: {
     __typename: 'TextTombstone'
   }

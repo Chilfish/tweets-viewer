@@ -5,6 +5,7 @@ import type {
   RawTweet,
   TweetUser,
 } from '../types/enriched'
+import { parseTrendingCard } from '../parsers/jetfuel'
 import { getEntities } from './entitytParser'
 
 /**
@@ -44,7 +45,7 @@ export function enrichTweet(sourceData: RawTweet, retweetedOrignalId?: string): 
     in_reply_to_screen_name: inReplyToScreenName,
     entities: getEntities(tweet, text),
     quoted_tweet_id: tweet.quoted_status_result?.result?.rest_id,
-    card: mapTwitterCard(tweet.card),
+    card: mapTwitterCard(tweet.card, tweet.jetfuel_attachment),
     media_details: mapMediaDetails(tweet),
     retweeted_original_id: retweetedOrignalId,
     is_inline_media: tweet.note_tweet?.note_tweet_results?.result?.media?.inline_media?.length ? true : undefined,
@@ -114,20 +115,49 @@ function getBestImage(map: Map<string, any>) {
 }
 
 /**
- * 辅助函数：解析 Unified Card (YouTube 等) 的复杂 JSON
+ * 辅助函数：解析 Unified Card (YouTube / Trending 等) 的复杂 JSON
+ *
+ * 兼容两种组件布局：
+ * - `details` 布局（YouTube 等）：`component_objects.details_1.data.{title,subtitle}`
+ * - `media_with_details_horizontal` 布局（X 站内 Trending/topic 卡）：
+ *   `component_objects.media_with_details_horizontal_1.data.topic_detail.{title,subtitle}`
+ *
+ * 标题/描述遍历所有组件提取；域名优先取 destination 的 `url_data.vanity`
+ * （真实 X 卡片均带），老 `details` 布局无 vanity 时回退 subtitle。
  */
 function parseUnifiedCard(jsonStr: string | undefined) {
   if (!jsonStr)
     return null
   try {
     const data = JSON.parse(jsonStr)
-    const details = data.component_objects?.details_1?.data
     const media = Object.values(data.media_entities || {})[0] as any
 
+    let title: string | undefined
+    let description: string | undefined
+    let subtitle: string | undefined // details 布局的 subtitle 在老行为中充当 domain
+
+    // 遍历所有组件，兼容 details / media_with_details_horizontal 等多种布局
+    for (const component of Object.values(data.component_objects || {})) {
+      const compData = (component as any)?.data
+      if (!compData)
+        continue
+      const topic = compData.topic_detail
+      title ??= topic?.title?.content ?? compData.title?.content
+      description ??= topic?.subtitle?.content
+      subtitle ??= compData.subtitle?.content
+    }
+
+    // 目标 URL 与域名：优先取 browser destination 的 url_data
+    const destinations = Object.values(data.destination_objects || {}) as any[]
+    const browser = destinations.find(d => d?.type === 'browser') ?? destinations[0]
+    const urlData = browser?.data?.url_data
+
     return {
-      title: details?.title?.content,
-      domain: details?.subtitle?.content,
-      url: data.destination_objects?.browser_1?.data?.url_data?.url,
+      title,
+      description,
+      // 域名优先取 url_data.vanity；老 details 布局回退 subtitle
+      domain: urlData?.vanity ?? subtitle,
+      url: urlData?.url,
       imageUrl: media?.media_url_https,
     }
   }
@@ -136,7 +166,10 @@ function parseUnifiedCard(jsonStr: string | undefined) {
   }
 }
 
-export function mapTwitterCard(cardData: any): LinkPreviewCard | undefined {
+export function mapTwitterCard(
+  cardData: any,
+  jetfuelAttachment?: { payload?: string } | null,
+): LinkPreviewCard | undefined {
   if (!cardData)
     return undefined
 
@@ -165,7 +198,32 @@ export function mapTwitterCard(cardData: any): LinkPreviewCard | undefined {
   if (name === 'unified_card') {
     const unifiedData = parseUnifiedCard(getStr(bindings, 'unified_card'))
     if (unifiedData) {
-      card = { ...card, ...unifiedData }
+      // 只覆盖非 undefined 字段，避免 description 等被 undefined 清空
+      card = {
+        ...card,
+        ...Object.fromEntries(Object.entries(unifiedData).filter(([, v]) => v !== undefined)),
+      }
+    }
+  }
+
+  // 4.5 jetfuel 增强：解析 responsive_web_jetfuel_frame 附件数据（Trending/topic 卡全量）
+  if (jetfuelAttachment?.payload) {
+    const trending = parseTrendingCard(jetfuelAttachment.payload)
+    if (trending) {
+      // 优先使用 jetfuel 数据（官方渲染同源，含更新版描述/图片 + 分类/头像/posts 数）
+      card = {
+        ...card,
+        url: trending.url || card.url,
+        imageUrl: trending.imageUrl || card.imageUrl,
+        title: trending.title || card.title,
+        description: trending.description || card.description,
+        domain: card.domain || getDomainFromUrl(trending.url) || '',
+        trending,
+      }
+    }
+    else {
+      // 解析失败：回退 unified_card 结果，并提示开发者 payload 结构已变更
+      console.warn('[jetfuel] payload did not yield url/image/title', { card: name })
     }
   }
 
@@ -184,6 +242,16 @@ export function mapTwitterCard(cardData: any): LinkPreviewCard | undefined {
   }
 
   return card
+}
+
+/** 从 URL 取域名；非法 URL 返回 null */
+function getDomainFromUrl(url: string): string | null {
+  try {
+    return new URL(url).hostname
+  }
+  catch {
+    return null
+  }
 }
 
 export function mapMediaDetails(tweet: RawTweet): MediaDetails[] | undefined {

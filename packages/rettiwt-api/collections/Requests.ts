@@ -34,8 +34,7 @@ export const Requests: { [key in keyof typeof ResourceType]: (args: IFetchArgs |
   DM_INBOX_TIMELINE: (args: IFetchArgs) => DMRequests.inboxTimeline(args.maxId),
   DM_DELETE_CONVERSATION: (args: IPostArgs) => DMRequests.deleteConversation(args.conversationId!),
 
-  SPACE_DETAILS: (args: IFetchArgs) =>
-    SpaceRequests.details(args.id!, args.withReplays, args.withListeners, args.isMetatagsQuery),
+  SPACE_DETAILS: (args: IFetchArgs) => SpaceRequests.details(args.id!),
 
   TWEET_BOOKMARK: (args: IPostArgs) => TweetRequests.bookmark(args.id!),
   TWEET_DETAILS: (args: IFetchArgs) => TweetRequests.details(args.id!),
