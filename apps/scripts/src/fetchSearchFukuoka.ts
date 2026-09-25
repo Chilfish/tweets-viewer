@@ -1,4 +1,5 @@
 import type { ITweetFilter } from '@tweets-viewer/rettiwt-api'
+import { attachSpaceDetails } from '@tweets-viewer/rettiwt-api'
 import { formatDate } from '@tweets-viewer/shared'
 import { apiClient, enrichmentService } from '../src/common'
 import { writeJson } from '../src/utils'
@@ -40,6 +41,7 @@ while (true) {
   }
 
   const enriched = enrichmentService.enrichTweets(data.tweets)
+  await attachSpaceDetails(enriched, data.tweets, id => apiClient.fetchSpaceDetails(id))
   allTweets.push(...enriched)
 
   console.log({
