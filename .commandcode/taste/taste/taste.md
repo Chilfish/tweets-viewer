@@ -5,7 +5,7 @@
 - Verify by actually running the code/scenario and confirming correct results before committing ("先跑一遍结果验证是否正确"). Confidence: 0.8
 - Prefers CLAUDE.md as the real, canonical agent-instructions file (regular file, not a symlink) and considers AGENTS.md deprecated; wants it kept in sync with /docs. Confidence: 0.8
 - When a decision depends on external/tooling behavior (e.g. whether a Vite plugin is still needed in vite@8), check the official docs instead of assuming. Confidence: 0.8
-- When the same code exists in more than one of his projects (e.g. tweets-viewer and anonTweet), apply the equivalent change to all affected projects ("两边都要改"). Confidence: 0.75
+- When the same code exists in more than one of his projects (e.g. tweets-viewer and anonTweet), apply the equivalent change to all affected projects ("两边都要改") — this includes syncing whole modules/features, not just a single fix (e.g. porting the entire rettiwt-api fork plus the tweet-fetching path), and he typically points at the upstream commit hash to mirror. Confidence: 0.8
 - When requesting a new feature, points to an existing sibling/prior project as the reference implementation to mirror ("参考这个项目"), including the file paths to copy from, rather than designing it from scratch; expects the agent to read that reference (lib + tests + route registration) before implementing. Confidence: 0.6
 - Wants generated/index artifacts (e.g. llms.txt) to be authored from the project's own existing documentation/specs ("要结合本项目的文档来描述") instead of invented or generic content. Confidence: 0.6
 - Cares about code style and separation of responsibilities; dislikes duplicated logic or overlapping responsibilities and expects such debt to be consolidated. Confidence: 0.8
