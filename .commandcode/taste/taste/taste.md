@@ -2,6 +2,8 @@
 - Documentation-first: before implementing or refactoring, inspect the project's current state and its docs/specs, and follow those conventions; repeatedly reminds "文档先行" and to align fully with the reference project's process and standards. Confidence: 0.9
 - Treats conventions as things that must be enforced, not just documented: wants lint rules, git hooks and gate scripts (e.g. pre-push running lint/typecheck/test/build, aggregate root scripts) updated alongside the docs ("更新本项目的文档以及相关约束"). Confidence: 0.6
 - Commit work following the project's documented git workflow (e.g. docs/engineering/git-workflow.md), splitting changes into logical batches rather than one blob; expects the agent to just proceed when told "直接干". Confidence: 0.85
+- Wants finished work delivered as a GitHub PR rather than left as local changes: commit everything, put it on a dedicated feature branch, push (letting the pre-push gate run) and open the PR himself — asking simply "提个pr，commit所有的更改". Confidence: 0.6
+- Expects PR descriptions written in Chinese and filled into the repo's PULL_REQUEST_TEMPLATE.md sections (what/why/checklist/verification), and values honest disclosure of deviations and caveats (e.g. unfinished docs, things left untouched) over a clean-sounding summary. Confidence: 0.5
 - Verify by actually running the code/scenario and confirming correct results before committing ("先跑一遍结果验证是否正确"). Confidence: 0.8
 - Prefers CLAUDE.md as the real, canonical agent-instructions file (regular file, not a symlink) and considers AGENTS.md deprecated; wants it kept in sync with /docs. Confidence: 0.8
 - When a decision depends on external/tooling behavior (e.g. whether a Vite plugin is still needed in vite@8), check the official docs instead of assuming. Confidence: 0.8
