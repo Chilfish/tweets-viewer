@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedTweet, SpaceDetails } from '@tweets-viewer/rettiwt-api'
 import { MyTweet } from '~/components/tweet/Tweet'
 
 const meta = {
@@ -468,4 +468,96 @@ export const TweetWith3Images: Story = {
 
 export const TweetWithLinkCard: Story = {
   render: () => <MyTweet tweet={withLinkCard as any} tweetAuthorName="Test User" />,
+}
+
+/** Space 卡片（真实数据：Space `1yoKMPnjEbOxQ`，Ended + 可回放；正文只贴了 Space 链接） */
+const withSpace: EnrichedTweet = {
+  id: '1968314084207788302',
+  lang: 'zxx',
+  url: 'https://twitter.com/BDP_yumemita/status/1968314084207788302',
+  created_at: 'Wed Sep 17 14:00:21 +0000 2025',
+  user: {
+    id_str: '1546362523561390081',
+    name: '夢限大みゅーたいぷ',
+    screen_name: 'BDP_yumemita',
+    is_blue_verified: true,
+    verified: false,
+    verified_type: 'Business',
+    profile_image_shape: 'Square',
+    profile_image_url_https: 'https://pbs.twimg.com/profile_images/1907233594067881984/8eZPMLR5.jpg',
+  },
+  text: 'https://t.co/gOS5Qc3DS4',
+  entities: [
+    {
+      type: 'url',
+      index: 0,
+      url: 'https://t.co/gOS5Qc3DS4',
+      text: 'x.com/i/spaces/1yoKM…',
+      display_url: 'x.com/i/spaces/1yoKM…',
+      expanded_url: 'https://x.com/i/spaces/1yoKMPnjEbOxQ',
+      href: 'https://x.com/i/spaces/1yoKMPnjEbOxQ',
+    },
+  ],
+  space: {
+    id: '1yoKMPnjEbOxQ',
+    url: 'https://x.com/i/spaces/1yoKMPnjEbOxQ',
+    title: '#ゆめみた合宿3日目！ついに最終日！✨コメントはハッシュタグにてお願いします✨',
+    state: 'Ended',
+    availability: 'replayable',
+    createdAt: 1758117617817,
+    startedAt: 1758117620659,
+    endedAt: 1758120181605,
+    durationMs: 2560946,
+    listenersCount: 2478,
+    liveListenersCount: 1245,
+    replayCount: 1233,
+    isReplayAvailable: true,
+    host: {
+      id_str: '1546362523561390081',
+      name: '夢限大みゅーたいぷ',
+      screen_name: 'BDP_yumemita',
+      profile_image_url_https: 'https://pbs.twimg.com/profile_images/1907233594067881984/8eZPMLR5_normal.jpg',
+      verified: false,
+      is_blue_verified: true,
+      verified_type: 'Business',
+    },
+  } satisfies SpaceDetails,
+  is_inline_media: false,
+}
+
+/** Space 已删除 / 不可访问：中性墓碑条，不再只剩一个裸链接 */
+const withUnavailableSpace: EnrichedTweet = {
+  ...withSpace,
+  id: '2057046686871232598',
+  space: {
+    id: '1DGLdvzVZmLGm',
+    url: 'https://x.com/i/spaces/1DGLdvzVZmLGm',
+    title: '',
+    state: '',
+    availability: 'unavailable',
+    createdAt: 0,
+    startedAt: null,
+    endedAt: null,
+    durationMs: null,
+    listenersCount: 0,
+    liveListenersCount: 0,
+    replayCount: 0,
+    isReplayAvailable: false,
+    host: {
+      id_str: '',
+      name: '',
+      screen_name: '',
+      profile_image_url_https: '',
+      verified: false,
+      is_blue_verified: false,
+    },
+  },
+}
+
+export const TweetWithSpace: Story = {
+  render: () => <MyTweet tweet={withSpace} tweetAuthorName="BDP_yumemita" />,
+}
+
+export const TweetWithUnavailableSpace: Story = {
+  render: () => <MyTweet tweet={withUnavailableSpace} tweetAuthorName="BDP_yumemita" />,
 }

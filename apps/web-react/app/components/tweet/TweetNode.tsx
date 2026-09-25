@@ -14,6 +14,7 @@ import {
 } from '../react-tweet'
 import { TweetLinkCard } from './TweetCard'
 import { TweetMediaAlt } from './TweetMediaAlt'
+import { TweetSpaceCard } from './TweetSpaceCard'
 
 export type TweetVariant = 'quoted' | 'main'
 
@@ -101,6 +102,7 @@ export const TweetNode = forwardRef<HTMLDivElement, TweetNodeProps>(({
 
         <TweetMediaAlt tweet={tweet} />
         {tweet.card && <TweetLinkCard tweet={tweet} />}
+        {tweet.space && <TweetSpaceCard tweet={tweet} />}
 
         {tweet.quoted_tweet && (
           <TweetNode
