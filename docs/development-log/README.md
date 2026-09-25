@@ -6,6 +6,7 @@
 
 | 日期 | 主题 |
 |---|---|
+| [2026-09-25](2026-09-25.md) | 同步 anonTweet 的 rettiwt-api 数据层（JetFuel 解析 + `AudioSpaceById` 请求）并端到端移植 X Space 卡片：五态行动区（可回放/直播中/尚未开始/不可回放/已删除墓碑）、正文链接去重、抓取时挂载 `space`；顺带清掉失效的 Space 请求选项 |
 | [2026-09-18](2026-09-18.md) | `fetch-tweet-daily` 每日抓取顺带刷新用户资料（`fetchUserDetailsRaw` + `createUser` upsert，粉丝/bio/推文数不再停在入库快照）；Key 级失败判定抽成 `getAbortReason()` 供资料与时间线共用 |
 | [2026-09-17](2026-09-17.md) | API 加固（issue #8 / #9）：`noReplies`/`cursor`/`search` 字段级校验（非法游标 400 不再 500）、medias 日期范围下 total/hasMore 收敛、媒体 partial index（migration 0004） |
 | [2026-09-14](2026-09-14.md) | 定时抓取全量 403 排查与修复（出口改走 mihomo 代理、`RettiwtPool` 错误分类硬化 + 明细日志、postmortem 006）；IG 抓取暂缓（cookie 过期） |
