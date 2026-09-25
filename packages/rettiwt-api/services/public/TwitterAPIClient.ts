@@ -2,6 +2,7 @@ import type { RettiwtPool } from '../../helper/RettiwtPool'
 import type { ITweetFilter } from '../../types/args/FetchArgs'
 import type { EnrichedUser, RawTweet } from '../../types/enriched'
 import type { IListTweetsResponse } from '../../types/raw/list/Tweets'
+import type { IAudioSpace, IAudioSpaceByIdResponse } from '../../types/raw/space/Details'
 import type { ITweetDetailsResponse } from '../../types/raw/tweet/Details'
 import type { ITweetRepliesResponse } from '../../types/raw/tweet/Replies'
 import type { ITweetSearchResponse } from '../../types/raw/tweet/Search'
@@ -38,6 +39,24 @@ export class TwitterAPIClient {
         { id },
       )
       return response.data.tweetResult.result
+    })
+  }
+
+  /**
+   * 获取 Space（语音直播/录音回放）的原始详情
+   *
+   * Space 推文的 `card` 是空壳（binding 只有 tweet_id / id / card_url，无标题与图片），
+   * 标题/主播/人数/时长全在 `AudioSpaceById` 的 `audioSpace.metadata` 里，
+   * 故卡片数据必须再打一次这个端点。查不到（已删除/无权限）时返回 null。
+   */
+  async fetchSpaceDetails(id: string): Promise<IAudioSpace | null> {
+    return this.pool.run(async (fetcher) => {
+      const response = await fetcher.request<IAudioSpaceByIdResponse>(
+        ResourceType.SPACE_DETAILS,
+        { id },
+      )
+
+      return response.data?.audioSpace ?? null
     })
   }
 

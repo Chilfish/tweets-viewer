@@ -10,6 +10,7 @@
 import type { ITweetFilter } from '@tweets-viewer/rettiwt-api'
 import { mkdir } from 'node:fs/promises'
 import path from 'node:path'
+import { attachSpaceDetails } from '@tweets-viewer/rettiwt-api'
 import { formatDate } from '@tweets-viewer/shared'
 import { apiClient, enrichmentService } from '../common'
 import { cacheDir, writeJson } from '../utils'
@@ -105,6 +106,7 @@ async function fetchTarget(target: SearchTarget): Promise<number> {
     }
 
     const enriched = enrichmentService.enrichTweets(data.tweets)
+    await attachSpaceDetails(enriched, data.tweets, id => apiClient.fetchSpaceDetails(id))
     allTweets.push(...enriched)
 
     console.log({

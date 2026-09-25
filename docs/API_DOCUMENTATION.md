@@ -59,6 +59,15 @@ interface PaginatedResponse<T> {
 推文详情对象，包含推文内容、媒体信息、统计数据等。
 (类型定义引用自 `@tweets-viewer/rettiwt-api`)
 
+可选字段（缺省即不渲染 / 不返回）：
+
+| 字段 | 说明 |
+| --- | --- |
+| `card?: LinkPreviewCard` | 链接预览卡片（`unified_card` / `summary*` / `player`），含可选 `trending`（JetFuel 增强：分类 / 头像 / posts 数） |
+| `space?: SpaceDetails` | X Space 卡片（`title` / `host` / `listenersCount` / `durationMs` / `availability`）；抓取时由 `AudioSpaceById` 补充，见 [Specification §4.6](./Specification.md) |
+| `quoted_tweet?` | 引用推文（同为 EnrichedTweet） |
+| `media_details?` | 媒体（图片 / 视频 / GIF），含尺寸与 alt 文本 |
+
 ### EnrichedUser
 
 用户详情对象，包含用户资料、关注数、粉丝数等。

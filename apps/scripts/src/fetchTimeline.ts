@@ -1,4 +1,5 @@
 import { writeFile } from 'node:fs/promises'
+import { attachSpaceDetails } from '@tweets-viewer/rettiwt-api'
 import { apiClient, cursor, cursorPath, enrichmentService, user, userId } from './common'
 import { writeJson } from './utils'
 
@@ -9,6 +10,9 @@ if (!rawTweets.tweets.length) {
 }
 
 const enrichedTweets = enrichmentService.enrichUserTimelineTweets(rawTweets.tweets, user.id)
+
+// Space 推文的外壳 card 拿不到标题/主播/人数，需再打一次 AudioSpaceById 挂到 space 字段
+await attachSpaceDetails(enrichedTweets, rawTweets.tweets, id => apiClient.fetchSpaceDetails(id))
 
 await writeJson({
   tweets: enrichedTweets,

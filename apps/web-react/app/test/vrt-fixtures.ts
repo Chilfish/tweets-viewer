@@ -1,4 +1,4 @@
-import type { EnrichedTweet, EnrichedUser, MediaDetails } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedTweet, EnrichedUser, MediaDetails, SpaceDetails } from '@tweets-viewer/rettiwt-api'
 
 /**
  * 视觉回归 fixture 的确定性图片源：内联 SVG data URL。
@@ -65,6 +65,35 @@ export function makeTweet(overrides: Partial<EnrichedTweet> = {}): EnrichedTweet
     view_count: 23421,
     ...overrides,
   }
+}
+
+/**
+ * Space 卡片 fixture（字段取自真实 Space `1yoKMPnjEbOxQ`，`Ended` + 可回放）。
+ * 官方卡片实测文案：`2,478 人收听/回放` / `9月17日` / `42:40`。
+ */
+export const fixtureSpaceDetails: SpaceDetails = {
+  id: '1yoKMPnjEbOxQ',
+  url: 'https://x.com/i/spaces/1yoKMPnjEbOxQ',
+  title: '#ゆめみた合宿3日目！ついに最終日！✨コメントはハッシュタグにてお願いします✨',
+  state: 'Ended',
+  availability: 'replayable',
+  createdAt: 1758117617817,
+  startedAt: 1758117620659,
+  endedAt: 1758120181605,
+  durationMs: 2560946,
+  listenersCount: 2478,
+  liveListenersCount: 1245,
+  replayCount: 1233,
+  isReplayAvailable: true,
+  host: {
+    id_str: '1546362523561390081',
+    name: '夢限大みゅーたいぷ',
+    screen_name: 'BDP_yumemita',
+    profile_image_url_https: fixtureAvatarUrl,
+    verified: false,
+    is_blue_verified: true,
+    verified_type: 'Business',
+  },
 }
 
 /** ProfileHeader 完整用户 fixture：覆盖 banner/头像/bio/位置/生日/链接/计数/认证标全部分支 */

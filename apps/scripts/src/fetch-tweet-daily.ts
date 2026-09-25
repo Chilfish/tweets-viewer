@@ -2,7 +2,7 @@ import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
 import { setTimeout as sleep } from 'node:timers/promises'
 import { neon } from '@neondatabase/serverless'
 import { createTweets, createUser, getDailyFetchUsers, schema } from '@tweets-viewer/database'
-import { RettiwtAuthError, RettiwtPool, RettiwtRateLimitError, TweetEnrichmentService, TwitterAPIClient } from '@tweets-viewer/rettiwt-api'
+import { attachSpaceDetails, RettiwtAuthError, RettiwtPool, RettiwtRateLimitError, TweetEnrichmentService, TwitterAPIClient } from '@tweets-viewer/rettiwt-api'
 import { drizzle } from 'drizzle-orm/neon-http'
 
 const KEYS = (process.env.TWEET_KEYS || '').split(',').filter(Boolean).map(key => key.trim())
@@ -77,6 +77,9 @@ async function fetchTimeline(userId: string, cursor?: string) {
   }
 
   const enrichedTweets = enrichmentService.enrichUserTimelineTweets(rawTweets.tweets, userId)
+
+  // Space 推文的外壳 card 拿不到标题/主播/人数，需再打一次 AudioSpaceById 挂到 space 字段
+  await attachSpaceDetails(enrichedTweets, rawTweets.tweets, id => apiClient.fetchSpaceDetails(id))
 
   return {
     tweets: enrichedTweets,
