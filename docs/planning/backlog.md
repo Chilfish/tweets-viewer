@@ -17,8 +17,7 @@
 - [ ] [fix] 恢复 Instagram 每日抓取：刷新已过期的 `INSTAGRAM_COOKIES`（2026-06-21 起，13 个账号全部 `User not found`）后取消 `dailyUpdate.ts` 里的注释；顺带修 `fetch-ins-daily.ts:270` 吞掉用户级错误、不设退出码（job 假绿）的问题（前置：拿到新的 IG cookie；关联：`docs/development-log/2026-09-14.md`；风险：低）
 - [ ] [refactor] 补齐 `apps/server` / `packages/database` 的 `typecheck`，把根 `bun run typecheck` 扩到全仓（前置：先隔离 vendored `packages/rettiwt-api` 的历史类型错误；关联：`docs/INDEX.md` §四、CI `typecheck` job；风险：低）
 - [ ] [test] 视觉回归（VRT）覆盖扩面：MediaCard / InstagramPostCard / TweetSkeleton / DateDivider × 双主题（前置：CI linux 基线生成流程；关联：`planning/visual-regression-testing.md`；风险：中）
-- [ ] [feat] Space 卡片历史数据回填：既有推文的 `jsonData` 没有 `space` 字段（字段是后加的），卡片只在新抓取的推文出现；需按实体里的 `x.com/i/spaces/…` 链接回填 `AudioSpaceById` 结果并回写 DB（前置：确认回填范围与限流预算；关联：`docs/development-log/2026-09-25.md`；风险：低）
-- [ ] [ui] Space 卡片 VRT 覆盖：新增 `TweetSpaceCard` 尚未纳入视觉回归（五态 + 窄屏），可并入上一条 VRT 扩面（关联：`docs/Specification.md` §4.6；风险：低）
+- [ ] [feat] 执行 Space 卡片历史数据回填：脚本已就绪（`apps/scripts/src/backfillSpace.ts`，只写 `jsonData`、默认 dry-run，`--write` 落库），但本机 Bun 连不上 Neon（TLS 校验失败，PowerShell 可连）故尚未实跑；需在能连 Neon 的环境先 dry-run 确认规模再 `--write`（前置：可访问 Neon 的网络 / 限流预算；关联：`docs/development-log/2026-09-25.md`；风险：低）
 
 ## 不做清单（裁决为删除/延后，Apple 式减法）
 
