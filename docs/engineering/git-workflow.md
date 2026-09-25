@@ -87,7 +87,7 @@ git commit -m "docs: sync architecture and API docs with date range"
 ```bash
 bun run lint:check   # ESLint --max-warnings=0
 bun run typecheck    # react-router typegen + tsc（web-react）
-bun run test         # 全包 Vitest（shared + database + server + web-react）
+bun run test         # 全包 Vitest（rettiwt-api + shared + database + server + web-react）
 bun run build:client # 前端生产构建
 ```
 

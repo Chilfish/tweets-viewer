@@ -34,7 +34,7 @@ bun run deploy       # API 部署到 Cloudflare Workers
 bun run lint         # ESLint --fix
 bun run lint:check   # ESLint --max-warnings=0（门禁用，不改文件）
 bun run typecheck    # react-router typegen + tsc（web-react）
-bun run test         # 全包 Vitest（shared + database + server + web-react）
+bun run test         # 全包 Vitest（rettiwt-api + shared + database + server + web-react）
 bun run test:visual  # VRT 视觉回归（本地 win32 基线不进门禁，见下）
 
 # 单包测试（调试时）

@@ -13,7 +13,7 @@
 
 - [ ] `bun run lint:check` 通过（无 error/warning）
 - [ ] `bun run typecheck` 通过
-- [ ] `bun run test` 全部通过（shared + database + server + web-react）
+- [ ] `bun run test` 全部通过（rettiwt-api + shared + database + server + web-react）
 - [ ] `bun run build:client` 成功产出构建
 - [ ] Postmortem 预发布检查（对照 `docs/postmortem/README.md`：Changed Files 重叠？模式复现？）
 

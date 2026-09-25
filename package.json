@@ -13,7 +13,7 @@
     "lint": "eslint . --fix",
     "lint:check": "eslint . --max-warnings=0",
     "typecheck": "bun --cwd apps/web-react typecheck",
-    "test": "bun --cwd packages/shared test && bun --cwd packages/database test && bun --cwd apps/server test && bun --cwd apps/web-react test",
+    "test": "bun --cwd packages/rettiwt-api test && bun --cwd packages/shared test && bun --cwd packages/database test && bun --cwd apps/server test && bun --cwd apps/web-react test",
     "test:visual": "bun --cwd apps/web-react test:visual"
   },
   "workspaces": [
