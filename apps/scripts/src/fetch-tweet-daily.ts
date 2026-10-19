@@ -87,31 +87,76 @@ async function fetchTimeline(userId: string, cursor?: string) {
   }
 }
 
-export async function fetchTweetDaily(): Promise<void> {
-  const DATABASE_URL = process.env.DATABASE_URL
+export interface FetchTweetDailyOptions {
+  /**
+   * 目标库连接串；缺省取 `process.env.DATABASE_URL`。
+   *
+   * 多库并发时由入口（`dailyUpdate.ts`）逐个传入：本模块不读全局库状态，
+   * 因此多份调用可以安全地同时进行。
+   */
+  databaseUrl?: string
+  /**
+   * 日志标识（多库并发时用来区分输出）；缺省 `database`。
+   *
+   * 只允许放主机名一类的非敏感标识——绝不打印完整连接串（含密码）。
+   */
+  label?: string
+}
 
-  if (!DATABASE_URL) {
-    console.error('DATABASE_URL is required — skipping Twitter fetch')
-    return
-  }
+export interface TweetDailyResult {
+  /** 目标库标识，与日志里的 `db` 字段一致 */
+  label: string
+  /** 抓取与入库全部完成且无用户级失败 */
+  ok: boolean
+  /** 成功抓取的用户数（含「无新推文」的用户） */
+  fetchedUsers: number
+  /** 抓取失败（重试耗尽）的用户 */
+  failedUsers: string[]
+  /** 推文入库失败的用户 */
+  writeFailedUsers: string[]
+  /** key 级中止原因（所有 Key 被拒/耗尽） */
+  aborted?: string
+}
+
+export async function fetchTweetDaily(options: FetchTweetDailyOptions = {}): Promise<TweetDailyResult> {
+  const DATABASE_URL = options.databaseUrl ?? process.env.DATABASE_URL
+  const dbLabel = options.label ?? 'database'
+
+  // 缺连接串是配置错误，不能静默跳过——否则定时任务会「什么都没做」却显绿
+  if (!DATABASE_URL)
+    throw new Error('DATABASE_URL is required for fetchTweetDaily')
 
   const client = neon(DATABASE_URL)
   const db = drizzle({ client, schema })
   const users = await getDailyFetchUsers(db)
 
   console.log({
+    db: dbLabel,
     action: 'twitter-pool',
     keysCount: KEYS.length,
     proxy: PROXY ? 'enabled' : 'disabled',
   })
 
   console.log({
+    db: dbLabel,
     action: 'get-users',
     usersCount: users.length,
     today: new Date().toISOString().split('T')[0],
   })
 
   const failedUsers: string[] = []
+  const writeFailedUsers: string[] = []
+  let fetchedUsers = 0
+
+  /** 所有提前返回都走这里，保证结果结构完整（中止原因可选） */
+  const report = (aborted?: string): TweetDailyResult => ({
+    label: dbLabel,
+    ok: !aborted && failedUsers.length === 0 && writeFailedUsers.length === 0,
+    fetchedUsers,
+    failedUsers,
+    writeFailedUsers,
+    aborted,
+  })
 
   for (const user of users) {
     // ── Phase 0: refresh user profile ──
@@ -125,6 +170,7 @@ export async function fetchTweetDaily(): Promise<void> {
       if (freshUser) {
         await createUser({ db, user: freshUser })
         console.log({
+          db: dbLabel,
           userId: user.id,
           username: freshUser.userName,
           followersCount: freshUser.followersCount,
@@ -133,6 +179,7 @@ export async function fetchTweetDaily(): Promise<void> {
       }
       else {
         console.warn({
+          db: dbLabel,
           userId: user.id,
           username: user.fullName,
           action: 'refresh-user-empty',
@@ -145,6 +192,7 @@ export async function fetchTweetDaily(): Promise<void> {
       const abortReason = getAbortReason(error)
 
       console.error({
+        db: dbLabel,
         userId: user.id,
         username: user.fullName,
         action: 'refresh-user-error',
@@ -155,12 +203,12 @@ export async function fetchTweetDaily(): Promise<void> {
 
       if (abortReason) {
         console.error({
+          db: dbLabel,
           action: 'refresh-user-abort',
           reason: abortReason,
           message: formatError(error),
         })
-        process.exitCode = 1
-        return
+        return report(abortReason)
       }
     }
 
@@ -190,7 +238,9 @@ export async function fetchTweetDaily(): Promise<void> {
         } while (true)
 
         fetchOk = true
+        fetchedUsers++
         console.log({
+          db: dbLabel,
           userId: user.id,
           username: user.fullName,
           tweetsCount: allTweets.length,
@@ -204,6 +254,7 @@ export async function fetchTweetDaily(): Promise<void> {
         lastError = error
 
         console.error({
+          db: dbLabel,
           userId: user.id,
           username: user.fullName,
           action: 'fetch-timeline-error',
@@ -219,12 +270,12 @@ export async function fetchTweetDaily(): Promise<void> {
 
         if (abortReason) {
           console.error({
+            db: dbLabel,
             action: 'fetch-timeline-abort',
             reason: abortReason,
             message: formatError(error),
           })
-          process.exitCode = 1
-          return
+          return report(abortReason)
         }
 
         if (attempt < MAX_RETRIES)
@@ -234,7 +285,7 @@ export async function fetchTweetDaily(): Promise<void> {
 
     if (!fetchOk) {
       failedUsers.push(user.fullName ?? user.userName ?? user.id)
-      console.error(`Failed to fetch @${user.fullName} after ${MAX_RETRIES} attempts (last error: ${formatError(lastError)}). Skipping.`)
+      console.error(`[${dbLabel}] Failed to fetch @${user.fullName} after ${MAX_RETRIES} attempts (last error: ${formatError(lastError)}). Skipping.`)
       continue
     }
 
@@ -244,11 +295,13 @@ export async function fetchTweetDaily(): Promise<void> {
 
     try {
       const result = await createTweets({ db, tweets: allTweets, user })
-      console.log(`  @${user.fullName}: ${result.rowCount} rows affected / ${allTweets.length} total`)
+      console.log(`  [${dbLabel}] @${user.fullName}: ${result.rowCount} rows affected / ${allTweets.length} total`)
     }
 
     catch (error: unknown) {
+      writeFailedUsers.push(user.fullName ?? user.userName ?? user.id)
       console.error({
+        db: dbLabel,
         userId: user.id,
         username: user.fullName,
         action: 'create-tweets-error',
@@ -258,14 +311,27 @@ export async function fetchTweetDaily(): Promise<void> {
     }
   }
 
-  // 有用户抓取失败时让进程以非 0 退出，定时任务才会显红而不是静默「成功」
-  if (failedUsers.length > 0) {
-    process.exitCode = 1
-    console.error(`Tweet daily fetch incomplete — ${failedUsers.length} user(s) failed: ${failedUsers.join(', ')}`)
-    return
+  // 抓取失败与入库失败都要如实汇报，交给入口决定退出码：
+  // 多库并发时其中一个库写失败，job 也必须显红，否则那个库会静默过期。
+  const result = report()
+
+  if (!result.ok) {
+    console.error({
+      db: dbLabel,
+      action: 'tweet-daily-incomplete',
+      fetchedUsers,
+      failedUsers,
+      writeFailedUsers,
+    })
+    return result
   }
 
-  console.log('Tweet daily fetch complete.')
+  console.log({
+    db: dbLabel,
+    action: 'tweet-daily-complete',
+    fetchedUsers,
+  })
+  return result
 }
 
 // Allow standalone run
@@ -273,9 +339,14 @@ export async function fetchTweetDaily(): Promise<void> {
 const isMain = process.argv[1]?.includes('fetch-tweet-daily')
 
 if (isMain) {
-  fetchTweetDaily().catch((err) => {
-    console.error('Fatal:', err)
+  fetchTweetDaily()
+    .then((result) => {
+      if (!result.ok)
+        process.exitCode = 1
+    })
+    .catch((err) => {
+      console.error('Fatal:', err)
 
-    process.exit(1)
-  })
+      process.exit(1)
+    })
 }
