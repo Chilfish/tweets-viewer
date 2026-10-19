@@ -65,8 +65,8 @@ tweets-viewer/
 - **核心脚本**：
   | 文件 | 用途 |
   |------|------|
-  | `dailyUpdate.ts` | 每日增量同步入口（顺序执行 Twitter + IG） |
-  | `fetch-tweet-daily.ts` | Twitter 每日抓取：按 `daily_fetch` 读 users，先刷新用户资料（`createUser` upsert），再抓时间线 upsert 推文 |
+  | `dailyUpdate.ts` | 每日增量同步入口（`DATABASE_URL` 逗号分隔多地址时，对每个归档库并发跑一轮 Twitter + IG） |
+  | `fetch-tweet-daily.ts` | Twitter 每日抓取：入参指定目标库（`databaseUrl` / `label`），按 `daily_fetch` 读 users，先刷新用户资料（`createUser` upsert），再抓时间线 upsert 推文；返回结构化结果供入口聚合退出码 |
   | `fetch-ins-daily.ts` | IG 每日抓取：从 users 表读取已关联 IG 的用户，SDK 抓取帖子，upsert 入库 |
   | `import-ins-data.ts` | IG 批量导入：读取本地 JSON，查 mapping.ts 映射，写入 users.ins_json_data + ins_posts |
   | `insertToDB.ts` | Twitter 批量导入：读取本地 JSON，写入 users + tweets |
@@ -199,7 +199,7 @@ tweets-viewer/
 
 | 变量           | 用途                              | 位置                                    |
 | -------------- | --------------------------------- | --------------------------------------- |
-| `DATABASE_URL` | Neon Postgres 连接串              | `.env`, `wrangler.toml`, GitHub Secrets |
+| `DATABASE_URL` | Postgres 连接串；逗号分隔多地址 = 定时抓取并发更新多库（首个为主库，`env.DATABASE_URLS` 为全量列表） | `.env`, `wrangler.toml`, GitHub Secrets |
 | `TWEET_KEYS`   | Twitter API Key 列表（逗号分隔）  | `.env`, `wrangler.toml`, GitHub Secrets |
 | `INSTAGRAM_COOKIES` | Instagram 登录 Cookie       | `.env`, GitHub Secrets                  |
 | `ENVIRONMENT`  | 运行环境 (development/production) | `env.server.ts` (Zod 验证)              |

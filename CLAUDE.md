@@ -119,24 +119,24 @@ ins_posts: id(serial PK), post_id(UQ), username(FK→users.userName), created_at
 
 ### Scripts（`apps/scripts/src/`）
 
-| 文件                                                           | 用途                                                                                   |
-| -------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| `dailyUpdate.ts`                                               | 每日增量同步（Twitter + IG），GitHub Actions cron 调用                                 |
-| `fetch-ins-daily.ts`                                           | 从 users 表读取已关联 IG 的用户，抓取最新帖子入库                                      |
-| `fetch-tweet-daily.ts` / `fetchTimeline.ts` / `fetchSearch.ts` | 推文增量抓取（`fetch-tweet-daily` 另刷新用户资料：粉丝/bio/推文数 → `users.jsonData`） |
-| `insertToDB.ts` / `mergeData.ts` / `import-ins-data.ts`        | 本地 JSON 批量入库 / 合并                                                              |
-| `mapping.ts`                                                   | IG username → twitter username 映射表                                                  |
-| `fukuoka/` + `fetchSearchFukuoka.ts`                           | 研究脚本，**不入库**                                                                   |
+| 文件                                                           | 用途                                                                                            |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `dailyUpdate.ts`                                               | 每日增量同步（Twitter + IG），GitHub Actions cron 调用；`DATABASE_URL` 多地址时对每个库并发更新 |
+| `fetch-ins-daily.ts`                                           | 从 users 表读取已关联 IG 的用户，抓取最新帖子入库                                               |
+| `fetch-tweet-daily.ts` / `fetchTimeline.ts` / `fetchSearch.ts` | 推文增量抓取（`fetch-tweet-daily` 另刷新用户资料：粉丝/bio/推文数 → `users.jsonData`）          |
+| `insertToDB.ts` / `mergeData.ts` / `import-ins-data.ts`        | 本地 JSON 批量入库 / 合并                                                                       |
+| `mapping.ts`                                                   | IG username → twitter username 映射表                                                           |
+| `fukuoka/` + `fetchSearchFukuoka.ts`                           | 研究脚本，**不入库**                                                                            |
 
 ### 环境变量（`env.server.ts` 单源 Zod 校验）
 
-| 变量                | 用途                                             |
-| ------------------- | ------------------------------------------------ |
-| `DATABASE_URL`      | Neon Postgres 连接串                             |
-| `TWEET_KEYS`        | 逗号分隔的抓取 key 列表（仅抓取脚本用）          |
-| `INSTAGRAM_COOKIES` | Instagram 登录 Cookie（仅 IG 抓取用）            |
-| `API_URL`           | 前端 API 基址（经 `vite.config.ts` 注入 bundle） |
-| `ENVIRONMENT`       | 运行环境（`development` / `production`）         |
+| 变量                | 用途                                                                                                 |
+| ------------------- | ---------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`      | Postgres 连接串；逗号分隔多地址 = 每日抓取并发更新多库（首个为主库，`env.DATABASE_URLS` 为全量列表） |
+| `TWEET_KEYS`        | 逗号分隔的抓取 key 列表（仅抓取脚本用）                                                              |
+| `INSTAGRAM_COOKIES` | Instagram 登录 Cookie（仅 IG 抓取用）                                                                |
+| `API_URL`           | 前端 API 基址（经 `vite.config.ts` 注入 bundle）                                                     |
+| `ENVIRONMENT`       | 运行环境（`development` / `production`）                                                             |
 
 参考 `example.env`，复制为根目录 `.env`。敏感凭据只走 `.env` + `env.server.ts`，绝不硬编码。
 

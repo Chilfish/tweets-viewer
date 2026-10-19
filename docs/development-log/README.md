@@ -6,6 +6,7 @@
 
 | 日期 | 主题 |
 |---|---|
+| [2026-10-19](2026-10-19.md) | `DATABASE_URL` 支持逗号分隔多地址：`dailyUpdate` 对每个归档库并发跑一轮完整更新（单库失败不影响其他库、但整体 exit ≠ 0）；`parseDatabaseUrls()` 下沉 shared，`fetchTweetDaily()` 参数化并返回结构化结果；顺带修 `DATABASE_URL` 缺失与入库失败两处「假绿」 |
 | [2026-09-25](2026-09-25.md) | 同步 anonTweet 的 rettiwt-api 数据层（JetFuel 解析 + `AudioSpaceById` 请求）并端到端移植 X Space 卡片：五态行动区（可回放/直播中/尚未开始/不可回放/已删除墓碑）、正文链接去重、抓取时挂载 `space`；顺带清掉失效的 Space 请求选项 |
 | [2026-09-18](2026-09-18.md) | `fetch-tweet-daily` 每日抓取顺带刷新用户资料（`fetchUserDetailsRaw` + `createUser` upsert，粉丝/bio/推文数不再停在入库快照）；Key 级失败判定抽成 `getAbortReason()` 供资料与时间线共用 |
 | [2026-09-17](2026-09-17.md) | API 加固（issue #8 / #9）：`noReplies`/`cursor`/`search` 字段级校验（非法游标 400 不再 500）、medias 日期范围下 total/hasMore 收敛、媒体 partial index（migration 0004） |

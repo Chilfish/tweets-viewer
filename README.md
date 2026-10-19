@@ -55,7 +55,7 @@ bun install
 把 `example.env` 复制成根目录 `.env`，按需修改：
 
 ```env
-DATABASE_URL="postgresql://..."   # Neon / Postgres 连接串
+DATABASE_URL="postgresql://..."   # 连接串；逗号分隔多地址 = 每日抓取并发更新多个归档库（首个为主库）
 TWEET_KEYS=""                     # 逗号分隔的抓取 key 列表（仅抓取脚本用）
 INSTAGRAM_COOKIES=""              # Instagram 登录 Cookie（仅 IG 抓取用）
 API_URL="https://tweet-api.chilfish.top"  # 前端 API 基址（经 vite 注入 bundle）
@@ -93,13 +93,16 @@ bun --cwd packages/database db:migrate
 
 `apps/scripts` 提供抓取与入库能力（依赖 `DATABASE_URL`、`TWEET_KEYS`、`INSTAGRAM_COOKIES`）。
 
-| 脚本                                                           | 用途                                                          |
-| -------------------------------------------------------------- | ------------------------------------------------------------- |
-| `dailyUpdate.ts`                                               | 每日增量同步（Twitter + IG），由 GitHub Actions cron 调用     |
-| `fetch-tweet-daily.ts` / `fetchTimeline.ts` / `fetchSearch.ts` | 推文增量抓取                                                  |
-| `fetch-ins-daily.ts`                                           | 从 users 表读取已关联 IG 的用户，抓取最新帖子入库             |
-| `insertToDB.ts` / `mergeData.ts` / `import-ins-data.ts`        | 本地 JSON 批量入库 / 合并                                     |
-| `mapping.ts`                                                   | IG username → twitter username 映射表（导入 IG 前必须有映射） |
+> `DATABASE_URL` 支持逗号分隔多地址（`url1,url2`，地址内若含逗号需写成 `%2C`）：`dailyUpdate.ts` 会对每个库**并发**跑一轮完整更新，
+> 任一库失败都让进程以非 0 退出（cron 显红）但不影响其他库；首个地址为主库，API / `drizzle-kit` / 单库脚本只用它。
+
+| 脚本                                                           | 用途                                                                              |
+| -------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `dailyUpdate.ts`                                               | 每日增量同步（Twitter + IG），由 GitHub Actions cron 调用；多地址时并发更新多个库 |
+| `fetch-tweet-daily.ts` / `fetchTimeline.ts` / `fetchSearch.ts` | 推文增量抓取                                                                      |
+| `fetch-ins-daily.ts`                                           | 从 users 表读取已关联 IG 的用户，抓取最新帖子入库                                 |
+| `insertToDB.ts` / `mergeData.ts` / `import-ins-data.ts`        | 本地 JSON 批量入库 / 合并                                                         |
+| `mapping.ts`                                                   | IG username → twitter username 映射表（导入 IG 前必须有映射）                     |
 
 > `fukuoka/` 与 `fetchSearchFukuoka.ts` 是研究脚本，**不入库**。
 
