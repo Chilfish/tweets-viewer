@@ -44,3 +44,27 @@ export function snowId2millis(id: string) {
 export function pubTime(id: string) {
   return new Date(Number(snowId2millis(id)))
 }
+
+/**
+ * 解析逗号分隔的连接串列表（`DATABASE_URL` 多地址）。
+ *
+ * 去首尾空白、丢弃空项、按首次出现去重（同一个库不会被抓两遍）。
+ * 地址本身若含逗号，需写成 `%2C`（与 `TWEET_KEYS` 的 CSV 约定一致）。
+ */
+export function parseDatabaseUrls(raw: string | null | undefined): string[] {
+  if (!raw)
+    return []
+
+  const seen = new Set<string>()
+  const urls: string[] = []
+
+  for (const part of raw.split(',')) {
+    const url = part.trim()
+    if (!url || seen.has(url))
+      continue
+    seen.add(url)
+    urls.push(url)
+  }
+
+  return urls
+}

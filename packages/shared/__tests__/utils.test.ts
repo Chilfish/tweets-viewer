@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { mergeData, pubTime, snowId2millis, tweetUrl, uniqueObj } from '../utils'
+import { mergeData, parseDatabaseUrls, pubTime, snowId2millis, tweetUrl, uniqueObj } from '../utils'
 
 describe('uniqueObj', () => {
   it('should deduplicate objects by key (keeps last)', () => {
@@ -68,5 +68,31 @@ describe('pubTime', () => {
     const date = pubTime('1720000000000000000')
     expect(date).toBeInstanceOf(Date)
     expect(date.getTime()).toBeGreaterThan(0)
+  })
+})
+
+describe('parseDatabaseUrls', () => {
+  it('should return a single url as-is', () => {
+    expect(parseDatabaseUrls('postgresql://u:p@h/one')).toEqual(['postgresql://u:p@h/one'])
+  })
+
+  it('should split comma-separated urls and trim whitespace', () => {
+    expect(parseDatabaseUrls('postgresql://h/one , postgresql://h/two'))
+      .toEqual(['postgresql://h/one', 'postgresql://h/two'])
+  })
+
+  it('should drop empty entries and tolerate trailing commas', () => {
+    expect(parseDatabaseUrls('postgresql://h/one,,  ,')).toEqual(['postgresql://h/one'])
+  })
+
+  it('should deduplicate while keeping the first occurrence order', () => {
+    expect(parseDatabaseUrls('a, b, a, c, b')).toEqual(['a', 'b', 'c'])
+  })
+
+  it('should return empty array for empty/missing input', () => {
+    expect(parseDatabaseUrls('')).toEqual([])
+    expect(parseDatabaseUrls('   ')).toEqual([])
+    expect(parseDatabaseUrls(undefined)).toEqual([])
+    expect(parseDatabaseUrls(null)).toEqual([])
   })
 })
