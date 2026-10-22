@@ -8,7 +8,6 @@ on:
 env:
   # X 会拒绝 GitHub runner 的出口 IP（403），所有抓取统一经 mihomo 转出去。
   MIHOMO_VERSION: v1.19.30
-  PROXY_NODE: HK-A
   TWEET_PROXY: http://127.0.0.1:7890
 
 jobs:
@@ -33,12 +32,22 @@ jobs:
           path: ~/mihomo
           key: mihomo-${{ runner.os }}-${{ env.MIHOMO_VERSION }}
 
-      - name: Start mihomo
+      # 每次运行都从订阅重新生成配置：节点域名/节点名会变，写死在 secret 里迟早失效。
+      - name: Fetch mihomo config
         env:
-          MIHOMO_CONFIG_B64: ${{ secrets.MIHOMO_CONFIG_B64 }}
+          MIHOMO_SUB_URL: ${{ secrets.MIHOMO_SUB_URL }}
         run: |
           set -euo pipefail
           mkdir -p /tmp/mihomo
+          # 订阅端是自签证书，只能跳过校验。
+          curl -fsSL --retry 3 --retry-all-errors -k -A 'clash.meta' \
+            "$MIHOMO_SUB_URL" -o /tmp/mihomo/subscription.yaml
+          bun run apps/scripts/src/prepareMihomo.ts \
+            /tmp/mihomo/subscription.yaml /tmp/mihomo/config.yaml
+
+      - name: Start mihomo
+        run: |
+          set -euo pipefail
           if [ ! -x "$HOME/mihomo/core" ]; then
             curl -sSL -o /tmp/core.gz \
               "https://github.com/MetaCubeX/mihomo/releases/download/${MIHOMO_VERSION}/mihomo-linux-amd64-${MIHOMO_VERSION}.gz"
@@ -47,7 +56,6 @@ jobs:
             mv /tmp/core "$HOME/mihomo/core"
             chmod +x "$HOME/mihomo/core"
           fi
-          echo "$MIHOMO_CONFIG_B64" | base64 -d > /tmp/mihomo/config.yaml
           nohup "$HOME/mihomo/core" -d /tmp/mihomo -f /tmp/mihomo/config.yaml > /tmp/mihomo/core.log 2>&1 &
           for _ in $(seq 1 30); do
             if curl -sf http://127.0.0.1:9099/version > /dev/null; then break; fi
@@ -56,6 +64,7 @@ jobs:
           # 起不来就让这几步失败：TWEET_PROXY 指向死端口时抓取会报 ECONNREFUSED，
           # 绝不能静默跌回直连（那只会拿到同一个 403）。
           curl -sf http://127.0.0.1:9099/version
+          PROXY_NODE=$(cat /tmp/mihomo/config.yaml.proxy-node)
           curl -sf -X PUT -H 'Content-Type: application/json' \
             -d "{\"name\":\"${PROXY_NODE}\"}" http://127.0.0.1:9099/proxies/PICK
           echo "mihomo ready, egress via ${PROXY_NODE}"
@@ -81,7 +90,7 @@ jobs:
             --body "The scheduled daily update workflow failed on $(date -u +%Y-%m-%dT%H:%M:%SZ).
 
             - Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-            - Check: mihomo / MIHOMO_CONFIG_B64 是否正常、IG Cookie 是否过期、TWEET_KEYS 速率限制、DATABASE_URL 连接" \
+            - Check: mihomo / MIHOMO_SUB_URL 是否可用、IG Cookie 是否过期、TWEET_KEYS 速率限制、DATABASE_URL 连接" \
             --repo ${{ github.repository }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
