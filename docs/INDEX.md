@@ -1,6 +1,6 @@
 # Tweets Viewer 文档索引
 
-> 先看这份索引，再按任务找对应文档。流程规范见 [CLAUDE.md](../CLAUDE.md)。
+> 先看这份索引，再按任务找对应文档。流程规范见 [AGENTS.md](../AGENTS.md)。
 
 ---
 
@@ -27,7 +27,7 @@ docs/
 ├── API_DOCUMENTATION.md    # REST API 完整说明
 ├── requirements/           # 需求文档（PRD · 用户故事 · 术语表）
 ├── planning/               # 规划（architecture ADR · backlog · roadmap）
-├── engineering/            # 工程规范（code-style · git-workflow · release-checklist）
+├── engineering/            # 工程规范（code-style · writing-style · git-workflow · release-checklist）
 ├── ui-design/              # UI 设计系统（OVERVIEW + components/GENERAL）
 ├── unified-sns/            # Unified SNS Viewer 新项目规格（DATA-MODEL · UI-DESIGN · API · RESEARCH · SCAFFOLD）
 ├── postmortem/             # 复盘记录（以前踩过的坑，写代码前必读）
@@ -40,7 +40,7 @@ docs/
 
 ## 三、文档导航 — 什么时候读哪个文档
 
-> **核心原则**：根据任务涉及的代码范围按需读取，不要一次性全读。
+> **核心原则**：按任务涉及的代码范围读取对应文档。
 
 | 任务场景 | 必读文档 | 说明 |
 | --- | --- | --- |
@@ -50,6 +50,7 @@ docs/
 | **规划下一阶段任务** | `planning/backlog.md` | 活跃未决清单（已完成里程碑见 `planning/action-plan.md` / `archive/`） |
 | **改 UI 组件 / 页面 / 样式** | `engineering/code-style.md` + `ui-design/OVERVIEW.md` | Token、命名、组件复用、Atom 规范 |
 | **改原子组件（Button/Input/…）** | `ui-design/components/GENERAL.md` | Base UI/COSS 组件使用规范 |
+| **写文案 / 文档** | `engineering/writing-style.md` + `requirements/glossary.md` | 具体、统一、可读的写法 |
 | **改数据抓取 / 入库脚本** | `ARCHITECTURE.md` + `apps/scripts` | 数据流、mapping、Fukuoka 为研究脚本不入库 |
 | **部署 / 环境配置** | `engineering/release-checklist.md` + `example.env` | Vercel / Workers、环境变量、性能预算 |
 | **写码前防复现** | `postmortem/README.md`（+ `TEMPLATE.md`） | 常见坑自查；新 Bug 模式写复盘记录 |
@@ -66,6 +67,7 @@ docs/
 | 未决任务清单（backlog） | `planning/backlog.md` |
 | 已完成里程碑 | `planning/action-plan.md` + `archive/` |
 | 代码规范（TS/React/Tailwind） | `engineering/code-style.md` |
+| 文案 / 文档写作 | `engineering/writing-style.md` |
 | Git / Commit / PR 流程 | `engineering/git-workflow.md` |
 | 发布前检查 | `engineering/release-checklist.md` |
 | 开发日志（按天） | `development-log/README.md` |
@@ -120,7 +122,7 @@ bun run test:visual      # 视觉回归
 规格         docs/Specification.md · API_DOCUMENTATION.md · ARCHITECTURE.md
 需求         docs/requirements/（PRD · user-stories · glossary）
 规划         docs/planning/（architecture ADR · backlog · roadmap）
-工程规范     docs/engineering/（code-style · git-workflow · release-checklist）
+工程规范     docs/engineering/（code-style · writing-style · git-workflow · release-checklist）
 UI 设计      docs/ui-design/（OVERVIEW · components/GENERAL）
 反馈         docs/postmortem/ · docs/reviews/ · docs/development-log/
 存档         docs/archive/（git mv 已完成阶段计划，不主动读取）
@@ -131,9 +133,10 @@ UI 设计      docs/ui-design/（OVERVIEW · components/GENERAL）
 | 事件 | 动作 |
 | --- | --- |
 | 功能行为变更 | 先改 `Specification.md`，再动代码 |
+| 文案 / 文档变更 | 先查 `requirements/glossary.md`，再按 `engineering/writing-style.md` 自查 |
 | API 变更 | 同步 `API_DOCUMENTATION.md` |
 | 架构级决策 | 记录 ADR 到 `planning/architecture.md` |
-| 新 Bug 模式 | 写 `postmortem/0NN-*.md`（模板 `TEMPLATE.md`），预防项同步 `CLAUDE.md` |
+| 新 Bug 模式 | 写 `postmortem/0NN-*.md`（模板 `TEMPLATE.md`），预防项同步 `AGENTS.md` |
 | 每次代码审查 | 记录到 `reviews/review-YYYY-MM-DD-<主题>.md` |
 | 每天收尾 | 记入 `development-log/YYYY-MM-DD.md` |
 | 阶段计划完成 | 计划文档 `git mv` 到 `archive/` |

@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to coding agents working with code in this repository.
 
 Tweets Viewer 用来读离线的推文归档。数据存在 PostgreSQL 里，前端可以一直往下滚，也可以按页跳。只能看，不能发推、点赞或关注。
 
@@ -151,6 +151,7 @@ ins_posts: id(serial PK), post_id(UQ), username(FK→users.userName), created_at
 - **Zustand**：`create<T>()()` 双括号；用 selector 订阅 + `useShallow`；`persist` store 用 `_hasHydrated` 防 SSR mismatch
 - **类型安全**：`catch` 用 `unknown` + `instanceof Error`，禁用 `catch (error: any)`
 - **IG→twitter 映射**：`ins_posts.username` 存 twitter userName，导入前确认 `mapping.ts` 存在映射
+- **文案与文档**：按 `docs/engineering/writing-style.md` 写；界面文案写用户能做的事，文档先给事实，一个概念一个名字
 
 ### 必须遵守的规则
 
@@ -165,6 +166,8 @@ ins_posts: id(serial PK), post_id(UQ), username(FK→users.userName), created_at
 5. **先写测试，检查全部通过再提交**：新增纯函数 / 查询模块先写 Vitest 测试再实现；`NODE_ENV` 一律走 `cross-env` 固定，禁止依赖宿主环境（见 postmortem 005）。**每次 commit 前本地跑 `bun run lint:check && bun run typecheck && bun run test`**，pre-push 检查另跑 `bun run build:client`；**禁止 `--no-verify` 绕过**，不要等钩子/CI 才发现违规。
 
 6. **只读性**：系统不提供任何写入功能（发推/点赞/关注），数据全部来自离线归档。
+
+7. **文案与文档**：新文案先查 `docs/requirements/glossary.md` 的统一叫法，再按 `docs/engineering/writing-style.md` 自查；文案变更同步 Specification、测试和 VRT。
 
 ## Current State
 
@@ -199,7 +202,7 @@ gh pr merge <N> --merge --delete-branch               # Create a Merge Commit
 - 核心规格（`docs/` 根）— `Specification.md`（以此为准）/ `ARCHITECTURE.md` / `API_DOCUMENTATION.md`
 - 需求（`docs/requirements/`）— PRD / 用户故事 / 术语表
 - 规划（`docs/planning/`）— ADR / backlog / roadmap
-- 工程规范（`docs/engineering/`）— code-style / git-workflow / release-checklist
+- 工程规范（`docs/engineering/`）— code-style / writing-style / git-workflow / release-checklist
 - UI 设计（`docs/ui-design/`）— 设计系统总览 + 组件规范
 - 开发日志（`docs/development-log/`）— 按天记录
 - 复盘记录（`docs/postmortem/`）— 以前踩过的坑，写代码前必读

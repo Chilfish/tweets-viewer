@@ -62,4 +62,4 @@
 2. 复制 [TEMPLATE.md](TEMPLATE.md)，编号顺延（`00X-<短横线主题>.md`），补摘要/影响/时间线/根因/行动项
 3. 在本索引表加一行，若属于既有根因归类则在「常见坑」补规则
 4. 在 `docs/development-log/README.md` 记录当天事件
-5. 根因是流程级 → 同步更新 `CLAUDE.md` 的「必须遵守的规则」或 `docs/engineering/git-workflow.md`
+5. 根因是流程级 → 同步更新 `AGENTS.md` 的「必须遵守的规则」或 `docs/engineering/git-workflow.md`

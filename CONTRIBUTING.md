@@ -49,6 +49,7 @@
 - [ ] 无硬编码（颜色 / URL / 凭据）、无 `any`
 - [ ] UI 变更已考虑移动端（<768px）与 `.dark` 模式，并附截图/录屏
 - [ ] 文档已同步（Specification / API / 开发日志 / 相关 docs）
+- [ ] 文案 / 文档已按 [writing-style.md](docs/engineering/writing-style.md) 自查（具体、统一、可读）
 - [ ] 没有遗留冲突
 
 ## 代码规范
