@@ -31,23 +31,23 @@
     "lint:check": "eslint --max-warnings 0 ."
   },
   "dependencies": {
-    "axios": "^1.20.0",
-    "chalk": "^6.0.0",
+    "axios": "^1.21.0",
+    "chalk": "^6.0.1",
     "commander": "^15.0.0",
     "cookiejar": "^2.1.4",
     "happy-dom": "20.1.0",
     "http-proxy-agent": "^9.1.0",
     "https-proxy-agent": "^9.1.0",
     "neoqs": "^6.13.0",
-    "node-html-parser": "^9.0.4",
+    "node-html-parser": "^9.0.5",
     "socks-proxy-agent": "^10.1.0",
-    "x-client-transaction-id": "^0.3.1"
+    "x-client-transaction-id": "^0.3.2"
   },
   "devDependencies": {
     "@types/cookiejar": "^2.1.5",
-    "@types/node": "^26.5.1",
-    "linkedom": "^0.18.11",
+    "@types/node": "^26.6.5",
+    "linkedom": "^0.18.14",
     "typescript": "~7.0.2",
-    "vitest": "^5.0.0"
+    "vitest": "^5.0.5"
   }
 }
