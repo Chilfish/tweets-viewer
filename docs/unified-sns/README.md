@@ -2,7 +2,7 @@
 
 > **项目定位**：一个「多平台 SNS 帖子统一归档阅读器」——用第三方开源工具把 X / Instagram / YouTube /
 > Bilibili / 微博 / Reddit / Bluesky / Mastodon / Threads / TikTok / 小红书等平台的帖子**抓取并清洗为统一基础格式**，
-> 在 Web 页面上以统一的沉浸式阅读体验展示（时间线 / 媒体墙 / 搜索 / 那年今日）。
+> 在 Web 页面上以统一的阅读体验展示（时间线 / 媒体 / 搜索 / 那年今日）。
 >
 > **UI 设计**完全参考本项目（tweets-viewer）前端：Apple 原生感设计系统、URL 驱动状态、服务端分页、
 > 骨架屏优先、媒体灯箱 hero 过渡。**数据架构**继承「结构化列 + JSON 列」双轨与 `PaginatedResponse` 分页协议。
@@ -18,7 +18,7 @@
 | 3 | 前端仅消费 `UnifiedPost`（SPA-first + 静态壳，clientLoader） | 继承本项目 ADR-010：首屏静态壳 + 骨架，SEO 由 meta() 覆盖 |
 | 4 | keyset 游标分页（`createdAt` 游标）+ offset 分页器并存 | 深翻页不退化 + 可分享定位（项目 4B 已转正的协议） |
 | 5 | 结构化列 + jsonData JSON 列双轨存储 | 查询效率与渲染灵活性兼得，避免 EAV |
-| 6 | URL 是唯一真值来源：前端只改 URL 不调 API | 书签/分享/刷新还原状态 |
+| 6 | URL 决定页面状态：前端只改 URL 不调 API | 书签/分享/刷新还原状态 |
 | 7 | 媒体图统一走前端代理组件 | 多平台 CDN 的 CORS/CORP 拦截（本项目已踩坑） |
 
 ---

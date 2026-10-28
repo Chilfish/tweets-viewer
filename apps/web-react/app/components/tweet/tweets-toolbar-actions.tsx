@@ -76,7 +76,7 @@ export function TweetsToolbarActions({ className, hideComments = false, hideDate
             className={cn(noReplies && 'text-primary bg-primary/10 hover:bg-primary/20 hover:text-primary')}
           >
             <MessageSquareOff className="size-4" />
-            <span className="hidden sm:inline text-xs font-medium">不看评论</span>
+            <span className="hidden sm:inline text-xs font-medium">排除回复</span>
           </Button>
         )
       }

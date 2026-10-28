@@ -54,19 +54,19 @@ export function buildLlmsTxt(): string {
 
   return `# Tweets Viewer
 
-> Tweets Viewer 是一个「推文归档阅读器」：数据来自离线归档（PostgreSQL），前端提供沉浸式无限滚动 + 精确分页的阅读体验。纯只读、无社交交互。
+> Tweets Viewer 用来读离线的推文归档。数据存在 PostgreSQL 里，前端可以一直往下滚，也可以按页跳。只能看，不能发推、点赞或关注。
 
 - 数据源：Twitter/X 归档与 Instagram 归档，经抓取脚本入库后供检索与阅读
 - 纯只读：不提供发推、点赞、关注等任何写入功能
-- 前端：React Router v8（SPA-first + 静态壳，clientLoader + URL 驱动状态），URL 是视图状态的唯一来源
+- 前端：React Router v8（SPA-first + 静态壳，clientLoader + URL 驱动状态），URL 决定页面状态
 - 后端：Hono v4 + Drizzle ORM + Neon Postgres（Serverless），部署于 Cloudflare Workers；前端部署于 Vercel
 - 分页协议：响应统一为 data + meta（total / page / pageSize / hasMore / nextCursor）；无限滚动用 cursor（keyset）续载，分页器跳页用 page
 
 ## Pages
 
 - [/](/): 首页 — Hero + 归档用户入口 + 那年今日入口 + 功能介绍
-- [/tweets/{name}](/tweets/${EXAMPLE_USER}): 主时间线 — 全量推文流，支持排序 / 日期范围 / 排除回复 / 无限滚动 + 分页器
-- [/media/{name}](/media/${EXAMPLE_USER}): 媒体墙 — 仅图片 / 视频网格
+- [/tweets/{name}](/tweets/${EXAMPLE_USER}): 主时间线 — 全部推文，支持排序 / 日期范围 / 排除回复 / 无限滚动 + 翻页
+- [/media/{name}](/media/${EXAMPLE_USER}): 图片和视频 — 图片 / 视频网格
 - [/search](/search): 全库搜索 — 跨用户关键词检索（/search/{name} 限定单个用户）
 - [/memo](/memo): 那年今日 — 按月日回顾历史同天推文（/memo/{name} 限定单个用户，按年分组）
 - [/ins/{name}](/ins/${EXAMPLE_USER}): Instagram — 浏览归档用户的 IG 帖子
@@ -80,18 +80,18 @@ ${apiBullets}
 - [OpenAPI 3.1 规范](${OPENAPI_URL}): 后端全部接口的机器可读定义（路径 / 参数 / 响应 schema）；可交互文档 UI 见 ${apiUrl}/scalar
 - [/sitemap.xml](/sitemap.xml): XML 站点地图（首页 + 全局视图 + 各归档用户的时间线 / 媒体页）
 - [/robots.txt](/robots.txt): 爬虫规则
-- [API 文档](${DOCS_BASE}/docs/API_DOCUMENTATION.md): 后端 REST 接口完整契约（PaginatedResponse / keyset 游标 / 错误码）
+- [API 文档](${DOCS_BASE}/docs/API_DOCUMENTATION.md): 后端 REST 接口完整说明（PaginatedResponse / keyset 游标 / 错误码）
 
 ## Documentation
 
 - [README](${DOCS_BASE}/README.md): 项目介绍、技术栈、快速开始与常用命令
-- [文档索引](${DOCS_BASE}/docs/INDEX.md): 项目文档唯一入口（规格 / 架构 / API / 需求 / 规划 / 工程规范 / 尸检报告）
-- [功能规格](${DOCS_BASE}/docs/Specification.md): 前端逻辑行为与 URL 路由协议的事实来源
-- [架构总览](${DOCS_BASE}/docs/ARCHITECTURE.md): Monorepo 结构、数据流与部署拓扑
+- [文档索引](${DOCS_BASE}/docs/INDEX.md): 项目文档索引（规格 / 架构 / API / 需求 / 规划 / 工程规范 / 复盘记录）
+- [功能规格](${DOCS_BASE}/docs/Specification.md): 前端逻辑行为与 URL 路由协议以此为准
+- [架构总览](${DOCS_BASE}/docs/ARCHITECTURE.md): Monorepo 结构、数据流与部署结构
 
 ## Optional
 
-- [贡献指南](${DOCS_BASE}/CONTRIBUTING.md): 分支模型、提交规范与门禁要求
+- [贡献指南](${DOCS_BASE}/CONTRIBUTING.md): 分支模型、提交规范与检查要求
 - [变更日志](${DOCS_BASE}/CHANGELOG.md): 版本变更记录
 `
 }

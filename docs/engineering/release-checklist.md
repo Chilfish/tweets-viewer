@@ -7,9 +7,9 @@
 
 - 版本号单源在根 `package.json` 的 `version` 字段；发布时同步 `CHANGELOG.md`，不要在多处手写副本
 - 发版走 `docs/engineering/git-workflow.md`：CHANGELOG 更新 → 版本号 → PR → tag → GitHub Release
-- tag 只打在门禁绿的 commit 上；版本号严格递增，禁止回退
+- tag 只打在检查通过的 commit 上；版本号严格递增，禁止回退
 
-## 本地门禁（push 前）
+## 本地检查（push 前）
 
 - [ ] `bun run lint:check` 通过（无 error/warning）
 - [ ] `bun run typecheck` 通过
@@ -22,7 +22,7 @@
 
 ## 性能预算（4D-2，"性能是功能"）
 
-以 Lighthouse（移动端模拟，`/tweets/:name` 与首页）为准，**预算即门槛**，超预算视为发布阻塞：
+以 Lighthouse（移动端模拟，`/tweets/:name` 与首页）为准，**预算就是硬指标**，超出即视为发布阻塞：
 
 | 指标 | 预算 | 说明 |
 | --- | --- | --- |
@@ -63,4 +63,4 @@
 
 - 前端部署由 Vercel 自动触发（push main），API 部署显式 `bun run deploy`
 - 数据无破坏性变更；若改 schema，需先迁移（Drizzle）
-- 发版前本地门禁全绿（见上），禁止 `--no-verify` 绕过
+- 发版前本地检查全部通过（见上），禁止 `--no-verify` 绕过

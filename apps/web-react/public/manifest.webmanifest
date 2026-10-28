@@ -1,7 +1,7 @@
 {
-  "name": "Tweets Viewer — 完整人生归档",
-  "short_name": "推文存档",
-  "description": "把一个人的完整网络人生归档，随时翻阅——推文、照片与每年今日的回忆。",
+  "name": "Tweets Viewer — 推文归档",
+  "short_name": "推文归档",
+  "description": "离线归档的推文阅读器。按时间线翻阅、按关键词搜索，也能回看往年今天的内容。",
   "lang": "zh-CN",
   "start_url": "/",
   "scope": "/",

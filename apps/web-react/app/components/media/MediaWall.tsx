@@ -144,7 +144,7 @@ export function MediaWall({ items, isLoading, isEmpty }: MediaWallProps) {
         <div className="bg-accent/50 p-6 rounded-full mb-4">
           <VideoIcon className="size-8 opacity-50" />
         </div>
-        <p className="text-sm">本页没有发现媒体内容</p>
+        <p className="text-sm">这里还没有图片或视频</p>
       </div>
     )
   }

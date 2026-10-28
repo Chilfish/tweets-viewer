@@ -1,6 +1,6 @@
-# 尸检报告索引（Postmortems）
+# 复盘记录索引（Postmortems）
 
-> **开写任何代码前，先读本页。** 本仓库历史踩坑全部沉淀于此，对照「高频雷区」自查后再动工，避免重复返工。
+> **写代码前先看这页。** 这里记着以前踩过的坑，对照「常见坑」自查，避免重复返工。
 >
 > 原则：**blameless** —— 不追究"谁写错了"，只追"什么系统条件允许它发生"，然后修系统和流程。
 
@@ -8,14 +8,14 @@
 
 | 编号 | 主题 | 根因归类 | 一句话教训 | 状态 |
 |---|---|---|---|---|
-| [001](001-windows-symlink-mode-sticky.md) | Windows 下符号链接改普通文件后 index mode 残留 symlink | 工具反馈滞后 | symlink→file 迁移必须 `git rm --cached` + `git add` 刷新 mode，提交后核对 `git ls-files -s` | 已沉淀 |
-| [002](002-vitest-component-test-infra.md) | Storybook addon-vitest 接入吞掉 test.include + Vitest 4 projects 配置踩坑 | 工具反馈滞后 | 会接管 include 的测试插件必须用 vitest projects 拆分，跑完核对 Test Files 数量防静默吞测试 | 已沉淀 |
-| [003](003-view-transition-persistent-chrome-morph.md) | View Transitions 的 `view-transition-name` 误用在持久 chrome 元素上 → morph 漂移；灯箱滚动锁 + `transition-all` 布局跳动 | API 契约未核实 | `view-transition-name` 是共享元素过渡（缩略图↔大图），持久元素打 name 会 morph 内容变形；modal 滚动锁不手动加 | 已沉淀 |
-| [004](004-bun-cwd-run-false-green.md) | `bun --cwd X run <script>` 无效语法打 usage 且 exit 0 → CI 步骤假绿空转（VRT 门禁失效两轮） | 工具反馈滞后 | workflow 调 bun 脚本只用隐式 `bun --cwd X <script>` 或 `working-directory:` + `bun run`；CI 的绿必须在日志里看到真实产物，不能只信退出码 | 已沉淀 |
-| [005](005-host-node-env-leak.md) | 宿主 `NODE_ENV=production` 泄漏进 Vitest → React 加载 production 构建（`React.act` 缺失），组件测试全红；脚本内联 `NODE_ENV=` 在 Bun shell 下静默无效 | 工具反馈滞后 | 脚本 `NODE_ENV` 一律 `cross-env` 固定；改完用探针确认真实值，不能只看退出码 | 已沉淀 |
-| [006](006-x-403-datacenter-egress.md) | 定时抓取 18 个用户全量 403 —— 真实原因是 X 拒绝数据中心出口 IP；排查中又踩「本机 TUN/fake-ip 污染测量」得出过错误结论 | 工具反馈滞后 + 设计建模 | 外部 API 拒绝时先落错误明细再判断；跨环境链路验证必须在目标环境做；轮换策略要按错误类别分类 | 已沉淀 |
+| [001](001-windows-symlink-mode-sticky.md) | Windows 下符号链接改普通文件后 index mode 残留 symlink | 工具反馈滞后 | symlink→file 迁移必须 `git rm --cached` + `git add` 刷新 mode，提交后核对 `git ls-files -s` | 已记录 |
+| [002](002-vitest-component-test-infra.md) | Storybook addon-vitest 接入吞掉 test.include + Vitest 4 projects 配置踩坑 | 工具反馈滞后 | 会接管 include 的测试插件必须用 vitest projects 拆分，跑完核对 Test Files 数量防静默吞测试 | 已记录 |
+| [003](003-view-transition-persistent-chrome-morph.md) | View Transitions 的 `view-transition-name` 误用在持久 chrome 元素上 → morph 漂移；灯箱滚动锁 + `transition-all` 布局跳动 | API 契约未核实 | `view-transition-name` 是共享元素过渡（缩略图↔大图），持久元素打 name 会 morph 内容变形；modal 滚动锁不手动加 | 已记录 |
+| [004](004-bun-cwd-run-false-green.md) | `bun --cwd X run <script>` 无效语法打 usage 且 exit 0 → CI 步骤假绿空转（VRT 检查失效两轮） | 工具反馈滞后 | workflow 调 bun 脚本只用隐式 `bun --cwd X <script>` 或 `working-directory:` + `bun run`；CI 的绿必须在日志里看到真实产物，不能只信退出码 | 已记录 |
+| [005](005-host-node-env-leak.md) | 宿主 `NODE_ENV=production` 泄漏进 Vitest → React 加载 production 构建（`React.act` 缺失），组件测试全红；脚本内联 `NODE_ENV=` 在 Bun shell 下静默无效 | 工具反馈滞后 | 脚本 `NODE_ENV` 一律 `cross-env` 固定；改完用探针确认真实值，不能只看退出码 | 已记录 |
+| [006](006-x-403-datacenter-egress.md) | 定时抓取 18 个用户全量 403 —— 真实原因是 X 拒绝数据中心出口 IP；排查中又踩「本机 TUN/fake-ip 污染测量」得出过错误结论 | 工具反馈滞后 + 设计建模 | 外部 API 拒绝时先落错误明细再判断；跨环境链路验证必须在目标环境做；轮换策略要按错误类别分类 | 已记录 |
 
-## 高频雷区（写码前自查）
+## 常见坑（写码前自查）
 
 ### 1. 类型与数据
 
@@ -60,6 +60,6 @@
 
 1. 遇到返工/事故 → 先跑 `git log` 定位 commit 与影响，查 `docs/development-log/README.md`
 2. 复制 [TEMPLATE.md](TEMPLATE.md)，编号顺延（`00X-<短横线主题>.md`），补摘要/影响/时间线/根因/行动项
-3. 在本索引表加一行，若属于既有根因归类则在「高频雷区」补规则
+3. 在本索引表加一行，若属于既有根因归类则在「常见坑」补规则
 4. 在 `docs/development-log/README.md` 记录当天事件
-5. 根因是流程级 → 同步更新 `CLAUDE.md` 强制规范或 `docs/engineering/git-workflow.md`
+5. 根因是流程级 → 同步更新 `CLAUDE.md` 的「必须遵守的规则」或 `docs/engineering/git-workflow.md`

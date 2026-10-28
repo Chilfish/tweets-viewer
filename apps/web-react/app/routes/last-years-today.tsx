@@ -80,9 +80,9 @@ function RitualHeader({ totalCount, isGlobal }: { totalCount: number, isGlobal: 
       </h1>
       <p className="mt-1.5 text-sm text-muted-foreground">
         {isGlobal ? '所有归档用户' : ''}
-        往年今日，共
+        往年今天，共
         <span className="mx-1 font-semibold text-foreground">{totalCount}</span>
-        条回忆
+        条推文
       </p>
       <div className="mt-5 h-px w-12 bg-border/70" />
     </div>
@@ -138,7 +138,7 @@ export default function LastYearsTodayPage({ loaderData, params }: Route.Compone
       return (
         <div className="py-12 text-center flex flex-col gap-2 items-center justify-center text-muted-foreground">
           <History className="size-12 opacity-20" />
-          <p>往年今天还没有留下回忆</p>
+          <p>往年今天还没有推文</p>
         </div>
       )
     }
@@ -168,7 +168,7 @@ export default function LastYearsTodayPage({ loaderData, params }: Route.Compone
           status={status}
           hasItems={items.length > 0}
           onRetry={retry}
-          tailText="已加载全部回忆"
+          tailText="已加载全部推文"
         />
 
         <InfiniteScrollTrigger

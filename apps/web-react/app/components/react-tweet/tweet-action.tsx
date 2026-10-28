@@ -26,7 +26,7 @@ export function TweetAction({ tweet, className }: TweetActionProps) {
     {
       icon: Repeat2,
       count: tweet.retweet_count ?? 0,
-      label: '转发',
+      label: '转推',
       hoverColor: 'hover:text-green-500',
       hoverBg: 'hover:bg-green-500/10',
     },

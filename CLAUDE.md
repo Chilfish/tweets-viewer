@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-Tweets Viewer — 推文归档阅读器：数据来自离线归档（PostgreSQL），前端提供沉浸式无限滚动 + 精确分页的阅读体验。纯只读、无社交交互。
+Tweets Viewer 用来读离线的推文归档。数据存在 PostgreSQL 里，前端可以一直往下滚，也可以按页跳。只能看，不能发推、点赞或关注。
 
 ## Project Context
 
@@ -30,12 +30,12 @@ bun dev:client       # 仅前端 (http://localhost:9080)
 bun run build:client # 前端构建（Vercel 部署前）
 bun run deploy       # API 部署到 Cloudflare Workers
 
-# 质量门禁（pre-push 同款，提交前本地先过）
+# 提交前检查（pre-push 同款）
 bun run lint         # ESLint --fix
-bun run lint:check   # ESLint --max-warnings=0（门禁用，不改文件）
+bun run lint:check   # ESLint --max-warnings=0（提交前检查用，不改文件）
 bun run typecheck    # react-router typegen + tsc（web-react）
 bun run test         # 全包 Vitest（rettiwt-api + shared + database + server + web-react）
-bun run test:visual  # VRT 视觉回归（本地 win32 基线不进门禁，见下）
+bun run test:visual  # VRT 视觉回归（本地 win32 基线不进检查，见下）
 
 # 单包测试（调试时）
 bun --cwd packages/shared test
@@ -75,7 +75,7 @@ Twitter API → apps/scripts（抓取） → Neon PostgreSQL → apps/server（H
 1. **URL 驱动状态**：分页/筛选/排序全部在 URL query params 中，前端不直接调 API，只修改 URL；React Router loader 监听 URL 变化自动请求
 2. **服务端驱动分页**：`PaginatedResponse<T>` 的 `meta.hasMore` 控制无限滚动；滚动续载走 keyset 游标（`meta.nextCursor`），分页器跳页走 offset `page`
 3. **PostgreSQL JSON 列**：`tweets.jsonData` / `users.jsonData` / `ins_posts.jsonData` 存完整 `EnrichedTweet` / `EnrichedUser` / `IGPost`，结构化列（`tweetId` / `fullText` / `createdAt`）辅助查询
-4. **双层缓存**：服务端 `SimpleLRUCache`（推文计数）+ 客户端 `axios-cache-interceptor`（API 响应）
+4. **两层缓存**：服务端 `SimpleLRUCache`（推文计数）+ 客户端 `axios-cache-interceptor`（API 响应）
 5. **SPA-first + 静态壳**：全路由 `clientLoader` + HydrateFallback 骨架屏，动态内容客户端渲染（ADR-010，不承诺首屏 SSR 内容）
 
 ### 数据库 Schema（`packages/database/schema.ts`）
@@ -112,7 +112,7 @@ ins_posts: id(serial PK), post_id(UQ), username(FK→users.userName), created_at
 | ---------------- | ------------------------------------------ |
 | `/`              | 首页（Hero + 归档用户入口 + 那年今日入口） |
 | `/tweets/:name`  | 主时间线（无限滚动 + 分页器）              |
-| `/media/:name`   | 媒体墙（图片/视频网格）                    |
+| `/media/:name`   | 图片和视频（网格浏览）                     |
 | `/search/:name?` | 搜索视图（`name` 缺省 = 全库）             |
 | `/memo/:name?`   | 那年今日（`name` 缺省 = 全量，按年分组）   |
 | `/ins/:name`     | Instagram 帖子浏览                         |
@@ -142,9 +142,9 @@ ins_posts: id(serial PK), post_id(UQ), username(FK→users.userName), created_at
 
 ## Key Conventions
 
-- **规格驱动（SDD）**：功能行为变更先改 `docs/Specification.md`（事实来源），API 变更同步 `docs/API_DOCUMENTATION.md`，再动代码
-- **URL 是唯一状态源**：组件只改 URL，不手动调 API；筛选/分页全走 query params
-- **纯函数下沉**：分组/分页状态机/日期/媒体 hash 等逻辑放 `app/lib/` 并单测（参考 `app/lib/__tests__/`）
+- **规格驱动**：功能行为变更先改 `docs/Specification.md`（以此为准），API 变更同步 `docs/API_DOCUMENTATION.md`，再动代码
+- **URL 决定页面状态**：组件只改 URL，不手动调 API；筛选/分页全走 query params
+- **纯逻辑放 `app/lib/`**：分组/分页状态机/日期/媒体 hash 等逻辑放这里并单测（参考 `app/lib/__tests__/`）
 - **组件优先复用**：`~/components/ui/` 下的 Base UI/COSS 组件，不手写 div 模拟
 - **导入路径**：用 `~/` 前缀，不用 `@/`
 - **样式**：Tailwind v4 语义 token（`bg-background` / `text-muted-foreground` 等），禁止硬编码颜色；`cn()` 合并类名；全组件兼容 `.dark`
@@ -152,31 +152,31 @@ ins_posts: id(serial PK), post_id(UQ), username(FK→users.userName), created_at
 - **类型安全**：`catch` 用 `unknown` + `instanceof Error`，禁用 `catch (error: any)`
 - **IG→twitter 映射**：`ins_posts.username` 存 twitter userName，导入前确认 `mapping.ts` 存在映射
 
-### 🔴 强制规范（必须遵循）
+### 必须遵守的规则
 
-1. **先写 commit message 再写代码**（详见 `docs/engineering/git-workflow.md#commit-纪律`）。每个 commit 是单一关注点的原子提交，避免"上帝 commit"；diff >10 文件或 >200 行时必须拆分。
+1. **先写 commit message 再写代码**（详见 `docs/engineering/git-workflow.md#commit-纪律`）。每个 commit 只做一件事，避免一次改太多文件；diff >10 文件或 >200 行时必须拆分。
 
-2. **文档先行（docs-first）**：每个任务第一步先更新相关文档（开发日志 `docs/development-log/README.md`、任务状态 `docs/planning/backlog.md`、方案文档），再开始写代码；实施中随实际反馈同步修改文档，而非事后补记。阶段完成的规划文档 `git mv` 进 `docs/archive/`——**历史记录，不主动读取**。
+2. **文档先行**：每个任务第一步先更新相关文档（开发日志 `docs/development-log/README.md`、任务状态 `docs/planning/backlog.md`、方案文档），再开始写代码；实施中随实际反馈同步修改文档，不要等做完再补。阶段完成的规划文档 `git mv` 进 `docs/archive/`，历史记录不用主动读。
 
-3. **规格驱动（SDD）**：功能行为变更必须先更新 `docs/Specification.md`（事实来源），API 变更同步 `docs/API_DOCUMENTATION.md`；架构级决策记录到 `docs/planning/architecture.md`（ADR）。
+3. **规格驱动**：功能行为变更必须先更新 `docs/Specification.md`（以此为准），API 变更同步 `docs/API_DOCUMENTATION.md`；架构级决策记录到 `docs/planning/architecture.md`（ADR）。
 
-4. **开写代码前先读尸检报告**（`docs/postmortem/README.md`）：本仓库历史踩坑沉淀于此，写码/重构前对照「高频雷区」自查。遇到新的返工/事故按 `docs/postmortem/TEMPLATE.md` 沉淀一条 postmortem。
+4. **写代码前先看复盘记录**（`docs/postmortem/README.md`）：这里记着以前踩过的坑，写码/重构前对照「常见坑」自查。遇到新的返工或事故，按 `docs/postmortem/TEMPLATE.md` 记一条。
 
-5. **测试先行 + 门禁全绿**：新增纯函数 / 查询模块先写 Vitest 测试再实现；`NODE_ENV` 一律走 `cross-env` 固定，禁止依赖宿主环境（见 postmortem 005）。**每次 commit 前本地跑 `bun run lint:check && bun run typecheck && bun run test`**，pre-push 门禁另跑 `bun run build:client`；**禁止 `--no-verify` 绕过**，不要等钩子/CI 才发现违规。
+5. **先写测试，检查全部通过再提交**：新增纯函数 / 查询模块先写 Vitest 测试再实现；`NODE_ENV` 一律走 `cross-env` 固定，禁止依赖宿主环境（见 postmortem 005）。**每次 commit 前本地跑 `bun run lint:check && bun run typecheck && bun run test`**，pre-push 检查另跑 `bun run build:client`；**禁止 `--no-verify` 绕过**，不要等钩子/CI 才发现违规。
 
 6. **只读性**：系统不提供任何写入功能（发推/点赞/关注），数据全部来自离线归档。
 
 ## Current State
 
-**Phase 1~4 全部完成**：基础阅读器 → IG 归档整合 → 体验打磨与数据补全 → 地基/架构一致/产品纵深（pg_trgm 全文索引、keyset 分页转正、统一分页流 hook、SSR 诚实化、时间导航、全局搜索、PWA）。
+**Phase 1~4 全部完成**：基础阅读器 → IG 归档整合 → 体验打磨与数据补全 → 架构统一与功能补齐（pg_trgm 全文索引、keyset 分页、统一分页流 hook、不做首屏 SSR、时间导航、全局搜索、PWA）。
 
-**Phase 5 — UI/UX 打磨（Apple 原生感 × 状态/路由切换流畅感）**：✅ 已完成（token 去重、View Transitions 文档级过渡、列表四态统一 `FeedStatus`、按压反馈、触控目标 ≥44px、日期分隔线、媒体 blur-up + 灯箱手势等）。
+**Phase 5 — UI/UX 打磨（Apple 原生感 × 状态/路由切换流畅感）**：已完成（token 去重、View Transitions 文档级过渡、列表四态统一 `FeedStatus`、按压反馈、触控目标 ≥44px、日期分隔线、媒体 blur-up + 灯箱手势等）。
 
-**Phase 6 — 测试纵深 / 数据洞察 / 阅读新体验**：❌ 已废弃（2026-09-08 定调不做了）。
+**Phase 6 — 测试补强 / 数据洞察 / 阅读新体验**：已废弃（2026-09-08 定调不做了）。
 
 **近期增量**：全量"那年今日"`/memo`（无用户模式，按年分组 + 组内时间平铺，排除转推）；推文分享按钮改为「净化后的链接 + Web Share API」（右键/修饰键保留原生链接行为）。
 
-**2026-09-13 — 工程规范对标**：文档体系与门禁对齐参考项目——`docs/INDEX.md` 唯一入口、工程规范（code-style / git-workflow / release-checklist）、`docs/reviews`、`docs/planning/backlog.md`、SECURITY / CODE_OF_CONDUCT、PR 模板；约束层补齐 `cross-env` NODE_ENV 固定、`bun run test`/`typecheck` 聚合脚本、pre-push 真实门禁（lint + typecheck + test + build）。
+**2026-09-13 — 工程规范对标**：文档体系和检查流程照参考项目补齐——`docs/INDEX.md` 作为文档索引、工程规范（code-style / git-workflow / release-checklist）、`docs/reviews`、`docs/planning/backlog.md`、SECURITY / CODE_OF_CONDUCT、PR 模板；约束层补齐 `cross-env` NODE_ENV 固定、`bun run test`/`typecheck` 聚合脚本、pre-push 跑真实检查（lint + typecheck + test + build）。
 
 ## GitHub CLI Flow
 
@@ -190,18 +190,18 @@ gh pr merge <N> --merge --delete-branch               # Create a Merge Commit
 ## Git Hooks（`lefthook.yml`）
 
 - `pre-commit`：ESLint autofix（staged files，`stage_fixed`）
-- `pre-push`：真实门禁 — `lint:check + typecheck + test + build:client`，全绿才放行
+- `pre-push`：真实检查 — `lint:check + typecheck + test + build:client`，全部通过才放行
 
 ## 文档索引
 
 完整文档体系见 [docs/INDEX.md](docs/INDEX.md)：
 
-- 核心规格（`docs/` 根）— `Specification.md`（事实来源）/ `ARCHITECTURE.md` / `API_DOCUMENTATION.md`
+- 核心规格（`docs/` 根）— `Specification.md`（以此为准）/ `ARCHITECTURE.md` / `API_DOCUMENTATION.md`
 - 需求（`docs/requirements/`）— PRD / 用户故事 / 术语表
 - 规划（`docs/planning/`）— ADR / backlog / roadmap
 - 工程规范（`docs/engineering/`）— code-style / git-workflow / release-checklist
 - UI 设计（`docs/ui-design/`）— 设计系统总览 + 组件规范
 - 开发日志（`docs/development-log/`）— 按天记录
-- 尸检报告（`docs/postmortem/`）— 踩坑沉淀，开写代码前必读
+- 复盘记录（`docs/postmortem/`）— 以前踩过的坑，写代码前必读
 - 代码审查（`docs/reviews/`）— review-YYYY-MM-DD-<主题>
 - 存档（`docs/archive/`）— 历史记录，不主动读取

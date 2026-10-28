@@ -113,8 +113,8 @@ export default function InsPage({ loaderData, params }: Route.ComponentProps) {
           hasItems={false}
           onRetry={() => revalidator.revalidate()}
           emptyIcon={<Inbox className="size-8 text-muted-foreground/60" aria-hidden="true" />}
-          emptyTitle="暂无 Instagram 归档"
-          emptyDescription={`@${params.name} 的 Instagram 数据未归档`}
+          emptyTitle="还没有 Instagram 归档"
+          emptyDescription={`@${params.name} 还没有关联 Instagram`}
         />
       </div>
     )
@@ -150,7 +150,7 @@ export default function InsPage({ loaderData, params }: Route.ComponentProps) {
           status={status}
           hasItems={items.length > 0}
           onRetry={retry}
-          emptyTitle="暂无帖子"
+          emptyTitle="还没有帖子"
           emptyDescription={`@${params.name} 还没有归档帖子`}
           tailText="已加载全部帖子"
         />

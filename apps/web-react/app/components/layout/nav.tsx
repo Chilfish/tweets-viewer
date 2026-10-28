@@ -15,7 +15,7 @@ export function useNavItems(currentUser?: string): NavItem[] {
 
   return [
     {
-      label: '主页',
+      label: '首页',
       icon: Home,
       href: currentUser ? `/tweets/${currentUser}` : '/',
       isActive: currentUser

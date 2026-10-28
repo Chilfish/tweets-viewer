@@ -139,7 +139,7 @@ export function ProfileHeader({ user, children }: ProfileHeaderProps) {
           </div>
           <div className="hover:underline cursor-pointer flex gap-1 decoration-foreground">
             <span className="font-bold text-foreground">{(user.statusesCount ?? 0).toLocaleString()}</span>
-            <span className="text-muted-foreground">帖子</span>
+            <span className="text-muted-foreground">推文</span>
           </div>
         </div>
       </div>

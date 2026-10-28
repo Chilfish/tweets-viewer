@@ -57,7 +57,7 @@ Scope 使用模块名或功能名：
 
 ### Commit 纪律
 
-> **先想 commit message，再动工写代码。** 避免"上帝 commit"（一个超大 commit 包含所有变更）。
+> **先想 commit message，再动工写代码。** 不要把所有变更塞进一个超大 commit。
 
 工作流程：
 1. **写代码前**，先用 Conventional Commit 格式确定 commit message（如 `feat(web): add date range filter`）
@@ -78,11 +78,11 @@ git commit -m "fix(server): accept date-only values for the date range"
 git commit -m "docs: sync architecture and API docs with date range"
 ```
 
-## 验证门禁
+## 提交前检查
 
-> **「看起来绿」不算绿**——改坏被测行为时门禁必须变红，否则等于没测。
+> **「看起来绿」不算绿**：改坏被测行为时，检查必须失败，否则等于没测。
 
-### 提交前本地门禁（= pre-push 同款）
+### 提交前本地检查（= pre-push 同款）
 
 ```bash
 bun run lint:check   # ESLint --max-warnings=0
@@ -91,7 +91,7 @@ bun run test         # 全包 Vitest（rettiwt-api + shared + database + server 
 bun run build:client # 前端生产构建
 ```
 
-- **禁止 `--no-verify`**：门禁红就修门禁，不要绕过
+- **禁止 `--no-verify`**：检查失败就修，不要绕过
 - 新功能/新纯函数先写测试再实现；断言必须能在「改坏行为」时失败，禁止静态源码字符串扫描冒充行为断言
 - `NODE_ENV` 一律经 `cross-env` 固定，不依赖宿主环境（见 [postmortem 005](../postmortem/005-host-node-env-leak.md)）
 - 新增测试后核对 `Test Files` 数量，防测试被静默吞掉（见 [postmortem 002](../postmortem/002-vitest-component-test-infra.md)）
@@ -177,6 +177,6 @@ gh pr merge 1 --merge --delete-branch   # Create a Merge Commit
 `lefthook.yml` 由 `bun install` 时自动安装（postinstall）。
 
 - `pre-commit`：ESLint autofix（staged files）
-- `pre-push`：真实 gate — `lint:check + typecheck + test + build:client`
+- `pre-push`：真实检查 — `lint:check + typecheck + test + build:client`
 
 手动运行：`bunx lefthook run pre-push`

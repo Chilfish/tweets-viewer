@@ -23,8 +23,8 @@
 - **日期**: 2026-06
 - **决策**: 分页/筛选/排序全部在 URL query params 中，前端不直接调 API，只修改 URL
 - **背景**: 需要支持书签/分享，且筛选状态需在前后端保持一致
-- **理由**: URL 是唯一真值来源 (Source of Truth)；React Router loader 监听 URL 变化自动请求
-- **后果**: 状态同步协议 = 初始化(Hydration) → 序列化(Serialization) → 响应式(Reactivity)
+- **理由**: URL 决定页面状态；React Router loader 监听 URL 变化自动请求
+- **后果**: URL 变化后由 loader 重新取数：初始化 → 修改 URL → 自动请求
 
 ## ADR-004: 服务端驱动分页
 
@@ -32,14 +32,14 @@
 - **决策**: `PaginatedResponse<T>` 包含 `meta.hasMore`，前端据此控制无限滚动
 - **背景**: 客户端猜测"是否还有更多"会出错，需服务端元数据驱动
 - **理由**: `meta: { total, page, pageSize, hasMore, nextCursor }` 精确控制列表末尾行为
-- **后果**: 无限滚动 + 分页器混合导航，两者互不冲突
+- **后果**: 无限滚动 + 按页跳，两者互不冲突
 
-## ADR-005: 双层缓存
+## ADR-005: 两层缓存
 
 - **日期**: 2026-06
 - **决策**: 服务端 `SimpleLRUCache`（推文计数，容量 1000）+ 客户端 `axios-cache-interceptor`（API 响应）
 - **背景**: 归档数据静态不变，重复请求浪费资源
-- **理由**: 服务端缓存热点计数，客户端缓存完整响应，双层降低延迟
+- **理由**: 服务端缓存热点计数，客户端缓存完整响应，两层降低延迟
 - **后果**: 数据变更后缓存可能短暂失效；scripts 入库脚本不受影响（直接写库）
 
 ## ADR-006: SSR + SPA 混合
@@ -79,7 +79,7 @@
   原"不写 URL"见 Specification §4.2 与 development-log/2026-09-04.md）；分页器跳页仍走 offset；
   `ins_posts` 量级小，保持 offset 不引入 keyset（见 `modules/ins.ts` 注释）
 
-## ADR-010: SSR 诚实化（SPA-first + 静态壳）
+## ADR-010: 不做首屏 SSR（SPA-first + 静态壳）
 
 - **日期**: 2026-08-13
 - **决策**: 保持全路由 `clientLoader`（SPA-first），不再宣称"首屏 SSR 渲染内容"
@@ -99,4 +99,4 @@
 | 后端 | Hono v4, Drizzle ORM, Neon Postgres (Serverless), Nitro v3 |
 | 部署 | Vercel (前端) + Cloudflare Workers (API) |
 | 测试 | Vitest（unit / stories / vrt 三 project，按包独立运行） |
-| 质量 | ESLint (@antfu/eslint-config), lefthook (pre-commit autofix + pre-push 门禁) |
+| 质量 | ESLint (@antfu/eslint-config), lefthook (pre-commit autofix + pre-push 检查) |

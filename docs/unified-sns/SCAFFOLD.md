@@ -116,7 +116,7 @@ unified-sns/
 1. **文档先行**：改动规格 → 先改 docs/；新功能 → 开发日志（`docs/development-log/YYYY-MM-DD.md`）。
 2. **先写 commit message 再写代码**，原子提交，diff >10 文件或 >200 行必须拆分。
 3. **测试先行**：清洗适配器 / 分页纯函数 / store 必带 Vitest。
-4. **读尸检报告**：新项目开写前把本项目 `docs/postmortem/README.md` 通读一遍，坑已迁移到 §4 表。
+4. **读复盘记录**：新项目开写前把本项目 `docs/postmortem/README.md` 通读一遍，坑已迁移到 §4 表。
 5. **SDD**：功能行为变更先改 `docs/Specification.md`（新项目建立自己的规格文档，DATA-MODEL/UI-DESIGN/API 即规格）。
 
 ---

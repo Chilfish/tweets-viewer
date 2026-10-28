@@ -91,7 +91,7 @@ export function UserSelector() {
           <>
             <DropdownMenuSeparator />
             <div className="p-2 text-sm text-muted-foreground text-center">
-              无归档用户
+              还没有归档用户
             </div>
           </>
         )}

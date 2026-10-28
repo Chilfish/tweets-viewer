@@ -4,7 +4,7 @@
 
 ## TypeScript 代码风格
 
-本项目遵循 [@antfu/eslint-config](https://github.com/antfu/eslint-config)（ESLint + fix 自动修复），配合 TypeScript strict 模式。`bun run lint` 触发 autofix，`bun run lint:check` 为门禁（不改文件）。
+本项目遵循 [@antfu/eslint-config](https://github.com/antfu/eslint-config)（ESLint + fix 自动修复），配合 TypeScript strict 模式。`bun run lint` 触发 autofix，`bun run lint:check` 为提交前检查（不改文件）。
 
 ### 命名约定
 
@@ -31,7 +31,7 @@ export interface Meta { /* ... */ }
 
 // 3. 常量
 
-// 4. 业务函数 / 组件（纯逻辑优先下沉 app/lib/）
+// 4. 业务函数 / 组件（纯逻辑优先放 app/lib/）
 
 // 5. Private helpers
 ```
@@ -44,7 +44,7 @@ export interface Meta { /* ... */ }
 - 导入路径使用 `~/` 前缀，不使用 `@/`
 - 所有颜色使用 CSS 变量 Token，禁止硬编码（详见 `../ui-design/OVERVIEW.md`）
 - 所有组件兼容 `.dark` 模式；移动端交互考虑 `active` 态与 ≥44px 触控目标
-- **纯逻辑下沉**：分组/分页状态机/日期/媒体 hash 等放 `app/lib/` 并单测；组件只做渲染与 URL 修改
+- **纯逻辑放 `app/lib/`**：分组/分页状态机/日期/媒体 hash 等放这里并单测；组件只做渲染与 URL 修改
 
 ### Zustand 约定
 
@@ -89,7 +89,7 @@ try { /* ... */ } catch (error: unknown) {
 | 字符串拼接类名 | `cn()` |
 | `@/` 别名导入 | `~/` 前缀 |
 | 脚本里裸写 `NODE_ENV=...`（Windows 失效） | `cross-env NODE_ENV=...`（见下） |
-| `git push --no-verify` 绕过门禁 | 修好门禁再 push |
+| `git push --no-verify` 绕过检查 | 修好检查再 push |
 
 ## 测试规范
 
@@ -126,6 +126,6 @@ try { /* ... */ } catch (error: unknown) {
 | Hook | 命令 | 说明 |
 | --- | --- | --- |
 | pre-commit | `bun run eslint {staged_files} --fix` | 修复暂存文件，`stage_fixed` |
-| pre-push | `lint:check` → `typecheck` → `test` → `build:client` | 真实门禁，全绿才放行 |
+| pre-push | `lint:check` → `typecheck` → `test` → `build:client` | 真实检查，全部通过才放行 |
 
-**禁止 `--no-verify`** 绕过钩子/CI；门禁红就修门禁。
+**禁止 `--no-verify`** 绕过钩子/CI；检查失败就修。

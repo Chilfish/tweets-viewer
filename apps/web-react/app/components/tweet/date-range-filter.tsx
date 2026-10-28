@@ -198,7 +198,7 @@ export function DateRangeFilter({ start, end, onApply }: DateRangeFilterProps) {
               onClick={() => apply(draft)}
               disabled={!draft?.from && !draft?.to}
             >
-              确认筛选
+              应用
             </Button>
             <Button
               variant="outline"
@@ -243,7 +243,7 @@ export function DateRangeFilter({ start, end, onApply }: DateRangeFilterProps) {
             onClick={() => apply(draft)}
             disabled={!draft?.from && !draft?.to}
           >
-            确认筛选
+            应用
           </Button>
         </div>
       </PopoverContent>

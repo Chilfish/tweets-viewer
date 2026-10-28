@@ -93,7 +93,7 @@ export function HomeUserEntry() {
       {users.length === 0 && (
         <div className="flex flex-col items-center gap-2 py-8 text-center text-muted-foreground">
           <Archive className="size-10 opacity-20" />
-          <p className="text-sm">归档为空，先去抓取数据再回来吧</p>
+          <p className="text-sm">还没有归档任何用户</p>
         </div>
       )}
     </div>

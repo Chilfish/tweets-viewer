@@ -5,7 +5,7 @@ Tweets Viewer 的前端应用（React Router v8，SPA-first + 静态壳）。
 项目级文档与开发说明在仓库根目录：
 
 - [`README.md`](../../README.md)
-- [`docs/INDEX.md`](../../docs/INDEX.md)（文档唯一入口）
+- [`docs/INDEX.md`](../../docs/INDEX.md)（文档索引）
 
 ## 常用命令
 

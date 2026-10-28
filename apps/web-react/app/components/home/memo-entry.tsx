@@ -39,7 +39,7 @@ export function HomeMemoEntry() {
         @
         {memoUser.userName}
         {' '}
-        往年今日留下的回忆
+        往年今天发过的推文
       </p>
 
       <span className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-primary">

@@ -42,7 +42,7 @@ export function FeedStatus({
   emptyIcon,
   emptyTitle = '暂无内容',
   emptyDescription,
-  errorMessage = '网络开小差了，请稍后重试。',
+  errorMessage = '请检查网络后重试。',
   tailText = '已加载全部内容',
   hideEmptyState = false,
   className,
@@ -68,7 +68,7 @@ export function FeedStatus({
         {status === 'fetching' && (
           <div className="flex items-center gap-2 text-muted-foreground">
             <Loader2 className="size-5 animate-spin" aria-hidden="true" />
-            <span className="text-sm font-medium">正在加载更多...</span>
+            <span className="text-sm font-medium">正在加载更多…</span>
           </div>
         )}
 
@@ -76,7 +76,7 @@ export function FeedStatus({
           <div className="flex flex-col items-center gap-2">
             <p className="text-sm text-destructive font-medium">加载失败</p>
             <Button variant="secondary" size="sm" onClick={onRetry}>
-              点击重试
+              重试
             </Button>
           </div>
         )}
@@ -116,7 +116,7 @@ export function FeedStatus({
             {errorMessage}
           </p>
           <Button variant="secondary" className="mt-2" onClick={onRetry}>
-            重新加载
+            重试
           </Button>
         </>
       ) : (

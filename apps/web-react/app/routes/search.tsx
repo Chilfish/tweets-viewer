@@ -25,7 +25,7 @@ export function meta({ location }: Route.MetaArgs) {
   const q = params.get('q')
   return [
     { title: q ? `搜索「${q}」` : '搜索归档' },
-    { name: 'description', content: '在归档中全文检索推文' },
+    { name: 'description', content: '搜索归档里的推文' },
   ]
 }
 
@@ -107,7 +107,7 @@ export default function SearchPage({ loaderData, params }: Route.ComponentProps)
           </div>
           <p className="text-base font-medium">输入关键词开始搜索</p>
           <p className="text-sm text-muted-foreground">
-            {username ? `在 @${username} 的归档中全文检索` : '支持全文检索归档推文'}
+            {username ? `在 @${username} 的归档里搜索` : '搜索全部归档推文'}
           </p>
         </div>
       )

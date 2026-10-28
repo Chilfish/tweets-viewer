@@ -25,8 +25,8 @@ export const handle = {
 export function meta({ params }: Route.MetaArgs) {
   const { name } = params
   return [
-    { title: `@${name} 的媒体` },
-    { name: 'description', content: `查看 @${name} 的媒体墙` },
+    { title: `@${name} 的图片和视频` },
+    { name: 'description', content: `查看 @${name} 的图片和视频` },
   ]
 }
 

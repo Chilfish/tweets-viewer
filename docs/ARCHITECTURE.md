@@ -1,7 +1,5 @@
 # Architecture Overview: Tweets Viewer
 
-> **文档性质**：本文档描述 Tweets Viewer 的整体架构——Monorepo 结构、各子系统职责、数据流向和部署拓扑。
-
 ## 1. 仓库结构 (Monorepo)
 
 ```
@@ -28,7 +26,7 @@ tweets-viewer/
 
 ### 2.1 `apps/web-react` — 前端
 
-- **职责**：推文归档的沉浸式阅读终端（只读）
+- **职责**：推文归档的只读阅读界面
 - **技术栈**：React 19 + React Router v8 (SPA-first + 静态壳，见 ADR-010) + Tailwind CSS v4 + Base UI/COSS
 - **状态管理**：Zustand (全局持久化) + useState (组件局部)；分页/筛选状态在 URL query params
 - **关键路由**（定义于 `app/routes.ts`）：
@@ -36,11 +34,11 @@ tweets-viewer/
   |-----|------|
   | `/` | 首页 (Hero + 功能介绍) |
   | `/tweets/:name` | 主时间线（无限滚动 + 分页器 + 日期/排序筛选） |
-  | `/media/:name` | 媒体墙（图片/视频网格，瀑布流布局） |
+  | `/media/:name` | 图片和视频（网格浏览，瀑布流布局） |
   | `/search/:name?` | 搜索视图（关键词全文检索） |
   | `/memo/:name?` | "那年今日"视图（`name` 缺省时为全量：所有用户的同月同日回忆，按年分组） |
   | `/ins/:name` | Instagram 帖子浏览（无限滚动 + 分页器） |
-- **状态同步协议**：URL 作为唯一真值来源——前端不直接调用 API，只修改 URL；React Router 的 loader 监听 URL 变化后自动发起请求。
+- **状态同步**：URL 决定页面状态。前端不直接调用 API，只修改 URL；React Router 的 loader 监听 URL 变化后自动发起请求。
 - **部署**：Vercel (React Router v8 preset)，域名为 `tweet.chilfish.top`
 
 ### 2.2 `apps/server` — API 服务端
@@ -174,7 +172,7 @@ tweets-viewer/
 
 ---
 
-## 5. 部署拓扑
+## 5. 部署结构
 
 ```
   用户浏览器
@@ -213,6 +211,6 @@ tweets-viewer/
 2. **PostgreSQL JSON 列**：兼顾查询效率（结构化列）和灵活性（完整 JSON），避免 EAV 反模式
 3. **URL 驱动状态**：前后端分页/筛选状态统一由 URL 管理，支持书签和分享
 4. **服务端驱动分页**：`PaginatedResponse.meta.hasMore` 精确控制列表末尾行为
-5. **双层持久化**：Zustand `persist` (localStorage) 缓存用户/设置；axios-cache-interceptor 缓存 API 响应
-6. **SSR 诚实化（SPA-first + 静态壳）**：全路由 `clientLoader`，首屏静态壳 + 骨架屏，动态内容客户端渲染；SEO 由路由 `meta()` 覆盖（见 ADR-010）
-7. **碳基读取 + 离线写入**：前端纯读库/读静态，抓取入库独立运行，互不干扰
+5. **本地持久化 + 接口缓存**：Zustand `persist` (localStorage) 保存用户/设置；axios-cache-interceptor 缓存 API 响应
+6. **不做首屏 SSR（SPA-first + 静态壳）**：全路由 `clientLoader`，首屏静态壳 + 骨架屏，动态内容客户端渲染；SEO 由路由 `meta()` 覆盖（见 ADR-010）
+7. **前端只读**：读取数据库或静态数据；写入由抓取脚本单独完成，两边互不干扰

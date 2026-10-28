@@ -34,7 +34,7 @@ export function Sidebar({ currentUser }: SidebarProps) {
           className="rounded-lg flex-shrink-0"
         />
         <h2 className="text-xl font-bold hidden xl:block">
-          推文存档站
+          推文归档
         </h2>
       </header>
 

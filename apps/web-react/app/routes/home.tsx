@@ -6,10 +6,10 @@ import { HomeUserEntry } from '~/components/home/user-entry'
 
 export function meta() {
   return [
-    { title: `完整人生归档 · Tweets Viewer` },
+    { title: `个人推文归档 · Tweets Viewer` },
     {
       name: 'description',
-      content: `把一个人的完整网络人生归档，随时翻阅——推文、照片与每年今日的回忆，跨越时间线、媒体墙与搜索。`,
+      content: `一位推主的推文、图片和视频归档。可按时间线翻阅、按关键词搜索，也能回看往年今天的内容。`,
     },
   ]
 }

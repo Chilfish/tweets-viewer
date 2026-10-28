@@ -1,5 +1,5 @@
 import type { ElementType } from 'react'
-import { Calendar, Search, Sparkles, Users } from 'lucide-react'
+import { Calendar, Infinity, Search, Users } from 'lucide-react'
 
 interface FeatureProps {
   icon: ElementType
@@ -25,23 +25,23 @@ export function HomeFeatures() {
   const features = [
     {
       icon: Users,
-      title: '多账号快速切换',
-      description: '无缝管理多个推主的归档数据，支持在不同用户间即时跳转。',
+      title: '多个归档用户',
+      description: '在侧边栏换一个人，时间线、媒体和搜索都会跟着换。',
     },
     {
-      icon: Sparkles,
-      title: '沉浸式阅读界面',
-      description: '采用流式布局与无限滚动，专为长文阅读和图片展示优化。',
+      icon: Infinity,
+      title: '连续阅读',
+      description: '滚到底自动加载下一页；也可以用分页器跳到某一页。',
     },
     {
       icon: Search,
-      title: '高效全文索引',
-      description: '支持按关键字、日期范围精准筛选，在海量存档中快速定位。',
+      title: '搜索和筛选',
+      description: '按关键词搜全部推文，也可以限定日期范围或某个用户。',
     },
     {
       icon: Calendar,
-      title: '历史上的今天',
-      description: '自动索引往年同期的历史推文，帮助你快速回顾社交动态。',
+      title: '那年今日',
+      description: '看看往年今天发过什么，按年份排好。',
     },
   ]
 

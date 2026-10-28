@@ -63,7 +63,7 @@ describe('homeUserEntry', () => {
         <HomeUserEntry />
       </MemoryRouter>,
     )
-    expect(screen.getByText(/归档为空/)).toBeInTheDocument()
+    expect(screen.getByText(/还没有归档任何用户/)).toBeInTheDocument()
   })
 
   it('renders nothing (placeholder) before hydration completes', () => {
