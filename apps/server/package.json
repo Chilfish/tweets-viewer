@@ -13,18 +13,18 @@
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",
-    "@scalar/hono-api-reference": "^0.12.14",
+    "@scalar/hono-api-reference": "^0.12.17",
     "@tweets-viewer/database": "workspace:*",
     "@tweets-viewer/shared": "workspace:*",
     "drizzle-orm": "^0.45.4",
     "hono": "^4.13.14",
     "hono-openapi": "^1.5.0",
-    "nitro": "^3.0.260903-beta"
+    "nitro": "^3.0.261029-rc"
   },
   "devDependencies": {
     "miniflare": "4.20260730.0",
     "vite": "^8.3.5",
     "vitest": "^5.0.5",
-    "wrangler": "^4.154.0"
+    "wrangler": "^4.156.0"
   }
 }

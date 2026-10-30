@@ -39,13 +39,13 @@
     "http-proxy-agent": "^9.1.0",
     "https-proxy-agent": "^9.1.0",
     "neoqs": "^6.13.0",
-    "node-html-parser": "^9.0.5",
+    "node-html-parser": "^9.0.6",
     "socks-proxy-agent": "^10.1.0",
     "x-client-transaction-id": "^0.3.2"
   },
   "devDependencies": {
     "@types/cookiejar": "^2.1.5",
-    "@types/node": "^26.6.5",
+    "@types/node": "^26.6.6",
     "linkedom": "^0.18.14",
     "typescript": "~7.0.2",
     "vitest": "^5.0.5"
