@@ -40,6 +40,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
     >
       <head>
         <meta charSet="utf-8" />
+        {/* 全站不发送 Referer：X/Twitter 图片 CDN 对非白名单 Referer 返回 351（等同 403）防盗链，
+            会导致 pbs.twimg.com / video.twimg.com 的图片、视频、fetch 全部失败 */}
+        <meta name="referrer" content="no-referrer" />
         <link rel="icon" type="image/jpeg" href="/icon.jpg" />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="theme-color" content="#f5f9fb" media="(prefers-color-scheme: light)" />

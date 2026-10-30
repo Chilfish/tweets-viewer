@@ -14,6 +14,7 @@ export function UserDivider({
         <img
           src={avatarUrl}
           alt=""
+          referrerPolicy="no-referrer"
           className="size-5 rounded-full object-cover bg-muted"
           loading="lazy"
         />

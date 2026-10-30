@@ -126,6 +126,7 @@ const MediaImage = forwardRef<HTMLImageElement, MediaImageProps>(
           onError={handleError}
           alt={alt}
           data-status={status}
+          referrerPolicy="no-referrer"
           loading="lazy"
           className={cn(
             'size-full object-cover transition-opacity duration-300',

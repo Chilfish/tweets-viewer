@@ -24,6 +24,7 @@ export const MediaCard = memo(({ item, onClick }: MediaCardProps) => {
       <img
         src={item.url}
         alt="media"
+        referrerPolicy="no-referrer"
         className={cn(
           'w-full h-full object-cover transition-all duration-500',
           isLoaded

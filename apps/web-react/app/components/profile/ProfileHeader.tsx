@@ -34,6 +34,7 @@ export function ProfileHeader({ user, children }: ProfileHeaderProps) {
           <img
             src={user.profileBanner}
             alt={`${user.fullName} 的封面`}
+            referrerPolicy="no-referrer"
             className="w-full h-full object-cover rounded-t"
           />
         ) : (

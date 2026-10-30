@@ -82,6 +82,7 @@ export function TweetMedia({ tweet, quoted, onMediaClick }: Props) {
                     <img
                       src={getMediaUrl(media, 'medium')}
                       alt={media.ext_alt_text || 'Image'}
+                      referrerPolicy="no-referrer"
                       className={cn(
                         'm-0 object-cover object-center w-full h-full',
                         isInlineMedia ? 'relative' : 'absolute inset-0',
