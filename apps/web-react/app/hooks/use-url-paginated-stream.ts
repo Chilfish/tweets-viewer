@@ -49,7 +49,9 @@ export function useUrlPaginatedStream<TPage, TItem extends { id: string } = TPag
     items: extract(pageData),
     status: pageData.meta.hasMore ? 'ready' : 'exhausted',
     total: pageData.meta.total,
-    nextCursor: pageData.meta.nextCursor == null ? undefined : String(pageData.meta.nextCursor),
+    nextCursor: pageData.meta.nextCursor == null
+      ? undefined
+      : String(pageData.meta.nextCursor),
     loadedPages: page,
   }))
 

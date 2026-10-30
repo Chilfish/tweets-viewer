@@ -47,7 +47,10 @@ describe('mapToEnrichedTweet', () => {
 
 describe('extractTweetSortKey', () => {
   it('should fall back to tweetId when no retweet', () => {
-    const row = { tweetId: '1234567890', jsonData: { retweeted_original_id: undefined } }
+    const row = {
+      tweetId: '1234567890',
+      jsonData: { retweeted_original_id: undefined },
+    }
     expect(extractTweetSortKey(row as any)).toBe('1234567890')
   })
 
@@ -62,7 +65,12 @@ describe('extractTweetSortKey', () => {
 
 describe('extractMediaImageUrls', () => {
   it('collects media_url_https from every media entry', () => {
-    const tweet = { media_details: [photo('a.jpg'), photo('b.jpg')] }
+    const tweet = {
+      media_details: [
+        photo('a.jpg'),
+        photo('b.jpg'),
+      ],
+    }
     expect(extractMediaImageUrls(tweet as any)).toEqual(['a.jpg', 'b.jpg'])
   })
 
@@ -72,7 +80,13 @@ describe('extractMediaImageUrls', () => {
 
   it('ignores empty or missing media_url_https', () => {
     const tweet = {
-      media_details: [photo('a.jpg'), { ...photo(''), media_url_https: undefined }],
+      media_details: [
+        photo('a.jpg'),
+        {
+          ...photo(''),
+          media_url_https: undefined,
+        },
+      ],
     }
     expect(extractMediaImageUrls(tweet as any)).toEqual(['a.jpg'])
   })
@@ -80,7 +94,9 @@ describe('extractMediaImageUrls', () => {
   it('returns [] for retweets (media belongs to the original author)', () => {
     const tweet = {
       retweeted_original_id: '111',
-      media_details: [photo('a.jpg')],
+      media_details: [
+        photo('a.jpg'),
+      ],
     }
     expect(extractMediaImageUrls(tweet as any)).toEqual([])
   })

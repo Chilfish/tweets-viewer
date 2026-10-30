@@ -100,8 +100,12 @@ function parseOptionalDateRange(c: Context) {
   const start = c.req.query('start')
   const end = c.req.query('end')
   return {
-    startDate: start ? new Date(start) : undefined,
-    endDate: end ? new Date(end) : undefined,
+    startDate: start
+      ? new Date(start)
+      : undefined,
+    endDate: end
+      ? new Date(end)
+      : undefined,
   }
 }
 
@@ -128,7 +132,10 @@ app.get('/get/:name', describeRoute({
   tags: ['Tweets'],
   summary: '获取用户推文列表',
   description: '按用户 Screen Name 分页获取推文，支持日期范围、排除回复与 keyset 游标续载。',
-  parameters: [nameParameter(), ...tweetQueryParameters],
+  parameters: [
+    nameParameter(),
+    ...tweetQueryParameters,
+  ],
   responses: {
     200: jsonResponse('分页推文列表', 'PaginatedTweets'),
     400: errorResponse,
@@ -139,13 +146,20 @@ app.get('/get/:name', describeRoute({
     return c.json({ error: 'invalid name' }, 400)
 
   const parsed = tweetListQuerySchema.safeParse(c.req.query())
-  if (!parsed.success)
-    return c.json({ error: formatIssues(parsed.error) }, 400)
+  if (!parsed.success) {
+    return c.json({
+      error: formatIssues(parsed.error),
+    }, 400)
+  }
 
   const { page, pageSize, reverse, cursor, start, end, noReplies } = parsed.data
 
-  const startDate = start ? new Date(start) : null
-  const endDate = end ? new Date(end) : null
+  const startDate = start
+    ? new Date(start)
+    : null
+  const endDate = end
+    ? new Date(end)
+    : null
 
   if ((startDate && !endDate) || (!startDate && endDate)) {
     return c.json({ error: 'start and end must both be provided or omitted' }, 400)
@@ -169,7 +183,9 @@ app.get('/get/:name', describeRoute({
     })
   }
   else {
-    const cacheKey = noReplies ? `${name}:no-replies` : name
+    const cacheKey = noReplies
+      ? `${name}:no-replies`
+      : name
     let total = tweetCountCache.get(cacheKey)
 
     if (total === undefined) {
@@ -198,7 +214,11 @@ app.get('/medias/:name', describeRoute({
   tags: ['Tweets'],
   summary: '获取用户媒体推文',
   description: '获取指定用户所有含图片/视频附件的推文（排除转推）。',
-  parameters: [nameParameter(), ...paginationParameters, ...dateParameters],
+  parameters: [
+    nameParameter(),
+    ...paginationParameters,
+    ...dateParameters,
+  ],
   responses: {
     200: jsonResponse('分页媒体推文列表', 'PaginatedTweets'),
     400: errorResponse,
@@ -249,7 +269,9 @@ app.get('/stats/:name', describeRoute({
   tags: ['Tweets'],
   summary: '获取用户推文按年统计',
   description: '归档完整性指示：覆盖年份范围 + 每年条数。',
-  parameters: [nameParameter()],
+  parameters: [
+    nameParameter(),
+  ],
   responses: {
     200: jsonResponse('按年份降序的统计', 'TweetsYearStats'),
     400: errorResponse,
@@ -283,7 +305,12 @@ app.get('/search', describeRoute({
       name: 'name',
       required: false,
       description: '限定用户 Screen Name；缺省为全库检索',
-      schema: { type: 'string', minLength: 1, maxLength: 50, pattern: '^\\w+$' },
+      schema: {
+        type: 'string',
+        minLength: 1,
+        maxLength: 50,
+        pattern: '^\\w+$',
+      },
     },
     ...paginationParameters,
   ],
@@ -294,7 +321,9 @@ app.get('/search', describeRoute({
 }), async (c) => {
   const searchResult = searchSchema.safeParse(c.req.query())
   if (!searchResult.success) {
-    return c.json({ error: formatIssues(searchResult.error) }, 400)
+    return c.json({
+      error: formatIssues(searchResult.error),
+    }, 400)
   }
 
   const { keyword, name } = normalizeSearchParams(searchResult.data)
@@ -321,7 +350,10 @@ app.get('/get/:name/last-years-today', describeRoute({
   tags: ['Tweets'],
   summary: '获取单用户「那年今日」',
   description: '指定用户历史年份同一天的推文（保留转推）。',
-  parameters: [nameParameter(), ...paginationParameters],
+  parameters: [
+    nameParameter(),
+    ...paginationParameters,
+  ],
   responses: {
     200: jsonResponse('分页「那年今日」推文', 'PaginatedTweets'),
     400: errorResponse,

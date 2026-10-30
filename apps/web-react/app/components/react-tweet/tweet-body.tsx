@@ -27,7 +27,9 @@ export function TweetBody({ tweet, lang, className }: TweetBodyProps) {
               return null
             return (
               <TweetLink key={item.index} href={item.href}>
-                {text.length > 36 ? item.display_url : text}
+                {text.length > 36
+                  ? item.display_url
+                  : text}
               </TweetLink>
             )
 

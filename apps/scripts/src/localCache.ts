@@ -76,7 +76,9 @@ class MemoryCacheAdapter implements ICacheAdapter {
         this.cache.delete(oldestKey)
     }
 
-    const expiresAt = ttl ? Date.now() + ttl : null
+    const expiresAt = ttl
+      ? Date.now() + ttl
+      : null
 
     // 存储前序列化再反序列化，确保存入的是快照
     const safeData = JSON.parse(JSON.stringify(value))
@@ -139,7 +141,9 @@ class NodeFsCacheAdapter implements ICacheAdapter {
 
     const filePath = this.path.join(this.dir, `${key}.json`)
     const tempPath = `${filePath}.${Date.now()}-${Math.random().toString(36).slice(2)}.tmp`
-    const expiresAt = ttl ? Date.now() + ttl : null
+    const expiresAt = ttl
+      ? Date.now() + ttl
+      : null
 
     const wrapper: CacheWrapper<T> = {
       data: value,

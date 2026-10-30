@@ -45,7 +45,10 @@ describe('homeUserEntry', () => {
   })
 
   it('renders recent and archived user cards with links', () => {
-    useUserStore.setState({ users: [userA, userB], recentUserNames: ['ttisrn_0710'] })
+    useUserStore.setState({
+      users: [userA, userB],
+      recentUserNames: ['ttisrn_0710'],
+    })
     render(
       <MemoryRouter>
         <HomeUserEntry />
@@ -101,7 +104,9 @@ describe('homeMemoEntry', () => {
   })
 
   it('falls back to the first archived user when no active user', () => {
-    useUserStore.setState({ users: [userB] })
+    useUserStore.setState({
+      users: [userB],
+    })
     render(
       <MemoryRouter>
         <HomeMemoEntry />

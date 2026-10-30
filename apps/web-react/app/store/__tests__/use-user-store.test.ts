@@ -10,7 +10,9 @@ describe('useUserStore', () => {
   })
 
   it('should set users', () => {
-    const users = [{ id: '1', userName: 'alice', fullName: 'Alice' }] as any
+    const users = [
+      { id: '1', userName: 'alice', fullName: 'Alice' },
+    ] as any
     useUserStore.getState().setUsers(users)
     expect(useUserStore.getState().users).toEqual(users)
   })

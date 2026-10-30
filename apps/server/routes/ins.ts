@@ -45,7 +45,12 @@ app.get('/:name', describeRoute({
 
   const [user, posts] = await Promise.all([
     getInsUserByName(db, twitterUsername),
-    getInsPosts({ db, username: twitterUsername, page, pageSize: PAGE_SIZE }),
+    getInsPosts({
+      db,
+      username: twitterUsername,
+      page,
+      pageSize: PAGE_SIZE,
+    }),
   ])
 
   if (!user && posts.data.length === 0) {

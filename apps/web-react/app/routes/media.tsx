@@ -44,7 +44,13 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
 
   try {
     const { data: pageData } = await apiClient.get<PaginatedResponse<EnrichedTweet>>(`/tweets/medias/${name}`, {
-      params: { page, reverse, pageSize: PAGE_SIZE, start, end },
+      params: {
+        page,
+        reverse,
+        pageSize: PAGE_SIZE,
+        start,
+        end,
+      },
     })
     return { pageData }
   }

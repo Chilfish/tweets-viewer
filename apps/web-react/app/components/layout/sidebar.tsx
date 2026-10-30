@@ -18,7 +18,9 @@ export function Sidebar({ currentUser }: SidebarProps) {
   const toggleTheme = () => {
     // 简单的 light/dark 切换，如果当前是 system 则根据实际色板切换或直接切到对面
     // 这里简单处理：system -> dark -> light -> dark ...
-    const nextTheme = theme === 'dark' ? 'light' : 'dark'
+    const nextTheme = theme === 'dark'
+      ? 'light'
+      : 'dark'
     setTheme(nextTheme)
   }
 

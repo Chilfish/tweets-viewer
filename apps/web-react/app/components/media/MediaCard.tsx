@@ -41,7 +41,9 @@ export const MediaCard = memo(({ item, onClick }: MediaCardProps) => {
         <div className="absolute top-2 right-2 bg-black/70 backdrop-blur-md px-2 py-1 rounded-md text-white flex items-center gap-1.5 shadow-lg border border-white/10 group-hover:scale-110 transition-transform">
           <VideoIcon className="size-3.5 fill-white/20" />
           <span className="text-[10px] font-bold tracking-wider">
-            {item.type === 'animated_gif' ? 'GIF' : 'VIDEO'}
+            {item.type === 'animated_gif'
+              ? 'GIF'
+              : 'VIDEO'}
           </span>
         </div>
       )}

@@ -19,7 +19,9 @@ function getSkeletonStyle(media: MediaDetails, itemCount: number) {
     paddingBottom = paddingBottom * 2
 
   return {
-    width: media.type === 'photo' ? undefined : 'unset',
+    width: media.type === 'photo'
+      ? undefined
+      : 'unset',
     paddingBottom: `${paddingBottom}%`,
   }
 }

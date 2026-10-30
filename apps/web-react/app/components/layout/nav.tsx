@@ -17,7 +17,9 @@ export function useNavItems(currentUser?: string): NavItem[] {
     {
       label: '首页',
       icon: Home,
-      href: currentUser ? `/tweets/${currentUser}` : '/',
+      href: currentUser
+        ? `/tweets/${currentUser}`
+        : '/',
       isActive: currentUser
         ? location.pathname === `/tweets/${currentUser}`
         : location.pathname === '/',
@@ -25,7 +27,9 @@ export function useNavItems(currentUser?: string): NavItem[] {
     {
       label: '媒体',
       icon: ImageIcon,
-      href: currentUser ? `/media/${currentUser}` : '/',
+      href: currentUser
+        ? `/media/${currentUser}`
+        : '/',
       isActive: currentUser
         ? location.pathname === `/media/${currentUser}`
         : false,
@@ -34,7 +38,9 @@ export function useNavItems(currentUser?: string): NavItem[] {
     {
       label: 'Instagram',
       icon: InsIcon,
-      href: currentUser ? `/ins/${currentUser}` : '/',
+      href: currentUser
+        ? `/ins/${currentUser}`
+        : '/',
       isActive: currentUser
         ? location.pathname === `/ins/${currentUser}`
         : false,
@@ -44,7 +50,9 @@ export function useNavItems(currentUser?: string): NavItem[] {
     {
       label: '那年今日',
       icon: Calendar,
-      href: currentUser ? `/memo/${currentUser}` : '/memo',
+      href: currentUser
+        ? `/memo/${currentUser}`
+        : '/memo',
       isActive: currentUser
         ? location.pathname === `/memo/${currentUser}`
         : location.pathname === '/memo',
@@ -53,7 +61,9 @@ export function useNavItems(currentUser?: string): NavItem[] {
     {
       label: '搜索',
       icon: Search,
-      href: currentUser ? `/search/${currentUser}` : '/search',
+      href: currentUser
+        ? `/search/${currentUser}`
+        : '/search',
       isActive: currentUser
         ? location.pathname === `/search/${currentUser}`
         : location.pathname.startsWith('/search'),

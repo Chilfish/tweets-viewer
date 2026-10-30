@@ -25,7 +25,9 @@ function parseOptionalName(c: Context): string | undefined | null {
   const raw = c.req.query('name')
   if (!raw)
     return undefined
-  return nameSchema.safeParse(raw).success ? raw : null
+  return nameSchema.safeParse(raw).success
+    ? raw
+    : null
 }
 
 /** 从推文随机选一张图片，构造图片条目 */
@@ -41,7 +43,9 @@ app.get('/get', describeRoute({
   tags: ['Image'],
   summary: '获取随机图片',
   description: '从归档推文中随机选取一张媒体图片（排除转推），可选 `name` 限定用户；返回图片链接与来源推文。',
-  parameters: [optionalNameParameter()],
+  parameters: [
+    optionalNameParameter(),
+  ],
   responses: {
     200: jsonResponse('随机图片条目（图片链接 + 来源推文）', 'ImageEntry'),
     400: errorResponse,
@@ -53,7 +57,9 @@ app.get('/get', describeRoute({
     return c.json({ error: 'invalid name' }, 400)
 
   const tweet = await getRandomMediaImageTweet({ db: c.var.db, name })
-  const entry = tweet ? pickImageEntry(tweet) : null
+  const entry = tweet
+    ? pickImageEntry(tweet)
+    : null
   if (!entry)
     return c.json({ error: 'no image available' }, 404)
 

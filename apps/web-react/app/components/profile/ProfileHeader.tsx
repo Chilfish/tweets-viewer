@@ -30,16 +30,18 @@ export function ProfileHeader({ user, children }: ProfileHeaderProps) {
     >
       {/* Banner */}
       <div className="relative aspect-3/1 w-full bg-muted overflow-hidden">
-        {user.profileBanner ? (
-          <img
-            src={user.profileBanner}
-            alt={`${user.fullName} 的封面`}
-            referrerPolicy="no-referrer"
-            className="w-full h-full object-cover rounded-t"
-          />
-        ) : (
-          <div className="w-full h-full bg-muted" />
-        )}
+        {user.profileBanner
+          ? (
+              <img
+                src={user.profileBanner}
+                alt={`${user.fullName} 的封面`}
+                referrerPolicy="no-referrer"
+                className="w-full h-full object-cover rounded-t"
+              />
+            )
+          : (
+              <div className="w-full h-full bg-muted" />
+            )}
       </div>
 
       {/* Profile Info Section */}

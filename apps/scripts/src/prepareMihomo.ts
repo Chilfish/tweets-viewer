@@ -47,7 +47,9 @@ function extendNameserverPolicy(dns: ClashConfig['dns'], servers: string[]) {
     return
 
   const covered = new Set(Object.keys(policy).flatMap(key => key.split(',')))
-  const missing = [...new Set(servers)].filter(server => server && !covered.has(server))
+  const missing = [
+    ...new Set(servers),
+  ].filter(server => server && !covered.has(server))
   if (missing.length)
     policy[missing.join(',')] = doh
 }
@@ -77,7 +79,13 @@ const config = {
   'udp': source?.udp ?? true,
   'dns': source?.dns,
   'proxies': proxies,
-  'proxy-groups': [{ name: 'PICK', type: 'select', proxies: proxies.map(node => node.name) }],
+  'proxy-groups': [
+    {
+      name: 'PICK',
+      type: 'select',
+      proxies: proxies.map(node => node.name),
+    },
+  ],
   'rules': ['MATCH,PICK'],
 }
 

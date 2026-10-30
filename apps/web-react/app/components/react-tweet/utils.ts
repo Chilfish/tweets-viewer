@@ -26,7 +26,9 @@ export function getMp4Videos(media: MediaAnimatedGif | MediaVideo) {
 export function getMp4Video(media: MediaAnimatedGif | MediaVideo) {
   const mp4Videos = getMp4Videos(media)
   // Skip the highest quality video and use the next quality
-  const video = mp4Videos.length > 1 ? mp4Videos[1]! : mp4Videos[0]!
+  const video = mp4Videos.length > 1
+    ? mp4Videos[1]!
+    : mp4Videos[0]!
   return video
 }
 

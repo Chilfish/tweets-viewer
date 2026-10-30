@@ -50,14 +50,30 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
     // 其他错误（网络/5xx）显式传给组件渲染"加载失败"，不伪装成空态。
     if (isAxiosError(err) && err.response?.status === 404) {
       return {
-        posts: { data: [], meta: { total: 0, page: 0, pageSize: 0, hasMore: false } },
+        posts: {
+          data: [],
+          meta: {
+            total: 0,
+            page: 0,
+            pageSize: 0,
+            hasMore: false,
+          },
+        },
         user: null,
       } as InsLoaderData
     }
 
     console.error('IG load failed:', err)
     return {
-      posts: { data: [], meta: { total: 0, page: 0, pageSize: 0, hasMore: false } },
+      posts: {
+        data: [],
+        meta: {
+          total: 0,
+          page: 0,
+          pageSize: 0,
+          hasMore: false,
+        },
+      },
       user: null,
       error: 'Instagram 数据加载失败，请重试',
     } as InsLoaderData

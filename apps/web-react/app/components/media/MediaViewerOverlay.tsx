@@ -60,33 +60,37 @@ export function MediaViewerOverlay({
             show ? 'opacity-100' : 'opacity-0',
           )}
         >
-          {currentIndex > 0 ? (
-            <Button
-              size="icon"
-              variant="ghost"
-              className="size-10 rounded-full bg-black/40 text-white hover:bg-black/60 pointer-events-auto"
-              onClick={(e) => {
-                e.stopPropagation()
-                onNavigate('prev')
-              }}
-            >
-              <ChevronLeft className="size-6 stroke-[1.5]" />
-            </Button>
-          ) : <div />}
+          {currentIndex > 0
+            ? (
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="size-10 rounded-full bg-black/40 text-white hover:bg-black/60 pointer-events-auto"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onNavigate('prev')
+                  }}
+                >
+                  <ChevronLeft className="size-6 stroke-[1.5]" />
+                </Button>
+              )
+            : <div />}
 
-          {currentIndex < totalMedia - 1 ? (
-            <Button
-              size="icon"
-              variant="ghost"
-              className="size-10 rounded-full bg-black/40 text-white hover:bg-black/60 pointer-events-auto"
-              onClick={(e) => {
-                e.stopPropagation()
-                onNavigate('next')
-              }}
-            >
-              <ChevronRight className="size-6 stroke-[1.5]" />
-            </Button>
-          ) : <div />}
+          {currentIndex < totalMedia - 1
+            ? (
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="size-10 rounded-full bg-black/40 text-white hover:bg-black/60 pointer-events-auto"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onNavigate('next')
+                  }}
+                >
+                  <ChevronRight className="size-6 stroke-[1.5]" />
+                </Button>
+              )
+            : <div />}
         </div>
       )}
 
@@ -103,7 +107,9 @@ export function MediaViewerOverlay({
               key={idx}
               className={cn(
                 'h-1.5 rounded-full transition-all duration-300',
-                idx === currentIndex ? 'bg-white w-4' : 'bg-white/40 w-1.5',
+                idx === currentIndex
+                  ? 'bg-white w-4'
+                  : 'bg-white/40 w-1.5',
               )}
             />
           ))}

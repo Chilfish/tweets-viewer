@@ -41,7 +41,9 @@ function Input({
           && 'text-muted-foreground file:me-3 file:bg-transparent file:font-medium file:text-foreground file:text-sm',
         )}
         data-slot="input"
-        size={typeof size === 'number' ? size : undefined}
+        size={typeof size === 'number'
+          ? size
+          : undefined}
         {...props}
       />
     </span>

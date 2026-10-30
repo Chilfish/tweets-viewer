@@ -52,7 +52,9 @@ export function MobileMediaViewer({
     // 只处理明显横向滑动（> 50px），纵向滚动不受影响
     if (Math.abs(deltaX) < 50)
       return
-    onNavigateMedia(deltaX < 0 ? 'next' : 'prev')
+    onNavigateMedia(deltaX < 0
+      ? 'next'
+      : 'prev')
   }, [onNavigateMedia])
 
   useEffect(() => {
@@ -67,7 +69,9 @@ export function MobileMediaViewer({
     return null
 
   const isVideo = currentItem?.type === 'video' || currentItem?.type === 'animated_gif'
-  const mp4Video = isVideo && currentItem?.videoInfo ? getMp4Video({ video_info: currentItem.videoInfo } as any) : null
+  const mp4Video = isVideo && currentItem?.videoInfo
+    ? getMp4Video({ video_info: currentItem.videoInfo } as any)
+    : null
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -85,28 +89,34 @@ export function MobileMediaViewer({
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
-          {isVideo && mp4Video ? (
-            <MediaVideo
-              key={mp4Video.url}
-              className="max-w-full max-h-full object-contain"
-              controls={showControls}
-              autoPlay
-              playsInline
-              loop={currentItem.type === 'animated_gif'}
-              onClick={e => e.stopPropagation()}
-              style={heroName ? { viewTransitionName: heroName } : undefined}
-            >
-              <source src={proxyMedia(mp4Video.url)} type={mp4Video.content_type} />
-            </MediaVideo>
-          ) : (
-            <MediaImage
-              src={currentItem?.url}
-              alt="preview"
-              className="max-w-full max-h-full object-contain"
-              draggable={false}
-              style={heroName ? { viewTransitionName: heroName } : undefined}
-            />
-          )}
+          {isVideo && mp4Video
+            ? (
+                <MediaVideo
+                  key={mp4Video.url}
+                  className="max-w-full max-h-full object-contain"
+                  controls={showControls}
+                  autoPlay
+                  playsInline
+                  loop={currentItem.type === 'animated_gif'}
+                  onClick={e => e.stopPropagation()}
+                  style={heroName
+                    ? { viewTransitionName: heroName }
+                    : undefined}
+                >
+                  <source src={proxyMedia(mp4Video.url)} type={mp4Video.content_type} />
+                </MediaVideo>
+              )
+            : (
+                <MediaImage
+                  src={currentItem?.url}
+                  alt="preview"
+                  className="max-w-full max-h-full object-contain"
+                  draggable={false}
+                  style={heroName
+                    ? { viewTransitionName: heroName }
+                    : undefined}
+                />
+              )}
         </div>
 
         <MediaViewerOverlay

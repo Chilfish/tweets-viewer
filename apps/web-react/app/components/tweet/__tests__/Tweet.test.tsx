@@ -125,7 +125,9 @@ describe('myTweet', () => {
               profile_image_url_https: 'https://pbs.twimg.com/profile_images/1973738194454872064/MRvlZY2A.jpg',
             },
             text: '新情報📢 LIVE FILM',
-            entities: [{ type: 'text', text: '新情報📢 LIVE FILM', index: 0 }],
+            entities: [
+              { type: 'text', text: '新情報📢 LIVE FILM', index: 0 },
+            ],
           }),
         })}
         tweetAuthorName="ttisrn_0710"

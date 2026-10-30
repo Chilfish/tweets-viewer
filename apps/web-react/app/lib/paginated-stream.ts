@@ -17,7 +17,9 @@ export interface StreamState<T extends { id: string }> {
 
 /** 规范化 meta.nextCursor（number 时转 string，保持游标为字符串协议） */
 export function normalizeCursor(cursor: number | string | undefined): string | undefined {
-  return cursor == null ? undefined : String(cursor)
+  return cursor == null
+    ? undefined
+    : String(cursor)
 }
 
 export interface LoaderPageInput<TPage, TItem extends { id: string }> {
@@ -40,7 +42,10 @@ export interface LoaderPageResult<TItem extends { id: string }> {
 /** 按 id 追加去重 */
 export function appendUnique<T extends { id: string }>(items: T[], newItems: T[]): T[] {
   const ids = new Set(items.map(i => i.id))
-  return [...items, ...newItems.filter(i => !ids.has(i.id))]
+  return [
+    ...items,
+    ...newItems.filter(i => !ids.has(i.id)),
+  ]
 }
 
 /**

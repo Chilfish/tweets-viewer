@@ -104,7 +104,9 @@ export function DateRangeFilter({ start, end, onApply }: DateRangeFilterProps) {
     setOpen(isOpen)
     if (isOpen) {
       // 打开时以已生效的筛选作为草稿
-      setDraft(start || end ? { from: start, to: end } : undefined)
+      setDraft(start || end
+        ? { from: start, to: end }
+        : undefined)
       setMonth(start ?? end ?? new Date())
     }
   }
@@ -131,7 +133,9 @@ export function DateRangeFilter({ start, end, onApply }: DateRangeFilterProps) {
     <>
       <CalendarIcon className="size-4 shrink-0" />
       <span className={cn('truncate text-xs', hasActiveFilter && 'font-medium')}>
-        {isMobile ? formatCompactLabel(start, end) : formatLabel(start, end)}
+        {isMobile
+          ? formatCompactLabel(start, end)
+          : formatLabel(start, end)}
       </span>
     </>
   )

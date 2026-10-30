@@ -10,7 +10,9 @@ function renderWithRouter(name = 'testuser') {
     [
       { path: '/tweets/:name', element: <YearNavigator name={name} /> },
     ],
-    { initialEntries: [`/tweets/${name}`] },
+    {
+      initialEntries: [`/tweets/${name}`],
+    },
   )
   render(<RouterProvider router={router} />)
   return router
@@ -53,7 +55,9 @@ describe('yearNavigator', () => {
   })
 
   it('writes start/end to URL when a year is clicked', async () => {
-    mockStats([{ year: 2026, count: 5 }])
+    mockStats([
+      { year: 2026, count: 5 },
+    ])
     const router = renderWithRouter()
 
     const trigger = await screen.findByRole('button', { name: /按年浏览/ })
@@ -70,7 +74,9 @@ describe('yearNavigator', () => {
   })
 
   it('shows active year when URL already has a year range', async () => {
-    mockStats([{ year: 2024, count: 3 }])
+    mockStats([
+      { year: 2024, count: 3 },
+    ])
     const router = createMemoryRouter(
       [
         {
@@ -78,7 +84,9 @@ describe('yearNavigator', () => {
           element: <YearNavigator name="testuser" />,
         },
       ],
-      { initialEntries: ['/tweets/testuser?start=2024-01-01&end=2024-12-31'] },
+      {
+        initialEntries: ['/tweets/testuser?start=2024-01-01&end=2024-12-31'],
+      },
     )
     render(<RouterProvider router={router} />)
 

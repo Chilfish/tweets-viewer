@@ -29,7 +29,9 @@ app.get('/all', describeRoute({
 app.get('/get/:name', describeRoute({
   tags: ['Users'],
   summary: '获取指定用户信息',
-  parameters: [nameParameter()],
+  parameters: [
+    nameParameter(),
+  ],
   responses: {
     200: jsonResponse('用户信息', 'EnrichedUser'),
     404: errorResponse,

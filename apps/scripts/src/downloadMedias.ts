@@ -139,7 +139,9 @@ function extractMedias(tweets: EnrichedTweet[]): MediaEntry[] {
 
 /** 生成下载文件名：screenName-tweetId-createdAt[_index].ext */
 function makeFilename(media: MediaEntry, hasMultipleInTweet: boolean): string {
-  const suffix = hasMultipleInTweet ? `_${media.index}` : ''
+  const suffix = hasMultipleInTweet
+    ? `_${media.index}`
+    : ''
   const raw = `${media.screenName}-${media.tweetId}-${media.createdAt}${suffix}.${media.ext}`
   return sanitizeFilename(raw)
 }
@@ -177,7 +179,9 @@ const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
  */
 async function applyMtime(filePath: string, resp: Response): Promise<void> {
   const lastModified = resp.headers.get('last-modified')
-  const mtime = lastModified ? new Date(lastModified) : new Date()
+  const mtime = lastModified
+    ? new Date(lastModified)
+    : new Date()
   await utimes(filePath, mtime, mtime)
 }
 
@@ -235,7 +239,12 @@ async function downloadOne(
     }
   }
 
-  return { url: media.url, filename: fileName, success: false, error: lastError!.message }
+  return {
+    url: media.url,
+    filename: fileName,
+    success: false,
+    error: lastError!.message,
+  }
 }
 
 // ─── 批量下载 ────────────────────────────────────────────────
@@ -334,12 +343,32 @@ async function patchTimestamps(
         })
         if (resp.ok) {
           await applyMtime(filePath, resp)
-          return { url: media.url, filename: fileName, success: true, patched: true, downloaded: false }
+          return {
+            url: media.url,
+            filename: fileName,
+            success: true,
+            patched: true,
+            downloaded: false,
+          }
         }
-        return { url: media.url, filename: fileName, success: false, patched: true, downloaded: false, error: `HTTP ${resp.status}` }
+        return {
+          url: media.url,
+          filename: fileName,
+          success: false,
+          patched: true,
+          downloaded: false,
+          error: `HTTP ${resp.status}`,
+        }
       }
       catch (err) {
-        return { url: media.url, filename: fileName, success: false, patched: true, downloaded: false, error: (err as Error).message }
+        return {
+          url: media.url,
+          filename: fileName,
+          success: false,
+          patched: true,
+          downloaded: false,
+          error: (err as Error).message,
+        }
       }
     })
 
@@ -378,8 +407,12 @@ async function main() {
   const imagesOnly = args.includes('--images-only')
   const videosOnly = args.includes('--videos-only')
   const positional = args.filter(a => !a.startsWith('--'))
-  const inputFile = positional[0] ? path.resolve(positional[0]) : DEFAULT_INPUT
-  const outputDir = positional[1] ? path.resolve(positional[1]) : DEFAULT_OUTPUT
+  const inputFile = positional[0]
+    ? path.resolve(positional[0])
+    : DEFAULT_INPUT
+  const outputDir = positional[1]
+    ? path.resolve(positional[1])
+    : DEFAULT_OUTPUT
 
   // 读取 & 解析 JSON
   console.log(`📄 读取: ${inputFile}`)

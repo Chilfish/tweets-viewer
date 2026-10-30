@@ -26,7 +26,9 @@ export const TweetNavigation = memo(({ totalPages, className, currentPage: propP
   const [searchParams, setSearchParams] = useSearchParams()
   const urlPage = Number(searchParams.get('page')) || 1
 
-  const currentPage = propPage !== undefined ? propPage : urlPage
+  const currentPage = propPage !== undefined
+    ? propPage
+    : urlPage
 
   // 即使总页数为 1，也应渲染组件以保持 Header 结构稳定
   // 只是在这种情况下，前后翻页按钮会被禁用
@@ -50,7 +52,10 @@ export const TweetNavigation = memo(({ totalPages, className, currentPage: propP
     }
     // 5C-3：prefers-reduced-motion 下禁用平滑滚动
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' })
+    window.scrollTo({
+      top: 0,
+      behavior: prefersReducedMotion ? 'auto' : 'smooth',
+    })
   }
 
   return (
@@ -83,7 +88,9 @@ export const TweetNavigation = memo(({ totalPages, className, currentPage: propP
           <span>{currentPage}</span>
           <span className="text-muted-foreground font-normal">
             /
-            {totalPages > 0 ? totalPages : 1}
+            {totalPages > 0
+              ? totalPages
+              : 1}
           </span>
           {showDropdown && <ChevronDown className="size-3.5 opacity-50 ml-0.5" />}
         </DropdownMenuTrigger>

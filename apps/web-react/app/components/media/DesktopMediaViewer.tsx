@@ -51,7 +51,9 @@ export function DesktopMediaViewer({
     return null
 
   const isVideo = currentItem?.type === 'video' || currentItem?.type === 'animated_gif'
-  const mp4Video = isVideo && currentItem?.videoInfo ? getMp4Video({ video_info: currentItem.videoInfo } as any) : null
+  const mp4Video = isVideo && currentItem?.videoInfo
+    ? getMp4Video({ video_info: currentItem.videoInfo } as any)
+    : null
 
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
@@ -64,28 +66,34 @@ export function DesktopMediaViewer({
               className="relative flex-1 bg-black flex items-center justify-center select-none cursor-pointer overflow-hidden"
               onClick={toggleControls}
             >
-              {isVideo && mp4Video ? (
-                <MediaVideo
-                  key={mp4Video.url}
-                  className="max-w-full max-h-full object-contain"
-                  controls={showControls}
-                  autoPlay
-                  playsInline
-                  loop={currentItem.type === 'animated_gif'}
-                  onClick={e => e.stopPropagation()}
-                  style={heroName ? { viewTransitionName: heroName } : undefined}
-                >
-                  <source src={proxyMedia(mp4Video.url)} type={mp4Video.content_type} />
-                </MediaVideo>
-              ) : (
-                <MediaImage
-                  src={currentItem?.url}
-                  alt="preview"
-                  className="max-w-full max-h-full object-contain"
-                  containerClassName="w-auto h-auto"
-                  style={heroName ? { viewTransitionName: heroName } : undefined}
-                />
-              )}
+              {isVideo && mp4Video
+                ? (
+                    <MediaVideo
+                      key={mp4Video.url}
+                      className="max-w-full max-h-full object-contain"
+                      controls={showControls}
+                      autoPlay
+                      playsInline
+                      loop={currentItem.type === 'animated_gif'}
+                      onClick={e => e.stopPropagation()}
+                      style={heroName
+                        ? { viewTransitionName: heroName }
+                        : undefined}
+                    >
+                      <source src={proxyMedia(mp4Video.url)} type={mp4Video.content_type} />
+                    </MediaVideo>
+                  )
+                : (
+                    <MediaImage
+                      src={currentItem?.url}
+                      alt="preview"
+                      className="max-w-full max-h-full object-contain"
+                      containerClassName="w-auto h-auto"
+                      style={heroName
+                        ? { viewTransitionName: heroName }
+                        : undefined}
+                    />
+                  )}
 
               <MediaViewerOverlay
                 show={showControls}

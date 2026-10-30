@@ -122,9 +122,15 @@ export function TweetLinkCard({ tweet, className }: TweetLinkCardProps) {
       || card.type === 'summary_large_image'
     )
 
-    const displayDomain = card.domain || (card.url ? getDomainFromUrl(card.url) : null)
-    const displayTitle = card.title ? truncateText(card.title, 120) : null
-    const displayDescription = card.description ? truncateText(card.description, 200) : null
+    const displayDomain = card.domain || (card.url
+      ? getDomainFromUrl(card.url)
+      : null)
+    const displayTitle = card.title
+      ? truncateText(card.title, 120)
+      : null
+    const displayDescription = card.description
+      ? truncateText(card.description, 200)
+      : null
 
     return {
       url: card.url,
@@ -154,21 +160,25 @@ export function TweetLinkCard({ tweet, className }: TweetLinkCardProps) {
         className,
       )}
     >
-      {isLargeImageCard && imageUrl ? (
-        <>
-          <CardImage imageUrl={imageUrl} altText={title || 'Link preview'} isLarge />
-          <CardContent domain={domain} title={title} description={description} />
-        </>
-      ) : hasImage && imageUrl ? (
-        <div className="flex">
-          <CardImage imageUrl={imageUrl} altText={title || 'Link preview'} />
-          <div className="flex-1 min-w-0">
-            <CardContent domain={domain} title={title} description={description} compact />
-          </div>
-        </div>
-      ) : (
-        <CardContent domain={domain} title={title} description={description} />
-      )}
+      {isLargeImageCard && imageUrl
+        ? (
+            <>
+              <CardImage imageUrl={imageUrl} altText={title || 'Link preview'} isLarge />
+              <CardContent domain={domain} title={title} description={description} />
+            </>
+          )
+        : hasImage && imageUrl
+          ? (
+              <div className="flex">
+                <CardImage imageUrl={imageUrl} altText={title || 'Link preview'} />
+                <div className="flex-1 min-w-0">
+                  <CardContent domain={domain} title={title} description={description} compact />
+                </div>
+              </div>
+            )
+          : (
+              <CardContent domain={domain} title={title} description={description} />
+            )}
     </a>
   )
 }

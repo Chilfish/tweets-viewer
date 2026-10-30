@@ -38,7 +38,9 @@ describe('buildLlmsTxt', () => {
   })
 
   it('站点页面用相对链接，API 与文档用外部绝对链接', () => {
-    const hrefs = [...txt.matchAll(/\]\(([^)]+)\)/g)].map(m => m[1] as string)
+    const hrefs = [
+      ...txt.matchAll(/\]\(([^)]+)\)/g),
+    ].map(m => m[1] as string)
 
     const relative = hrefs.filter(h => h.startsWith('/'))
     const absolute = hrefs.filter(h => h.startsWith('https://'))
@@ -73,7 +75,9 @@ describe('buildLlmsTxt', () => {
   })
 
   it('覆盖全部后端端点，且标签唯一', () => {
-    const labels = [...txt.matchAll(/^- \[([^\]]+)\]/gm)].map(m => m[1] as string)
+    const labels = [
+      ...txt.matchAll(/^- \[([^\]]+)\]/gm),
+    ].map(m => m[1] as string)
     for (const endpoint of apiEndpoints)
       expect(labels).toContain(endpoint.label)
 

@@ -32,7 +32,9 @@ function getErrorStatus(error: unknown): number | undefined {
 }
 
 function formatError(error: unknown): string {
-  return error instanceof Error ? error.message : String(error)
+  return error instanceof Error
+    ? error.message
+    : String(error)
 }
 
 /** 取出 X 返回的错误明细（错误码/消息）；类型化错误把原始 TwitterError 挂在 cause 上 */

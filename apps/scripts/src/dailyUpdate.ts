@@ -91,7 +91,9 @@ async function main(): Promise<void> {
       console.error({
         db: label,
         action: 'daily-update-target-error',
-        message: outcome.reason instanceof Error ? outcome.reason.message : String(outcome.reason),
+        message: outcome.reason instanceof Error
+          ? outcome.reason.message
+          : String(outcome.reason),
       })
       return
     }

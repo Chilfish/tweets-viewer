@@ -1,5 +1,5 @@
 import type { ElementType } from 'react'
-import { Calendar, Infinity, Search, Users } from 'lucide-react'
+import { Calendar, Infinity as InfinityIcon, Search, Users } from 'lucide-react'
 
 interface FeatureProps {
   icon: ElementType
@@ -29,7 +29,7 @@ export function HomeFeatures() {
       description: '在侧边栏换一个人，时间线、媒体和搜索都会跟着换。',
     },
     {
-      icon: Infinity,
+      icon: InfinityIcon,
       title: '连续阅读',
       description: '滚到底自动加载下一页；也可以用分页器跳到某一页。',
     },

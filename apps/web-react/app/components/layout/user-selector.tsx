@@ -32,69 +32,73 @@ export function UserSelector() {
         />
       )}
       >
-        {activeUser ? (
-          <>
-            <Avatar className="size-8">
-              <AvatarImage src={activeUser.profileImage} />
-              <AvatarFallback>{activeUser.fullName?.charAt(0)}</AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col items-start overflow-hidden">
-              <span className="font-semibold text-sm truncate">
-                {activeUser.fullName}
-              </span>
-              <span className="text-xs text-muted-foreground truncate">
-                @
-                {activeUser.userName}
-              </span>
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="size-8 rounded-full bg-muted flex items-center justify-center">
-              <User className="size-4 text-muted-foreground" />
-            </div>
-            <span className="font-medium text-sm">选择用户</span>
-          </>
-        )}
+        {activeUser
+          ? (
+              <>
+                <Avatar className="size-8">
+                  <AvatarImage src={activeUser.profileImage} />
+                  <AvatarFallback>{activeUser.fullName?.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col items-start overflow-hidden">
+                  <span className="font-semibold text-sm truncate">
+                    {activeUser.fullName}
+                  </span>
+                  <span className="text-xs text-muted-foreground truncate">
+                    @
+                    {activeUser.userName}
+                  </span>
+                </div>
+              </>
+            )
+          : (
+              <>
+                <div className="size-8 rounded-full bg-muted flex items-center justify-center">
+                  <User className="size-4 text-muted-foreground" />
+                </div>
+                <span className="font-medium text-sm">选择用户</span>
+              </>
+            )}
         <ChevronDown className="size-4 ml-auto text-muted-foreground" />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="start" className="w-56 max-h-100">
-        {userList.length > 0 ? (
-          <>
-            {userList.map(user => (
-              <DropdownMenuItem
-                key={user.fullName}
-                className="flex items-center gap-3 p-2 cursor-pointer active:scale-[0.98] transition-transform"
-                render={<NavLink to={`/${curPath}/${user.userName}`} viewTransition />}
-              >
-                <Avatar className="size-8">
-                  <AvatarImage src={user.profileImage} />
-                  <AvatarFallback>{user.fullName?.charAt(0)}</AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col flex-1 overflow-hidden">
-                  <span className="font-medium text-sm truncate">
-                    {user.fullName}
-                  </span>
-                  <span className="text-xs text-muted-foreground truncate">
-                    @
-                    {user.userName}
-                  </span>
+        {userList.length > 0
+          ? (
+              <>
+                {userList.map(user => (
+                  <DropdownMenuItem
+                    key={user.fullName}
+                    className="flex items-center gap-3 p-2 cursor-pointer active:scale-[0.98] transition-transform"
+                    render={<NavLink to={`/${curPath}/${user.userName}`} viewTransition />}
+                  >
+                    <Avatar className="size-8">
+                      <AvatarImage src={user.profileImage} />
+                      <AvatarFallback>{user.fullName?.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col flex-1 overflow-hidden">
+                      <span className="font-medium text-sm truncate">
+                        {user.fullName}
+                      </span>
+                      <span className="text-xs text-muted-foreground truncate">
+                        @
+                        {user.userName}
+                      </span>
+                    </div>
+                    {activeUser?.userName === user.userName && (
+                      <Check className="size-4 text-primary" />
+                    )}
+                  </DropdownMenuItem>
+                ))}
+              </>
+            )
+          : (
+              <>
+                <DropdownMenuSeparator />
+                <div className="p-2 text-sm text-muted-foreground text-center">
+                  还没有归档用户
                 </div>
-                {activeUser?.userName === user.userName && (
-                  <Check className="size-4 text-primary" />
-                )}
-              </DropdownMenuItem>
-            ))}
-          </>
-        ) : (
-          <>
-            <DropdownMenuSeparator />
-            <div className="p-2 text-sm text-muted-foreground text-center">
-              还没有归档用户
-            </div>
-          </>
-        )}
+              </>
+            )}
       </DropdownMenuContent>
     </DropdownMenu>
   )

@@ -87,7 +87,9 @@ export function HydrateFallback() {
 
         <main className="flex-1 flex flex-col items-center justify-start gap-4 pt-2 px-3 mx-auto min-w-0 border-r border-border/40">
 
-          {!isGlobalView && (isInsRoute ? <InsProfileHeaderSkeleton /> : <ProfileHeader user={null} />)}
+          {!isGlobalView && (isInsRoute
+            ? <InsProfileHeaderSkeleton />
+            : <ProfileHeader user={null} />)}
           <div className="w-full">
             {currentHandle?.skeleton || <Outlet />}
           </div>
@@ -107,7 +109,9 @@ export function HydrateFallback() {
         currentHandle.isWide ? 'sm:max-w-6xl' : 'sm:max-w-[600px]',
       )}
       >
-        {!isGlobalView && (isInsRoute ? <InsProfileHeaderSkeleton /> : <ProfileHeaderSkeleton />)}
+        {!isGlobalView && (isInsRoute
+          ? <InsProfileHeaderSkeleton />
+          : <ProfileHeaderSkeleton />)}
 
         <div className="w-full">
           {currentHandle?.skeleton || <Outlet />}
@@ -179,7 +183,10 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
   if (isMobile) {
     return (
       <div className="min-h-screen bg-background transition-colors duration-200">
-        <TopNav title={curUserName ? `@${curUserName}` : 'Tweets Viewer'} />
+        <TopNav title={curUserName
+          ? `@${curUserName}`
+          : 'Tweets Viewer'}
+        />
 
         <main className="flex-1 flex flex-col items-center justify-start gap-4 pt-2 px-3 mx-auto min-w-0 border-r border-border/40">
 

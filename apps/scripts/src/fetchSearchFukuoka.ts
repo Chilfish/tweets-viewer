@@ -15,7 +15,9 @@ let page = 0
 
 while (true) {
   page++
-  console.log(`Fetching page ${page}${currentCursor ? ` (cursor: ${currentCursor.slice(0, 20)}...)` : ''}`)
+  console.log(`Fetching page ${page}${currentCursor
+    ? ` (cursor: ${currentCursor.slice(0, 20)}...)`
+    : ''}`)
 
   const data = await apiClient.searchTweetsRaw(filter, currentCursor).catch((e) => {
     if (e.message.includes('429')) {
@@ -49,7 +51,9 @@ while (true) {
     page,
     tweetsThisPage: data.tweets.length,
     totalSoFar: allTweets.length,
-    lastTweetDate: enriched.at(-1)?.created_at ? formatDate(enriched.at(-1)!.created_at) : 'N/A',
+    lastTweetDate: enriched.at(-1)?.created_at
+      ? formatDate(enriched.at(-1)!.created_at)
+      : 'N/A',
   })
 
   if (!data.cursor || !data.cursor.trim()) {

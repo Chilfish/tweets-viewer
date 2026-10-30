@@ -44,7 +44,9 @@ export default defineConfig({
         resolve: {
           tsconfigPaths: true,
         },
-        plugins: [storybookTest()],
+        plugins: [
+          storybookTest(),
+        ],
         test: {
           name: 'stories',
           environment: 'jsdom',
@@ -58,7 +60,9 @@ export default defineConfig({
         resolve: {
           tsconfigPaths: true,
         },
-        plugins: [tailwindcss()],
+        plugins: [
+          tailwindcss(),
+        ],
         // 与 app 的 vite.config.ts 同源：注入 VITE_API_URL 让 shared/constant.ts 的
         // `?? process.env.API_URL` 短路（浏览器 iframe 里没有 process，vrt 用例不发请求，值本身无关紧要）
         define: {
@@ -77,7 +81,10 @@ export default defineConfig({
             provider: playwright(),
             headless: true,
             instances: [
-              { browser: 'chromium', viewport: { width: 1280, height: 720 } },
+              {
+                browser: 'chromium',
+                viewport: { width: 1280, height: 720 },
+              },
             ],
             expect: {
               toMatchScreenshot: {

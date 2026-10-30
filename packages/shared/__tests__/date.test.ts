@@ -57,7 +57,9 @@ describe('convertDate', () => {
   })
 
   it('should handle nested objects', () => {
-    const obj = { nested: { created_at: '2024-01-15T12:00:00Z' } }
+    const obj = {
+      nested: { created_at: '2024-01-15T12:00:00Z' },
+    }
     convertDate(obj)
     expect(obj.nested.created_at).toBeInstanceOf(Date)
   })

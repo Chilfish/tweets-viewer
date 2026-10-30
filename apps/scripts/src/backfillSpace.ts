@@ -28,8 +28,12 @@ const PROXY = process.env.TWEET_PROXY?.trim() || undefined
 const WRITE = process.argv.includes('--write')
 const LIMIT = (() => {
   const arg = process.argv.find(a => a.startsWith('--limit='))
-  const n = arg ? Number(arg.split('=')[1]) : Number.NaN
-  return Number.isFinite(n) && n > 0 ? n : undefined
+  const n = arg
+    ? Number(arg.split('=')[1])
+    : Number.NaN
+  return Number.isFinite(n) && n > 0
+    ? n
+    : undefined
 })()
 
 const client = neon(env.DATABASE_URL)
@@ -88,7 +92,9 @@ for (const row of candidates) {
       // 只改 jsonData：结构化列（userId / fullText / createdAt）保持原样
       await db
         .update(tweetsTable)
-        .set({ jsonData: { ...tweet, space } })
+        .set({
+          jsonData: { ...tweet, space },
+        })
         .where(eq(tweetsTable.tweetId, row.tweetId))
     }
     patched++
@@ -100,7 +106,9 @@ for (const row of candidates) {
       action: 'backfill-space-error',
       tweetId: row.tweetId,
       spaceId,
-      message: error instanceof Error ? error.message : String(error),
+      message: error instanceof Error
+        ? error.message
+        : String(error),
     })
   }
 }

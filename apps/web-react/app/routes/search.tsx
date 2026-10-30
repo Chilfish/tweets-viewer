@@ -24,7 +24,11 @@ export function meta({ location }: Route.MetaArgs) {
   const params = new URLSearchParams(location.search)
   const q = params.get('q')
   return [
-    { title: q ? `搜索「${q}」` : '搜索归档' },
+    {
+      title: q
+        ? `搜索「${q}」`
+        : '搜索归档',
+    },
     { name: 'description', content: '搜索归档里的推文' },
   ]
 }
@@ -48,7 +52,12 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
   if (q) {
     try {
       const tweetsRes = await apiClient.get<PaginatedResponse<EnrichedTweet>>(`/tweets/search`, {
-        params: { q, name: username, page, pageSize: PAGE_SIZE },
+        params: {
+          q,
+          name: username,
+          page,
+          pageSize: PAGE_SIZE,
+        },
       })
       paginatedTweets = tweetsRes.data
     }
@@ -107,7 +116,9 @@ export default function SearchPage({ loaderData, params }: Route.ComponentProps)
           </div>
           <p className="text-base font-medium">输入关键词开始搜索</p>
           <p className="text-sm text-muted-foreground">
-            {username ? `在 @${username} 的归档里搜索` : '搜索全部归档推文'}
+            {username
+              ? `在 @${username} 的归档里搜索`
+              : '搜索全部归档推文'}
           </p>
         </div>
       )
@@ -190,7 +201,9 @@ export default function SearchPage({ loaderData, params }: Route.ComponentProps)
           <SearchInput
             user={user ?? undefined}
             defaultValue={q || serverQ}
-            placeholder={username ? `搜索 @${username} 的推文` : '搜索全部归档推文'}
+            placeholder={username
+              ? `搜索 @${username} 的推文`
+              : '搜索全部归档推文'}
             className="flex-1"
           />
           {username && (

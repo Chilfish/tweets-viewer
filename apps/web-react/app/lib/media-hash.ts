@@ -12,7 +12,9 @@ export function parseMediaHash(hash: string): number | null {
   if (value === '')
     return null
   const index = Number(value)
-  return Number.isInteger(index) && index >= 0 ? index : null
+  return Number.isInteger(index) && index >= 0
+    ? index
+    : null
 }
 
 /** 构建灯箱 hash。 */

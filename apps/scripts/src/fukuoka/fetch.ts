@@ -85,7 +85,9 @@ async function fetchTarget(target: SearchTarget): Promise<number> {
 
   while (page < target.maxPages) {
     page++
-    console.log(`  page ${page}${currentCursor ? ` (cursor: ${currentCursor.slice(0, 16)}…)` : ''}`)
+    console.log(`  page ${page}${currentCursor
+      ? ` (cursor: ${currentCursor.slice(0, 16)}…)`
+      : ''}`)
 
     const data = await apiClient.searchTweetsRaw(target.filter, currentCursor, COUNT).catch((e) => {
       if (e.message?.includes('429')) {
@@ -135,7 +137,13 @@ async function fetchTarget(target: SearchTarget): Promise<number> {
     console.log(`  authors: ${JSON.stringify(authors)}`)
 
     await writeJson(
-      { target: target.name, label: target.label, fetchedAt: new Date().toISOString(), tweets: allTweets, total: allTweets.length },
+      {
+        target: target.name,
+        label: target.label,
+        fetchedAt: new Date().toISOString(),
+        tweets: allTweets,
+        total: allTweets.length,
+      },
       `fukuoka/raw/${target.name}-${Date.now()}.json`,
     )
   }

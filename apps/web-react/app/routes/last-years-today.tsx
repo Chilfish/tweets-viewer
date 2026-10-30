@@ -24,8 +24,17 @@ export const handle = {
 export function meta({ params }: Route.MetaArgs) {
   const { name } = params
   return [
-    { title: name ? `那年今日 - @${name}` : '那年今日 - 全部用户' },
-    { name: 'description', content: name ? `查看 @${name} 在往年今天的推文` : '查看所有归档用户在往年今天的推文' },
+    {
+      title: name
+        ? `那年今日 - @${name}`
+        : '那年今日 - 全部用户',
+    },
+    {
+      name: 'description',
+      content: name
+        ? `查看 @${name} 在往年今天的推文`
+        : '查看所有归档用户在往年今天的推文',
+    },
   ]
 }
 
@@ -36,7 +45,9 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
   const reverse = url.searchParams.get('reverse') === 'true'
 
   // 全量（无 name）与单用户共用同一查询模块，仅端点不同
-  const endpoint = name ? `/tweets/get/${name}/last-years-today` : '/tweets/last-years-today'
+  const endpoint = name
+    ? `/tweets/get/${name}/last-years-today`
+    : '/tweets/last-years-today'
 
   try {
     const { data: paginatedTweets } = await apiClient.get<PaginatedResponse<EnrichedTweet>>(endpoint, {
@@ -63,7 +74,9 @@ function YearDivider({ year, className }: { year: number, className?: string }) 
   return (
     <div className={cn('mb-3 flex items-center gap-3 px-1', className)}>
       <span className="text-sm font-semibold tracking-wide text-foreground/70">
-        {year > 0 ? year : '年份未知'}
+        {year > 0
+          ? year
+          : '年份未知'}
       </span>
       <div className="h-px flex-1 bg-border/60" />
     </div>
@@ -101,7 +114,9 @@ export default function LastYearsTodayPage({ loaderData, params }: Route.Compone
   const user = layoutData?.activeUser
 
   const isGlobal = !name
-  const endpoint = name ? `/tweets/get/${name}/last-years-today` : '/tweets/last-years-today'
+  const endpoint = name
+    ? `/tweets/get/${name}/last-years-today`
+    : '/tweets/last-years-today'
 
   // 流身份签名（不含 page）：筛选变化时换 key 重挂载淡入；滚动续载同步 URL page 不触发
   const filterKey = `${name ?? 'all'}-${reverse}`
@@ -151,7 +166,12 @@ export default function LastYearsTodayPage({ loaderData, params }: Route.Compone
         >
           {yearGroups.map((group, idx) => (
             <section key={`${group.year}-${idx}`}>
-              <YearDivider year={group.year} className={idx === 0 ? 'mt-2' : 'mt-8'} />
+              <YearDivider
+                year={group.year}
+                className={idx === 0
+                  ? 'mt-2'
+                  : 'mt-8'}
+              />
               {group.tweets.map(tweet => (
                 <MyTweet
                   tweet={tweet}

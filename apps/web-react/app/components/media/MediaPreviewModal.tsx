@@ -62,7 +62,12 @@ export function MediaPreviewModal({
     if (targetIndex !== -1) {
       onNavigate(targetIndex)
     }
-  }, [currentIndex, items, currentItem, onNavigate])
+  }, [
+    currentIndex,
+    items,
+    currentItem,
+    onNavigate,
+  ])
 
   const navigateMedia = useCallback((direction: 'next' | 'prev') => {
     if (direction === 'next' && currentMediaIndexInTweet < tweetMediaItems.length - 1) {
@@ -75,7 +80,12 @@ export function MediaPreviewModal({
       const globalIndex = items.findIndex(item => item.id === prevMediaId)
       onNavigate(globalIndex)
     }
-  }, [currentMediaIndexInTweet, tweetMediaItems, items, onNavigate])
+  }, [
+    currentMediaIndexInTweet,
+    tweetMediaItems,
+    items,
+    onNavigate,
+  ])
 
   useEffect(() => {
     if (!open)
@@ -112,7 +122,12 @@ export function MediaPreviewModal({
 
     window.addEventListener('keydown', handleKeyDown, true) // 使用捕获阶段确保优先处理
     return () => window.removeEventListener('keydown', handleKeyDown, true)
-  }, [open, navigateMedia, navigateTweet, onOpenChange])
+  }, [
+    open,
+    navigateMedia,
+    navigateTweet,
+    onOpenChange,
+  ])
 
   // 根据设备类型条件渲染，避免重复挂载
   return isMobile

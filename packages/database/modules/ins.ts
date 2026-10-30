@@ -43,7 +43,9 @@ export async function createInsPosts({ db, posts, username }: {
   const seen = new Map<string, IGPost>()
   for (const p of posts)
     seen.set(p.id, p)
-  const deduped = [...seen.values()]
+  const deduped = [
+    ...seen.values(),
+  ]
   if (deduped.length < posts.length) {
     console.warn(`createInsPosts: deduped ${posts.length - deduped.length} duplicate postId(s)`)
   }
@@ -56,7 +58,9 @@ export async function createInsPosts({ db, posts, username }: {
       .values(chunk.map(post => ({
         postId: post.id,
         userId: username,
-        createdAt: post.created_at ? new Date(post.created_at) : new Date(),
+        createdAt: post.created_at
+          ? new Date(post.created_at)
+          : new Date(),
         jsonData: post,
       })))
       .onConflictDoUpdate({
@@ -111,7 +115,9 @@ export async function getInsPosts({ db, username, page, pageSize = PAGE_SIZE }: 
 
   const [totalResult, rows] = await Promise.all([
     db
-      .select({ count: count() })
+      .select({
+        count: count(),
+      })
       .from(insPostsTable)
       .where(eq(insPostsTable.userId, username)),
     db

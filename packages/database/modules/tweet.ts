@@ -24,7 +24,9 @@ const BATCH_SIZE = 1000
 const sortKeyExpr = sql`CAST(COALESCE(${tweetsTable.jsonData}->>'retweeted_original_id', ${tweetsTable.tweetId}) AS BIGINT)`
 
 function _order(reverse: boolean) {
-  return reverse ? asc(sortKeyExpr) : desc(sortKeyExpr)
+  return reverse
+    ? asc(sortKeyExpr)
+    : desc(sortKeyExpr)
 }
 
 /** keyset 游标条件：desc 时取「比游标更小」的键，asc（reverse）时取「更大」的键 */
@@ -89,7 +91,9 @@ async function paginateTweets({
   let total = totalNum
   if (total === undefined) {
     const [{ value }] = await db
-      .select({ value: count() })
+      .select({
+        value: count(),
+      })
       .from(tweetsTable)
       .where(whereClause)
     total = value
@@ -107,7 +111,9 @@ async function paginateTweets({
       .orderBy(orderBy)
       .limit(pageSize + 1)
     hasMore = rowsWithProbe.length > pageSize
-    rows = hasMore ? rowsWithProbe.slice(0, pageSize) : rowsWithProbe
+    rows = hasMore
+      ? rowsWithProbe.slice(0, pageSize)
+      : rowsWithProbe
   }
   else {
     const offset = (page - 1) * pageSize
@@ -144,7 +150,9 @@ export async function createTweets({ db, tweets, user }: { db: DB, tweets: Enric
   const seen = new Map<string, EnrichedTweet>()
   for (const t of tweets)
     seen.set(t.id, t)
-  const deduped = [...seen.values()]
+  const deduped = [
+    ...seen.values(),
+  ]
   if (deduped.length < tweets.length) {
     console.warn(`createTweets: deduped ${tweets.length - deduped.length} duplicate tweetId(s)`)
   }
@@ -193,7 +201,9 @@ export async function getTweets({
 }: GetTweet & { cursor?: string, total?: number }): Promise<PaginatedResponse<EnrichedTweet>> {
   const whereClause = and(
     eq(tweetsTable.userId, name),
-    noReplies ? sql`${tweetsTable.jsonData}->>'parent_id' IS NULL` : undefined,
+    noReplies
+      ? sql`${tweetsTable.jsonData}->>'parent_id' IS NULL`
+      : undefined,
   )
 
   return paginateTweets({
@@ -218,14 +228,25 @@ export async function getLastYearsTodayTweets({
   const today = now('beijing')
 
   const whereClause = and(
-    name ? eq(tweetsTable.userId, name) : undefined,
+    name
+      ? eq(tweetsTable.userId, name)
+      : undefined,
     // 全量（无 name）模式排除转推；指定用户模式保留转推
-    !name ? sql`${tweetsTable.jsonData}->>'retweeted_original_id' IS NULL` : undefined,
+    !name
+      ? sql`${tweetsTable.jsonData}->>'retweeted_original_id' IS NULL`
+      : undefined,
     sql`EXTRACT(DAY FROM ${tweetsTable.createdAt}) = ${today.getDate()}`,
     sql`EXTRACT(MONTH FROM ${tweetsTable.createdAt}) = ${today.getMonth() + 1}`,
   )
 
-  return paginateTweets({ db, whereClause, page, pageSize, reverse, cursor })
+  return paginateTweets({
+    db,
+    whereClause,
+    page,
+    pageSize,
+    reverse,
+    cursor,
+  })
 }
 
 export async function getTweetsByDateRange({
@@ -242,10 +263,19 @@ export async function getTweetsByDateRange({
   const whereClause = and(
     eq(tweetsTable.userId, name),
     sql`CAST(${tweetsTable.createdAt} AS DATE) BETWEEN ${startDate} AND ${endDate}`,
-    noReplies ? sql`${tweetsTable.jsonData}->>'parent_id' IS NULL` : undefined,
+    noReplies
+      ? sql`${tweetsTable.jsonData}->>'parent_id' IS NULL`
+      : undefined,
   )
 
-  return paginateTweets({ db, whereClause, page, pageSize, reverse, cursor })
+  return paginateTweets({
+    db,
+    whereClause,
+    page,
+    pageSize,
+    reverse,
+    cursor,
+  })
 }
 
 /**
@@ -263,11 +293,20 @@ export async function getTweetsByKeyword({
   cursor,
 }: GetTweet & { keyword: string, cursor?: string }): Promise<PaginatedResponse<EnrichedTweet>> {
   const whereClause = and(
-    name ? eq(tweetsTable.userId, name) : undefined,
+    name
+      ? eq(tweetsTable.userId, name)
+      : undefined,
     sql`${tweetsTable.fullText} ILIKE ${`%${keyword}%`}`,
   )
 
-  return paginateTweets({ db, whereClause, page, pageSize, reverse, cursor })
+  return paginateTweets({
+    db,
+    whereClause,
+    page,
+    pageSize,
+    reverse,
+    cursor,
+  })
 }
 
 export async function getTweetsCount(db: DB, name: string, noReplies?: boolean) {
@@ -278,7 +317,9 @@ export async function getTweetsCount(db: DB, name: string, noReplies?: boolean) 
     .from(tweetsTable)
     .where(and(
       eq(tweetsTable.userId, name),
-      noReplies ? sql`${tweetsTable.jsonData}->>'parent_id' IS NULL` : undefined,
+      noReplies
+        ? sql`${tweetsTable.jsonData}->>'parent_id' IS NULL`
+        : undefined,
     ))
 }
 
@@ -363,7 +404,9 @@ const hasMediaImageCondition = and(
  * 少量扫描，避免全表 Seq Scan 与全量排序（实测 102k 行下 1.5s → 亚毫秒级）。
  */
 export async function getRandomMediaImageTweet({ db, name }: { db: DB, name?: string }): Promise<EnrichedTweet | null> {
-  const scope = name ? eq(tweetsTable.userId, name) : undefined
+  const scope = name
+    ? eq(tweetsTable.userId, name)
+    : undefined
 
   const [bounds] = await db
     .select({
@@ -397,7 +440,9 @@ export async function getRandomMediaImageTweet({ db, name }: { db: DB, name?: st
     .orderBy(desc(tweetsTable.id))
     .limit(1)
 
-  return backward[0] ? mapToEnrichedTweet(backward[0]) : null
+  return backward[0]
+    ? mapToEnrichedTweet(backward[0])
+    : null
 }
 
 /**
@@ -415,7 +460,10 @@ export async function getTweetsYearStats(db: DB, name: string): Promise<{ year: 
     .groupBy(sql`EXTRACT(YEAR FROM ${tweetsTable.createdAt})`)
     .orderBy(desc(sql`EXTRACT(YEAR FROM ${tweetsTable.createdAt})`))
 
-  return rows.map(row => ({ year: Number(row.year), count: Number(row.count) }))
+  return rows.map(row => ({
+    year: Number(row.year),
+    count: Number(row.count),
+  }))
 }
 
 export function mapToEnrichedTweet(tweet: SelectTweet): EnrichedTweet {

@@ -22,7 +22,9 @@ export function renderTarget(element: ReactElement, options: { width?: number } 
     <div
       data-testid="vrt-target"
       className="inline-block bg-background p-4 text-foreground"
-      style={options.width ? { width: `${options.width}px` } : undefined}
+      style={options.width
+        ? { width: `${options.width}px` }
+        : undefined}
     >
       {element}
     </div>,

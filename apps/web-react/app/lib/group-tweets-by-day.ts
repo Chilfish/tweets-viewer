@@ -38,7 +38,10 @@ export function groupTweetsByDay<T extends DateCarrier>(tweets: T[]): DayGroup<T
       last.tweets.push(tweet)
     }
     else {
-      groups.push({ dateKey, tweets: [tweet] })
+      groups.push({
+        dateKey,
+        tweets: [tweet],
+      })
     }
   }
   return groups

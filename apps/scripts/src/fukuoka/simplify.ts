@@ -97,9 +97,13 @@ async function main() {
       byId.set(t.id, t)
   }
 
-  const simplified = [...byId.values()]
+  const simplified = [
+    ...byId.values(),
+  ]
     .map(simplify)
-    .sort((a, b) => (a.jst < b.jst ? -1 : 1))
+    .sort((a, b) => (a.jst < b.jst
+      ? -1
+      : 1))
 
   await writeJson(simplified, OUT_FILE)
 

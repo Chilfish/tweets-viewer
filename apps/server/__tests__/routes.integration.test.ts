@@ -20,7 +20,12 @@ vi.mock('@tweets-viewer/database', () => ({
 function page(data: unknown[], hasMore = false) {
   return {
     data,
-    meta: { total: data.length, page: 1, pageSize: 10, hasMore },
+    meta: {
+      total: data.length,
+      page: 1,
+      pageSize: 10,
+      hasMore,
+    },
   }
 }
 
@@ -38,13 +43,21 @@ function buildApp() {
 describe('tweets routes integration (mocked db)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(db.getTweets).mockResolvedValue(page([{ id: '1' }]) as never)
-    vi.mocked(db.getTweetsCount).mockResolvedValue([{ value: 1 }] as never)
+    vi.mocked(db.getTweets).mockResolvedValue(page([
+      { id: '1' },
+    ]) as never)
+    vi.mocked(db.getTweetsCount).mockResolvedValue([
+      { value: 1 },
+    ] as never)
     vi.mocked(db.getTweetsByKeyword).mockResolvedValue(page([]) as never)
     vi.mocked(db.getMediaTweets).mockResolvedValue(page([]) as never)
-    vi.mocked(db.getMediaTweetsCount).mockResolvedValue([{ value: 0 }] as never)
+    vi.mocked(db.getMediaTweetsCount).mockResolvedValue([
+      { value: 0 },
+    ] as never)
     vi.mocked(db.getLastYearsTodayTweets).mockResolvedValue(page([]) as never)
-    vi.mocked(db.getTweetsYearStats).mockResolvedValue([{ year: 2026, count: 5 }])
+    vi.mocked(db.getTweetsYearStats).mockResolvedValue([
+      { year: 2026, count: 5 },
+    ])
   })
 
   it('passes cursor/page to getTweets and sets CDN cache headers', async () => {
@@ -180,7 +193,9 @@ describe('tweets routes integration (mocked db)', () => {
     const app = buildApp()
     const res = await app.request('/v3/tweets/stats/testuser')
     expect(res.status).toBe(200)
-    expect(await res.json()).toEqual([{ year: 2026, count: 5 }])
+    expect(await res.json()).toEqual([
+      { year: 2026, count: 5 },
+    ])
     expect(res.headers.get('Cache-Control')).toContain('s-maxage=3600')
   })
 })

@@ -13,5 +13,10 @@ export function useArchiveUsers() {
     .map(name => users.find(user => user.userName === name))
     .filter((user): user is EnrichedUser => Boolean(user))
 
-  return { users, activeUser, recentUsers, hasHydrated }
+  return {
+    users,
+    activeUser,
+    recentUsers,
+    hasHydrated,
+  }
 }

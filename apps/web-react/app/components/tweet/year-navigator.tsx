@@ -134,7 +134,9 @@ export function YearNavigator({ name, className }: YearNavigatorProps) {
           >
             <span>{year}</span>
             <span className="text-xs text-muted-foreground">
-              {count === null ? '暂无数据' : `${count} 条`}
+              {count === null
+                ? '暂无数据'
+                : `${count} 条`}
             </span>
           </DropdownMenuItem>
         ))}

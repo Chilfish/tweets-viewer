@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest'
 import { groupTweetsByUser } from '../group-tweets-by-user'
 
 function tweet(id: number, userName: string, name?: string) {
-  return { id, user: { screen_name: userName, name } }
+  return {
+    id,
+    user: { screen_name: userName, name },
+  }
 }
 
 describe('groupTweetsByUser', () => {
@@ -36,7 +39,10 @@ describe('groupTweetsByUser', () => {
 
   it('falls back to userName and unknown', () => {
     const tweets = [
-      { id: 1, user: { userName: 'viaUsername' } },
+      {
+        id: 1,
+        user: { userName: 'viaUsername' },
+      },
       { id: 2 },
     ]
     const groups = groupTweetsByUser(tweets as any)
@@ -45,7 +51,10 @@ describe('groupTweetsByUser', () => {
 
   it('captures avatar url', () => {
     const tweets = [
-      { id: 1, user: { screen_name: 'alice', profile_image_url_https: 'https://x/avatar.jpg' } },
+      {
+        id: 1,
+        user: { screen_name: 'alice', profile_image_url_https: 'https://x/avatar.jpg' },
+      },
     ]
     const groups = groupTweetsByUser(tweets as any)
     expect(groups[0].avatarUrl).toBe('https://x/avatar.jpg')

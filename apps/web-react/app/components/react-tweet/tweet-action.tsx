@@ -73,7 +73,9 @@ export function TweetAction({ tweet, className }: TweetActionProps) {
             <action.icon className="size-4" />
           </div>
           <span className="text-[0.8rem]">
-            {(action.count ?? 0) > 0 ? formatNumber(action.count ?? 0) : ''}
+            {(action.count ?? 0) > 0
+              ? formatNumber(action.count ?? 0)
+              : ''}
           </span>
         </div>
       ))}

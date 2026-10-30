@@ -14,7 +14,13 @@ interface Item {
 function pageOf(items: Item[], hasMore: boolean, nextCursor?: string): PaginatedResponse<Item> {
   return {
     data: items,
-    meta: { total: 100, page: 1, pageSize: 15, hasMore, nextCursor },
+    meta: {
+      total: 100,
+      page: 1,
+      pageSize: 15,
+      hasMore,
+      nextCursor,
+    },
   }
 }
 
@@ -107,7 +113,13 @@ describe('applyLoaderPage (loader 数据吸收契约)', () => {
 describe('applyFetchedPage (滚动续载吸收契约)', () => {
   it('should extract, append deduped items and update cursor/status', () => {
     const next = applyFetchedPage(
-      { items: [A, B], status: 'ready', total: 100, nextCursor: '2', loadedPages: 1 },
+      {
+        items: [A, B],
+        status: 'ready',
+        total: 100,
+        nextCursor: '2',
+        loadedPages: 1,
+      },
       pageOf([B, C], true, '3'),
       identity,
     )
@@ -121,7 +133,13 @@ describe('applyFetchedPage (滚动续载吸收契约)', () => {
 
   it('should mark exhausted when no more', () => {
     const next = applyFetchedPage(
-      { items: [A], status: 'ready', total: 100, nextCursor: '1', loadedPages: 4 },
+      {
+        items: [A],
+        status: 'ready',
+        total: 100,
+        nextCursor: '1',
+        loadedPages: 4,
+      },
       pageOf([C], false),
       identity,
     )
@@ -132,8 +150,22 @@ describe('applyFetchedPage (滚动续载吸收契约)', () => {
 
   it('should normalize numeric cursor to string', () => {
     const next = applyFetchedPage(
-      { items: [A], status: 'ready', total: 100, loadedPages: 1 },
-      { data: [C], meta: { total: 100, page: 2, pageSize: 15, hasMore: true, nextCursor: 42 } },
+      {
+        items: [A],
+        status: 'ready',
+        total: 100,
+        loadedPages: 1,
+      },
+      {
+        data: [C],
+        meta: {
+          total: 100,
+          page: 2,
+          pageSize: 15,
+          hasMore: true,
+          nextCursor: 42,
+        },
+      },
       identity,
     )
     expect(next.nextCursor).toBe('42')

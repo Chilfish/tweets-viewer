@@ -14,7 +14,11 @@ const ref = (name: string) => ({ $ref: `#/components/schemas/${name}` })
 export function jsonResponse(description: string, schema: string) {
   return {
     description,
-    content: { 'application/json': { schema: ref(schema) } },
+    content: {
+      'application/json': {
+        schema: ref(schema),
+      },
+    },
   }
 }
 
@@ -34,7 +38,12 @@ export const paginationParameters = [
     name: 'pageSize',
     required: false,
     description: '每页数量（1-100）',
-    schema: { type: 'integer' as const, minimum: 1, maximum: 100, default: 10 },
+    schema: {
+      type: 'integer' as const,
+      minimum: 1,
+      maximum: 100,
+      default: 10,
+    },
   },
   {
     in: 'query' as const,
@@ -59,7 +68,12 @@ export function nameParameter(name = 'name') {
     name,
     required: true,
     description: '用户 Screen Name（`\\w+`）',
-    schema: { type: 'string' as const, minLength: 1, maxLength: 50, pattern: '^\\w+$' },
+    schema: {
+      type: 'string' as const,
+      minLength: 1,
+      maxLength: 50,
+      pattern: '^\\w+$',
+    },
   }
 }
 
@@ -70,7 +84,12 @@ export function optionalNameParameter(description = '限定用户 Screen Name；
     name: 'name',
     required: false,
     description,
-    schema: { type: 'string' as const, minLength: 1, maxLength: 50, pattern: '^\\w+$' },
+    schema: {
+      type: 'string' as const,
+      minLength: 1,
+      maxLength: 50,
+      pattern: '^\\w+$',
+    },
   }
 }
 
@@ -107,7 +126,12 @@ const paginationMeta: SchemaObject = {
     page: { type: 'integer' },
     pageSize: { type: 'integer' },
     hasMore: { type: 'boolean' },
-    nextCursor: { oneOf: [{ type: 'integer' }, { type: 'string' }] },
+    nextCursor: {
+      oneOf: [
+        { type: 'integer' },
+        { type: 'string' },
+      ],
+    },
   },
   required: ['total', 'page', 'pageSize', 'hasMore'],
 }
@@ -119,12 +143,20 @@ const igMediaSchema: SchemaObject = {
     media_id: { type: 'string' },
     shortcode: { type: 'string' },
     display_url: { type: 'string', description: '图片/视频缩略图 CDN URL' },
-    video_url: { oneOf: [{ type: 'string' }, { type: 'null' }] },
+    video_url: {
+      oneOf: [
+        { type: 'string' },
+        { type: 'null' },
+      ],
+    },
     width: { type: 'integer' },
     height: { type: 'integer' },
     width_original: { type: 'integer' },
     height_original: { type: 'integer' },
-    type: { type: 'string', enum: ['photo', 'video'] },
+    type: {
+      type: 'string',
+      enum: ['photo', 'video'],
+    },
     tagged_users: {
       type: 'array',
       items: {
@@ -138,7 +170,14 @@ const igMediaSchema: SchemaObject = {
       },
     },
   },
-  required: ['num', 'media_id', 'display_url', 'width', 'height', 'type'],
+  required: [
+    'num',
+    'media_id',
+    'display_url',
+    'width',
+    'height',
+    'type',
+  ],
 }
 
 const igAudioSchema: SchemaObject = {
@@ -159,7 +198,9 @@ const igAudioSchema: SchemaObject = {
 const schemas: Record<string, SchemaObject> = {
   ErrorResponse: {
     type: 'object',
-    properties: { error: { type: 'string' } },
+    properties: {
+      error: { type: 'string' },
+    },
     required: ['error'],
   },
   PaginationMeta: paginationMeta,
@@ -176,15 +217,24 @@ const schemas: Record<string, SchemaObject> = {
   PaginatedTweets: {
     type: 'object',
     properties: {
-      data: { type: 'array', items: ref('EnrichedTweet') },
+      data: {
+        type: 'array',
+        items: ref('EnrichedTweet'),
+      },
       meta: ref('PaginationMeta'),
     },
     required: ['data', 'meta'],
   },
-  EnrichedUserList: { type: 'array', items: ref('EnrichedUser') },
+  EnrichedUserList: {
+    type: 'array',
+    items: ref('EnrichedUser'),
+  },
   YearStat: {
     type: 'object',
-    properties: { year: { type: 'integer' }, count: { type: 'integer' } },
+    properties: {
+      year: { type: 'integer' },
+      count: { type: 'integer' },
+    },
     required: ['year', 'count'],
   },
   TweetsYearStats: {
@@ -203,10 +253,19 @@ const schemas: Record<string, SchemaObject> = {
       username: { type: 'string' },
       fullname: { type: 'string' },
       description: { type: 'string' },
-      tags: { type: 'array', items: { type: 'string' } },
+      tags: {
+        type: 'array',
+        items: { type: 'string' },
+      },
       likes: { type: 'integer' },
-      type: { type: 'string', enum: ['post', 'reel'] },
-      media: { type: 'array', items: ref('IGMedia') },
+      type: {
+        type: 'string',
+        enum: ['post', 'reel'],
+      },
+      media: {
+        type: 'array',
+        items: ref('IGMedia'),
+      },
       avatar_url: { type: 'string' },
       created_at: { type: 'string' },
       location_name: { type: 'string' },
@@ -214,14 +273,27 @@ const schemas: Record<string, SchemaObject> = {
         type: 'array',
         items: {
           type: 'object',
-          properties: { username: { type: 'string' }, fullname: { type: 'string' } },
+          properties: {
+            username: { type: 'string' },
+            fullname: { type: 'string' },
+          },
           required: ['username', 'fullname'],
         },
       },
       verified: { type: 'boolean' },
       audio: ref('IGAudio'),
     },
-    required: ['id', 'post_id', 'url', 'username', 'fullname', 'description', 'likes', 'type', 'media'],
+    required: [
+      'id',
+      'post_id',
+      'url',
+      'username',
+      'fullname',
+      'description',
+      'likes',
+      'type',
+      'media',
+    ],
   },
   IGUserInfo: {
     type: 'object',
@@ -241,7 +313,10 @@ const schemas: Record<string, SchemaObject> = {
   PaginatedIGPosts: {
     type: 'object',
     properties: {
-      data: { type: 'array', items: ref('IGPost') },
+      data: {
+        type: 'array',
+        items: ref('IGPost'),
+      },
       meta: ref('PaginationMeta'),
     },
     required: ['data', 'meta'],
@@ -249,7 +324,12 @@ const schemas: Record<string, SchemaObject> = {
   IGUserPageResponse: {
     type: 'object',
     properties: {
-      user: { oneOf: [ref('IGUserInfo'), { type: 'null' }] },
+      user: {
+        oneOf: [
+          ref('IGUserInfo'),
+          { type: 'null' },
+        ],
+      },
       posts: ref('PaginatedIGPosts'),
     },
     required: ['user', 'posts'],
@@ -267,7 +347,10 @@ const schemas: Record<string, SchemaObject> = {
     properties: {
       today: { type: 'string' },
       message: { type: 'string' },
-      tweetsSize: { type: 'object', additionalProperties: { type: 'integer' } },
+      tweetsSize: {
+        type: 'object',
+        additionalProperties: { type: 'integer' },
+      },
     },
     required: ['today', 'message', 'tweetsSize'],
   },

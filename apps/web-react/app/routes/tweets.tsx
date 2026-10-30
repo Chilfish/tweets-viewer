@@ -133,7 +133,12 @@ export default function TweetsPage({ loaderData, params }: Route.ComponentProps)
         >
           {dayGroups.map((group, idx) => (
             <section key={`${group.dateKey}-${idx}`}>
-              <DateDivider dateKey={group.dateKey} className={idx === 0 ? 'pt-1' : 'pt-3'} />
+              <DateDivider
+                dateKey={group.dateKey}
+                className={idx === 0
+                  ? 'pt-1'
+                  : 'pt-3'}
+              />
               <div className="flex flex-col gap-3">
                 {group.tweets.map(tweet => (
                   <MyTweet

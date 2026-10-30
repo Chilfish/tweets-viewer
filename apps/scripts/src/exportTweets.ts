@@ -64,7 +64,9 @@ function parseArgs(argv: string[]): CliArgs {
   return {
     from,
     to,
-    usernames: usernames.length > 0 ? usernames : DEFAULT_USERNAMES,
+    usernames: usernames.length > 0
+      ? usernames
+      : DEFAULT_USERNAMES,
   }
 }
 

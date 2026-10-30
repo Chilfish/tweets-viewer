@@ -72,7 +72,9 @@ export function TweetMediaVideo({ media, showCoverOnly }: Props) {
         poster={getMediaUrl(media, 'small')}
         controls={!showPlayButton}
         playsInline
-        tabIndex={showPlayButton ? -1 : 0}
+        tabIndex={showPlayButton
+          ? -1
+          : 0}
       >
         <source
           src={proxyMedia(mp4Video.url)}

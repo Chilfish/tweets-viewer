@@ -114,15 +114,17 @@ describe('tweetSpaceCard', () => {
 })
 
 describe('tweetBody space link de-duplication', () => {
-  const entities = [{
-    type: 'url',
-    index: 0,
-    url: 'https://t.co/gOS5Qc3DS4',
-    text: 'x.com/i/spaces/1yoKM…',
-    display_url: 'x.com/i/spaces/1yoKM…',
-    expanded_url: SPACE_URL,
-    href: SPACE_URL,
-  }] as unknown as EnrichedTweet['entities']
+  const entities = [
+    {
+      type: 'url',
+      index: 0,
+      url: 'https://t.co/gOS5Qc3DS4',
+      text: 'x.com/i/spaces/1yoKM…',
+      display_url: 'x.com/i/spaces/1yoKM…',
+      expanded_url: SPACE_URL,
+      href: SPACE_URL,
+    },
+  ] as unknown as EnrichedTweet['entities']
 
   it('hides the space url when the card is rendered', () => {
     const { container } = render(

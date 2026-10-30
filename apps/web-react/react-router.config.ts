@@ -6,7 +6,9 @@ const isInVercel = process.env.VERCEL === 'true'
 const config: Config = {
   ssr: true,
   presets: isInVercel
-    ? ([vercelPreset()] as unknown as NonNullable<Config['presets']>)
+    ? ([
+        vercelPreset(),
+      ] as unknown as NonNullable<Config['presets']>)
     : [],
   prerender: ['/'],
   splitRouteModules: true,

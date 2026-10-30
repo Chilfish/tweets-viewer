@@ -31,7 +31,9 @@ function makeTweet(overrides: Partial<EnrichedTweet> = {}): EnrichedTweet {
     created_at: '2024-01-01T00:00:00Z',
     url: 'https://x.com/u/status/1',
     entities: [],
-    media_details: [photo('https://pbs.twimg.com/media/a.jpg')],
+    media_details: [
+      photo('https://pbs.twimg.com/media/a.jpg'),
+    ],
     ...overrides,
   } as EnrichedTweet
 }

@@ -29,7 +29,9 @@ describe.each([false, true])('myTweet visual (dark: %s)', (dark) => {
     setTheme(dark)
     renderTarget(
       <MyTweet
-        tweet={makeTweet({ media_details: fixturePhotos(2) })}
+        tweet={makeTweet({
+          media_details: fixturePhotos(2),
+        })}
         tweetAuthorName="ttisrn_0710"
       />,
       { width: 560 },
@@ -57,7 +59,9 @@ describe.each([false, true])('myTweet visual (dark: %s)', (dark) => {
               profile_image_url_https: fixtureAvatarUrl,
             },
             text: '新情報📢 LIVE FILM',
-            entities: [{ type: 'text', text: '新情報📢 LIVE FILM', index: 0 }],
+            entities: [
+              { type: 'text', text: '新情報📢 LIVE FILM', index: 0 },
+            ],
           }),
         })}
         tweetAuthorName="ttisrn_0710"

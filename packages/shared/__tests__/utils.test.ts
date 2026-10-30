@@ -22,15 +22,23 @@ describe('uniqueObj', () => {
   })
 
   it('should handle single-element arrays', () => {
-    const items = [{ id: 'x', value: 1 }]
+    const items = [
+      { id: 'x', value: 1 },
+    ]
     expect(uniqueObj(items, 'id')).toEqual(items)
   })
 })
 
 describe('mergeData', () => {
   it('should merge and replace newer data by key', () => {
-    const old = [{ id: 'a', v: 1 }, { id: 'b', v: 2 }]
-    const new_ = [{ id: 'b', v: 20 }, { id: 'c', v: 3 }]
+    const old = [
+      { id: 'a', v: 1 },
+      { id: 'b', v: 2 },
+    ]
+    const new_ = [
+      { id: 'b', v: 20 },
+      { id: 'c', v: 3 },
+    ]
     const result = mergeData(old, new_, 'id')
     expect(result).toHaveLength(3)
     expect(result.find(r => r.id === 'b')!.v).toBe(20)
@@ -38,8 +46,12 @@ describe('mergeData', () => {
   })
 
   it('should keep old data when no overlap', () => {
-    const old = [{ id: 'a', v: 1 }]
-    const new_ = [{ id: 'b', v: 2 }]
+    const old = [
+      { id: 'a', v: 1 },
+    ]
+    const new_ = [
+      { id: 'b', v: 2 },
+    ]
     const result = mergeData(old, new_, 'id')
     expect(result).toHaveLength(2)
   })

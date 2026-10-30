@@ -53,7 +53,9 @@ describe('groupTweetsByYear', () => {
   })
 
   it('uses year 0 for unparseable dates', () => {
-    const tweets = [{ id: 1, created_at: 'not-a-date' }]
+    const tweets = [
+      { id: 1, created_at: 'not-a-date' },
+    ]
     const groups = groupTweetsByYear(tweets)
     expect(groups[0].year).toBe(0)
   })

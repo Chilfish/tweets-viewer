@@ -106,30 +106,32 @@ export function FeedStatus({
         className,
       )}
     >
-      {status === 'error' ? (
-        <>
-          <div className="flex size-16 items-center justify-center rounded-full bg-muted/60">
-            <TriangleAlert className="size-8 text-destructive" aria-hidden="true" />
-          </div>
-          <p className="text-base font-semibold">加载失败</p>
-          <p className="text-sm text-muted-foreground max-w-md">
-            {errorMessage}
-          </p>
-          <Button variant="secondary" className="mt-2" onClick={onRetry}>
-            重试
-          </Button>
-        </>
-      ) : (
-        <>
-          <div className="flex size-16 items-center justify-center rounded-full bg-muted/60">
-            {emptyIcon ?? <Inbox className="size-8 text-muted-foreground/60" aria-hidden="true" />}
-          </div>
-          <p className="text-base font-semibold">{emptyTitle}</p>
-          {emptyDescription && (
-            <p className="text-sm text-muted-foreground max-w-md">{emptyDescription}</p>
+      {status === 'error'
+        ? (
+            <>
+              <div className="flex size-16 items-center justify-center rounded-full bg-muted/60">
+                <TriangleAlert className="size-8 text-destructive" aria-hidden="true" />
+              </div>
+              <p className="text-base font-semibold">加载失败</p>
+              <p className="text-sm text-muted-foreground max-w-md">
+                {errorMessage}
+              </p>
+              <Button variant="secondary" className="mt-2" onClick={onRetry}>
+                重试
+              </Button>
+            </>
+          )
+        : (
+            <>
+              <div className="flex size-16 items-center justify-center rounded-full bg-muted/60">
+                {emptyIcon ?? <Inbox className="size-8 text-muted-foreground/60" aria-hidden="true" />}
+              </div>
+              <p className="text-base font-semibold">{emptyTitle}</p>
+              {emptyDescription && (
+                <p className="text-sm text-muted-foreground max-w-md">{emptyDescription}</p>
+              )}
+            </>
           )}
-        </>
-      )}
     </div>
   )
 }

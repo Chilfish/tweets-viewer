@@ -63,7 +63,9 @@ export function TweetsToolbarActions({ className, hideComments = false, hideDate
         size="sm"
         onClick={toggleSort}
       >
-        {isReverse ? <SortAsc className="size-4" /> : <SortDesc className="size-4" />}
+        {isReverse
+          ? <SortAsc className="size-4" />
+          : <SortDesc className="size-4" />}
         <span className="hidden sm:inline text-xs font-medium">排序</span>
       </Button>
 
@@ -84,8 +86,12 @@ export function TweetsToolbarActions({ className, hideComments = false, hideDate
       {
         !hideDateRange && (
           <DateRangeFilter
-            start={startDateStr ? new Date(startDateStr) : undefined}
-            end={endDateStr ? new Date(endDateStr) : undefined}
+            start={startDateStr
+              ? new Date(startDateStr)
+              : undefined}
+            end={endDateStr
+              ? new Date(endDateStr)
+              : undefined}
             onApply={applyDateRange}
           />
         )

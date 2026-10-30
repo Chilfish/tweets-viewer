@@ -15,7 +15,9 @@ function getYear<T extends DateCarrier>(tweet: T): number {
   if (!source)
     return 0
   const date = new Date(source)
-  return Number.isNaN(date.getTime()) ? 0 : date.getFullYear()
+  return Number.isNaN(date.getTime())
+    ? 0
+    : date.getFullYear()
 }
 
 /**
@@ -32,7 +34,10 @@ export function groupTweetsByYear<T extends DateCarrier>(tweets: T[]): YearGroup
       last.tweets.push(tweet)
     }
     else {
-      groups.push({ year, tweets: [tweet] })
+      groups.push({
+        year,
+        tweets: [tweet],
+      })
     }
   }
   return groups

@@ -20,7 +20,9 @@ function makeTweet(overrides: Partial<EnrichedTweet> = {}): EnrichedTweet {
       profile_image_url_https: 'https://pbs.twimg.com/profile_images/1952673634377756672/FWjMlNpA.jpg',
     },
     text: 'MyGO!!!!!×Ave Mujica 合同ライブ\n「わかれ道の、その先へ」 LIVE FILM',
-    entities: [{ type: 'text', text: 'MyGO!!!!!×Ave Mujica 合同ライブ\n「わかれ道の、その先へ」 LIVE FILM', index: 0 }],
+    entities: [
+      { type: 'text', text: 'MyGO!!!!!×Ave Mujica 合同ライブ\n「わかれ道の、その先へ」 LIVE FILM', index: 0 },
+    ],
     is_inline_media: false,
     reply_count: 9,
     like_count: 802,

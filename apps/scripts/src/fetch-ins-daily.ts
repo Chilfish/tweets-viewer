@@ -89,7 +89,9 @@ function convertToIGPost(meta: Metadata): IGPost | null {
     description: (meta.description as string) ?? '',
     tags: meta.tags as string[] | undefined,
     likes: (meta.likes as number) ?? 0,
-    type: ((meta.type as string) === 'reel' ? 'reel' : 'post') as IGPost['type'],
+    type: ((meta.type as string) === 'reel'
+      ? 'reel'
+      : 'post') as IGPost['type'],
     media,
     avatar_url: avatar,
     created_at: (meta.post_date as string) ?? (meta.date as string),
@@ -171,14 +173,16 @@ async function handleQueue(
   if (!match)
     return []
 
-  const child = Reflect.construct(ExtrClass, [{
-    url,
-    match,
-    config: ig.config,
-    http: ig.http,
-    storage: ig.storage,
-    log: ig.log,
-  }]) as { initialize: () => Promise<void>, [Symbol.asyncIterator]: () => AsyncGenerator<any, void, unknown> }
+  const child = Reflect.construct(ExtrClass, [
+    {
+      url,
+      match,
+      config: ig.config,
+      http: ig.http,
+      storage: ig.storage,
+      log: ig.log,
+    },
+  ]) as { initialize: () => Promise<void>, [Symbol.asyncIterator]: () => AsyncGenerator<any, void, unknown> }
 
   await child.initialize()
 
