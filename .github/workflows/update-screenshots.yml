@@ -13,16 +13,13 @@ name: Update Visual Regression Screenshots
 on:
   workflow_dispatch:
   pull_request:
-    types: [ labeled ]
+    types: [labeled]
 
 jobs:
   update-screenshots:
     # 不在默认分支上直接跑（安全阀，参照 Vitest 官方模板）；fork PR 无法 push 回分支
     if: >-
-      (github.event_name == 'workflow_dispatch' && github.ref_name !=
-      github.event.repository.default_branch) || (github.event_name ==
-      'pull_request' && github.event.label.name == 'update-screenshots' &&
-      github.event.pull_request.head.repo.fork == false)
+      (github.event_name == 'workflow_dispatch' && github.ref_name != github.event.repository.default_branch) || (github.event_name == 'pull_request' && github.event.label.name == 'update-screenshots' && github.event.pull_request.head.repo.fork == false)
 
     runs-on: ubuntu-latest
 
@@ -30,8 +27,7 @@ jobs:
       contents: write
 
     concurrency:
-      group: update-screenshots-${{ github.event.pull_request.head.ref ||
-        github.ref_name }}
+      group: update-screenshots-${{ github.event.pull_request.head.ref || github.ref_name }}
       cancel-in-progress: true
 
     steps:
