@@ -66,14 +66,15 @@ export function FeedStatus({
         )}
       >
         {status === 'fetching' && (
-          <div className="flex items-center gap-2 text-muted-foreground">
+          <div data-vrt-mask className="flex w-full items-center justify-center gap-2 text-muted-foreground">
             <Loader2 className="size-5 animate-spin" aria-hidden="true" />
             <span className="text-sm font-medium">正在加载更多…</span>
           </div>
         )}
 
         {status === 'error' && (
-          <div className="flex flex-col items-center gap-2">
+          // 整宽行固定 VRT 遮罩区域，避免按钮文案宽度变化导致基线误报（见 app/test/vrt.tsx）
+          <div data-vrt-mask className="flex w-full flex-col items-center gap-2">
             <p className="text-sm text-destructive font-medium">加载失败</p>
             <Button variant="secondary" size="sm" onClick={onRetry}>
               重试
@@ -116,9 +117,12 @@ export function FeedStatus({
               <p className="text-sm text-muted-foreground max-w-md">
                 {errorMessage}
               </p>
-              <Button variant="secondary" className="mt-2" onClick={onRetry}>
-                重试
-              </Button>
+              {/* 整宽行固定 VRT 遮罩区域，避免按钮文案宽度变化导致基线误报 */}
+              <div data-vrt-mask className="mt-2 flex w-full justify-center">
+                <Button variant="secondary" onClick={onRetry}>
+                  重试
+                </Button>
+              </div>
             </>
           )
         : (
