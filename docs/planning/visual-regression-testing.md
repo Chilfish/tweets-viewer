@@ -57,6 +57,7 @@ Phase 5 完成后，UI 的视觉表现（token 化配色、`.dark` 双主题、�
 3. **动画**：Playwright provider 截图时自动 `animations: 'disabled'`（`animate-spin`/`animate-in fade-in` 冻结在自然终态），无需额外注入 CSS。
 4. **双主题**：`@custom-variant dark (&:is(.dark *))` 是后代选择器，测试内对 `document.documentElement` 切换 `.dark` 类（与真实 app 行为一致：token 从 html 继承）。
 5. 组件截图定位用 `page.getByTestId('vrt-target')`（渲染时包裹），只截组件本体不截整页。
+6. **文案遮罩（2026-10-31 起）**：`toMatchScreenshot` 的 `screenshotOptions.mask` 遮掉 UI 文案（`p` / `button` / `[data-vrt-mask]` 行），文案由 RTL 单测断言；像素只守布局、间距、配色、图标几何。宽度随文案变化的控件（重试按钮）用 `[data-vrt-mask]` 包成整宽行再遮，避免遮罩框随文案长短漂移。当前只在 `FeedStatus`（纯状态文案组件）启用；Tweet / Profile 的文本是 fixture 内容，保留在截图里。
 
 ### 3.3 覆盖对象（第一期：核心组件 × 双主题）
 
@@ -75,6 +76,8 @@ Phase 5 完成后，UI 的视觉表现（token 化配色、`.dark` 双主题、�
 - 基线**只能在 CI（ubuntu）生成/更新**，本地跑 `test:visual` 仅作参考（win32 基线不提交）
 - `.gitignore` 加规则忽略 `__screenshots__/**/*-win32.png`，防止误提交
 - 本地故意改 UI 后：**不要**本地 `--update` 提交；走 §五 的 update workflow
+- **环境固定（2026-10-31 起）**：`ci.yml` 的 `visual` job 与 `update-screenshots.yml` 都固定 `runs-on: ubuntu-24.04`、`bun-version-file: package.json`。固定 runner 镜像版本而不是 `ubuntu-latest`，避免 runner 升级静默改变字形渲染导致基线整体失配；两个 workflow 必须同步修改
+- **文案变化不再需要重生成基线**：UI 文案已由 mask 排除（§3.2 第 6 条）；只有布局/间距/配色/图标等结构变化才更新基线
 
 ### 播种流程（首次落地，CI 不红）
 
@@ -103,7 +106,8 @@ Phase 5 完成后，UI 的视觉表现（token 化配色、`.dark` 双主题、�
 
 ## 七、已知限制
 
-- **平台字体差异**：`--font-sans` 是系统栈 + Noto CJK 回退，win32/linux 字形不同 → 本地 vrt 结果仅供开发参考，门禁以 CI 为准
+- **平台字体差异**：`--font-sans` 是系统栈 + Noto CJK 回退，win32/linux 字形不同 → 本地 vrt 结果仅供开发参考，门禁以 CI 为准；CI runner 已固定 `ubuntu-24.04`，升级 runner 时需同步重生成基线
+- **文本字形不在像素门禁内**：FeedStatus 的文案被 mask，字形/断行回归由 RTL 单测与人工审阅覆盖；像素门禁只守其布局、配色与图标
 - **首期不做**：移动端 viewport（390×844）第二组基线、页面级 E2E、视频/灯箱交互——视首期运行成本再决定
 - **基线是二进制**：18 张 PNG 体积可控（每张 tens-of-KB），若未来超百张再考虑 Git LFS（官方建议）
 

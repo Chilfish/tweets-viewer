@@ -6,6 +6,7 @@
 
 | 日期 | 主题 |
 |---|---|
+| [2026-10-31](2026-10-31.md) | VRT 门禁降噪：文案用 `screenshotOptions.mask` 排除、改由 RTL 断言；重试按钮行用 `[data-vrt-mask]` 固定遮罩；CI 与基线 workflow 固定 `ubuntu-24.04` / bun 版本（postmortem 007） |
 | [2026-10-22](2026-10-22.md) | 每日抓取代理配置改由订阅动态生成（`MIHOMO_SUB_URL` + `prepareMihomo.ts`）；修 10/20–10/21 节点域名失效导致的 DNS 解析失败 |
 | [2026-10-19](2026-10-19.md) | `DATABASE_URL` 支持逗号分隔多地址：`dailyUpdate` 对每个归档库并发跑一轮完整更新（单库失败不影响其他库、但整体 exit ≠ 0）；`parseDatabaseUrls()` 下沉 shared，`fetchTweetDaily()` 参数化并返回结构化结果；顺带修 `DATABASE_URL` 缺失与入库失败两处「假绿」 |
 | [2026-09-25](2026-09-25.md) | 同步 anonTweet 的 rettiwt-api 数据层（JetFuel 解析 + `AudioSpaceById` 请求）并端到端移植 X Space 卡片：五态行动区（可回放/直播中/尚未开始/不可回放/已删除墓碑）、正文链接去重、抓取时挂载 `space`；顺带清掉失效的 Space 请求选项 |

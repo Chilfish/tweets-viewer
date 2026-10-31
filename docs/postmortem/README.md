@@ -14,6 +14,7 @@
 | [004](004-bun-cwd-run-false-green.md) | `bun --cwd X run <script>` 无效语法打 usage 且 exit 0 → CI 步骤假绿空转（VRT 检查失效两轮） | 工具反馈滞后 | workflow 调 bun 脚本只用隐式 `bun --cwd X <script>` 或 `working-directory:` + `bun run`；CI 的绿必须在日志里看到真实产物，不能只信退出码 | 已记录 |
 | [005](005-host-node-env-leak.md) | 宿主 `NODE_ENV=production` 泄漏进 Vitest → React 加载 production 构建（`React.act` 缺失），组件测试全红；脚本内联 `NODE_ENV=` 在 Bun shell 下静默无效 | 工具反馈滞后 | 脚本 `NODE_ENV` 一律 `cross-env` 固定；改完用探针确认真实值，不能只看退出码 | 已记录 |
 | [006](006-x-403-datacenter-egress.md) | 定时抓取 18 个用户全量 403 —— 真实原因是 X 拒绝数据中心出口 IP；排查中又踩「本机 TUN/fake-ip 污染测量」得出过错误结论 | 工具反馈滞后 + 设计建模 | 外部 API 拒绝时先落错误明细再判断；跨环境链路验证必须在目标环境做；轮换策略要按错误类别分类 | 已记录 |
+| [007](007-vrt-copy-churn-stale-baselines.md) | 文案重构后 VRT 基线未重生成 → `visual` job 红；同一改动 dark 被拦、light 被放过 | 流程缺失 + 设计建模 | 像素门禁不测文案（mask + RTL 断言）；mask 目标必须尺寸稳定；门禁与基线生成环境固定 runner 版本 | 已记录 |
 
 ## 常见坑（写码前自查）
 
@@ -52,6 +53,8 @@
 |---|---|
 | 宿主 `NODE_ENV` 泄漏 | 各包 `test`/`dev`/`build` 脚本一律 `cross-env NODE_ENV=...`；脚本内联 `NODE_ENV=foo cmd` 在 Bun shell 下静默无效，不要用（见 [005](005-host-node-env-leak.md)） |
 | 「改了但没生效」的脚本配置 | 用探针（临时用例 `console.log(process.env.NODE_ENV, typeof React.act)`）核对真实值，不能只看退出码 |
+| 用像素基线测 UI 文案 | 文案属内容，改动频繁：用 `toMatchScreenshot` 的 `screenshotOptions.mask` 遮掉 `p`/`button`，文案交给 RTL 断言；mask 目标用固定尺寸容器（`[data-vrt-mask]`），否则遮罩框仍随文案漂移（见 [007](007-vrt-copy-churn-stale-baselines.md)） |
+| 门禁用浮动环境标签 | 视觉门禁与基线生成 workflow 固定 `runs-on: ubuntu-24.04`、`bun-version-file: package.json`；`ubuntu-latest` / `bun-version: latest` 升级会让整套基线静默失配（见 [007](007-vrt-copy-churn-stale-baselines.md)） |
 | 本地有 TUN/系统代理时验证代理链路 | 出口 IP 与 DNS 都会被外层接管（fake-ip 会解析成 `198.18.x.x`）、出站被二次跳转 → 逐节点结论全部不可信；跨环境链路问题放到目标环境（runner）验证，或先证明进程实际解析/连接的目标（见 [006](006-x-403-datacenter-egress.md)） |
 | 测试假绿 | 断言必须能在「改坏行为」时变红；`test/expect-expect` 等 lint 规则 + 核对 Test Files 数量双重兜底 |
 
