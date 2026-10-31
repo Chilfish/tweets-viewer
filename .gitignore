@@ -64,6 +64,7 @@ coverage/
 **/__screenshots__/**/*-win32.png
 
 # vitest 附件产物（截图 diff/actual 等临时输出）
+.vitest/
 .vitest-attachments
 # Local harness memory state
 .mnemon/

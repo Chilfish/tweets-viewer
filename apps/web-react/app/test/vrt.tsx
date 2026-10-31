@@ -1,5 +1,9 @@
+import type { ScreenshotMatcherOptions } from '@vitest/browser/context'
 import type { ReactElement } from 'react'
+import type { Locator } from 'vitest/browser'
 import { render } from '@testing-library/react'
+import { expect } from 'vitest'
+import { page } from 'vitest/browser'
 
 /**
  * 切换文档级主题。
@@ -29,4 +33,36 @@ export function renderTarget(element: ReactElement, options: { width?: number } 
       {element}
     </div>,
   )
+}
+
+/**
+ * 文案是「内容」不是「视觉」：像素基线只守布局 / 配色 / 图标几何，
+ * 文案由 RTL 断言覆盖。遮掉文本块后，改一句 UI 文案不再需要重生成所有基线。
+ *
+ * 选择 `p` / `button` 而不是 `getByText`：getByText 依赖当前文案，
+ * 文案一改 locator 就失效，遮罩必须在文案变化后仍然稳定。
+ *
+ * `[data-vrt-mask]` 用于包住「宽度随文案变化」的控件（如按钮行）：
+ * 只遮按钮会因文案长短改变遮罩框宽度而误报，遮整宽的行才是稳定区域。
+ */
+export function maskText(root: Locator = page.getByTestId('vrt-target')): Locator[] {
+  return Array.from(root.element().querySelectorAll('p, button, [data-vrt-mask]'))
+    .map(element => page.elementLocator(element))
+}
+
+// Vitest 5 运行时支持 Playwright 的 mask（@vitest/browser 内部 ScreenshotMatcherArguments
+// 已声明），但公开的 ScreenshotMatcherOptions 类型还没暴露。集中在这里断言一次，
+// 避免每个用例各自处理类型；等上游公开后删掉这个类型和断言即可。
+type ScreenshotOptionsWithMask = ScreenshotMatcherOptions & {
+  screenshotOptions?: ScreenshotMatcherOptions['screenshotOptions'] & { mask?: Locator[] }
+}
+
+/** 带文本遮罩的截图断言；未传 mask 时等价于直接调用 toMatchScreenshot。 */
+export function expectScreenshot(locator: Locator, name: string, mask?: Locator[]): Promise<void> {
+  const options = mask?.length
+    ? {
+        screenshotOptions: { mask },
+      } as ScreenshotOptionsWithMask
+    : undefined
+  return expect(locator).toMatchScreenshot(name, options) as Promise<void>
 }

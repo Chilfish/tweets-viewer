@@ -26,7 +26,14 @@ export default antfu({
     'e18e/prefer-array-fill': 'off',
     // 断言存在性机器化：每条 it 至少一条断言，拦住条件断言 / 裸 expect
     // （防止「测试看起来绿，其实什么都没验」这一类假绿，见 docs/postmortem）
-    'test/expect-expect': 'error',
+    // expectScreenshot 是 toMatchScreenshot 的带遮罩封装（app/test/vrt.tsx），
+    // 与 expect 一样属于断言，加入白名单避免误报「Test has no assertions」
+    'test/expect-expect': [
+      'error',
+      {
+        assertFunctionNames: ['expect', 'expectScreenshot'],
+      },
+    ],
     'test/no-conditional-expect': 'error',
     'test/no-standalone-expect': 'error',
   },
