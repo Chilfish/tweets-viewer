@@ -60,13 +60,14 @@ jobs:
 
   # 视觉回归门禁（VRT）：环境必须与 update-screenshots.yml 严格同构
   # （runner / playwright 安装 / CJK 字体三者任一不同 → 基线像素级不匹配 → 永久红）
+  # 固定 ubuntu-24.04 而不是 ubuntu-latest：runner 镜像升级会静默改变字形渲染。
   visual:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
+          bun-version-file: package.json
       - run: bun install
       - name: Install Playwright browsers
         run: bunx playwright install --with-deps --only-shell
