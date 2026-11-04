@@ -35,7 +35,6 @@
     "chalk": "^6.0.1",
     "commander": "^15.0.0",
     "cookiejar": "^2.1.4",
-    "happy-dom": "20.1.0",
     "http-proxy-agent": "^9.1.0",
     "https-proxy-agent": "^9.1.0",
     "neoqs": "^6.13.0",
