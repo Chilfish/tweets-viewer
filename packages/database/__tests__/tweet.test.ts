@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  dateRangeToSortKeyRange,
   extractMediaImageUrls,
   extractTweetSortKey,
   mapToEnrichedTweet,
@@ -60,6 +61,31 @@ describe('extractTweetSortKey', () => {
       jsonData: { retweeted_original_id: '1111111111' },
     }
     expect(extractTweetSortKey(row as any)).toBe('1111111111')
+  })
+})
+
+describe('dateRangeToSortKeyRange', () => {
+  const day = new Date('2026-11-03')
+
+  it('includes a retweet by its action day, not the original publish day', () => {
+    const { min, max } = dateRangeToSortKeyRange(day, day)
+    // 2026-11-03 转发了一条 2025 年的旧推：排序键（转推动作 id）落在当天
+    const retweetEventId = 2117602274172338417n
+    expect(retweetEventId).toBeGreaterThanOrEqual(BigInt(min))
+    expect(retweetEventId).toBeLessThanOrEqual(BigInt(max))
+  })
+
+  it('covers the whole UTC day and stays contiguous', () => {
+    const { max } = dateRangeToSortKeyRange(day, day)
+    const next = dateRangeToSortKeyRange(new Date('2026-11-04'), new Date('2026-11-04'))
+    expect(BigInt(next.min)).toBe(BigInt(max) + 1n)
+  })
+
+  it('spans multiple days inclusively', () => {
+    const single = dateRangeToSortKeyRange(new Date('2026-11-01'), new Date('2026-11-01'))
+    const range = dateRangeToSortKeyRange(new Date('2026-11-01'), new Date('2026-11-03'))
+    expect(range.min).toBe(single.min)
+    expect(BigInt(range.max)).toBeGreaterThan(BigInt(single.max))
   })
 })
 

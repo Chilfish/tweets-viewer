@@ -38,6 +38,9 @@ interface PaginatedResponse<T> {
 > - `meta.nextCursor` 在 `hasMore` 为 true 时返回（tweets 系列端点）。无限滚动用 `?cursor=<值>` 续载下一页，
 >   深翻页不随页码退化；分页器跳页仍用 `?page=N`（offset 定位）。
 > - 排序键 = `COALESCE(jsonData->>'retweeted_original_id', "tweetId")`（snowflake，时间有序）。
+>   `retweeted_original_id` 存的是**转推动作自身**的推文 id（被转原推的 id 在 `id`），排序键即「事件时间」。
+> - 日期范围 `start` / `end` 与排序 / `cursor` 同域：按排序键对应的 UTC 自然日筛选，`end` 含当天。
+>   转推按转推动作发生日归入范围（当天转发的旧推在当天可见），按年统计同样按事件时间。
 > - `cursor` 必须是 1-19 位十进制数字（snowflake id，超出 BIGINT 范围无意义）；非法游标返回 **400**，不会透传到数据库。
 > - IG 帖子量级小，保持 offset 分页，`nextCursor` 不返回。
 
@@ -91,8 +94,8 @@ interface PaginatedResponse<T> {
   - `pageSize` (number, default: 10): 每页数量
   - `reverse` (boolean, default: false): 排序方向（true 为旧 -> 新，false 为新 -> 旧）；接受 `true` / `false` / `1` / `0`
   - `cursor` (string, optional): keyset 游标（1-19 位十进制 snowflake 排序键），滚动续载下一页（优先于 `page`）
-  - `start` (string, ISO Date, optional): 筛选开始日期（与 `end` 成对提供）
-  - `end` (string, ISO Date, optional): 筛选结束日期（与 `start` 成对提供）
+  - `start` (string, ISO Date, optional): 筛选开始日期（与 `end` 成对提供）；按排序键（事件时间）的 UTC 自然日，含当天
+  - `end` (string, ISO Date, optional): 筛选结束日期（与 `start` 成对提供）；转推按转发发生日归入范围
   - `noReplies` (boolean, default: false): 是否排除回复推文；接受 `true` / `false` / `1` / `0`
 
 - **Response**: `PaginatedResponse<EnrichedTweet>`
@@ -137,7 +140,7 @@ interface PaginatedResponse<T> {
 
 ### 4. 获取用户推文按年统计
 
-用户推文按年分布（档案完整性指示：覆盖年份范围 + 每年条数）。
+用户推文按年分布（档案完整性指示：覆盖年份范围 + 每年条数）。年份按**事件时间**统计：转推计入转发发生的年份，与 `start` / `end` 筛选和排序同域。
 
 - **Endpoint**: `GET /v3/tweets/stats/:name`
 

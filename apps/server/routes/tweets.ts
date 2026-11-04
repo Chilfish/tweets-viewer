@@ -268,7 +268,7 @@ app.get('/medias/:name', describeRoute({
 app.get('/stats/:name', describeRoute({
   tags: ['Tweets'],
   summary: '获取用户推文按年统计',
-  description: '归档完整性指示：覆盖年份范围 + 每年条数。',
+  description: '归档完整性指示：覆盖年份范围 + 每年条数。年份按事件时间统计（转推计入转发发生年份），与日期范围筛选同域。',
   parameters: [
     nameParameter(),
   ],

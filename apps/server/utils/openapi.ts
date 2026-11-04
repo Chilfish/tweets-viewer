@@ -98,14 +98,14 @@ export const dateParameters = [
     in: 'query' as const,
     name: 'start',
     required: false,
-    description: '起始日期（ISO date；与 end 成对提供，两者同时存在时才在查询中生效）',
+    description: '起始日期（ISO date；与 end 成对提供）；按排序键的 UTC 自然日筛选，含当天，转推按转发发生日归入范围',
     schema: { type: 'string' as const, format: 'date' },
   },
   {
     in: 'query' as const,
     name: 'end',
     required: false,
-    description: '结束日期（ISO date）',
+    description: '结束日期（ISO date）；与 start 同域，含当天',
     schema: { type: 'string' as const, format: 'date' },
   },
 ]

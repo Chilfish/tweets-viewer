@@ -118,6 +118,11 @@
 - **keyset 续载（nextCursor 转正）**: 当 `meta.hasMore` 为 `true` 时，服务端返回 `meta.nextCursor`
   （排序键 = `COALESCE(retweeted_original_id, tweetId)`，snowflake 时间有序）。探索模式（无限滚动）
   用 `?cursor=<nextCursor>` 续载下一页，深翻页不随页码退化。IG 帖子流（量级小）不返回游标，保持 page 分页。
+  其中 `retweeted_original_id` 存的是**转推动作自身**的推文 id（被转原推的 id 在 `id`），排序键表达的是「事件时间」。
+- **日期范围与排序同域（事件流语义）**: `start` / `end` 按**排序键**对应的 UTC 自然日筛选，`end` 含当天。
+  范围表达「当天发生了哪些动作」：原推按发布日、转推按**转推动作发生日**归入范围（同一天转发的旧推可见）。
+  筛选条件与排序 / `nextCursor` 使用同一时间域，结果页不会出现区间外的排序键。
+  `/v3/tweets/stats/:name` 的按年统计采用同一口径（转推计入转发发生的年份）。
 - **游标校验**: `cursor` 是 1-19 位十进制 snowflake 排序键；非法游标在进入数据库前返回 **400**（不透传触发 SQL 类型错误）。
 - **筛选下的 total**: 带日期范围等筛选时，`total` 必须是**该范围内**的计数；`hasMore` 由 `offset + rows.length < total` 判定，
   空页必须收敛为 `hasMore=false`（不得复用未过滤的缓存总数）。

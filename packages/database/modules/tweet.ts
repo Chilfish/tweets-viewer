@@ -17,11 +17,40 @@ interface GetTweet {
 
 const BATCH_SIZE = 1000
 
+const SNOWFLAKE_EPOCH_MS = 1288834974657n
+const SNOWFLAKE_TIME_SHIFT = 22n
+const SNOWFLAKE_SEQUENCE_MASK = (1n << SNOWFLAKE_TIME_SHIFT) - 1n
+const DAY_MS = 86_400_000n
+
 /**
- * 推文流排序键：优先按被转推原推 id（转推跟随原推时间线），否则按推文 id。
+ * 推文流排序键：转推取**转推动作自身**的推文 id（`retweeted_original_id`），
+ * 原推取推文 id。两者都是 snowflake，表达「事件时间」而非原推发布日。
  * snowflake id 时间有序，可直接 cast 为 BIGINT 比较（keyset 分页的游标语义）。
  */
 const sortKeyExpr = sql`CAST(COALESCE(${tweetsTable.jsonData}->>'retweeted_original_id', ${tweetsTable.tweetId}) AS BIGINT)`
+
+/** 排序键对应的 UTC 时间（timestamptz）；与日期范围筛选保持同一时间域。 */
+const sortKeyTimestampExpr = sql`to_timestamp(((${sortKeyExpr} >> 22) + ${sql.raw(SNOWFLAKE_EPOCH_MS.toString())})::double precision / 1000)`
+
+/** 排序键对应的 UTC 年份，用于按年统计。 */
+const sortKeyYearExpr = sql`EXTRACT(YEAR FROM (${sortKeyTimestampExpr} AT TIME ZONE 'UTC'))`
+
+/**
+ * 将日期范围映射为排序键（snowflake）的闭区间。
+ *
+ * `start` / `end` 按 UTC 自然日解释，`end` 含当天整天；返回值是十进制字符串，
+ * 可直接与 `sortKeyExpr` 的 BIGINT 比较，并命中 `idx_tweets_username_sortkey`。
+ */
+export function dateRangeToSortKeyRange(startDate: Date, endDate: Date): { min: string, max: string } {
+  const min = (BigInt(startDate.getTime()) - SNOWFLAKE_EPOCH_MS) << SNOWFLAKE_TIME_SHIFT
+  const max = ((BigInt(endDate.getTime()) + DAY_MS - 1n - SNOWFLAKE_EPOCH_MS) << SNOWFLAKE_TIME_SHIFT)
+    | SNOWFLAKE_SEQUENCE_MASK
+
+  return {
+    min: min.toString(),
+    max: max.toString(),
+  }
+}
 
 function _order(reverse: boolean) {
   return reverse
@@ -260,9 +289,12 @@ export async function getTweetsByDateRange({
   noReplies,
   cursor,
 }: GetTweet & { startDate: Date, endDate: Date, cursor?: string }): Promise<PaginatedResponse<EnrichedTweet>> {
+  const range = dateRangeToSortKeyRange(startDate, endDate)
+
   const whereClause = and(
     eq(tweetsTable.userId, name),
-    sql`CAST(${tweetsTable.createdAt} AS DATE) BETWEEN ${startDate} AND ${endDate}`,
+    // 范围按排序键（事件时间）过滤，与排序 / 游标同域
+    sql`${sortKeyExpr} BETWEEN CAST(${range.min} AS BIGINT) AND CAST(${range.max} AS BIGINT)`,
     noReplies
       ? sql`${tweetsTable.jsonData}->>'parent_id' IS NULL`
       : undefined,
@@ -338,6 +370,10 @@ export async function getMediaTweets({
   endDate,
   total: providedTotal,
 }: GetTweet & { cursor?: string, startDate?: Date, endDate?: Date, total?: number }): Promise<PaginatedResponse<EnrichedTweet>> {
+  const range = startDate && endDate
+    ? dateRangeToSortKeyRange(startDate, endDate)
+    : undefined
+
   const whereClause = and(
     eq(tweetsTable.userId, name),
     // 排除转推
@@ -345,8 +381,9 @@ export async function getMediaTweets({
     // 必须包含媒体
     sql`json_typeof(${tweetsTable.jsonData}->'media_details') = 'array'`,
     sql`json_array_length(${tweetsTable.jsonData}->'media_details') > 0`,
-    startDate && endDate
-      ? sql`CAST(${tweetsTable.createdAt} AS DATE) BETWEEN ${startDate} AND ${endDate}`
+    // 与排序 / 游标同域（媒体已排除转推，排序键即推文发布 id）
+    range
+      ? sql`${sortKeyExpr} BETWEEN CAST(${range.min} AS BIGINT) AND CAST(${range.max} AS BIGINT)`
       : undefined,
   )
 
@@ -452,13 +489,13 @@ export async function getRandomMediaImageTweet({ db, name }: { db: DB, name?: st
 export async function getTweetsYearStats(db: DB, name: string): Promise<{ year: number, count: number }[]> {
   const rows = await db
     .select({
-      year: sql<number>`EXTRACT(YEAR FROM ${tweetsTable.createdAt})`,
+      year: sql<number>`${sortKeyYearExpr}`,
       count: count(),
     })
     .from(tweetsTable)
     .where(eq(tweetsTable.userId, name))
-    .groupBy(sql`EXTRACT(YEAR FROM ${tweetsTable.createdAt})`)
-    .orderBy(desc(sql`EXTRACT(YEAR FROM ${tweetsTable.createdAt})`))
+    .groupBy(sortKeyYearExpr)
+    .orderBy(desc(sortKeyYearExpr))
 
   return rows.map(row => ({
     year: Number(row.year),

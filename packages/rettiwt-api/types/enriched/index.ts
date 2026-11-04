@@ -45,6 +45,10 @@ export type EnrichedTweet = Omit<Tweet, OmitTypes> & {
   card?: LinkPreviewCard
   /** X Space（语音直播/录音回放）卡片数据；仅带 Space 卡或正文含 Space 链接的推文有 */
   space?: SpaceDetails
+  /**
+   * 转推动作自身的推文 id（被转原推的 id 在 `id`），同时作为推文流的排序键。
+   * 字段名沿用上游，含义是「事件 id」而非「原推 id」。
+   */
   retweeted_original_id?: string
   is_inline_media?: boolean
   reply_count?: number
