@@ -1,4 +1,5 @@
-# Taste
+# 通用约定
+
 - Documentation-first: before implementing or refactoring, inspect the project's current state and its docs/specs, and follow those conventions; repeatedly reminds "文档先行" and to align fully with the reference project's process and standards. Confidence: 0.9
 - Treats conventions as things that must be enforced, not just documented: wants lint rules, git hooks and gate scripts (e.g. pre-push running lint/typecheck/test/build, aggregate root scripts) updated alongside the docs ("更新本项目的文档以及相关约束"). Confidence: 0.6
 - Commit work following the project's documented git workflow (e.g. docs/engineering/git-workflow.md), splitting changes into logical batches rather than one blob; expects the agent to just proceed when told "直接干" or once he approves the plan ("看起来没问题了，你可以继续后续的步骤"), including the follow-ups the agent flagged itself. Confidence: 0.85
