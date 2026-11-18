@@ -69,6 +69,7 @@ tweets-viewer/
   | `import-ins-data.ts` | IG 批量导入：读取本地 JSON，查 mapping.ts 映射，写入 users.ins_json_data + ins_posts |
   | `insertToDB.ts` | Twitter 批量导入：读取本地 JSON，写入 users + tweets |
   | `mapping.ts` | IG username → twitter username 映射表，供导入脚本查询 |
+- **IG 归档接入流程**：导出 → 下载媒体并改写 CDN 链接 → 上传 R2 → 登记映射 → 入库，见 [engineering/ig-archive-onboarding.md](engineering/ig-archive-onboarding.md)
 - **调度**：GitHub Actions cron (`0 16 * * *` UTC = 北京时间 00:00) + 手动触发
 - **工作流**：`.github/workflows/fetch-daily.yml` — checkout → setup Bun → install → run `dailyUpdate.ts`
 - **连接池**：Twitter 用 `RettiwtPool` 多 API_KEY 轮转；IG 用 `@chilfish/gallery-dl-instagram` SDK + Cookie 认证
