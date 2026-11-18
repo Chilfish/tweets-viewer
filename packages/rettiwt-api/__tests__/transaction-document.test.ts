@@ -1,14 +1,14 @@
 import { parseHTML } from 'linkedom'
 import { describe, expect, it } from 'vitest'
-import { isUsableXDocument, X_LEGACY_HOME_URLS } from '../services/public/FetcherService'
+import { buildXShellHeaders, isUsableXDocument, X_SHELL_URLS } from '../services/public/FetcherService'
 
 /**
  * X's migration to a Rolldown/Vite build ("x-web") removed the `ondemand.s`
- * webpack chunk map from `/` and `/home`, which made `x-client-transaction-id`
- * throw `OnDemandFileUrlResolutionError`. FetcherService now probes
- * `X_LEGACY_HOME_URLS` for a page that still serves the legacy shell. These
- * cases pin the "usable document" rule: both the site verification meta and the
- * `ondemand.s` chunk reference must be present.
+ * webpack chunk map from anonymous `/home` responses, which made
+ * `x-client-transaction-id` throw `OnDemandFileUrlResolutionError`. The legacy
+ * shell is only served to an authenticated session, so the shell request must
+ * carry the decoded cookie (see `buildXShellHeaders`). These cases pin the
+ * "usable document" rule and the header construction.
  */
 
 function doc(body: string): Document {
@@ -37,8 +37,26 @@ describe('isUsableXDocument', () => {
     expect(isUsableXDocument(doc(''))).toBe(false)
   })
 
-  it('keeps a non-empty probe list with /home as the last-resort fallback', () => {
-    expect(X_LEGACY_HOME_URLS.length).toBeGreaterThan(1)
-    expect(X_LEGACY_HOME_URLS.at(-1)).toBe('https://x.com/home')
+  it('probes /home first and keeps fallbacks', () => {
+    expect(X_SHELL_URLS.length).toBeGreaterThan(1)
+    expect(X_SHELL_URLS[0]).toBe('https://x.com/home')
+  })
+})
+
+describe('buildXShellHeaders', () => {
+  it('attaches the decoded cookie when an API key is configured', () => {
+    const cookie = 'auth_token=abc; ct0=def'
+    const apiKey = Buffer.from(cookie).toString('base64')
+
+    expect(buildXShellHeaders({ 'accept': 'text/html' }, apiKey)).toEqual({
+      'accept': 'text/html',
+      'cookie': cookie,
+    })
+  })
+
+  it('leaves the headers untouched without an API key', () => {
+    expect(buildXShellHeaders({ 'accept': 'text/html' })).toEqual({
+      'accept': 'text/html',
+    })
   })
 })

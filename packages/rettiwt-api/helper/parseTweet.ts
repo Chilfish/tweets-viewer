@@ -1,4 +1,5 @@
 import type {
+  CardCarouselImage,
   EnrichedTweet,
   LinkPreviewCard,
   MediaDetails,
@@ -6,6 +7,7 @@ import type {
   TweetUser,
 } from '../types/enriched'
 import { parseTrendingCard } from '../parsers/jetfuel'
+import { mapPollCard } from '../parsers/poll'
 import { getEntities } from './entitytParser'
 
 /**
@@ -46,6 +48,7 @@ export function enrichTweet(sourceData: RawTweet, retweetedOrignalId?: string): 
     entities: getEntities(tweet, text),
     quoted_tweet_id: tweet.quoted_status_result?.result?.rest_id,
     card: mapTwitterCard(tweet.card, tweet.jetfuel_attachment),
+    poll: mapPollCard(tweet.card),
     media_details: mapMediaDetails(tweet),
     retweeted_original_id: retweetedOrignalId,
     is_inline_media: tweet.note_tweet?.note_tweet_results?.result?.media?.inline_media?.length ? true : undefined,
@@ -114,6 +117,182 @@ function getBestImage(map: Map<string, any>) {
   return undefined
 }
 
+/** 零宽字符（官方空标题常用 \u200b 占位），清洗后为空视为无标题 */
+const INVISIBLE_CHARS_RE = /[\u200B-\u200D\uFEFF]/g
+/** media id 的 `3_` / `13_` 前缀（部分变体的 media_entities 键不带前缀） */
+const MEDIA_ID_PREFIX_RE = /^\d+_/
+
+function cleanCardText(value?: string): string | undefined {
+  if (typeof value !== 'string')
+    return undefined
+  const cleaned = value.replace(INVISIBLE_CHARS_RE, '').trim()
+  return cleaned || undefined
+}
+
+/** CTA 枚举 → 中文文案（未知值原样保留） */
+const CTA_LABELS: Record<string, string> = {
+  learn_more: '了解更多',
+  visit: '访问',
+  shop_now: '立即购买',
+  book_now: '立即预订',
+  sign_up: '注册',
+  download: '下载',
+  install: '安装',
+  watch: '观看',
+  listen: '收听',
+  get_offer: '获取优惠',
+  order_now: '立即下单',
+  shop: '去购物',
+  play: '开始游戏',
+}
+
+function mapCtaLabel(raw?: string): string | undefined {
+  if (!raw)
+    return undefined
+  return CTA_LABELS[raw] ?? raw
+}
+
+function rgbToHex(rgb?: {
+  r?: number
+  g?: number
+  b?: number
+  red?: number
+  green?: number
+  blue?: number
+}): string | undefined {
+  // 官方 mediaColor 用 red/green/blue，部分缓存用 r/g/b
+  const r = rgb?.r ?? rgb?.red
+  const g = rgb?.g ?? rgb?.green
+  const b = rgb?.b ?? rgb?.blue
+  if (typeof r !== 'number' || typeof g !== 'number' || typeof b !== 'number')
+    return undefined
+  return `#${[r, g, b]
+    .map(c => Math.round(c).toString(16).padStart(2, '0'))
+    .join('')}`
+}
+
+/** 单个 media_list 项 / media 组件项 → 轮播图（缺失实体时返回 null） */
+function toCardImage(
+  item: any,
+  entities: Record<string, any>,
+  destinations: Record<string, any>,
+): CardCarouselImage | null {
+  const id = typeof item === 'string'
+    ? item
+    : item?.id
+  const entity = (id && (entities[id] ?? entities[`3_${id}`] ?? entities[id.replace(MEDIA_ID_PREFIX_RE, '')]))
+    ?? (typeof item === 'object'
+      ? item
+      : undefined)
+  if (!entity?.media_url_https)
+    return null
+
+  const origin = entity.original_info ?? entity.sizes?.large
+  const destinationId = typeof item === 'object'
+    ? item.destination
+    : undefined
+  const href = destinationId
+    ? destinations[destinationId]?.data?.url_data?.url
+    : undefined
+  const palette = entity.ext?.mediaColor?.r?.ok?.palette
+  const color = palette?.[0]?.rgb
+    ? rgbToHex(palette[0].rgb)
+    : undefined
+
+  // 视频：media_url_https 是封面；播放源保留给下游（下载/未来播放器），UI 暂不渲染
+  const isVideo = entity.type === 'video' || entity.type === 'animated_gif'
+  const variants = Array.isArray(entity.video_info?.variants)
+    ? entity.video_info.variants
+    : []
+  const mp4 = variants
+    .filter((v: any) => v?.content_type === 'video/mp4' && v?.url)
+    .sort((a: any, b: any) => (b.bitrate ?? 0) - (a.bitrate ?? 0))[0]
+    ?.url
+  const hls = variants.find(
+    (v: any) => v?.content_type === 'application/x-mpegURL' && v?.url,
+  )?.url
+  const durationMs = entity.video_info?.duration_millis ?? entity.video_info?.duration_ms
+
+  return {
+    url: entity.media_url_https,
+    width: origin?.width ?? origin?.w ?? 0,
+    height: origin?.height ?? origin?.h ?? 0,
+    ...(href
+      ? { href }
+      : {}),
+    ...(color
+      ? { color }
+      : {}),
+    ...(isVideo
+      ? {
+          type: 'video' as const,
+          ...((mp4 || hls || typeof durationMs === 'number')
+            ? {
+                video: {
+                  ...(mp4
+                    ? { mp4 }
+                    : {}),
+                  ...(hls
+                    ? { hls }
+                    : {}),
+                  ...(typeof durationMs === 'number'
+                    ? { durationMs }
+                    : {}),
+                },
+              }
+            : {}),
+        }
+      : {}),
+  }
+}
+
+/**
+ * 按 `components` 声明顺序（缺失时按对象键顺序）遍历媒体组件：
+ * - 多图：`swipeable_media.data.media_list`（顺序必须按 media_list，不能依赖对象键顺序）
+ * - 单图：`media_1.data.{id,destination}` / `media_id` / 内联 `media`（`image_website`）
+ */
+function mapCardMedia(data: any): CardCarouselImage[] {
+  const components = data.component_objects || {}
+  const entities = data.media_entities || {}
+  const destinations = data.destination_objects || {}
+  const declaredOrder: string[] = Array.isArray(data.components)
+    ? data.components
+    : []
+  const names: string[] = [
+    ...declaredOrder.filter(name => components[name]),
+    ...Object.keys(components).filter(name => !declaredOrder.includes(name)),
+  ]
+
+  const images: CardCarouselImage[] = []
+  for (const name of names) {
+    const compData = components[name]?.data
+    if (!compData)
+      continue
+
+    if (Array.isArray(compData.media_list)) {
+      for (const item of compData.media_list) {
+        const image = toCardImage(item, entities, destinations)
+        if (image)
+          images.push(image)
+      }
+      continue
+    }
+
+    // 单媒体组件：media_1 / media_with_details_horizontal 的 media_id
+    const singleItem = compData.media
+      ?? (compData.id || compData.media_id
+        ? { ...compData, id: compData.id ?? compData.media_id }
+        : undefined)
+    if (!singleItem)
+      continue
+
+    const image = toCardImage(singleItem, entities, destinations)
+    if (image)
+      images.push(image)
+  }
+  return images
+}
+
 /**
  * 辅助函数：解析 Unified Card (YouTube / Trending 等) 的复杂 JSON
  *
@@ -130,7 +309,6 @@ function parseUnifiedCard(jsonStr: string | undefined) {
     return null
   try {
     const data = JSON.parse(jsonStr)
-    const media = Object.values(data.media_entities || {})[0] as any
 
     let title: string | undefined
     let description: string | undefined
@@ -142,9 +320,9 @@ function parseUnifiedCard(jsonStr: string | undefined) {
       if (!compData)
         continue
       const topic = compData.topic_detail
-      title ??= topic?.title?.content ?? compData.title?.content
-      description ??= topic?.subtitle?.content
-      subtitle ??= compData.subtitle?.content
+      title ??= cleanCardText(topic?.title?.content ?? compData.title?.content)
+      description ??= cleanCardText(topic?.subtitle?.content)
+      subtitle ??= cleanCardText(compData.subtitle?.content)
     }
 
     // 目标 URL 与域名：优先取 browser destination 的 url_data
@@ -152,13 +330,55 @@ function parseUnifiedCard(jsonStr: string | undefined) {
     const browser = destinations.find(d => d?.type === 'browser') ?? destinations[0]
     const urlData = browser?.data?.url_data
 
+    const images = mapCardMedia(data)
+    const legacyMedia = Object.values(data.media_entities || {})[0] as any
+
+    const declaredOrder: string[] = Array.isArray(data.components)
+      ? data.components
+      : []
+    const cardType = typeof data.type === 'string'
+      ? data.type
+      : ''
+    const isCarousel = cardType.startsWith('image_carousel')
+    // image_* → 图片卡（单图按原图比例 / 多图轮播）；video_* → 视频卡
+    const layout = isCarousel
+      ? 'image_carousel' as const
+      : cardType.startsWith('video_')
+        ? 'video_card' as const
+        : cardType.startsWith('image_') || images.length > 1
+          ? 'image_card' as const
+          : 'default' as const
+
+    const isMediaComponent = (compData: any) =>
+      Array.isArray(compData?.media_list) || !!(compData?.media || compData?.id || compData?.media_id)
+    const mediaIndex = declaredOrder.findIndex(
+      name => isMediaComponent(data.component_objects?.[name]?.data),
+    )
+    const detailsIndex = declaredOrder.findIndex((name) => {
+      const compData = data.component_objects?.[name]?.data
+      return !!(compData?.title || compData?.subtitle || compData?.topic_detail)
+    })
+    const mediaFirst = mediaIndex === -1 || detailsIndex === -1 || mediaIndex < detailsIndex
+    const ctaLabel = mapCtaLabel(data.experiment_signals?.website_cta_card_label)
+
     return {
       title,
       description,
       // 域名优先取 url_data.vanity；老 details 布局回退 subtitle
       domain: urlData?.vanity ?? subtitle,
       url: urlData?.url,
-      imageUrl: media?.media_url_https,
+      // 首图与轮播首帧保持一致，而非 media_entities 的对象首键
+      imageUrl: images[0]?.url ?? legacyMedia?.media_url_https ?? '',
+      layout,
+      ...(images.length
+        ? { images }
+        : {}),
+      ...(layout !== 'default'
+        ? { mediaFirst }
+        : {}),
+      ...(ctaLabel
+        ? { ctaLabel }
+        : {}),
     }
   }
   catch {
@@ -188,10 +408,13 @@ export function mapTwitterCard(
   let card: LinkPreviewCard = {
     type: name === 'player' ? 'summary_large_image' : name, // Player 统一视为大图卡片
     url: legacy.url || getStr(bindings, 'card_url') || '',
-    title: getStr(bindings, 'title'),
-    description: getStr(bindings, 'description'),
-    domain: getStr(bindings, 'domain') || getStr(bindings, 'vanity_url'),
+    title: cleanCardText(getStr(bindings, 'title')) ?? '',
+    description: cleanCardText(getStr(bindings, 'description')) ?? '',
+    // 域名优先取官方展示用的 vanity_url（youtube.com），domain 会带 www 前缀
+    domain: getStr(bindings, 'vanity_url') || getStr(bindings, 'domain'),
     imageUrl: getBestImage(bindings),
+    // 布局标记：非 unified_card 直接视为普通卡
+    layout: 'default',
   }
 
   // 4. 特殊处理 Unified Card (覆盖之前的提取)
@@ -218,6 +441,7 @@ export function mapTwitterCard(
         title: trending.title || card.title,
         description: trending.description || card.description,
         domain: card.domain || getDomainFromUrl(trending.url) || '',
+        layout: 'trending',
         trending,
       }
     }
