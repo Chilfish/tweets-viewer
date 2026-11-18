@@ -8,8 +8,8 @@
     "run:search": "bun src/fetchSearch.ts"
   },
   "dependencies": {
-    "@chilfish/gallery-dl-instagram": "^0.2.4",
-    "@neondatabase/serverless": "^1.2.0",
+    "@chilfish/gallery-dl-instagram": "^0.2.6",
+    "@neondatabase/serverless": "^1.2.1",
     "drizzle-orm": "^0.45.4"
   },
   "devDependencies": {

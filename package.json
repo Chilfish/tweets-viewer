@@ -21,21 +21,21 @@
     "apps/*"
   ],
   "dependencies": {
-    "rolldown": "^1.2.16",
-    "vite": "^8.3.5",
+    "rolldown": "^1.3.3",
+    "vite": "^8.3.8",
     "zod": "^4.6.7"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^10.0.0",
     "@types/bun": "^1.4.4",
     "@types/node": "^26.6.6",
-    "concurrently": "^10.0.6",
+    "concurrently": "^10.0.7",
     "cross-env": "^10.1.0",
-    "dotenv": "^18.0.9",
-    "eslint": "^10.13.0",
+    "dotenv": "^18.0.10",
+    "eslint": "^10.15.0",
     "eslint-plugin-format": "^2.0.1",
     "lefthook": "^2.2.2",
-    "lint-staged": "^17.6.0",
+    "lint-staged": "^17.6.1",
     "typescript": "6.0.3"
   }
 }
