@@ -53,7 +53,7 @@
 | JSON 列 | JSON Column | `jsonData` 存储完整 `EnrichedTweet`/`EnrichedUser` |
 | 两层缓存 | Two-Layer Cache | 服务端 `SimpleLRUCache` + 客户端 `axios-cache-interceptor` |
 | URL 驱动状态 | URL-Driven State | 分页/筛选/排序全在 URL query params |
-| ins→twitter 映射 | Mapping | `mapping.ts` 维护 IG username → twitter username |
+| ins→twitter 映射 | Mapping | `users.ins_username` 列是唯一来源：IG 用户名 → `users.userName` |
 | 不做首屏 SSR | SPA-first | 首屏是静态壳 + 骨架屏，内容由客户端渲染 |
 
 ## 类型/实体术语

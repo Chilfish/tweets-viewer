@@ -6,7 +6,7 @@
 
 | 日期 | 主题 |
 |---|---|
-| [2026-11-18](2026-11-18.md) | 新增 IG 归档账号的标准流程（`engineering/ig-archive-onboarding.md`）：导出 → 下载媒体改写 CDN 链接 → 传 R2 → 登记映射 → 入库；接入 `ritsu_mgmg` |
+| [2026-11-18](2026-11-18.md) | 新增 IG 归档账号的标准流程（`engineering/ig-archive-onboarding.md`）；方案：把 gallery-dl-ins 的脚本搬进本仓库，改成 `bun run ig` 统一 CLI（`engineering/ig-cli.md`），并参考 ymmemita 搭本地 Postgres + Neon `/sql` 代理做验证（`engineering/local-database.md`） |
 | [2026-11-04](2026-11-04.md) | 日期范围筛选与排序统一到事件时间（issue #19）：`start` / `end` 改按排序键的 snowflake 闭区间过滤，年统计同口径；清理 `rettiwt-api` 未使用的 `happy-dom` 依赖，关闭 3 条 Dependabot 告警 |
 | [2026-10-31](2026-10-31.md) | VRT 门禁降噪：文案用 `screenshotOptions.mask` 排除、改由 RTL 断言；重试按钮行用 `[data-vrt-mask]` 固定遮罩；CI 与基线 workflow 固定 `ubuntu-24.04` / bun 版本（postmortem 007） |
 | [2026-10-22](2026-10-22.md) | 每日抓取代理配置改由订阅动态生成（`MIHOMO_SUB_URL` + `prepareMihomo.ts`）；修 10/20–10/21 节点域名失效导致的 DNS 解析失败 |

@@ -65,11 +65,12 @@ tweets-viewer/
   |------|------|
   | `dailyUpdate.ts` | 每日增量同步入口（`DATABASE_URL` 逗号分隔多地址时，对每个归档库并发跑一轮 Twitter + IG） |
   | `fetch-tweet-daily.ts` | Twitter 每日抓取：入参指定目标库（`databaseUrl` / `label`），按 `daily_fetch` 读 users，先刷新用户资料（`createUser` upsert），再抓时间线 upsert 推文；返回结构化结果供入口聚合退出码 |
-  | `fetch-ins-daily.ts` | IG 每日抓取：从 users 表读取已关联 IG 的用户，SDK 抓取帖子，upsert 入库 |
-  | `import-ins-data.ts` | IG 批量导入：读取本地 JSON，查 mapping.ts 映射，写入 users.ins_json_data + ins_posts |
   | `insertToDB.ts` | Twitter 批量导入：读取本地 JSON，写入 users + tweets |
-  | `mapping.ts` | IG username → twitter username 映射表，供导入脚本查询 |
-- **IG 归档接入流程**：导出 → 下载媒体并改写 CDN 链接 → 上传 R2 → 登记映射 → 入库，见 [engineering/ig-archive-onboarding.md](engineering/ig-archive-onboarding.md)
+  | `cli.ts` | IG 归档唯一入口：`bun run ig ins <add\|export\|media\|import\|sync\|verify\|upload>` 与 `ig dev <db\|proxy>` |
+  | `commands/ins/*` | IG 抓取（公开包 `@chilfish/gallery-dl-instagram`）、媒体下载与 CDN 改写、入库、每日增量、对账 |
+  | `commands/dev/*` | 本地 Postgres 初始化与 Neon `/sql` 代理 |
+- **IG 归档接入**：一条 `bun run ig ins add <账号> --twitter <userName>`，命令表见 [engineering/ig-cli.md](engineering/ig-cli.md)，本地验证见 [engineering/local-database.md](engineering/local-database.md)
+- **IG→twitter 映射**：只认 `users.ins_username` 列，不再维护常量表
 - **调度**：GitHub Actions cron (`0 16 * * *` UTC = 北京时间 00:00) + 手动触发
 - **工作流**：`.github/workflows/fetch-daily.yml` — checkout → setup Bun → install → run `dailyUpdate.ts`
 - **连接池**：Twitter 用 `RettiwtPool` 多 API_KEY 轮转；IG 用 `@chilfish/gallery-dl-instagram` SDK + Cookie 认证

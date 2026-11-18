@@ -57,7 +57,8 @@ docs/
 | **改推文卡片 / 富媒体解析** | `features/tweet/README.md` + 对应卡片文档 | 轮播 / 投票 / Trending 的数据形状、解析与渲染 |
 | **改抓取请求 / transaction ID** | `features/tweet/transaction-id.md` + `packages/rettiwt-api` | 外壳 cookie、候选页面、feature flags |
 | **改数据抓取 / 入库脚本** | `ARCHITECTURE.md` + `apps/scripts` | 数据流、mapping、Fukuoka 为研究脚本不入库 |
-| **新增 Instagram 归档账号** | `engineering/ig-archive-onboarding.md` | 导出 → 下载媒体 → 传 R2 → 登记映射 → 入库的完整流程 |
+| **新增 Instagram 归档账号** | `engineering/ig-archive-onboarding.md` + `engineering/ig-cli.md` | 一条 `bun run ig ins add` 跑完抓取、下载、入库、对账 |
+| **本地跑抓取 / 入库** | `engineering/local-database.md` | 本机 Postgres + Neon `/sql` 代理，`LOCAL=1` 总开关 |
 | **部署 / 环境配置** | `engineering/release-checklist.md` + `example.env` | Vercel / Workers、环境变量、性能预算 |
 | **写码前防复现** | `postmortem/README.md`（+ `TEMPLATE.md`） | 常见坑自查；新 Bug 模式写复盘记录 |
 | **每次 commit / PR** | `engineering/git-workflow.md` | 分支模型、Conventional Commits、检查 |

@@ -1,131 +1,149 @@
 # 给归档新增一个 Instagram 账号
 
-五步：确认 twitter 用户已入库 → 导出 IG 数据 → 下载媒体并改写 CDN 链接 → 上传 R2 → 登记映射并入库。前三步在 [gallery-dl-ins](../../../gallery-dl-ins) 做，后两步在本仓库做。
+> **状态**：目标流程，代码实现中（2026-11-18）。命令落地前按文末「过渡期」的旧脚本执行。
 
-`ins_posts.username` 存的是 **twitter userName**（FK → `users.userName`），不是 IG 用户名。所以写库前那个 twitter 用户必须已经在 `users` 表里，否则外键直接拒写。
+一条命令：`bun run ig ins add <IG 账号> --twitter <twitter userName>`。它按顺序做抓取、下载媒体、入库、对账，失败即停。
+
+写库前那个 twitter 用户必须已经在 `users` 表里：`ins_posts.username` 存的是 **twitter userName**（FK → `users.userName`），不是 IG 用户名，缺行会直接触发外键错误。
+
+命令细节见 [ig-cli.md](./ig-cli.md)，本地库见 [local-database.md](./local-database.md)。
 
 ---
 
-## 0. 前置条件
+## 0. 确认对应关系
 
-| 项 | 位置 | 说明 |
-| --- | --- | --- |
-| `INSTAGRAM_COOKIES` | gallery-dl-ins `.env` | 完整 Cookie 串，至少含 `sessionid` + `csrftoken`。过期时表现为 401/`User not found` |
-| `DATABASE_URL` | 本仓库 `.env` | `import-ins-data.ts` 经 `env.server.ts` 读取 |
-| R2 写权限 | chill-s3 面板 | 上传 `instagram/` 前缀下的对象 |
-
-账号未必有公开的 twitter 对应关系。IG 主页的简介里常有 `t.co` 短链，解析一下就能确认落在哪个归档用户上：
+账号未必有公开的 twitter 对应关系。IG 主页简介里常有 `t.co` 短链，解析一下就能确认落在哪个归档用户上：
 
 ```bash
 bun -e "const r=await fetch('https://t.co/XXXX',{redirect:'manual'}); console.log(r.headers.get('location'))"
 ```
 
-先确认要写入的那一行确实存在：
+确认那一行存在，并且还没接 IG：
 
 ```sql
 select "userName", daily_fetch, ins_username from users where "userName" = 'ritsu_yumemita';
 ```
 
-`daily_fetch = true` 才会进每日增量；`ins_username` / `ins_json_data` 为空就是还没接进来。
+`ins_username` / `ins_json_data` 为空就是还没接进来；`daily_fetch = true` 才会进每日增量。
 
----
+`.env` 需要 `INSTAGRAM_COOKIES`（至少含 `sessionid` + `csrftoken`）和 `DATABASE_URL`。Cookie 过期时抓取会报 401 或 `User not found`。
 
-## 1. 导出 IG 数据
-
-```bash
-cd I:/dev/gallery-dl-ins
-bun run scripts/export-user.ts https://www.instagram.com/ritsu_mgmg/
-```
-
-产出 `data/ritsu_mgmg.json`，结构是 `{ user, posts }`。`user` 是清洗后的资料（`userName` / `fullName` / `profileImage` / `followersCount` …），`posts` 是全部帖子，`created_at` 为 ISO 时间。
-
-SDK 内置 6–12 秒随机请求间隔，且不提供关闭开关，所以帖子多的账号会连续发出数十上百次请求。撞上 429 就等一会儿重跑。
-
-## 2. 下载媒体并改写 CDN 链接
+## 1. 先看会做什么
 
 ```bash
-bun run scripts/download-media.ts data/ritsu_mgmg.json
+bun run ig ins add https://www.instagram.com/ritsu_mgmg --twitter ritsu_yumemita --dry-run
 ```
 
-两个产出：
+`--dry-run` 只报告将要执行的步骤，不抓取、不写文件、不写库。
 
-- `data/instagram/ritsu_mgmg/` — `<shortcode>-<序号>.<ext>`，图片 webp/jpg、视频 mp4
-- `data/ritsu_mgmg.cdn.json` — 同样的数据，`display_url` / `video_url` / `avatar_url` / `user.profileImage` 改成 `https://s3.chilfish.top/instagram/...`
+## 2. 正式执行
 
-**入库必须用 `.cdn.json`。** 原 JSON 里的 `scontent-*.cdninstagram.com` 链接带签名和过期时间（`oe=`），几小时后全部 403。
+```bash
+bun run ig ins add https://www.instagram.com/ritsu_mgmg --twitter ritsu_yumemita
+```
 
-## 3. 上传 R2
+四步的产物与检查点：
 
-在 chill-s3 面板进到桶的 `instagram/` 前缀，导入文件夹 `ritsu_mgmg`，对象 key 落在：
+| 步骤 | 产物 | 失败时 |
+| --- | --- | --- |
+| 抓取 | `data/ritsu_mgmg.json` | 不写库，退出码 1 |
+| 下载媒体 + 改写链接 | `data/instagram/ritsu_mgmg/`、`data/ritsu_mgmg.cdn.json` | 同上 |
+| 入库 | `users.ins_username` / `users.ins_json_data` / `ins_posts` | 已写入的部分保留，可重复跑 |
+| 对账 | — | 报告失败项，退出码 1 |
+
+想分步执行、中途核对：
+
+```bash
+bun run ig ins export ritsu_mgmg
+bun run ig ins media ritsu_mgmg
+bun run ig ins import data/ritsu_mgmg.cdn.json --twitter ritsu_yumemita
+bun run ig ins verify ritsu_yumemita
+```
+
+## 3. 上传媒体
+
+入库前媒体必须已经能访问。本地验证可以先跳过这步，上线前必须完成：
+
+```bash
+bun run ig ins upload ritsu_mgmg
+```
+
+对象 key：
 
 ```
 instagram/ritsu_mgmg/<shortcode>-1.webp
 instagram/ritsu_mgmg/<shortcode>-2.webp
+instagram/ritsu_mgmg.jpg                 # 头像，平铺，不在目录里
 ```
 
-头像要单独放到平铺位置 `instagram/ritsu_mgmg.jpg`（和用户目录同级，不在目录里）。`.cdn.json` 里的头像地址就是平铺形式。
-
-传完抽查两个 key 是否为 200：
-
-```bash
-curl -s -o /dev/null -w "%{http_code}\n" https://s3.chilfish.top/instagram/ritsu_mgmg.jpg
-```
+没有 R2 凭据时命令会给出下一步提示，不会假装成功。也可以在 chill-s3 面板手动导入文件夹。
 
 上传必须先于入库。顺序反了页面能打开，但每张图都是 404。
 
-## 4. 登记映射
-
-`apps/scripts/src/mapping.ts`：
-
-```ts
-'ritsu_mgmg': 'ritsu_yumemita',
-```
-
-key 是 IG 用户名，value 是 `users.userName`。反向表 `twitterToInsUsername` 由它自动派生，不用另写。
-
-映射是导入脚本和每日抓取的共同入口：`import-ins-data.ts` 找不到 key 会跳过整个文件，`fetch-ins-daily.ts` 只抓「映射里有 + `daily_fetch = true`」的账号。
-
-## 5. 入库
+## 4. 验收
 
 ```bash
-cd I:/dev/tweets-viewer
-bun run apps/scripts/src/import-ins-data.ts ../gallery-dl-ins/data/ritsu_mgmg.cdn.json
-```
-
-脚本做两件事，都按 `post_id` upsert，可重复跑：
-
-- `upsertInsUserInfo` → `users.ins_username` + `users.ins_json_data`
-- `createInsPosts` → `ins_posts`，1000 条一批
-
----
-
-## 验收
-
-```bash
-curl -s "https://tweet-api.chilfish.top/v3/ins/ritsu_yumemita?page=1" | head -c 400
+bun run ig ins verify ritsu_yumemita
 ```
 
 四条都过才算接完：
 
 - `user` 不为 `null`，`posts_count` 与导出条数接近
-- `posts.data` 有时间倒序的帖子，`meta.total` 对得上
-- 取一条 `display_url` 打开是 200
-- 前端 `/ins/ritsu_yumemita` 头像、网格、灯箱都正常
+- `posts.meta.total` 与导出条数一致
+- 全部 `created_at` 可解析且严格递减
+- 抽样 `display_url` 返回 200
 
-前端返回的是 `axios-cache-interceptor` 的客户端缓存（5 分钟），导入前打开过该页面的标签页刷新一下再看。
+线上再确认一次：
+
+```bash
+curl -s "https://tweet-api.chilfish.top/v3/ins/ritsu_yumemita?page=1" | head -c 400
+```
+
+前端 `/ins/ritsu_yumemita` 的头像、网格、灯箱正常。前端有 5 分钟客户端缓存，导入前打开过的标签页要刷新。
+
+## 日常增量
+
+```bash
+bun run ig ins sync                 # 库里 ins_username 非空且 daily_fetch = true 的账号
+bun run ig ins sync --since 2026-11-16T00:00:00Z
+bun run ig ins sync --account ritsu_mgmg
+```
+
+`dailyUpdate.ts` 的 cron 走同一个实现。账号是否被每日抓取由 `users.daily_fetch` 决定，不再有第二份名单。
 
 ## 踩过的坑
 
 | 现象 | 原因 | 处理 |
 | --- | --- | --- |
-| 入库成功，页面图片全 404 | 用了 `ritsu_mgmg.json` 而非 `.cdn.json` | 签名 URL 过期，改用 `.cdn.json` 重导 |
-| 头像 404，帖子图正常 | 头像传进了 `instagram/<用户名>/` 目录 | 平铺到 `instagram/<用户名>.jpg` |
-| 导入打印 `No twitter mapping for IG username`，退出码却是 0 | `import-ins-data.ts` 逐文件 `catch` 后不改变 `exitCode` | 看日志不看退出码；这一步待补（见下） |
+| 入库成功，页面图片全 404 | 导入用了 `ritsu_mgmg.json` 而非 `.cdn.json` | 签名 URL 过期，用 `.cdn.json` 重导 |
+| 头像 404，帖子图正常 | 头像传进了 `instagram/<账号>/` 目录 | 平铺到 `instagram/<账号>.jpg` |
 | 外键报错 | `users` 里没有对应 twitter 用户 | 先把推文归档跑完（`fetchTimeline.ts` + `insertToDB.ts`） |
-| 429 / `User not found` | Cookie 过期或被限流 | 换 Cookie；间隔重试 |
+| 429 / `User not found` | Cookie 过期或被限流 | 换 Cookie；SDK 自带 6–12 秒请求间隔，等一会儿重跑 |
+| 抓到的帖子数明显偏少 | 账号是私密号，或 Cookie 失效导致只返回公开部分 | 用有效 Cookie 重跑，并核对 `posts_count` |
+| `verify` 报时间顺序错误 | 库里混入了上一版导入的旧行 | 用同一条命令重跑，upsert 会覆盖 |
 
-## 已知缺口
+## 过渡期（CLI 落地前）
 
-- `import-ins-data.ts` 单文件失败不置 `process.exitCode`，批量导入时只能靠翻日志发现失败。下一步改成收集失败项、有失败即 exit ≠ 0。
-- `dailyUpdate.ts` 的 IG 步骤目前是注释状态（`f282651`「skip the Instagram step until its cookies are refreshed」）。首次导入完成后，确认 Cookie 稳定再放开，否则每日 cron 会白跑。
-- 上传 R2 仍靠面板手动操作，没有脚本。帖子量级增大后值得补一个 `PutObject` 批量上传，复用 chill-s3 里 `generate-thumbnails.ts` 的凭据读取方式。
+命令实现完成前，按下面的旧脚本执行，步骤与产物和上面一致：
+
+```bash
+# 1. 导出
+cd I:/dev/gallery-dl-ins
+bun run scripts/export-user.ts https://www.instagram.com/ritsu_mgmg/
+
+# 2. 下载媒体 + 改写 CDN 链接
+bun run scripts/download-media.ts data/ritsu_mgmg.json
+
+# 3. 在 chill-s3 面板把 data/instagram/ritsu_mgmg/ 传到 instagram/ 前缀
+#    头像平铺成 instagram/ritsu_mgmg.jpg
+
+# 4. 登记映射：apps/scripts/src/mapping.ts 加一行
+#    'ritsu_mgmg': 'ritsu_yumemita',
+
+# 5. 入库
+cd I:/dev/tweets-viewer
+bun run apps/scripts/src/import-ins-data.ts ../gallery-dl-ins/data/ritsu_mgmg.cdn.json
+```
+
+旧脚本的两处已知问题在 CLI 里修掉：缺少映射时 `import-ins-data.ts` 只打日志、退出码仍为 0；上传 R2 没有脚本。
+
