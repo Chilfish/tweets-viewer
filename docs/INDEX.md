@@ -25,10 +25,11 @@ docs/
 ├── Specification.md        # 前端功能规格 — 以此为准
 ├── ARCHITECTURE.md         # 全局架构（Monorepo / 数据流 / 部署结构）
 ├── API_DOCUMENTATION.md    # REST API 完整说明
+├── features/               # 功能文档（tweet 富卡片：轮播 / 投票 / Trending / transaction-id）
 ├── requirements/           # 需求文档（PRD · 用户故事 · 术语表）
 ├── planning/               # 规划（architecture ADR · backlog · roadmap）
 ├── engineering/            # 工程规范（code-style · writing-style · git-workflow · release-checklist）
-├── ui-design/              # UI 设计系统（OVERVIEW + components/GENERAL）
+├── ui-design/              # UI 设计系统（README 索引 + 视觉/页面/反馈/交互 + components/GENERAL）
 ├── unified-sns/            # Unified SNS Viewer 新项目规格（DATA-MODEL · UI-DESIGN · API · RESEARCH · SCAFFOLD）
 ├── postmortem/             # 复盘记录（以前踩过的坑，写代码前必读）
 ├── reviews/                # 代码审查记录（review-YYYY-MM-DD-<主题>）
@@ -48,9 +49,13 @@ docs/
 | **改 API / 加端点** | `API_DOCUMENTATION.md` + `packages/database/schema.ts` | 接口约定、分页/游标协议、错误码 |
 | **架构级变更前** | `planning/architecture.md`（ADR-001~010） + `ARCHITECTURE.md` | 先读 ADR 历史决策，再对照架构总览 |
 | **规划下一阶段任务** | `planning/backlog.md` | 活跃未决清单（已完成里程碑见 `planning/action-plan.md` / `archive/`） |
-| **改 UI 组件 / 页面 / 样式** | `engineering/code-style.md` + `ui-design/OVERVIEW.md` | Token、命名、组件复用、Atom 规范 |
+| **改 UI 组件 / 页面 / 样式** | `engineering/code-style.md` + `ui-design/README.md` | Token、命名、组件复用、页面骨架、三态与密度 |
 | **改原子组件（Button/Input/…）** | `ui-design/components/GENERAL.md` | Base UI/COSS 组件使用规范 |
+| **写交互 / 状态 / 路由动画** | `ui-design/interaction.md` | 键盘、URL 状态、SPA 边界、触摸与减少动态 |
+| **接数据 / 写空加载错误** | `ui-design/feedback.md` + `ui-design/patterns.md` | `FeedStatus`、Empty、Alert、浮层与文案 |
 | **写文案 / 文档** | `engineering/writing-style.md` + `requirements/glossary.md` | 具体、统一、可读的写法 |
+| **改推文卡片 / 富媒体解析** | `features/tweet/README.md` + 对应卡片文档 | 轮播 / 投票 / Trending 的数据形状、解析与渲染 |
+| **改抓取请求 / transaction ID** | `features/tweet/transaction-id.md` + `packages/rettiwt-api` | 外壳 cookie、候选页面、feature flags |
 | **改数据抓取 / 入库脚本** | `ARCHITECTURE.md` + `apps/scripts` | 数据流、mapping、Fukuoka 为研究脚本不入库 |
 | **部署 / 环境配置** | `engineering/release-checklist.md` + `example.env` | Vercel / Workers、环境变量、性能预算 |
 | **写码前防复现** | `postmortem/README.md`（+ `TEMPLATE.md`） | 常见坑自查；新 Bug 模式写复盘记录 |
@@ -121,9 +126,10 @@ bun run test:visual      # 视觉回归
 ```
 规格         docs/Specification.md · API_DOCUMENTATION.md · ARCHITECTURE.md
 需求         docs/requirements/（PRD · user-stories · glossary）
+功能         docs/features/（tweet 富卡片：轮播 / 投票 / Trending / transaction-id）
 规划         docs/planning/（architecture ADR · backlog · roadmap）
 工程规范     docs/engineering/（code-style · writing-style · git-workflow · release-checklist）
-UI 设计      docs/ui-design/（OVERVIEW · components/GENERAL）
+UI 设计      docs/ui-design/（README · visual · patterns · feedback · interaction · components/GENERAL）
 反馈         docs/postmortem/ · docs/reviews/ · docs/development-log/
 存档         docs/archive/（git mv 已完成阶段计划，不主动读取）
 ```
