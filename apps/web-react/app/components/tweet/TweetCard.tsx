@@ -1,20 +1,10 @@
 import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
-import { useMemo, useState } from 'react'
+import { ImageIcon } from 'lucide-react'
+import { useMemo } from 'react'
 import { MediaImage } from '~/components/ui/media'
 import { cn } from '~/lib/utils'
-
-/**
- * Truncates a string to a maximum length, appending '...'.
- * @param text The text to truncate.
- * @param maxLength The maximum length of the text.
- * @returns The truncated text.
- */
-function truncateText(text: string, maxLength: number): string {
-  if (text.length <= maxLength) {
-    return text
-  }
-  return `${text.slice(0, maxLength).trim()}...`
-}
+import { CarouselCardView } from './CarouselCard'
+import { TrendingCardView } from './TrendingCard'
 
 /**
  * Safely extracts the hostname from a URL string.
@@ -36,29 +26,29 @@ interface CardImageProps {
   isLarge?: boolean
 }
 
+/**
+ * 统一媒体三态（加载/错误/成功）已由 MediaImage 承担（app/components/ui/media.tsx）。
+ */
 function CardImage({ imageUrl, altText, isLarge = false }: CardImageProps) {
-  const [isError, setIsError] = useState(false)
-
-  if (isError) {
-    return null
-  }
-
   return (
     <div
       className={cn(
-        'relative overflow-hidden bg-muted/50 rounded',
-        isLarge ? 'aspect-[16/9]' : 'w-20 h-20 flex-shrink-0',
+        // 圆角/裁剪由外层 <a> 的 rounded-md + overflow-hidden 负责，
+        // 此处若自带 rounded 会与外框半径不一致而露出直角。
+        'relative overflow-hidden bg-muted/50',
+        // 缩略图必须随卡片高度拉伸（self-stretch + 仅最小高度），否则固定的 h-20
+        // 会在文本比 80px 高时于图片下方留出空白、与卡片底边错位。
+        isLarge ? 'aspect-[1.91/1]' : 'w-20 min-h-20 flex-shrink-0 self-stretch',
       )}
     >
       <MediaImage
-        src={(imageUrl)}
+        src={imageUrl}
         alt={altText}
         className={cn(
           'h-full w-full object-cover',
           isLarge ? 'transition-transform duration-300 hover:scale-[1.02]' : '',
         )}
         loading="lazy"
-        onError={() => setIsError(true)}
       />
       {isLarge && (
         <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent" />
@@ -74,17 +64,23 @@ interface CardContentProps {
   compact?: boolean
 }
 
+/**
+ * 截断交给 CSS line-clamp，完整文本由 title 属性承载（hover/读屏可获取全文）。
+ */
 function CardContent({ domain, title, description, compact = false }: CardContentProps) {
   return (
-    <div className={cn('space-y-2 p-3')}>
+    <div className="space-y-2 p-3">
       {domain && (
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground/80 truncate font-medium">
+        <div className="flex items-center gap-1.5 truncate font-medium text-muted-foreground/80 text-xs">
           {domain}
         </div>
       )}
 
       {title && (
-        <h3 className="font-semibold text-[1rem] leading-tight line-clamp-2 text-foreground/90">
+        <h3
+          title={title}
+          className="line-clamp-2 font-semibold text-[1rem] text-foreground/90 leading-tight"
+        >
           {title}
         </h3>
       )}
@@ -92,13 +88,30 @@ function CardContent({ domain, title, description, compact = false }: CardConten
       {description && (
         <p
           className={cn(
-            'text-xs text-muted-foreground/70 leading-relaxed',
+            'text-muted-foreground/70 text-xs leading-relaxed',
             compact ? 'line-clamp-2' : 'line-clamp-3',
           )}
         >
           {description}
         </p>
       )}
+    </div>
+  )
+}
+
+/**
+ * 无图卡的占位媒体块（官方同款）。
+ *
+ * X 对声明了大图位却没有图片 binding 的卡片（如 youtu.be 的 App 卡）会在左侧渲染
+ * 图标占位块，而不是塌成纯文字卡。
+ */
+function CardImagePlaceholder() {
+  return (
+    <div
+      className="relative flex w-1/3 min-w-20 shrink-0 items-center justify-center self-stretch border-border/60 border-r bg-muted/50"
+      aria-hidden
+    >
+      <ImageIcon className="size-5 text-muted-foreground/50" />
     </div>
   )
 }
@@ -125,30 +138,43 @@ export function TweetLinkCard({ tweet, className }: TweetLinkCardProps) {
     const displayDomain = card.domain || (card.url
       ? getDomainFromUrl(card.url)
       : null)
-    const displayTitle = card.title
-      ? truncateText(card.title, 120)
-      : null
-    const displayDescription = card.description
-      ? truncateText(card.description, 200)
-      : null
+
+    // 大图卡声明了媒体位却没有图片 → 官方渲染占位 icon 块（而非纯文字卡）
+    const showsImagePlaceholder = !hasImage && card.type === 'summary_large_image'
 
     return {
       url: card.url,
       imageUrl: card.imageUrl,
       hasImage,
+      showsImagePlaceholder,
       isLargeImageCard,
       domain: displayDomain,
-      title: displayTitle,
-      description: displayDescription,
+      title: card.title ?? null,
+      description: card.description ?? null,
     }
   }, [card])
 
-  // 如果没有有效的卡片数据，则不渲染任何内容
+  // 官方 Trending 卡片变体优先（有 jetfuel 结构化数据时渲染；解析失败/缺数据自然落普通卡路径）。
+  if (card?.trending) {
+    return <TrendingCardView trending={card.trending} className={className} />
+  }
+
+  // 官方媒体卡（image_website 单图 / image_carousel_* 多图 / video_website 视频）。
+  if (
+    (card?.layout === 'image_card'
+      || card?.layout === 'image_carousel'
+      || card?.layout === 'video_card')
+    && card.images?.length
+  ) {
+    return <CarouselCardView card={card} className={className} />
+  }
+
+  // 无有效卡片数据：不渲染
   if (!cardData) {
     return null
   }
 
-  const { url, imageUrl, hasImage, isLargeImageCard, domain, title, description } = cardData
+  const { url, imageUrl, hasImage, showsImagePlaceholder, isLargeImageCard, domain, title, description } = cardData
 
   return (
     <a
@@ -156,29 +182,39 @@ export function TweetLinkCard({ tweet, className }: TweetLinkCardProps) {
       target="_blank"
       rel="noopener noreferrer"
       className={cn(
-        'rounded-md mt-2 block border border-border/60',
+        // overflow-hidden：把子元素裁剪到 rounded-md 圆角内，避免图片直角溢出边框。
+        'mt-2 block overflow-hidden rounded-md border border-border/60',
         className,
       )}
     >
-      {isLargeImageCard && imageUrl
+      {isLargeImageCard
         ? (
             <>
-              <CardImage imageUrl={imageUrl} altText={title || 'Link preview'} isLarge />
+              <CardImage imageUrl={imageUrl!} altText={title || 'Link preview'} isLarge />
               <CardContent domain={domain} title={title} description={description} />
             </>
           )
-        : hasImage && imageUrl
+        : hasImage
           ? (
               <div className="flex">
-                <CardImage imageUrl={imageUrl} altText={title || 'Link preview'} />
-                <div className="flex-1 min-w-0">
+                <CardImage imageUrl={imageUrl!} altText={title || 'Link preview'} />
+                <div className="flex min-w-0 flex-1 flex-col justify-center">
                   <CardContent domain={domain} title={title} description={description} compact />
                 </div>
               </div>
             )
-          : (
-              <CardContent domain={domain} title={title} description={description} />
-            )}
+          : showsImagePlaceholder
+            ? (
+                <div className="flex">
+                  <CardImagePlaceholder />
+                  <div className="flex min-w-0 flex-1 flex-col justify-center">
+                    <CardContent domain={domain} title={title} description={description} compact />
+                  </div>
+                </div>
+              )
+            : (
+                <CardContent domain={domain} title={title} description={description} />
+              )}
     </a>
   )
 }

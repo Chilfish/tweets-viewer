@@ -12,6 +12,7 @@ import {
   TweetInReplyTo,
   TweetMedia,
 } from '../react-tweet'
+import { PollCardView } from './PollCard'
 import { TweetLinkCard } from './TweetCard'
 import { TweetMediaAlt } from './TweetMediaAlt'
 import { TweetSpaceCard } from './TweetSpaceCard'
@@ -97,6 +98,8 @@ export const TweetNode = forwardRef<HTMLDivElement, TweetNodeProps>(({
       <div>
         <TweetInReplyTo tweet={tweet} />
         <TweetBody tweet={tweet} />
+
+        {tweet.poll && <PollCardView poll={tweet.poll} />}
 
         <TweetMediaSection tweet={tweet} hideMedia={hideMedia} />
 
