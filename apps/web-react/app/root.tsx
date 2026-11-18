@@ -11,6 +11,7 @@ import {
 import { GlobalMediaViewer } from './components/media/GlobalMediaViewer'
 import { ProgressBar } from './components/progress-bar'
 import { Button } from './components/ui/button'
+import { AnchoredToastProvider, ToastProvider } from './components/ui/toast'
 import { useTheme } from './hooks/use-theme'
 import './app.css'
 import './fonts.css'
@@ -76,7 +77,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <ProgressBar />
-        {children}
+        <ToastProvider>
+          <AnchoredToastProvider>
+            {children}
+          </AnchoredToastProvider>
+        </ToastProvider>
         <GlobalMediaViewer />
         <ScrollRestoration getKey={location => location.pathname} />
         <Scripts />
