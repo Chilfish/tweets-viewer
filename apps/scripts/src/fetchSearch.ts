@@ -1,9 +1,9 @@
 import type { ITweetFilter } from '@tweets-viewer/rettiwt-api'
-import { attachSpaceDetails } from '@tweets-viewer/rettiwt-api'
+import { attachSpaceDetails } from '@chilfish/tweet'
 import { formatDate } from '@tweets-viewer/shared'
-import { apiClient, cursor, enrichmentService, writeCursor } from '../src/common'
-import { writeJson } from '../src/utils'
-import { userId } from './common'
+import { apiClient, cursor, enrichmentService, userId, writeCursor } from './common'
+import { toArchivedTweets } from './lib/tweet'
+import { writeJson } from './utils'
 
 const filter: ITweetFilter = {
   fromUsers: [userId],
@@ -38,7 +38,7 @@ const enrichedTweets = enrichmentService.enrichTweets(data.tweets)
 await attachSpaceDetails(enrichedTweets, data.tweets, id => apiClient.fetchSpaceDetails(id))
 
 await writeJson({
-  tweets: enrichedTweets,
+  tweets: toArchivedTweets(enrichedTweets),
   cursor: data.cursor,
 }, `data/${userId}/search-${Date.now()}.json`)
 

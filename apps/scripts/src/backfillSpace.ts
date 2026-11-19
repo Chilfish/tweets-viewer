@@ -13,16 +13,17 @@
  * 用法: bun src/backfillSpace.ts [--write] [--limit=N]
  */
 import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
+import { mapSpaceDetails, resolveSpaceId, RettiwtPool, TwitterAPIClient } from '@chilfish/tweet'
 import { neon } from '@neondatabase/serverless'
 import { schema } from '@tweets-viewer/database'
-import { mapSpaceDetails, resolveSpaceId, RettiwtPool, TwitterAPIClient } from '@tweets-viewer/rettiwt-api'
 import { eq, sql } from 'drizzle-orm'
 import { drizzle } from 'drizzle-orm/neon-http'
 import { env } from '../../../env.server'
+import { readTweetKeys, toArchivedSpace, toSdkUser } from './lib/tweet'
 
 const { tweetsTable } = schema
 
-const KEYS = (env.TWEET_KEYS || '').split(',').filter(Boolean).map(key => key.trim())
+const KEYS = readTweetKeys(env.TWEET_KEYS)
 const PROXY = process.env.TWEET_PROXY?.trim() || undefined
 
 const WRITE = process.argv.includes('--write')
@@ -74,7 +75,7 @@ for (const row of candidates) {
       cache.set(spaceId, await apiClient.fetchSpaceDetails(spaceId))
     }
 
-    const space = mapSpaceDetails(spaceId, cache.get(spaceId), tweet.user)
+    const space = mapSpaceDetails(spaceId, cache.get(spaceId), toSdkUser(tweet.user))
     if (!space) {
       skipped++
       continue
@@ -93,7 +94,10 @@ for (const row of candidates) {
       await db
         .update(tweetsTable)
         .set({
-          jsonData: { ...tweet, space },
+          jsonData: {
+            ...tweet,
+            space: toArchivedSpace(space),
+          },
         })
         .where(eq(tweetsTable.tweetId, row.tweetId))
     }

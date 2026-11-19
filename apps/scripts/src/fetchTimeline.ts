@@ -1,6 +1,7 @@
 import { writeFile } from 'node:fs/promises'
-import { attachSpaceDetails } from '@tweets-viewer/rettiwt-api'
+import { attachSpaceDetails } from '@chilfish/tweet'
 import { apiClient, cursor, cursorPath, enrichmentService, user, userId } from './common'
+import { toArchivedTweets } from './lib/tweet'
 import { writeJson } from './utils'
 
 const rawTweets = await apiClient.fetchUserTimelineWithRepliesRaw(user.id, cursor)
@@ -15,7 +16,7 @@ const enrichedTweets = enrichmentService.enrichUserTimelineTweets(rawTweets.twee
 await attachSpaceDetails(enrichedTweets, rawTweets.tweets, id => apiClient.fetchSpaceDetails(id))
 
 await writeJson({
-  tweets: enrichedTweets,
+  tweets: toArchivedTweets(enrichedTweets),
   cursor: rawTweets.cursor,
 }, `data/${userId}/timeline-${user.userName}-${Date.now()}.json`)
 

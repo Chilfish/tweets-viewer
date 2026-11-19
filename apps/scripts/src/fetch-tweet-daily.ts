@@ -1,10 +1,11 @@
 import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
 import { setTimeout as sleep } from 'node:timers/promises'
+import { attachSpaceDetails, AuthError, RateLimitError, RettiwtPool, TweetEnrichmentService, TwitterAPIClient } from '@chilfish/tweet'
 import { createDb, createTweets, createUser, getDailyFetchUsers } from '@tweets-viewer/database'
-import { attachSpaceDetails, RettiwtAuthError, RettiwtPool, RettiwtRateLimitError, TweetEnrichmentService, TwitterAPIClient } from '@tweets-viewer/rettiwt-api'
 import { resolveDatabaseUrl, resolveNeonEndpoint } from './lib/local-config'
+import { readTweetKeys, toArchivedTweets } from './lib/tweet'
 
-const KEYS = (process.env.TWEET_KEYS || '').split(',').filter(Boolean).map(key => key.trim())
+const KEYS = readTweetKeys()
 const PROXY = process.env.TWEET_PROXY?.trim() || undefined
 const SYNC_SINCE = process.env.SYNC_SINCE
   ? new Date(process.env.SYNC_SINCE)
@@ -57,9 +58,9 @@ function getErrorDetails(error: unknown): unknown {
 function getAbortReason(error: unknown): string | undefined {
   const status = getErrorStatus(error)
 
-  if (error instanceof RettiwtAuthError || status === 401 || status === 403)
+  if (error instanceof AuthError || status === 401 || status === 403)
     return 'all-keys-rejected'
-  if (error instanceof RettiwtRateLimitError || status === 429)
+  if (error instanceof RateLimitError || status === 429)
     return 'rate-limit-exhausted'
   return undefined
 }
@@ -90,7 +91,7 @@ async function fetchTimeline(userId: string, cursor?: string) {
   await attachSpaceDetails(enrichedTweets, rawTweets.tweets, id => apiClient.fetchSpaceDetails(id))
 
   return {
-    tweets: enrichedTweets,
+    tweets: toArchivedTweets(enrichedTweets),
     cursor: rawTweets.cursor,
   }
 }

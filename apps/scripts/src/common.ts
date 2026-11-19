@@ -1,14 +1,15 @@
-import type { CursoredTweets, EnrichedUser } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedUser } from '@tweets-viewer/rettiwt-api'
 import { mkdir, readFile, stat, writeFile } from 'node:fs/promises'
 import path from 'node:path'
-import { RettiwtPool, TweetEnrichmentService, TwitterAPIClient } from '@tweets-viewer/rettiwt-api'
+import { RettiwtPool, TweetEnrichmentService, TwitterAPIClient } from '@chilfish/tweet'
 import { env } from '../../../env.server'
+import { readTweetKeys } from './lib/tweet'
 import { getLocalCache } from './localCache'
 import { cacheDir, writeJson } from './utils'
 
 export const userId = 'ritsu_yumemita'
 
-const KEYS = (env.TWEET_KEYS || '').split(',').filter(Boolean).map(key => key.trim())
+const KEYS = readTweetKeys(env.TWEET_KEYS)
 
 const twitterPool = new RettiwtPool(KEYS)
 
@@ -51,7 +52,7 @@ export {
   enrichedUser as user,
 }
 
-export async function writeCursor(data: CursoredTweets) {
+export async function writeCursor(data: { cursor?: string }) {
   if (data.cursor) {
     await writeFile(cursorPath, data.cursor, 'utf8')
     console.log(`Cursor saved: ${data.cursor}`)
