@@ -1,4 +1,4 @@
-import type { EnrichedUser } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedUser } from '@tweets-viewer/tweet-types'
 import { format } from 'date-fns'
 import { zhCN } from 'date-fns/locale'
 import { BalloonIcon, CalendarDays, LinkIcon, MapPin } from 'lucide-react'

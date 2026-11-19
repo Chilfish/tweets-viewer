@@ -1,6 +1,6 @@
 import type { DB } from '@tweets-viewer/database'
 import type { SelectUser } from '@tweets-viewer/database/schema'
-import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedTweet } from '@tweets-viewer/tweet-types'
 
 export interface AppType {
   Variables: {

@@ -1,4 +1,4 @@
-import type { MediaDetails } from '@tweets-viewer/rettiwt-api'
+import type { MediaDetails } from '@tweets-viewer/tweet-types'
 import { describe, expect, it, vi } from 'vitest'
 import { page } from 'vitest/browser'
 import { renderTarget, setTheme } from '~/test/vrt'

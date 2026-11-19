@@ -4,7 +4,7 @@
  * 读取 cache/fukuoka/raw/*.json，合并所有推文，按 id 去重，
  * 精简为只保留关注字段的结构，输出 cache/fukuoka/tweets.simplified.json
  */
-import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedTweet } from '@tweets-viewer/tweet-types'
 import { readdir } from 'node:fs/promises'
 import path from 'node:path'
 import { cacheDir, readJson, writeJson } from '../utils'

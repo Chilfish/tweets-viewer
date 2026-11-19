@@ -8,7 +8,6 @@ export default antfu({
     'apps/server/.output/**',
     'apps/server/.wrangler/**',
     'docs/**',
-    'packages/rettiwt-api/**',
     '**/data/**',
     // Agent 工具产物（settings / taste），由工具自身管理，不参与 lint
     '.commandcode/**',

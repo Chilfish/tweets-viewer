@@ -1,5 +1,5 @@
-import type { EnrichedTweet, EnrichedUser } from '@tweets-viewer/rettiwt-api'
 import type { PaginatedResponse } from '@tweets-viewer/shared'
+import type { EnrichedTweet, EnrichedUser } from '@tweets-viewer/tweet-types'
 import type { DB } from '..'
 import type { SelectTweet } from '../schema'
 import { now } from '@tweets-viewer/shared'

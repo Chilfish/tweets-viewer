@@ -1,4 +1,4 @@
-import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedTweet } from '@tweets-viewer/tweet-types'
 import type { FlatMediaItem } from '~/lib/media'
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog'
 import { useCallback, useEffect, useState } from 'react'

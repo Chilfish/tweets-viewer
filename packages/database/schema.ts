@@ -1,5 +1,5 @@
-import type { EnrichedTweet, EnrichedUser } from '@tweets-viewer/rettiwt-api'
 import type { IGPost, IGUserInfo } from '@tweets-viewer/shared'
+import type { EnrichedTweet, EnrichedUser } from '@tweets-viewer/tweet-types'
 import { sql } from 'drizzle-orm'
 import {
   boolean,

@@ -1,4 +1,4 @@
-import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedTweet } from '@tweets-viewer/tweet-types'
 import { render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { TweetAction } from '../tweet-action'

@@ -1,4 +1,4 @@
-import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedTweet } from '@tweets-viewer/tweet-types'
 import { setTimeout as sleep } from 'node:timers/promises'
 import { attachSpaceDetails, AuthError, RateLimitError, RettiwtPool, TweetEnrichmentService, TwitterAPIClient } from '@chilfish/tweet'
 import { createDb, createTweets, createUser, getDailyFetchUsers } from '@tweets-viewer/database'

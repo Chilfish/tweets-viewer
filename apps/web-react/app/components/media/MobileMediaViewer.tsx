@@ -1,4 +1,4 @@
-import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedTweet } from '@tweets-viewer/tweet-types'
 import type { FlatMediaItem } from '~/lib/media'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { MyTweet } from '~/components/tweet/Tweet'

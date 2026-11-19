@@ -1,4 +1,4 @@
-import type { EnrichedUser } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedUser } from '@tweets-viewer/tweet-types'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it } from 'vitest'

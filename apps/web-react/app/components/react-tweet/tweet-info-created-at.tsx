@@ -1,4 +1,4 @@
-import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedTweet } from '@tweets-viewer/tweet-types'
 import { formatDate } from '@tweets-viewer/shared'
 
 export function TweetInfoCreatedAt({ tweet }: { tweet: EnrichedTweet }) {

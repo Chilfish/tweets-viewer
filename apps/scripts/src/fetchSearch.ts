@@ -1,4 +1,4 @@
-import type { ITweetFilter } from '@tweets-viewer/rettiwt-api'
+import type { ITweetFilter } from '@chilfish/tweet'
 import { attachSpaceDetails } from '@chilfish/tweet'
 import { formatDate } from '@tweets-viewer/shared'
 import { apiClient, cursor, enrichmentService, userId, writeCursor } from './common'

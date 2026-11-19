@@ -1,4 +1,4 @@
-import type { CardCarouselImage, LinkPreviewCard } from '@tweets-viewer/rettiwt-api'
+import type { CardCarouselImage, LinkPreviewCard } from '@tweets-viewer/tweet-types'
 import type { CSSProperties } from 'react'
 import { ChevronLeft, ChevronRight, GalleryHorizontalEnd, LayoutGrid, Play } from 'lucide-react'
 import { useRef, useState } from 'react'

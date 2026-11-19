@@ -1,4 +1,4 @@
-import type { EnrichedTweet, MediaDetails } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedTweet, MediaDetails } from '@tweets-viewer/tweet-types'
 import { Fragment } from 'react'
 import { Skeleton } from '~/components/ui/skeleton'
 import { cn } from '~/lib/utils'

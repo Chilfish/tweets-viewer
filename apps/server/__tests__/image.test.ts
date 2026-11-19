@@ -1,4 +1,4 @@
-import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedTweet } from '@tweets-viewer/tweet-types'
 import type { AppType } from '../common'
 import * as db from '@tweets-viewer/database'
 import { Hono } from 'hono'

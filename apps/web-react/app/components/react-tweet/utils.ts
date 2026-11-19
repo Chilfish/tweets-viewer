@@ -1,4 +1,4 @@
-import type { MediaAnimatedGif, MediaDetails, MediaVideo } from '@tweets-viewer/rettiwt-api'
+import type { MediaAnimatedGif, MediaDetails, MediaVideo } from '@tweets-viewer/tweet-types'
 
 export function getMediaUrl(media: MediaDetails, size: 'small' | 'medium' | 'large'): string {
   const url = new URL(media.media_url_https)

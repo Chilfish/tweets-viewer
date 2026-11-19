@@ -1,5 +1,5 @@
-import type { EnrichedUser } from '@tweets-viewer/rettiwt-api'
 import type { IGUserInfo } from '@tweets-viewer/shared'
+import type { EnrichedUser } from '@tweets-viewer/tweet-types'
 import type { ClientLoaderFunctionArgs, ShouldRevalidateFunctionArgs } from 'react-router'
 import type { Route } from './+types/layout'
 import { isAxiosError } from 'axios'

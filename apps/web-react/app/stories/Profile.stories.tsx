@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import type { EnrichedUser } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedUser } from '@tweets-viewer/tweet-types'
 import { ProfileHeader } from '~/components/profile/ProfileHeader'
 
 const meta = {

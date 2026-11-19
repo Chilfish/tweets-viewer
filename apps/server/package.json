@@ -16,6 +16,7 @@
     "@scalar/hono-api-reference": "^0.12.22",
     "@tweets-viewer/database": "workspace:*",
     "@tweets-viewer/shared": "workspace:*",
+    "@tweets-viewer/tweet-types": "workspace:*",
     "drizzle-orm": "^0.45.4",
     "hono": "^4.13.19",
     "hono-openapi": "^1.6.0",

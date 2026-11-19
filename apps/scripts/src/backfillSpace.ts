@@ -12,7 +12,7 @@
  *
  * 用法: bun src/backfillSpace.ts [--write] [--limit=N]
  */
-import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedTweet } from '@tweets-viewer/tweet-types'
 import { mapSpaceDetails, resolveSpaceId, RettiwtPool, TwitterAPIClient } from '@chilfish/tweet'
 import { neon } from '@neondatabase/serverless'
 import { schema } from '@tweets-viewer/database'

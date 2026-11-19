@@ -1,4 +1,4 @@
-import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedTweet } from '@tweets-viewer/tweet-types'
 import { ImageIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import { MediaImage } from '~/components/ui/media'

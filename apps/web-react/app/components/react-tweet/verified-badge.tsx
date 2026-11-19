@@ -1,4 +1,4 @@
-import type { TweetUser } from '@tweets-viewer/rettiwt-api'
+import type { TweetUser } from '@tweets-viewer/tweet-types'
 import { cn } from '~/lib/utils'
 import {
   Verified,

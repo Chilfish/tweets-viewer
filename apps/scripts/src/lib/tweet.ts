@@ -7,7 +7,7 @@ import type {
   EnrichedTweet,
   SpaceDetails,
   TweetUser,
-} from '@tweets-viewer/rettiwt-api'
+} from '@tweets-viewer/tweet-types'
 
 /**
  * Twitter 抓取运行时使用上游 `@chilfish/tweet`（camelCase）；归档 JSON 仍是本仓库的

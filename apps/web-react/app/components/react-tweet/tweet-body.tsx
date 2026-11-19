@@ -1,4 +1,4 @@
-import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedTweet } from '@tweets-viewer/tweet-types'
 import { isSpaceUrl } from '~/lib/space'
 import { cn } from '~/lib/utils'
 import { TweetLink } from './tweet-link'

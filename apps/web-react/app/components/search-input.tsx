@@ -1,4 +1,4 @@
-import type { EnrichedUser } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedUser } from '@tweets-viewer/tweet-types'
 import type { FormEvent } from 'react'
 import { SearchIcon, XIcon } from 'lucide-react'
 import { useState } from 'react'

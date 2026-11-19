@@ -14,7 +14,7 @@
  *   bun run src/downloadMedias.ts --videos-only             # 仅下载视频/动图
  */
 
-import type { EnrichedTweet, MediaDetails } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedTweet, MediaDetails } from '@tweets-viewer/tweet-types'
 import { createWriteStream, existsSync } from 'node:fs'
 import { mkdir, readFile, utimes } from 'node:fs/promises'
 import path from 'node:path'

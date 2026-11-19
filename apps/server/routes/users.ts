@@ -1,4 +1,4 @@
-import type { EnrichedUser } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedUser } from '@tweets-viewer/tweet-types'
 
 import type { AppType } from '../common'
 import { getAllUsers, getUserByName } from '@tweets-viewer/database'

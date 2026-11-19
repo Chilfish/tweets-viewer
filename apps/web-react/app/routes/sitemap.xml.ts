@@ -1,4 +1,4 @@
-import type { EnrichedUser } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedUser } from '@tweets-viewer/tweet-types'
 import type { Route } from './+types/sitemap.xml'
 import type { SitemapUrl } from '~/lib/sitemap'
 import { apiUrl } from '@tweets-viewer/shared'

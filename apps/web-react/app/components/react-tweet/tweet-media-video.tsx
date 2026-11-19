@@ -1,4 +1,4 @@
-import type { EnrichedTweet, MediaAnimatedGif, MediaVideo as TMediaVideo } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedTweet, MediaAnimatedGif, MediaVideo as TMediaVideo } from '@tweets-viewer/tweet-types'
 import { useRef, useState } from 'react'
 import { MediaImage, MediaVideo } from '~/components/ui/media'
 import { proxyMedia } from '~/lib/utils'

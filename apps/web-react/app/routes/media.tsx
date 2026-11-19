@@ -1,5 +1,5 @@
-import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
 import type { PaginatedResponse } from '@tweets-viewer/shared'
+import type { EnrichedTweet } from '@tweets-viewer/tweet-types'
 import type { Route } from './+types/media'
 import type { FlatMediaItem } from '~/lib/media'
 import { PAGE_SIZE } from '@tweets-viewer/shared'

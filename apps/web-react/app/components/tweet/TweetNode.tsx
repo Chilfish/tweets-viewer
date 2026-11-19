@@ -1,4 +1,4 @@
-import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedTweet } from '@tweets-viewer/tweet-types'
 import { formatDate, pubTime } from '@tweets-viewer/shared'
 import { Repeat2Icon } from 'lucide-react'
 import { forwardRef, useMemo } from 'react'

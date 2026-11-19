@@ -1,4 +1,4 @@
-import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedTweet } from '@tweets-viewer/tweet-types'
 import { readdir } from 'node:fs/promises'
 import path from 'node:path'
 import { dataPath, userId } from './common'

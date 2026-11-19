@@ -1,4 +1,4 @@
-import type { PollChoice, TweetPoll } from '@tweets-viewer/rettiwt-api'
+import type { PollChoice, TweetPoll } from '@tweets-viewer/tweet-types'
 import { formatDate } from '@tweets-viewer/shared'
 import { MediaImage } from '~/components/ui/media'
 import { cn } from '~/lib/utils'

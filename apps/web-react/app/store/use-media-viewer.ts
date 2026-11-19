@@ -1,4 +1,4 @@
-import type { EnrichedTweet, MediaDetails } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedTweet, MediaDetails } from '@tweets-viewer/tweet-types'
 import { create } from 'zustand'
 
 interface MediaViewerState {

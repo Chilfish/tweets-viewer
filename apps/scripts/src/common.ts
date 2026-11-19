@@ -1,4 +1,4 @@
-import type { EnrichedUser } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedUser } from '@tweets-viewer/tweet-types'
 import { mkdir, readFile, stat, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { RettiwtPool, TweetEnrichmentService, TwitterAPIClient } from '@chilfish/tweet'
@@ -10,8 +10,9 @@ import { cacheDir, writeJson } from './utils'
 export const userId = 'ritsu_yumemita'
 
 const KEYS = readTweetKeys(env.TWEET_KEYS)
+const PROXY = process.env.TWEET_PROXY?.trim() || undefined
 
-const twitterPool = new RettiwtPool(KEYS)
+const twitterPool = new RettiwtPool(KEYS, { proxy: PROXY })
 
 export const apiClient = new TwitterAPIClient(twitterPool)
 export const enrichmentService = new TweetEnrichmentService()

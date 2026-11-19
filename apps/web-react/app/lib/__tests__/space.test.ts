@@ -1,4 +1,4 @@
-import type { SpaceDetails } from '@tweets-viewer/rettiwt-api'
+import type { SpaceDetails } from '@tweets-viewer/tweet-types'
 import { describe, expect, it } from 'vitest'
 import {
   formatSpaceDate,

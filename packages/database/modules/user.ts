@@ -1,4 +1,4 @@
-import type { EnrichedUser } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedUser } from '@tweets-viewer/tweet-types'
 import type { DB } from '../'
 import type { SelectUser } from '../schema'
 import { and, eq, isNotNull } from 'drizzle-orm'

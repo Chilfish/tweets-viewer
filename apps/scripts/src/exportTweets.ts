@@ -13,7 +13,7 @@
  * 输出：cache/export/<from>-<to>.json —— 一个扁平 EnrichedTweet[] 数组，
  *       可直接喂给 downloadMedias.ts / insertToDB.ts（merged.json 同格式）。
  */
-import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedTweet } from '@tweets-viewer/tweet-types'
 import { mkdir } from 'node:fs/promises'
 import path from 'node:path'
 import { neon } from '@neondatabase/serverless'

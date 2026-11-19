@@ -1,12 +1,12 @@
-import type { SpaceDetails, SpacePlaybackState } from '@tweets-viewer/rettiwt-api'
+import type { SpaceDetails, SpacePlaybackState } from '@tweets-viewer/tweet-types'
 import { formatDate } from '@tweets-viewer/shared'
 
 /**
  * X Space 卡片的**展示层**纯逻辑。
  *
- * 数据层映射（卡片识别 / AudioSpaceById → SpaceDetails）在 `packages/rettiwt-api/helper/space`；
- * 这里只做与呈现相关的格式化与状态判定——刻意放在前端，因为 web-react 从 rettiwt-api
- * 只做 type-only 导入，运行时导入会把服务端依赖拖进浏览器 bundle。
+ * 数据层映射（卡片识别 / AudioSpaceById → SpaceDetails）在上游 `@chilfish/tweet`；
+ * 这里只做与呈现相关的格式化与状态判定——刻意放在前端，因为 web-react 从
+ * `@tweets-viewer/tweet-types` 只做 type-only 导入。
  */
 
 /** 正文中的 Space 链接（`x.com/i/spaces/<id>` / `twitter.com/i/spaces/<id>`） */

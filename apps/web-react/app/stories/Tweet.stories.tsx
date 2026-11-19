@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import type { EnrichedTweet, SpaceDetails } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedTweet, SpaceDetails } from '@tweets-viewer/tweet-types'
 import { MyTweet } from '~/components/tweet/Tweet'
 
 const meta = {

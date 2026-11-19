@@ -1,4 +1,4 @@
-import type { EnrichedUser } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedUser } from '@tweets-viewer/tweet-types'
 import { useMemo } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 import { Tabs, TabsList, TabsTab } from '~/components/ui/tabs'

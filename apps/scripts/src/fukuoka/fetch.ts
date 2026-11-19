@@ -7,7 +7,7 @@
  * 搜索结果缓存在 cache/fukuoka/raw/<target>-<timestamp>.json
  * （与日常归档 cache/data/ 分离，本次分析专属）
  */
-import type { ITweetFilter } from '@tweets-viewer/rettiwt-api'
+import type { ITweetFilter } from '@chilfish/tweet'
 import { mkdir } from 'node:fs/promises'
 import path from 'node:path'
 import { attachSpaceDetails } from '@chilfish/tweet'

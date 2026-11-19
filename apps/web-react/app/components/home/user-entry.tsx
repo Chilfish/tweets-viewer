@@ -1,4 +1,4 @@
-import type { EnrichedUser } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedUser } from '@tweets-viewer/tweet-types'
 import { Archive, ArrowRight } from 'lucide-react'
 import { Link } from 'react-router'
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'

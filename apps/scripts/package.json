@@ -19,8 +19,8 @@
   },
   "devDependencies": {
     "@tweets-viewer/database": "workspace:*",
-    "@tweets-viewer/rettiwt-api": "workspace:*",
     "@tweets-viewer/shared": "workspace:*",
+    "@tweets-viewer/tweet-types": "workspace:*",
     "@types/pg": "^8.23.1",
     "vitest": "^5.1.1"
   }

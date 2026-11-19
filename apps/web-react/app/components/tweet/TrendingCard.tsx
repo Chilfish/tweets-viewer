@@ -1,4 +1,4 @@
-import type { TrendingCardInfo } from '@tweets-viewer/rettiwt-api'
+import type { TrendingCardInfo } from '@tweets-viewer/tweet-types'
 import { Avatar, AvatarImage } from '~/components/ui/avatar'
 import { MediaImage } from '~/components/ui/media'
 import { cn } from '~/lib/utils'

@@ -1,0 +1,10 @@
+{
+  "name": "@tweets-viewer/tweet-types",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "packageManager": "bun@1.4.4",
+  "main": "./index.ts",
+  "module": "./index.ts",
+  "types": "./index.ts"
+}

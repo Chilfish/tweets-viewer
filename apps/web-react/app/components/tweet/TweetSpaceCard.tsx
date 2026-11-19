@@ -1,4 +1,4 @@
-import type { EnrichedTweet, SpaceAvailability } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedTweet, SpaceAvailability } from '@tweets-viewer/tweet-types'
 import { MicOff, Play } from 'lucide-react'
 import { VerifiedBadge } from '~/components/react-tweet/verified-badge'
 import { MediaImage } from '~/components/ui/media'

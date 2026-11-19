@@ -1,5 +1,5 @@
-import type { EnrichedTweet, EnrichedUser } from '@tweets-viewer/rettiwt-api'
 import type { PaginatedResponse } from '@tweets-viewer/shared'
+import type { EnrichedTweet, EnrichedUser } from '@tweets-viewer/tweet-types'
 import type { Route } from './+types/search'
 import { PAGE_SIZE } from '@tweets-viewer/shared'
 import { Search, SearchX } from 'lucide-react'

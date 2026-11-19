@@ -1,4 +1,4 @@
-import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedTweet } from '@tweets-viewer/tweet-types'
 import { memo } from 'react'
 import { cn } from '~/lib/utils'
 import { TweetNode } from './TweetNode'

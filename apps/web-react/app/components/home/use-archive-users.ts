@@ -1,4 +1,4 @@
-import type { EnrichedUser } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedUser } from '@tweets-viewer/tweet-types'
 import { useUserStore } from '~/store/use-user-store'
 
 /** 首页共用的归档用户解析：继续浏览/最近浏览/那年今日入口都依赖同一份派生数据。 */

@@ -1,4 +1,4 @@
-import type { EnrichedTweet, EnrichedUser, MediaDetails, SpaceDetails } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedTweet, EnrichedUser, MediaDetails, SpaceDetails } from '@tweets-viewer/tweet-types'
 
 /**
  * 视觉回归 fixture 的确定性图片源：内联 SVG data URL。

@@ -1,4 +1,4 @@
-import type { EnrichedTweet, EnrichedUser } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedTweet, EnrichedUser } from '@tweets-viewer/tweet-types'
 import { neon } from '@neondatabase/serverless'
 import { createTweets, createUser, schema } from '@tweets-viewer/database'
 import { drizzle } from 'drizzle-orm/neon-http'

@@ -13,8 +13,8 @@
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.1",
-    "@tweets-viewer/rettiwt-api": "workspace:*",
     "@tweets-viewer/shared": "workspace:*",
+    "@tweets-viewer/tweet-types": "workspace:*",
     "drizzle-kit": "^0.31.11",
     "drizzle-orm": "^0.45.4"
   },

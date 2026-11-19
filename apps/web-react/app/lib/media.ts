@@ -1,4 +1,4 @@
-import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
+import type { EnrichedTweet } from '@tweets-viewer/tweet-types'
 
 export interface FlatMediaItem {
   id: string // 组合ID: tweetId + mediaIndex
