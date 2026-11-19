@@ -39,6 +39,22 @@ interface ProxyHealth {
   database?: string
 }
 
+/** 端口优先级：`NEON_HTTP_ENDPOINT` 的端口 → `TWEETS_DB_PROXY_PORT` → 4444。 */
+function defaultPort(): number {
+  const endpoint = process.env.NEON_HTTP_ENDPOINT?.trim()
+  if (endpoint) {
+    try {
+      const port = new URL(endpoint).port
+      if (port)
+        return Number(port)
+    }
+    catch {
+      // 非法地址交给下面的回退值
+    }
+  }
+  return Number(process.env.TWEETS_DB_PROXY_PORT ?? 4444)
+}
+
 /** 端口上已经有代理时读它的 /health，避免把别的库当成自己的。 */
 async function probeHealth(port: number): Promise<ProxyHealth | undefined> {
   try {
@@ -77,7 +93,7 @@ export const devProxySpec: CommandSpec<DevProxyData> = {
     }
 
     const port = ctx.options.port === undefined
-      ? Number(process.env.TWEETS_DB_PROXY_PORT ?? 4444)
+      ? defaultPort()
       : ctx.integer('port', 4444, 1)
 
     const target = new URL(databaseUrl)

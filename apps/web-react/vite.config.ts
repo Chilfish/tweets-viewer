@@ -32,11 +32,16 @@ function getGitInfo() {
 const gitInfo = getGitInfo()
 
 // 前端 API 基址：优先取仓库根 `.env` 中的 `API_URL`（与 env.server.ts 同源），
-// 回退到生产默认值。dev 模式由 localhost:3000 反代本地 API server。
+// 回退到生产默认值。`LOCAL=1` 时指向本机 API（`bun run dev:server`）。
 const mode = process.env.NODE_ENV ?? 'production'
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const loadedEnv = loadEnv(mode, repoRoot, '')
-const resolvedApiUrl = loadedEnv.API_URL ?? 'https://tweet-api.chilfish.top'
+const localMode = ['1', 'true', 'yes'].includes(
+  (process.env.LOCAL ?? loadedEnv.LOCAL ?? '').trim().toLowerCase(),
+)
+const resolvedApiUrl = localMode
+  ? `http://127.0.0.1:${process.env.API_DEV_PORT ?? 3000}`
+  : (loadedEnv.API_URL ?? 'https://tweet-api.chilfish.top')
 
 const babelInclude = /\.[jt]sx?$/
 const ReactCompilerConfig = { /* ... */ }

@@ -84,7 +84,25 @@ bun run ig dev db --dry-run
 bun run ig dev db --url postgres://postgres@localhost:5433/tweets_dev
 ```
 
-## 启动代理
+## 启动开发：一条命令
+
+```bash
+bun run dev
+```
+
+`LOCAL=1` 时它会先跑 `apps/scripts/dev-setup.ts`：启动 Postgres → 建库 → 跑迁移 → 后台拉起 `/sql` 代理，然后才启动 server 与 client。代理是独立后台进程，dev 退出后继续运行，下次 `bun run dev` 直接复用。
+
+只做前置、不起服务器：
+
+```bash
+bun run dev:setup
+```
+
+线上模式（`LOCAL` 未设置）会跳过全部本地服务，直接启动 server 与 client。
+
+代理端口取 `NEON_HTTP_ENDPOINT` 里的端口（其次 `TWEETS_DB_PROXY_PORT`，最后 4444）。端口被另一个库的代理占用时直接报错，不会静默连错库。
+
+## 单独启动代理
 
 ```bash
 bun run ig dev proxy
@@ -97,7 +115,7 @@ curl http://127.0.0.1:4444/health
 # {"ok":true,"pid":925604,"host":"localhost:5432","database":"tweets_dev","queries":0}
 ```
 
-跑过一次抓取后 `queries` 会增加，说明查询确实落在本地库。
+跑过一次抓取或访问过页面后 `queries` 会增加，说明查询确实落在本地库。
 
 端口被占用时换一个，并同步 `.env` 的 `NEON_HTTP_ENDPOINT`：
 
@@ -117,9 +135,13 @@ bun run ig ins verify ritsu_yumemita --json | jq .meta.mode   # "local"
 本地 API 也走同一个代理：
 
 ```bash
-bun dev:server
-curl -s "http://localhost:3000/v3/ins/ritsu_yumemita?page=1" | jq '.user.fullname, .posts.meta.total'
+bun run dev:server                                      # wrangler dev，默认 8787
+curl -s "http://127.0.0.1:8787/v3/ins/ritsu_yumemita" | jq '.user.fullname, .posts.meta.total'
 ```
+
+判断读的是哪个库，看 `/v3/users/all` 的条数：本地库只会有你导入过的那几个用户。
+
+本机已经有别的项目占了 4444 时，把 `.env` 的 `NEON_HTTP_ENDPOINT` 改成 `http://127.0.0.1:4445/sql`，`bun run dev` 会把代理起在 4445。
 
 ## 切回线上
 

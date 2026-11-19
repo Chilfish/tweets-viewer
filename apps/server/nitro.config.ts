@@ -21,6 +21,10 @@ export default defineNitroConfig({
       vars: {
         DATABASE_URL: env.DATABASE_URL,
         TWEET_KEYS: env.TWEET_KEYS,
+        // 本地开发（LOCAL=1）时指向 `ig dev proxy`；线上不设。
+        ...(env.NEON_HTTP_ENDPOINT
+          ? { NEON_HTTP_ENDPOINT: env.NEON_HTTP_ENDPOINT }
+          : {}),
       },
     },
   },

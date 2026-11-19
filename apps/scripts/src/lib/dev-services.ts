@@ -1,5 +1,5 @@
-import { spawnSync } from 'node:child_process'
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { spawn, spawnSync } from 'node:child_process'
+import { existsSync, mkdirSync, openSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { connect } from 'node:net'
 import { dirname, join, resolve } from 'node:path'
 import process from 'node:process'
@@ -337,4 +337,105 @@ export async function ensureDatabaseReachable(databaseUrl: string): Promise<void
   if (!(await isPortOpen(parsed.hostname, port))) {
     throw new Error(`Postgres 已启动但 ${parsed.hostname}:${port} 不可连接；检查 pg_hba.conf 与监听地址`)
   }
+}
+
+interface ProxyHealth {
+  ok: boolean
+  pid?: number
+  host?: string
+  database?: string
+}
+
+async function getProxyHealth(endpoint: string): Promise<ProxyHealth | undefined> {
+  try {
+    const response = await fetch(new URL('/health', endpoint), {
+      signal: AbortSignal.timeout(1500),
+    })
+    if (!response.ok)
+      return undefined
+    return await response.json() as ProxyHealth
+  }
+  catch {
+    return undefined
+  }
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolveSleep => setTimeout(resolveSleep, ms))
+}
+
+/**
+ * 确保 `/sql` 代理在后台运行；`bun run dev` 用它把本地库接进 workerd。
+ *
+ * 已在运行且连着同一个库时直接复用；端口被别的库占用时报错，
+ * 不静默连错库。
+ */
+export async function ensureProxyRunning(endpoint: string, databaseUrl: string): Promise<void> {
+  const url = new URL(endpoint)
+  if (!isLocalUrl(endpoint)) {
+    console.log(`[dev] NEON_HTTP_ENDPOINT 不是本机地址，跳过开发代理：${endpoint}`)
+    return
+  }
+
+  const host = new URL(databaseUrl).host
+  const database = new URL(databaseUrl).pathname.slice(1)
+
+  const health = await getProxyHealth(endpoint)
+  if (health?.ok) {
+    if (health.host === host && health.database === database) {
+      console.log(`[dev] 复用已运行的代理（pid ${health.pid ?? '?'}）：${host}/${database}`)
+      return
+    }
+    throw new Error(
+      `端口 ${url.port} 已被另一个代理占用（pid ${health.pid ?? '?'}，连着 ${health.host ?? '?'}/${health.database ?? '?'}），`
+      + `当前需要 ${host}/${database}。改 .env 的 NEON_HTTP_ENDPOINT 换端口`,
+    )
+  }
+
+  const log = logPath('dev-db-proxy.log')
+  const fd = openSync(log, 'a')
+  const script = resolve(projectRoot, 'apps/scripts/src/cli.ts')
+  const env = { ...process.env, DATABASE_URL: databaseUrl, NEON_HTTP_ENDPOINT: endpoint }
+
+  if (process.platform === 'win32') {
+    // `start` 让代理脱离父进程树：关掉 dev 终端不会带走它。
+    const child = spawn('cmd.exe', [
+      '/c',
+      'start',
+      '',
+      '/b',
+      process.execPath,
+      script,
+      'dev',
+      'proxy',
+    ], {
+      cwd: projectRoot,
+      detached: true,
+      windowsHide: true,
+      stdio: ['ignore', fd, fd],
+      env,
+    })
+    child.unref()
+  }
+  else {
+    const child = spawn(process.execPath, [script, 'dev', 'proxy'], {
+      cwd: projectRoot,
+      detached: true,
+      stdio: ['ignore', fd, fd],
+      env,
+    })
+    child.unref()
+  }
+  console.log('[dev] 启动 Neon 代理（日志 logs/dev-db-proxy.log）')
+
+  for (let attempt = 0; attempt < 50; attempt++) {
+    await sleep(200)
+    const started = await getProxyHealth(endpoint)
+    if (started?.ok) {
+      console.log(`[dev] 代理就绪（pid ${started.pid ?? '?'}）：${endpoint} -> ${host}/${database}`)
+      return
+    }
+  }
+
+  throw new Error(`代理启动失败（${endpoint}），见 logs/dev-db-proxy.log`)
 }

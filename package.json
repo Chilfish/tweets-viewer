@@ -5,7 +5,8 @@
   "private": true,
   "packageManager": "bun@1.4.4",
   "scripts": {
-    "dev": "concurrently \"bun run dev:server\" \"bun run dev:client\"",
+    "dev": "bun apps/scripts/dev-setup.ts && concurrently \"bun run dev:server\" \"bun run dev:client\"",
+    "dev:setup": "bun apps/scripts/dev-setup.ts",
     "dev:server": "bun --cwd apps/server dev",
     "dev:client": "bun --cwd apps/web-react dev",
     "ig": "bun apps/scripts/src/cli.ts",
