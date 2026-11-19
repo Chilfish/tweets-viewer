@@ -64,7 +64,7 @@ tweets-viewer/
   | 文件 | 用途 |
   |------|------|
   | `dailyUpdate.ts` | 每日增量同步入口（`DATABASE_URL` 逗号分隔多地址时，对每个归档库并发跑一轮 Twitter + IG） |
-  | `fetch-tweet-daily.ts` | Twitter 每日抓取：入参指定目标库（`databaseUrl` / `label`），按 `daily_fetch` 读 users，先刷新用户资料（`createUser` upsert），再抓时间线 upsert 推文；返回结构化结果供入口聚合退出码 |
+  | `fetch-tweet-daily.ts` | Twitter 每日抓取：入参指定目标库（`databaseUrl` / `label`），按 `daily_fetch` 读 users，先刷新用户资料（`createUser` upsert），再抓时间线 upsert 推文；返回结构化结果供入口聚合退出码。`SYNC_MAX_PAGES=1` 只翻一页（本地冒烟用） |
   | `insertToDB.ts` | Twitter 批量导入：读取本地 JSON，写入 users + tweets |
   | `cli.ts` | IG 归档唯一入口：`bun run ig ins <add\|export\|media\|import\|sync\|verify\|upload>` 与 `ig dev <db\|proxy>` |
   | `commands/ins/*` | IG 抓取（公开包 `@chilfish/gallery-dl-instagram`）、媒体下载与 CDN 改写、入库、每日增量、对账 |

@@ -1,15 +1,21 @@
 import type { EnrichedTweet } from '@tweets-viewer/rettiwt-api'
 import { setTimeout as sleep } from 'node:timers/promises'
-import { neon } from '@neondatabase/serverless'
-import { createTweets, createUser, getDailyFetchUsers, schema } from '@tweets-viewer/database'
+import { createDb, createTweets, createUser, getDailyFetchUsers } from '@tweets-viewer/database'
 import { attachSpaceDetails, RettiwtAuthError, RettiwtPool, RettiwtRateLimitError, TweetEnrichmentService, TwitterAPIClient } from '@tweets-viewer/rettiwt-api'
-import { drizzle } from 'drizzle-orm/neon-http'
+import { resolveDatabaseUrl, resolveNeonEndpoint } from './lib/local-config'
 
 const KEYS = (process.env.TWEET_KEYS || '').split(',').filter(Boolean).map(key => key.trim())
 const PROXY = process.env.TWEET_PROXY?.trim() || undefined
 const SYNC_SINCE = process.env.SYNC_SINCE
   ? new Date(process.env.SYNC_SINCE)
   : new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
+
+/** 每个用户最多翻几页；`SYNC_MAX_PAGES=1` 用于本地冒烟。缺省不限制。 */
+const ENV_MAX_PAGES = Number(process.env.SYNC_MAX_PAGES)
+const MAX_PAGES = Number.isInteger(ENV_MAX_PAGES) && ENV_MAX_PAGES > 0
+  ? ENV_MAX_PAGES
+  : Number.POSITIVE_INFINITY
+
 const twitterPool = new RettiwtPool(KEYS, { proxy: PROXY })
 
 const MAX_RETRIES = 5
@@ -103,6 +109,8 @@ export interface FetchTweetDailyOptions {
    * 只允许放主机名一类的非敏感标识——绝不打印完整连接串（含密码）。
    */
   label?: string
+  /** 每个用户最多翻几页；缺省取 `SYNC_MAX_PAGES`，再不设就不限制。 */
+  maxPages?: number
 }
 
 export interface TweetDailyResult {
@@ -121,15 +129,14 @@ export interface TweetDailyResult {
 }
 
 export async function fetchTweetDaily(options: FetchTweetDailyOptions = {}): Promise<TweetDailyResult> {
-  const DATABASE_URL = options.databaseUrl ?? process.env.DATABASE_URL
+  const DATABASE_URL = options.databaseUrl ?? resolveDatabaseUrl()
   const dbLabel = options.label ?? 'database'
+  const maxPages = options.maxPages ?? MAX_PAGES
 
-  // 缺连接串是配置错误，不能静默跳过——否则定时任务会「什么都没做」却显绿
-  if (!DATABASE_URL)
-    throw new Error('DATABASE_URL is required for fetchTweetDaily')
-
-  const client = neon(DATABASE_URL)
-  const db = drizzle({ client, schema })
+  const db = createDb({
+    url: DATABASE_URL,
+    endpoint: resolveNeonEndpoint(DATABASE_URL),
+  })
   const users = await getDailyFetchUsers(db)
 
   console.log({
@@ -226,6 +233,7 @@ export async function fetchTweetDaily(options: FetchTweetDailyOptions = {}): Pro
 
       try {
         let nowCursor: string | undefined
+        let pages = 0
         do {
           const { tweets, cursor } = await fetchTimeline(user.id, nowCursor)
           if (!tweets.length)
@@ -233,8 +241,12 @@ export async function fetchTweetDaily(options: FetchTweetDailyOptions = {}): Pro
 
           allTweets.push(...tweets)
           nowCursor = cursor
+          pages++
           const lastTweet = tweets.at(-1)
 
+          // 本地冒烟时限制翻页数；线上默认不限。
+          if (pages >= maxPages)
+            break
           if (new Date(lastTweet!.created_at).getTime() < SYNC_SINCE.getTime())
             break
         } while (true)
