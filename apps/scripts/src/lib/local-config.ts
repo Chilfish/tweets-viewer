@@ -53,7 +53,8 @@ export function resolveNeonEndpoint(
 ): string | undefined {
   const effective = normalizeEnv(env)
   const configured = effective.NEON_HTTP_ENDPOINT?.trim()
-  if (configured) {
+  // `ig dev db` 会把本机代理写进 .env；切回线上时不能拿它去连远端库。
+  if (configured && (isLocalMode(effective) || !isLocalDatabaseUrl(configured))) {
     return configured
   }
   if (isLocalDatabaseUrl(databaseUrl)) {
@@ -135,5 +136,10 @@ export function resolveCdnBase(env: NodeJS.ProcessEnv = process.env): string {
   if (isLocalMode(env)) {
     return localStoragePublicBase(env)
   }
-  return (env.IG_CDN_BASE?.trim() || DEFAULT_CDN_BASE).replace(/\/+$/, '')
+  const configured = env.IG_CDN_BASE?.trim()
+  // 同上：`.env` 里的本机桶地址只属于 LOCAL=1，线上回落到公开 CDN。
+  if (configured && !isLocalDatabaseUrl(configured)) {
+    return configured.replace(/\/+$/, '')
+  }
+  return DEFAULT_CDN_BASE
 }
