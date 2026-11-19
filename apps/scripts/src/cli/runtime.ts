@@ -221,13 +221,25 @@ function toEnvelopeError(error: unknown): { payload: EnvelopeError, exitCode: nu
       exitCode: error.exitCode,
     }
   }
-  const message = error instanceof Error
-    ? error.message
-    : String(error)
+  const message = describeError(error)
   return {
     payload: { code: 'FAILED', message },
     exitCode: EXIT_CODES.failure,
   }
+}
+
+/** Drizzle 等包装错误把真实原因放在 `cause`，只打外层消息会看不到根因。 */
+function describeError(error: unknown): string {
+  if (!(error instanceof Error)) {
+    return String(error)
+  }
+  const cause = (error as { cause?: unknown }).cause
+  const causeMessage = cause instanceof Error
+    ? cause.message
+    : undefined
+  return causeMessage
+    ? `${error.message}（原因：${causeMessage}）`
+    : error.message
 }
 
 function buildMeta(globals: GlobalValues, startTime: number): {

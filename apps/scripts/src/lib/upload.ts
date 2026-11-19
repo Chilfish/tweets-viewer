@@ -3,63 +3,26 @@ import { existsSync } from 'node:fs'
 import { readdir, readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { ConfigError } from '../cli/exit'
+import { isLocalMode, resolveStorage } from './local-config'
 import { avatarPath, mediaDir } from './media'
 
 /**
- * R2 / S3 上传。
+ * 媒体上传：`LOCAL=1` 写本机 SILO，否则写 R2（或通用 S3）。
  *
- * 凭据来自环境变量（R2_* 优先，其次通用 S3_*）。没有凭据时直接报错并给出
- * 下一步，不把「没上传」伪装成成功。
+ * 没有凭据时直接报错并给出下一步，不把「没上传」伪装成成功。
  */
 
-interface UploadConfig {
-  endpoint: string
-  accessKeyId: string
-  secretAccessKey: string
-  bucket: string
-  publicBase: string
-}
-
-export function hasUploadCredentials(env: NodeJS.ProcessEnv = process.env): boolean {
-  const accountId = env.R2_ACCOUNT_ID?.trim()
-  const accessKeyId = env.R2_ACCESS_KEY_ID?.trim() ?? env.S3_ACCESS_KEY_ID?.trim()
-  const secretAccessKey = env.R2_SECRET_ACCESS_KEY?.trim() ?? env.S3_SECRET_ACCESS_KEY?.trim()
-  return Boolean((accountId || env.S3_ENDPOINT) && accessKeyId && secretAccessKey)
-}
-
-function resolveUploadConfig(bucketOverride?: string, env: NodeJS.ProcessEnv = process.env): UploadConfig {
-  const accountId = env.R2_ACCOUNT_ID?.trim()
-  const accessKeyId = env.R2_ACCESS_KEY_ID?.trim() ?? env.S3_ACCESS_KEY_ID?.trim()
-  const secretAccessKey = env.R2_SECRET_ACCESS_KEY?.trim() ?? env.S3_SECRET_ACCESS_KEY?.trim()
-  const bucket = bucketOverride ?? env.R2_BUCKET?.trim() ?? env.S3_BUCKET_NAME?.trim()
-  const customEndpoint = env.S3_ENDPOINT?.trim()
-
-  const endpoint = accountId
-    ? `https://${accountId}.r2.cloudflarestorage.com`
-    : customEndpoint
-
-  if (!endpoint || !accessKeyId || !secretAccessKey || !bucket) {
-    throw new ConfigError('缺少对象存储凭据，无法上传', {
-      code: 'MISSING_ENV',
-      hint: '配置 R2_ACCOUNT_ID / R2_ACCESS_KEY_ID / R2_SECRET_ACCESS_KEY / R2_BUCKET，'
-        + '或先在 chill-s3 面板手动导入 data/instagram/<账号>/',
-      context: {
-        missing: [
-          !endpoint && 'R2_ACCOUNT_ID 或 S3_ENDPOINT',
-          !accessKeyId && 'R2_ACCESS_KEY_ID 或 S3_ACCESS_KEY_ID',
-          !secretAccessKey && 'R2_SECRET_ACCESS_KEY 或 S3_SECRET_ACCESS_KEY',
-          !bucket && 'R2_BUCKET 或 S3_BUCKET_NAME',
-        ].filter(Boolean),
-      },
-    })
+/** 本地模式总是可用（默认凭据）；线上需要完整的 R2 配置。 */
+export function hasStorageCredentials(env: NodeJS.ProcessEnv = process.env): boolean {
+  if (isLocalMode(env)) {
+    return true
   }
-
-  return {
-    endpoint: endpoint.replace(/\/+$/, ''),
-    accessKeyId,
-    secretAccessKey,
-    bucket,
-    publicBase: (env.IG_CDN_BASE?.trim() || 'https://s3.chilfish.top').replace(/\/+$/, ''),
+  try {
+    resolveStorage(env)
+    return true
+  }
+  catch {
+    return false
   }
 }
 
@@ -69,6 +32,9 @@ interface UploadTask {
 }
 
 export interface UploadResult {
+  endpoint: string
+  bucket: string
+  publicBase: string
   uploaded: number
   skipped: number
   failed: { key: string, error: string }[]
@@ -79,13 +45,18 @@ export async function uploadAccountMedia(
   insUsername: string,
   options: { bucket?: string, concurrency?: number, log?: Logger } = {},
 ): Promise<UploadResult> {
-  const config = resolveUploadConfig(options.bucket)
+  const storage = resolveStorage()
+  if (options.bucket) {
+    storage.bucket = options.bucket
+    storage.publicBase = `${storage.endpoint}/${options.bucket}`
+  }
+
   const { AwsClient } = await import('aws4fetch')
   const client = new AwsClient({
-    accessKeyId: config.accessKeyId,
-    secretAccessKey: config.secretAccessKey,
+    accessKeyId: storage.accessKeyId,
+    secretAccessKey: storage.secretAccessKey,
     service: 's3',
-    region: 'auto',
+    region: process.env.S3_REGION ?? (storage.local ? 'us-east-1' : 'auto'),
   })
 
   const tasks: UploadTask[] = []
@@ -112,7 +83,14 @@ export async function uploadAccountMedia(
     })
   }
 
-  const result: UploadResult = { uploaded: 0, skipped: 0, failed: [] }
+  const result: UploadResult = {
+    endpoint: storage.endpoint,
+    bucket: storage.bucket,
+    publicBase: storage.publicBase,
+    uploaded: 0,
+    skipped: 0,
+    failed: [],
+  }
   let index = 0
   let completed = 0
   const concurrency = options.concurrency ?? 8
@@ -120,7 +98,7 @@ export async function uploadAccountMedia(
   async function worker(): Promise<void> {
     while (index < tasks.length) {
       const task = tasks[index++]!
-      const url = `${config.endpoint}/${config.bucket}/${encodeURI(task.key)}`
+      const url = `${storage.endpoint}/${storage.bucket}/${encodeURI(task.key)}`
       try {
         const head = await client.fetch(url, { method: 'HEAD' })
         if (head.ok) {
@@ -135,6 +113,10 @@ export async function uploadAccountMedia(
           body,
           headers: {
             'Content-Type': contentType(task.file),
+            // 本地桶 path-style 直读；线上 R2 由桶侧规则决定缓存。
+            ...(storage.local
+              ? {}
+              : { 'Cache-Control': 'public, max-age=31536000, immutable' }),
           },
         })
         if (!response.ok) {
@@ -164,7 +146,7 @@ export async function uploadAccountMedia(
     length: Math.max(1, Math.min(concurrency, tasks.length)),
   }, worker))
 
-  options.log?.info(`上传目标：${config.bucket}（${config.publicBase}）`)
+  options.log?.info(`上传目标：${storage.endpoint}/${storage.bucket}`)
   return result
 }
 
