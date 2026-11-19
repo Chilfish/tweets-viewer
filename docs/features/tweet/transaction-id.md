@@ -1,7 +1,10 @@
 # X client transaction ID 与外壳 cookie
 
-> 更新时间：2026-11-18
-> 关联：`packages/rettiwt-api/__tests__/transaction-document.test.ts`
+> 更新时间：2026-11-19
+> 关联：上游 `@chilfish/tweet` 的 `src/lib/transaction.ts` 与 `tests/transaction.test.ts`
+>
+> 运行时已迁到 `@chilfish/tweet@0.2.0`；本仓库 `packages/rettiwt-api` 只保留归档类型，
+> 下文代码路径为历史参考（同名实现已在上游包内）。
 
 ## 结论
 
@@ -22,7 +25,7 @@
 
 ## 实现
 
-`packages/rettiwt-api/services/public/FetcherService.ts`：
+`@chilfish/tweet` 的 `src/lib/services/public/FetcherService.ts`：
 
 ```ts
 export const X_SHELL_URLS = [
@@ -71,7 +74,7 @@ curl -sL --compressed -A "$UA" -H "Cookie: $COOKIE" https://x.com/home | grep -c
 
 ## 测试
 
-`packages/rettiwt-api/__tests__/transaction-document.test.ts`：
+`@chilfish/tweet` 的 `tests/transaction.test.ts`（本仓库 fork 的同类测试保留作历史参考）：
 
 - `isUsableXDocument` 接受同时含 verification key 与 `ondemand.s` 的文档；
 - 拒绝新外壳（无 chunk map）与缺少 verification key 的文档；

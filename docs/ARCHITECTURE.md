@@ -10,7 +10,7 @@ tweets-viewer/
 │   └── scripts/     # 离线归档脚本 (抓取→合并→入库)
 ├── packages/
 │   ├── database/    # 数据库 Schema + 查询/写入模块 (Drizzle ORM)
-│   ├── rettiwt-api/ # Twitter API 客户端库 (内部 Fork)
+│   ├── rettiwt-api/ # 归档类型（Twitter 客户端 Fork；运行时已外置到 @chilfish/tweet）
 │   └── shared/      # 共享常量、类型、工具
 ├── docs/            # 项目文档
 ├── wrangler.json    # Cloudflare Workers 部署配置
@@ -73,7 +73,7 @@ tweets-viewer/
 - **IG→twitter 映射**：只认 `users.ins_username` 列，不再维护常量表
 - **调度**：GitHub Actions cron (`0 16 * * *` UTC = 北京时间 00:00) + 手动触发
 - **工作流**：`.github/workflows/fetch-daily.yml` — checkout → setup Bun → install → run `dailyUpdate.ts`
-- **连接池**：Twitter 用 `RettiwtPool` 多 API_KEY 轮转；IG 用 `@chilfish/gallery-dl-instagram` SDK + Cookie 认证
+- **连接池**：Twitter 运行时用 `@chilfish/tweet` 的 `RettiwtPool`（Bun 原生 proxy）多 API_KEY 轮转，抓取结果经 `apps/scripts/src/lib/tweet.ts` 映射回归档 snake_case；IG 用 `@chilfish/gallery-dl-instagram` SDK + Cookie 认证
 
 ---
 
@@ -112,14 +112,11 @@ tweets-viewer/
   - `user.ts`：`createUser` (upsert), `getAllUsers`, `getUserByName`
   - `ins.ts`：`upsertInsUserInfo` (更新 users 表的 IG 信息), `getInsUserByName`, `getInsUserByInsName`, `createInsPosts`, `getInsPosts`
 
-### 3.2 `packages/rettiwt-api` — Twitter API 客户端
+### 3.2 `packages/rettiwt-api` — 归档类型（vendored Fork）
 
-- **来源**：[Rettiwt-API](https://github.com/Rishikant181/Rettiwt-API) (v6) 的本地 Fork，提供免速率限制的 Twitter API 访问
-- **本项目扩展**：
-  - `TwitterAPIClient.ts`：底层 HTTP 抓取封装
-  - `TweetEnrichmentService.ts`：原始推文 → `EnrichedTweet` 转换（过滤广告、处理引用推文）
-  - `RettiwtPool.ts`：多 API_KEY 连接池轮转
-  - `types/enriched/`：`EnrichedTweet`, `EnrichedUser` 等增强类型
+- **来源**：[Rettiwt-API](https://github.com/Rishikant181/Rettiwt-API) (v6) 的本地 Fork
+- **当前职责**：只保留 `EnrichedTweet` / `EnrichedUser` 等**归档 JSON 契约类型**，供 `packages/database` / `apps/server` / `apps/web-react` 做 type-only 引用
+- **运行时**：抓取、解析、连接池已切换到 [`@chilfish/tweet@0.2.0`](https://github.com/Chilfish/tweet-sdk)；字段差异由 `apps/scripts/src/lib/tweet.ts` 在写入前映射（归档仍是 snake_case）
 
 ### 3.3 `packages/shared` — 共享代码
 
@@ -135,7 +132,7 @@ tweets-viewer/
 ```
                          ┌────────────────────┐
                          │  Twitter API        │
-                         │ (Rettiwt-API)       │
+                         │ (@chilfish/tweet)   │
                          └────────┬───────────┘
                                   │ 原始推文
                                   ▼
@@ -216,3 +213,4 @@ tweets-viewer/
 5. **本地持久化 + 接口缓存**：Zustand `persist` (localStorage) 保存用户/设置；axios-cache-interceptor 缓存 API 响应
 6. **不做首屏 SSR（SPA-first + 静态壳）**：全路由 `clientLoader`，首屏静态壳 + 骨架屏，动态内容客户端渲染；SEO 由路由 `meta()` 覆盖（见 ADR-010）
 7. **前端只读**：读取数据库或静态数据；写入由抓取脚本单独完成，两边互不干扰
+8. **数据层外置 + 边界映射**：Twitter 抓取/解析用 npm 包 `@chilfish/tweet`（Bun 原生），归档契约仍由本仓库持有；SDK 的 camelCase 字段在 `apps/scripts/src/lib/tweet.ts` 一次性映射回 snake_case，DB / server / web-react 不感知上游命名

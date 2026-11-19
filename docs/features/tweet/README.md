@@ -16,10 +16,11 @@
 
 | 层 | 文件 |
 | --- | --- |
-| 原始请求 | `packages/rettiwt-api/requests/Tweet.ts` |
-| 外壳 / transaction | `packages/rettiwt-api/services/public/FetcherService.ts` |
-| 卡片解析 | `packages/rettiwt-api/helper/parseTweet.ts` · `packages/rettiwt-api/parsers/{jetfuel,poll}.ts` |
-| 数据模型 | `packages/rettiwt-api/types/enriched/{card,poll,index}.ts` |
+| 原始请求 | `@chilfish/tweet`（`src/lib/requests/Tweet.ts`） |
+| 外壳 / transaction | `@chilfish/tweet`（`src/lib/transaction.ts` · `src/lib/services/public/FetcherService.ts`） |
+| 卡片解析 | `@chilfish/tweet`（`src/lib/parse/{tweet,jetfuel,poll,space}.ts`） |
+| 归档映射 | `apps/scripts/src/lib/tweet.ts`（SDK camelCase → 归档 snake_case） |
+| 数据模型 | `packages/rettiwt-api/types/enriched/{card,poll,index}.ts`（归档契约） |
 | 渲染 | `apps/web-react/app/components/tweet/{TweetCard,CarouselCard,PollCard,TrendingCard,TweetSpaceCard}.tsx` |
 
 ## 渲染顺序

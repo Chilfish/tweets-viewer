@@ -55,7 +55,7 @@ docs/
 | **接数据 / 写空加载错误** | `ui-design/feedback.md` + `ui-design/patterns.md` | `FeedStatus`、Empty、Alert、浮层与文案 |
 | **写文案 / 文档** | `engineering/writing-style.md` + `requirements/glossary.md` | 具体、统一、可读的写法 |
 | **改推文卡片 / 富媒体解析** | `features/tweet/README.md` + 对应卡片文档 | 轮播 / 投票 / Trending 的数据形状、解析与渲染 |
-| **改抓取请求 / transaction ID** | `features/tweet/transaction-id.md` + `packages/rettiwt-api` | 外壳 cookie、候选页面、feature flags |
+| **改抓取请求 / transaction ID** | `features/tweet/transaction-id.md` + `@chilfish/tweet` | 外壳 cookie、候选页面、feature flags；本仓库 `packages/rettiwt-api` 仅保留归档类型 |
 | **改数据抓取 / 入库脚本** | `ARCHITECTURE.md` + `apps/scripts` | 数据流、mapping、Fukuoka 为研究脚本不入库 |
 | **新增 Instagram 归档账号** | `engineering/ig-archive-onboarding.md` + `engineering/ig-cli.md` | 一条 `bun run ig ins add` 跑完抓取、下载、入库、对账 |
 | **本地跑抓取 / 入库** | `engineering/local-database.md` | 本机 Postgres + Neon `/sql` 代理 + SILO 对象存储，`LOCAL=1` 总开关 |

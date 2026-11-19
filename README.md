@@ -19,7 +19,7 @@
 - **框架**：React Router v8（SPA-first + 静态壳）
 - **运行时**：Bun 1.3+，TypeScript
 - **仓库**：Bun Workspaces Monorepo
-- **数据源**：Twitter/X 归档（`packages/rettiwt-api` 内部 Fork）、Instagram 归档
+- **数据源**：Twitter/X 归档（运行时 `@chilfish/tweet`，归档类型在 `packages/rettiwt-api`）、Instagram 归档
 - **后端**：Hono v4 + Drizzle ORM + Neon Postgres（Serverless），Nitro v3 → Cloudflare Workers
 - **UI**：Tailwind CSS v4、Base UI/COSS、Lucide
 - **状态**：Zustand（客户端持久化）、URL 驱动 loader（服务端数据）
@@ -35,7 +35,7 @@ apps/
 └── scripts/     # 离线归档脚本（抓取 / 合并 / 入库）
 packages/
 ├── database/    # Drizzle schema + 查询/写入模块
-├── rettiwt-api/ # Twitter API 客户端（内部 Fork）
+├── rettiwt-api/ # 归档类型（Twitter 客户端 Fork；运行时已外置）
 └── shared/      # 共享常量、类型、工具
 docs/            # 文档入口：docs/INDEX.md
 ```

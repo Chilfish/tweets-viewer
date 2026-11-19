@@ -11,7 +11,7 @@ Tweets Viewer 用来读离线的推文归档。数据存在 PostgreSQL 里，前
 - **运行时**: Bun 1.3+（`packageManager: bun@1.3.14`）
 - **仓库**: Bun Workspaces Monorepo（`apps/*` + `packages/*`）
 - **后端**: Hono v4 + Drizzle ORM + Neon Postgres（Serverless）+ Nitro v3 → Cloudflare Workers
-- **数据源**: Twitter/X 归档（`packages/rettiwt-api` 内部 Fork）+ Instagram 归档
+- **数据源**: Twitter/X 归档（运行时 `@chilfish/tweet`，归档类型仍在 `packages/rettiwt-api`）+ Instagram 归档
 - **前端状态**: Zustand v5（persist）｜ **服务端状态**: URL 驱动 loader + `axios-cache-interceptor`
 - **UI**: Tailwind CSS v4 + Base UI/COSS + Lucide React
 - **部署**: Vercel（前端）+ Cloudflare Workers（API）
@@ -35,7 +35,7 @@ bun run deploy       # API 部署到 Cloudflare Workers
 bun run lint         # ESLint --fix
 bun run lint:check   # ESLint --max-warnings=0（提交前检查用，不改文件）
 bun run typecheck    # react-router typegen + tsc（web-react）
-bun run test         # 全包 Vitest（rettiwt-api + shared + database + server + web-react）
+bun run test         # 全包 Vitest（rettiwt-api + shared + database + server + scripts + web-react）
 bun run test:visual  # VRT 视觉回归（本地 win32 基线不进检查，见下）
 
 # 单包测试（调试时）
@@ -57,7 +57,7 @@ tweets-viewer/
 │   └── scripts/          # 离线归档脚本（抓取/合并/入库；fukuoka/ 为不入库的研究脚本）
 ├── packages/
 │   ├── database/         # Drizzle ORM Schema + 查询/写入模块
-│   ├── rettiwt-api/      # Twitter API 客户端（内部 Fork，vendored，lint 豁免）
+│   ├── rettiwt-api/      # 归档类型（Twitter 客户端 Fork；运行时已外置，vendored，lint 豁免）
 │   └── shared/           # 共享常量、类型、工具（date/group 纯函数）
 ├── docs/                 # 文档入口：docs/INDEX.md（规格 / 架构 / 工程规范 / 踩坑）
 └── env.server.ts         # 服务端环境变量 Zod 验证（根级单源）
