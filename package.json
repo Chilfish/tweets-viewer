@@ -8,6 +8,7 @@
     "dev": "concurrently \"bun run dev:server\" \"bun run dev:client\"",
     "dev:server": "bun --cwd apps/server dev",
     "dev:client": "bun --cwd apps/web-react dev",
+    "ig": "bun apps/scripts/src/cli.ts",
     "build:client": "bun --cwd apps/web-react build",
     "deploy": "bun --cwd apps/server deploy",
     "lint": "eslint . --fix",

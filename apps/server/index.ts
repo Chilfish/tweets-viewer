@@ -1,8 +1,6 @@
 import type { AppType } from './common'
-import { neon } from '@neondatabase/serverless'
-import { schema } from '@tweets-viewer/database'
+import { createDb } from '@tweets-viewer/database'
 import { now } from '@tweets-viewer/shared'
-import { drizzle } from 'drizzle-orm/neon-http'
 import { Hono } from 'hono'
 import { describeRoute } from 'hono-openapi'
 import { contextStorage } from 'hono/context-storage'
@@ -27,8 +25,10 @@ app
     maxAge: 86400,
   }))
   .use(async (c, next) => {
-    const sql = neon(process.env.DATABASE_URL || c.env.DATABASE_URL)
-    const db = drizzle({ client: sql, schema })
+    const db = createDb({
+      url: process.env.DATABASE_URL || c.env.DATABASE_URL,
+      endpoint: process.env.NEON_HTTP_ENDPOINT || c.env.NEON_HTTP_ENDPOINT,
+    })
     c.set('db', db)
     return next()
   })

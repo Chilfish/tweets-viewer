@@ -3,11 +3,10 @@
  *
  * Runs in order:
  *   1. Twitter tweet fetch + upsert
- *   2. Instagram post fetch + upsert (reads users from users table)
+ *   2. Instagram post fetch + upsert（账号名单来自 users.ins_username）
  *
- * 第 2 步目前停用：INSTAGRAM_COOKIES 已过期，13 个用户全部 "User not found"，
- * 而该失败在 fetch-ins-daily 里被吞掉不改变退出码，只会白跑几分钟 + 刷一堆错。
- * 等 cookie 刷新后再放开。
+ * IG 步骤只在配置了 `INSTAGRAM_COOKIES` 时执行；抓取失败的账号计入结果并让
+ * 目标库显红，不会「什么都没做」却报成功。
  *
  * `DATABASE_URL` 支持逗号分隔多地址（`url1,url2`）：每个地址是一个独立归档库，
  * 各有自己的 `daily_fetch` 用户集，因此按地址**并发**各跑一轮完整更新；
@@ -21,16 +20,24 @@
  *   DATABASE_URL          Neon Postgres（逗号分隔 = 多库并发更新）
  *   TWEET_KEYS            Twitter API Keys (comma-separated)
  *   TWEET_PROXY           代理地址（可选，X 拒绝数据中心 IP 时用）
- *   INSTAGRAM_COOKIES     Instagram login Cookie
+ *   INSTAGRAM_COOKIES     Instagram login Cookie（缺省时跳过 IG 步骤）
  */
 
 import type { TweetDailyResult } from './fetch-tweet-daily'
+import { createDb } from '@tweets-viewer/database'
 import { parseDatabaseUrls } from '@tweets-viewer/shared'
-// ═══ Instagram Daily Update ═══
-// import { fetchInsDaily } from './fetch-ins-daily'
+import { createLogger } from './cli/logger'
 // ═══ Twitter Daily Update ═══
 import { fetchTweetDaily } from './fetch-tweet-daily'
+// ═══ Instagram Daily Update ═══
+import { syncInsAccounts } from './lib/ins-sync'
+import { resolveNeonEndpoint } from './lib/local-config'
 import 'dotenv'
+
+export interface DailyResult extends TweetDailyResult {
+  /** 抓取失败的 IG 账号（IG 步骤被跳过时为空） */
+  insFailedUsers: string[]
+}
 
 /** 目标库地址（`DATABASE_URL` 逗号分隔，已去重）；空 = 配置错误，直接失败 */
 const DATABASE_URLS = parseDatabaseUrls(process.env.DATABASE_URL)
@@ -50,14 +57,53 @@ function databaseLabel(url: string, index: number): string {
   }
 }
 
-/** 对单个归档库跑一轮完整更新（Twitter；IG 恢复后同样在此传参） */
-async function updateTarget(databaseUrl: string, label: string): Promise<TweetDailyResult> {
+/** 对单个归档库跑一轮完整更新：Twitter，然后 IG（有 Cookie 时）。 */
+async function updateTarget(databaseUrl: string, label: string): Promise<DailyResult> {
   console.log(`\n───── [${label}] daily update start ─────`)
 
-  const result = await fetchTweetDaily({ databaseUrl, label })
-  // await fetchInsDaily({ databaseUrl, label })
+  const tweetResult = await fetchTweetDaily({ databaseUrl, label })
 
-  return result
+  const insFailedUsers: string[] = []
+  if (process.env.INSTAGRAM_COOKIES?.trim()) {
+    try {
+      const db = createDb({
+        url: databaseUrl,
+        endpoint: resolveNeonEndpoint(databaseUrl),
+      })
+      const result = await syncInsAccounts(db, {
+        log: createLogger({ name: `ig.${label}` }),
+      })
+      insFailedUsers.push(...result.failures.map(failure => failure.account))
+      console.log({
+        db: label,
+        action: 'ins-sync-done',
+        accounts: result.accounts,
+        imported: result.imported,
+        posts: result.posts,
+        failedAccounts: insFailedUsers.length,
+      })
+    }
+    catch (error) {
+      // IG 步骤整轮失败（Cookie 失效、SDK 异常）：记到目标库头上，让 cron 显红。
+      insFailedUsers.push('*')
+      console.error({
+        db: label,
+        action: 'ins-sync-error',
+        message: error instanceof Error
+          ? error.message
+          : String(error),
+      })
+    }
+  }
+  else {
+    console.log({ db: label, action: 'ins-sync-skipped', reason: 'INSTAGRAM_COOKIES not set' })
+  }
+
+  return {
+    ...tweetResult,
+    ok: tweetResult.ok && insFailedUsers.length === 0,
+    insFailedUsers,
+  }
 }
 
 // ═══ Main ═══
@@ -98,7 +144,7 @@ async function main(): Promise<void> {
       return
     }
 
-    const { ok, fetchedUsers, failedUsers, writeFailedUsers, aborted } = outcome.value
+    const { ok, fetchedUsers, failedUsers, writeFailedUsers, aborted, insFailedUsers } = outcome.value
 
     console.log({
       db: label,
@@ -107,6 +153,7 @@ async function main(): Promise<void> {
       fetchedUsers,
       failedUsers: failedUsers.length,
       writeFailedUsers: writeFailedUsers.length,
+      insFailedUsers: insFailedUsers.length,
       aborted,
     })
 

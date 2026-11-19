@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { parseDatabaseUrls } from '@tweets-viewer/shared'
+import { applyLocalDefaults, parseDatabaseUrls } from '@tweets-viewer/shared'
 import { config } from 'dotenv'
 import { z } from 'zod'
 
@@ -11,11 +11,20 @@ config({
   quiet: true,
 })
 
+/** `LOCAL=1` 时把数据库相关变量补成本机默认值；线上原样返回。 */
+const effectiveEnv = applyLocalDefaults(process.env as Record<string, string | undefined>)
+
 /**
  * Server environment schema definition with validation rules
  */
 const serverEnvSchema = z.object({
   ENVIRONMENT: z.enum(['development', 'production']).default('development'),
+  /** 本地开发总开关；`1` 时 DATABASE_URL / NEON_HTTP_ENDPOINT 可省略。 */
+  LOCAL: z.string().optional(),
+  /** 本地 Neon `/sql` 代理地址；本地开发时由写入端设置。 */
+  NEON_HTTP_ENDPOINT: z.url().optional(),
+  /** IG 媒体 CDN 前缀，导入媒体链接与 API 输出共用。 */
+  IG_CDN_BASE: z.url().default('https://s3.chilfish.top'),
   TWEET_KEYS: z.string().min(1),
   /**
    * Postgres 连接串。支持逗号分隔多地址（`url1,url2`），
@@ -46,7 +55,7 @@ const serverEnvSchema = z.object({
  * Validated server environment variables
  */
 const validatedEnv = (() => {
-  const parsed = serverEnvSchema.safeParse(process.env)
+  const parsed = serverEnvSchema.safeParse(effectiveEnv)
 
   if (parsed.success === false) {
     console.error(

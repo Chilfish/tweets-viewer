@@ -8,6 +8,7 @@ export interface AppType {
   }
   Bindings: {
     DATABASE_URL: string
+    NEON_HTTP_ENDPOINT?: string
     TWEET_KEY: string
   }
 }

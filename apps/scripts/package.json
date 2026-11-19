@@ -10,11 +10,15 @@
   "dependencies": {
     "@chilfish/gallery-dl-instagram": "^0.2.6",
     "@neondatabase/serverless": "^1.2.1",
-    "drizzle-orm": "^0.45.4"
+    "aws4fetch": "^1.0.20",
+    "commander": "^15.1.0",
+    "drizzle-orm": "^0.45.4",
+    "pg": "^8.23.1"
   },
   "devDependencies": {
     "@tweets-viewer/database": "workspace:*",
     "@tweets-viewer/rettiwt-api": "workspace:*",
-    "@tweets-viewer/shared": "workspace:*"
+    "@tweets-viewer/shared": "workspace:*",
+    "@types/pg": "^8.23.1"
   }
 }
