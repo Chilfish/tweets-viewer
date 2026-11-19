@@ -1,5 +1,16 @@
 import { describe, expect, it } from 'vitest'
-import { mergeData, parseDatabaseUrls, pubTime, snowId2millis, tweetUrl, uniqueObj } from '../utils'
+import {
+  applyLocalDefaults,
+  isLocalMode,
+  LOCAL_DATABASE_URL,
+  LOCAL_PROXY_ENDPOINT,
+  mergeData,
+  parseDatabaseUrls,
+  pubTime,
+  snowId2millis,
+  tweetUrl,
+  uniqueObj,
+} from '../utils'
 
 describe('uniqueObj', () => {
   it('should deduplicate objects by key (keeps last)', () => {
@@ -106,5 +117,54 @@ describe('parseDatabaseUrls', () => {
     expect(parseDatabaseUrls('   ')).toEqual([])
     expect(parseDatabaseUrls(undefined)).toEqual([])
     expect(parseDatabaseUrls(null)).toEqual([])
+  })
+})
+
+describe('isLocalMode', () => {
+  it('accepts the documented switch values', () => {
+    expect(isLocalMode({ LOCAL: '1' })).toBe(true)
+    expect(isLocalMode({ LOCAL: 'true' })).toBe(true)
+    expect(isLocalMode({ LOCAL: ' YES ' })).toBe(true)
+  })
+
+  it('treats anything else as remote', () => {
+    expect(isLocalMode({})).toBe(false)
+    expect(isLocalMode({ LOCAL: '0' })).toBe(false)
+    expect(isLocalMode({ LOCAL: 'false' })).toBe(false)
+  })
+})
+
+describe('applyLocalDefaults', () => {
+  it('leaves the environment untouched in remote mode', () => {
+    const env = { DATABASE_URL: 'postgresql://u:p@ep-x.neon.tech/db' }
+    expect(applyLocalDefaults(env)).toBe(env)
+  })
+
+  it('replaces a remote database URL with the local one', () => {
+    const result = applyLocalDefaults({
+      LOCAL: '1',
+      DATABASE_URL: 'postgresql://u:p@ep-x.neon.tech/db',
+    })
+    expect(result.DATABASE_URL).toBe(LOCAL_DATABASE_URL)
+    expect(result.NEON_HTTP_ENDPOINT).toBe(LOCAL_PROXY_ENDPOINT)
+  })
+
+  it('keeps a local database URL and its custom port', () => {
+    const result = applyLocalDefaults({
+      LOCAL: '1',
+      DATABASE_URL: 'postgres://postgres@localhost:5433/other_db',
+      NEON_HTTP_ENDPOINT: 'http://127.0.0.1:4445/sql',
+    })
+    expect(result.DATABASE_URL).toBe('postgres://postgres@localhost:5433/other_db')
+    expect(result.NEON_HTTP_ENDPOINT).toBe('http://127.0.0.1:4445/sql')
+  })
+
+  it('falls back to the local proxy when the endpoint is remote', () => {
+    const result = applyLocalDefaults({
+      LOCAL: '1',
+      DATABASE_URL: 'postgres://postgres@localhost:5432/tweets_dev',
+      NEON_HTTP_ENDPOINT: 'https://ep-x.neon.tech/sql',
+    })
+    expect(result.NEON_HTTP_ENDPOINT).toBe(LOCAL_PROXY_ENDPOINT)
   })
 })

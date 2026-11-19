@@ -68,3 +68,52 @@ export function parseDatabaseUrls(raw: string | null | undefined): string[] {
 
   return urls
 }
+
+/** 本地开发模式总开关：`LOCAL=1` / `true` / `yes`。 */
+export const LOCAL_DATABASE_URL = 'postgres://postgres@localhost:5432/tweets_dev'
+export const LOCAL_PROXY_ENDPOINT = 'http://127.0.0.1:4444/sql'
+
+export function isLocalMode(env: Record<string, string | undefined> = process.env): boolean {
+  const value = (env.LOCAL ?? '').trim().toLowerCase()
+  return value === '1' || value === 'true' || value === 'yes'
+}
+
+/** 只认本机地址：localhost / 127.0.0.1 / ::1 / 0.0.0.0。 */
+export function isLocalDatabaseUrl(url: string): boolean {
+  try {
+    const { hostname } = new URL(url)
+    return [
+      'localhost',
+      '127.0.0.1',
+      '::1',
+      '0.0.0.0',
+    ].includes(hostname)
+  }
+  catch {
+    return false
+  }
+}
+
+/**
+ * 本地模式下把数据库相关变量切到本机。
+ *
+ * `LOCAL=1` 的语义是「只动本机库」，因此显式配了远程地址也会被替换；
+ * 已经是本机地址（含自定义端口）时保持原样。线上原样返回。
+ */
+export function applyLocalDefaults(
+  env: Record<string, string | undefined>,
+): Record<string, string | undefined> {
+  if (!isLocalMode(env))
+    return env
+
+  const next = { ...env }
+  const databaseUrl = parseDatabaseUrls(next.DATABASE_URL)[0] ?? ''
+  if (!isLocalDatabaseUrl(databaseUrl))
+    next.DATABASE_URL = LOCAL_DATABASE_URL
+
+  const endpoint = next.NEON_HTTP_ENDPOINT?.trim() ?? ''
+  if (!isLocalDatabaseUrl(endpoint))
+    next.NEON_HTTP_ENDPOINT = LOCAL_PROXY_ENDPOINT
+
+  return next
+}

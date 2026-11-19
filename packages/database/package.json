@@ -12,6 +12,7 @@
     "test:watch": "cross-env NODE_ENV=test vitest"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.2.1",
     "@tweets-viewer/rettiwt-api": "workspace:*",
     "@tweets-viewer/shared": "workspace:*",
     "drizzle-kit": "^0.31.11",
