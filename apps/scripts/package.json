@@ -8,7 +8,7 @@
     "run:search": "bun src/fetchSearch.ts"
   },
   "dependencies": {
-    "@chilfish/gallery-dl-instagram": "^0.2.6",
+    "@chilfish/gallery-dl-instagram": "^0.2.7",
     "@neondatabase/serverless": "^1.2.1",
     "aws4fetch": "^1.0.20",
     "commander": "^15.1.0",

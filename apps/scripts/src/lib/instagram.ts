@@ -1,17 +1,45 @@
 import type {
   DirectoryMsg,
-  ExtractorClass,
+  InstagramExtractorOptions,
   InstagramSDK,
   Message,
   Metadata,
   QueueMsg,
 } from '@chilfish/gallery-dl-instagram'
 import type { IGMedia, IGPost, IGUserInfo } from '@tweets-viewer/shared'
+import { InstagramInfoExtractor, InstagramUserExtractor } from '@chilfish/gallery-dl-instagram'
 import { createSDK } from '@chilfish/gallery-dl-instagram/node'
 
+/**
+ * 父子提取器共享的会话 token。
+ *
+ * 0.2.7 起用户 feed 走 doc_id GraphQL，`lsd` 与 `wwwClaim` 需要跨子提取器复用，
+ * 否则每个子类都要重新拉首页换 token。
+ */
+export interface IgSessionState {
+  csrfToken: { value: string }
+  wwwClaim: { value: string }
+  lsdToken: { value: string }
+}
+
+/** 一次抓取会话：SDK 实例 + 共享 token。 */
+export interface IgSession {
+  sdk: InstagramSDK
+  state: IgSessionState
+}
+
 /** 抓取会话：只依赖 SDK 的公开导出面。 */
-export async function createSession(cookies: string): Promise<InstagramSDK> {
-  return createSDK({ cookies })
+export async function createSession(cookies: string): Promise<IgSession> {
+  const sdk = await createSDK({ cookies })
+  const csrfToken = extractCsrfToken(cookies)
+  return {
+    sdk,
+    state: {
+      csrfToken: { value: csrfToken },
+      wwwClaim: { value: '0' },
+      lsdToken: { value: '' },
+    },
+  }
 }
 
 /** 从 Cookie 串里取 csrftoken；子提取器需要它发送 X-CSRFToken。 */
@@ -27,6 +55,33 @@ function userRoot(username: string): string {
 interface ChildExtractor {
   initialize: () => Promise<void>
   [Symbol.asyncIterator]: () => AsyncGenerator<Message, void, unknown>
+}
+
+interface ExtractorConstructor {
+  readonly pattern: RegExp
+  new (opts: InstagramExtractorOptions): ChildExtractor
+}
+
+/** 用会话的共享配置与 token 构造提取器，等价于 SDK 内部的 `_resolve`。 */
+function createExtractor(
+  session: IgSession,
+  ExtrClass: ExtractorConstructor,
+  url: string,
+): ChildExtractor {
+  const match = ExtrClass.pattern.exec(url) ?? ExtrClass.pattern.exec(url.replace(/\/$/, ''))
+  if (!match) {
+    throw new Error(`无法匹配 IG 地址：${url}`)
+  }
+
+  return new ExtrClass({
+    url,
+    match,
+    config: session.sdk.config,
+    http: session.sdk.http,
+    storage: session.sdk.storage,
+    log: session.sdk.log,
+    state: session.state,
+  })
 }
 
 export interface CollectPostsOptions {
@@ -46,8 +101,9 @@ export interface CollectPostsOptions {
  * 走 `/info/` 提取器：directory 消息里带关注数、简介、外链与 HD 头像，
  * 不需要内部 REST 客户端。
  */
-export async function collectUserInfo(sdk: InstagramSDK, username: string): Promise<IGUserInfo> {
-  for await (const msg of sdk.extract(`${userRoot(username)}info/`)) {
+export async function collectUserInfo(session: IgSession, username: string): Promise<IGUserInfo> {
+  const extractor = createExtractor(session, InstagramInfoExtractor, `${userRoot(username)}info/`)
+  for await (const msg of extractor) {
     if (msg.type !== 'directory') {
       continue
     }
@@ -75,21 +131,22 @@ export async function collectUserInfo(sdk: InstagramSDK, username: string): Prom
 
 /** 抓取一个账号的帖子，按 `post_shortcode` 去重。 */
 export async function collectUserPosts(
-  sdk: InstagramSDK,
+  session: IgSession,
   username: string,
   options: CollectPostsOptions = {},
 ): Promise<IGPost[]> {
-  const csrfToken = extractCsrfToken(process.env.INSTAGRAM_COOKIES ?? '')
+  const { sdk } = session
   sdk.config.set('extractor.instagram.user.include', options.include ?? 'posts,reels')
   if (options.maxPosts) {
     sdk.config.set('extractor.instagram.user.max-posts', options.maxPosts)
   }
 
   const posts = new Map<string, IGPost>()
+  const extractor = createExtractor(session, InstagramUserExtractor, userRoot(username))
 
-  for await (const msg of sdk.extract(userRoot(username))) {
+  for await (const msg of extractor) {
     if (msg.type === 'queue') {
-      for (const post of await drainQueue(sdk, msg, csrfToken)) {
+      for (const post of await drainQueue(session, msg)) {
         addPost(posts, post, options)
       }
     }
@@ -117,35 +174,17 @@ function addPost(posts: Map<string, IGPost>, post: IGPost, options: CollectPosts
 }
 
 /** `queue` 消息里带着子提取器类，按 DownloadJob 的方式重新实例化。 */
-function instantiateChild(sdk: InstagramSDK, msg: QueueMsg, csrfToken: string): ChildExtractor | null {
-  const ExtrClass = msg.metadata._extractor as (ExtractorClass & {
-    new (opts: Record<string, unknown>): ChildExtractor
-  }) | undefined
+function instantiateChild(session: IgSession, msg: QueueMsg): ChildExtractor | null {
+  const ExtrClass = msg.metadata._extractor as ExtractorConstructor | undefined
   if (!ExtrClass) {
     return null
   }
 
-  const url = msg.url
-  const match = ExtrClass.pattern.exec(url) ?? ExtrClass.pattern.exec(url.replace(/\/$/, ''))
-  if (!match) {
-    return null
-  }
-
-  return Reflect.construct(ExtrClass, [
-    {
-      url,
-      match,
-      config: sdk.config,
-      http: sdk.http,
-      storage: sdk.storage,
-      log: sdk.log,
-      csrfToken,
-    },
-  ]) as ChildExtractor
+  return createExtractor(session, ExtrClass, msg.url)
 }
 
-async function drainQueue(sdk: InstagramSDK, msg: QueueMsg, csrfToken: string): Promise<IGPost[]> {
-  const child = instantiateChild(sdk, msg, csrfToken)
+async function drainQueue(session: IgSession, msg: QueueMsg): Promise<IGPost[]> {
+  const child = instantiateChild(session, msg)
   if (!child) {
     return []
   }
@@ -161,7 +200,7 @@ async function drainQueue(sdk: InstagramSDK, msg: QueueMsg, csrfToken: string): 
       }
     }
     else if (message.type === 'queue') {
-      posts.push(...(await drainQueue(sdk, message as QueueMsg, csrfToken)))
+      posts.push(...(await drainQueue(session, message as QueueMsg)))
     }
   }
   return posts

@@ -27,7 +27,7 @@
       "name": "@tweets-viewer/scripts",
       "version": "0.0.0",
       "dependencies": {
-        "@chilfish/gallery-dl-instagram": "^0.2.6",
+        "@chilfish/gallery-dl-instagram": "^0.2.7",
         "@neondatabase/serverless": "^1.2.1",
         "aws4fetch": "^1.0.20",
         "commander": "^15.1.0",
@@ -246,7 +246,7 @@
 
     "@cacheable/utils": ["@cacheable/utils@2.5.0", "", { "dependencies": { "hashery": "^1.5.1", "keyv": "^5.6.0" } }, "sha512-buipgOVDkkPXNR5+xBpDw7Zk2n1EvU7qBJCNUcL7rhQ//kfpOXPAvQ511Os0vpLYJ1pZnvudNytkQt2hst3wqA=="],
 
-    "@chilfish/gallery-dl-instagram": ["@chilfish/gallery-dl-instagram@0.2.6", "", { "bin": { "dl-ins": "dist/dl-ins.mjs" } }, "sha512-EfGXp+UKeOXqsumZ+qepVCrxHUoZvCA59dYw9MAzGb/eWEZXSNKwIVUaT6OrT4o3T0iwGZdul9YMHN2hi0srUQ=="],
+    "@chilfish/gallery-dl-instagram": ["@chilfish/gallery-dl-instagram@0.2.7", "", { "bin": { "dl-ins": "dist/dl-ins.mjs" } }, "sha512-x1FUxoyspD3gceh/ysmC6pl4uZST1Y7F0LmUwX4jcPUCpZ4ZQTqrvqbr7FftCxaj7WdMjJBdcSR0HQ8jW8c9eQ=="],
 
     "@chromatic-com/storybook": ["@chromatic-com/storybook@5.6.0", "", { "dependencies": { "@neoconfetti/react": "^1.0.0", "chromatic": "^18.12.1", "jsonfile": "^6.1.0", "strip-ansi": "^7.1.0" }, "peerDependencies": { "storybook": "^0.0.0-0 || ^10.1.0 || ^10.1.0-0 || ^10.2.0-0 || ^10.3.0-0 || ^10.4.0-0 || ^10.5.0-0 || ^10.6.0-0 || ^11.0.0-0" } }, "sha512-Z7YMtr9DVwegQeWcBeQaiK5dLcAvgpX53Qr/eGGYTyAEqTb1meUr5VQNq1wmst0Lj+gT6lQEco0PuFfUuf3jzA=="],
 

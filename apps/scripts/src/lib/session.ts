@@ -1,9 +1,9 @@
-import type { InstagramSDK } from '@chilfish/gallery-dl-instagram'
+import type { IgSession } from './instagram'
 import { ConfigError, UsageError } from '../cli/exit'
 import { createSession } from './instagram'
 
 /** 读取 Cookie 并建立抓取会话。 */
-export async function openSession(): Promise<InstagramSDK> {
+export async function openSession(): Promise<IgSession> {
   const cookies = process.env.INSTAGRAM_COOKIES?.trim()
   if (!cookies) {
     throw new ConfigError('缺少环境变量 INSTAGRAM_COOKIES', {

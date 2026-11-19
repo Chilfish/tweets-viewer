@@ -2,7 +2,7 @@
 
 Instagram 归档只走一个入口：`bun run ig <group> <command> [选项]`。参数解析、日志、退出码与 JSON 信封由 `apps/scripts/src/cli/` 统一提供，命令实现在 `apps/scripts/src/commands/`。
 
-抓取用已发布包 `@chilfish/gallery-dl-instagram`，只碰公开入口（`createSDK` / `ig.extract`）。上游 `gallery-dl-ins/scripts` 不再需要手工执行。
+抓取用已发布包 `@chilfish/gallery-dl-instagram`（`^0.2.7`，用户 feed 走 doc_id GraphQL）。根提取器与 `/info/` 提取器按 SDK 的方式直接实例化，父子提取器共享 `csrfToken` / `wwwClaim` / `lsdToken`，子类不再各自拉首页换 token。上游 `gallery-dl-ins/scripts` 不再需要手工执行。
 
 ## 常用
 

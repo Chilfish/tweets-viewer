@@ -1,7 +1,7 @@
-import type { InstagramSDK } from '@chilfish/gallery-dl-instagram'
 import type { DB } from '@tweets-viewer/database'
 import type { IGPost } from '@tweets-viewer/shared'
 import type { Logger } from '../cli/logger'
+import type { IgSession } from './instagram'
 import type { ExportFile } from './media'
 import { getInsPosts, getInsUserByName } from '@tweets-viewer/database'
 import { importInsData, resolveTwitterUsername } from './ins-store'
@@ -23,12 +23,12 @@ export interface ExportOutcome {
 
 /** 抓取资料与帖子并落盘。 */
 export async function runExport(
-  sdk: InstagramSDK,
+  session: IgSession,
   insUsername: string,
   options: { include?: string, since?: Date, maxPosts?: number, log?: Logger } = {},
 ): Promise<ExportOutcome> {
   const log = options.log
-  const posts = await collectUserPosts(sdk, insUsername, {
+  const posts = await collectUserPosts(session, insUsername, {
     include: options.include,
     since: options.since,
     maxPosts: options.maxPosts,
@@ -38,7 +38,7 @@ export async function runExport(
     throw new Error(`@${insUsername} 没有抓到帖子（检查 Cookie、账号是否私密）`)
   }
 
-  const info = await collectUserInfo(sdk, insUsername)
+  const info = await collectUserInfo(session, insUsername)
   const exported: ExportFile = {
     user: toExportedUser(info),
     posts,

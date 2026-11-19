@@ -45,10 +45,10 @@ export const exportSpec: CommandSpec<ExportData> = {
       }
     }
 
-    const sdk = await openSession()
+    const session = await openSession()
     log.info('抓取帖子…')
 
-    const { exported, file } = await runExport(sdk, insUsername, {
+    const { exported, file } = await runExport(session, insUsername, {
       include: ctx.options.include as string | undefined,
       maxPosts,
       log,

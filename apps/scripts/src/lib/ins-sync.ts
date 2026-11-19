@@ -1,6 +1,6 @@
-import type { InstagramSDK } from '@chilfish/gallery-dl-instagram'
 import type { DB } from '@tweets-viewer/database'
 import type { Logger } from '../cli/logger'
+import type { IgSession } from './instagram'
 import { getDailyFetchInsUsers } from '@tweets-viewer/database'
 import { runExport, runImport, runMedia } from './pipeline'
 import { openSession } from './session'
@@ -48,12 +48,12 @@ export async function syncInsAccounts(
   }
 
   const since = options.since ?? new Date(Date.now() - DEFAULT_SINCE_DAYS * 24 * 60 * 60 * 1000)
-  const sdk = await openSession()
-  return syncWithSession(sdk, db, accounts, { ...options, since })
+  const session = await openSession()
+  return syncWithSession(session, db, accounts, { ...options, since })
 }
 
 async function syncWithSession(
-  sdk: InstagramSDK,
+  session: IgSession,
   db: DB,
   accounts: { userName: string, insUsername: string }[],
   options: SyncOptions & { since: Date },
@@ -65,7 +65,7 @@ async function syncWithSession(
   for (const account of accounts) {
     const log = options.log?.child(account.insUsername)
     try {
-      const { exported } = await runExport(sdk, account.insUsername, { since: options.since, log })
+      const { exported } = await runExport(session, account.insUsername, { since: options.since, log })
       let payload = exported
 
       if (options.media !== false) {

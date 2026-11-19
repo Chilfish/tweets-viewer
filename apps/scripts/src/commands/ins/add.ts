@@ -68,10 +68,10 @@ export const addSpec: CommandSpec<AddData> = {
     }
 
     const { db } = getDb()
-    const sdk = await openSession()
+    const session = await openSession()
     const log = ctx.log.child(insUsername)
 
-    const { exported } = await runExport(sdk, insUsername, {
+    const { exported } = await runExport(session, insUsername, {
       include: ctx.options.include as string | undefined,
       maxPosts: ctx.options.maxPosts === undefined
         ? undefined
