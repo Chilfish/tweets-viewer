@@ -88,7 +88,7 @@ ins_posts: id(serial PK), post_id(UQ), username(FK→users.userName), created_at
 ```
 
 - 索引：`idx_tweets_username_createdat`（复合）+ `idx_tweets_createdat`（单列）+ keyset 表达式索引
-- IG 用户信息并入 `users` 表，不再有独立 `ins_users`；`ins_posts.username` 存的是 **twitter userName**，IG → twitter 映射维护在 `apps/scripts/src/mapping.ts`
+- IG 用户信息并入 `users` 表，不再有独立 `ins_users`；`ins_posts.username` 存的是 **twitter userName**，IG → twitter 映射的唯一来源是 `users.ins_username` 列
 
 ### API 路由（`apps/server/routes/`，详情见 `docs/API_DOCUMENTATION.md`）
 
@@ -122,21 +122,23 @@ ins_posts: id(serial PK), post_id(UQ), username(FK→users.userName), created_at
 | 文件                                                           | 用途                                                                                            |
 | -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
 | `dailyUpdate.ts`                                               | 每日增量同步（Twitter + IG），GitHub Actions cron 调用；`DATABASE_URL` 多地址时对每个库并发更新 |
-| `fetch-ins-daily.ts`                                           | 从 users 表读取已关联 IG 的用户，抓取最新帖子入库                                               |
+| `cli.ts`（`bun run ig`）                                       | IG 归档唯一入口：`ins add/export/media/import/sync/verify/upload`、`dev db/proxy`               |
 | `fetch-tweet-daily.ts` / `fetchTimeline.ts` / `fetchSearch.ts` | 推文增量抓取（`fetch-tweet-daily` 另刷新用户资料：粉丝/bio/推文数 → `users.jsonData`）          |
-| `insertToDB.ts` / `mergeData.ts` / `import-ins-data.ts`        | 本地 JSON 批量入库 / 合并                                                                       |
-| `mapping.ts`                                                   | IG username → twitter username 映射表                                                           |
+| `insertToDB.ts` / `mergeData.ts`                               | 本地 JSON 批量入库 / 合并                                                                       |
 | `fukuoka/` + `fetchSearchFukuoka.ts`                           | 研究脚本，**不入库**                                                                            |
 
 ### 环境变量（`env.server.ts` 单源 Zod 校验）
 
-| 变量                | 用途                                                                                                 |
-| ------------------- | ---------------------------------------------------------------------------------------------------- |
-| `DATABASE_URL`      | Postgres 连接串；逗号分隔多地址 = 每日抓取并发更新多库（首个为主库，`env.DATABASE_URLS` 为全量列表） |
-| `TWEET_KEYS`        | 逗号分隔的抓取 key 列表（仅抓取脚本用）                                                              |
-| `INSTAGRAM_COOKIES` | Instagram 登录 Cookie（仅 IG 抓取用）                                                                |
-| `API_URL`           | 前端 API 基址（经 `vite.config.ts` 注入 bundle）                                                     |
-| `ENVIRONMENT`       | 运行环境（`development` / `production`）                                                             |
+| 变量                 | 用途                                                                                                 |
+| -------------------- | ---------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`       | Postgres 连接串；逗号分隔多地址 = 每日抓取并发更新多库（首个为主库，`env.DATABASE_URLS` 为全量列表） |
+| `LOCAL`              | `1` 时数据库与媒体地址切到本机（`ig dev db` / `ig dev proxy`）；线上不设                             |
+| `NEON_HTTP_ENDPOINT` | 本地 Neon `/sql` 代理地址，默认 `http://127.0.0.1:4444/sql`                                          |
+| `IG_CDN_BASE`        | IG 媒体 CDN 前缀，默认 `https://s3.chilfish.top`                                                     |
+| `TWEET_KEYS`         | 逗号分隔的抓取 key 列表（仅抓取脚本用）                                                              |
+| `INSTAGRAM_COOKIES`  | Instagram 登录 Cookie（仅 IG 抓取用）                                                                |
+| `API_URL`            | 前端 API 基址（经 `vite.config.ts` 注入 bundle）                                                     |
+| `ENVIRONMENT`        | 运行环境（`development` / `production`）                                                             |
 
 参考 `example.env`，复制为根目录 `.env`。敏感凭据只走 `.env` + `env.server.ts`，绝不硬编码。
 
@@ -150,7 +152,7 @@ ins_posts: id(serial PK), post_id(UQ), username(FK→users.userName), created_at
 - **样式**：Tailwind v4 语义 token（`bg-background` / `text-muted-foreground` 等），禁止硬编码颜色；`cn()` 合并类名；全组件兼容 `.dark`
 - **Zustand**：`create<T>()()` 双括号；用 selector 订阅 + `useShallow`；`persist` store 用 `_hasHydrated` 防 SSR mismatch
 - **类型安全**：`catch` 用 `unknown` + `instanceof Error`，禁用 `catch (error: any)`
-- **IG→twitter 映射**：`ins_posts.username` 存 twitter userName，导入前确认 `mapping.ts` 存在映射
+- **IG→twitter 映射**：`ins_posts.username` 存 twitter userName，映射只认 `users.ins_username`；新账号用 `bun run ig ins add <账号> --twitter <userName>` 写入
 - **文案与文档**：按 `docs/engineering/writing-style.md` 写；界面文案写用户能做的事，文档先给事实，一个概念一个名字
 
 ### 必须遵守的规则

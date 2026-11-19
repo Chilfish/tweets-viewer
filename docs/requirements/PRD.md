@@ -38,8 +38,8 @@
 | 功能 | 说明 | 优先级 |
 |---|---|---|
 | IG 用户信息 + 帖子浏览 | `/ins/:name`，无限滚动 + 分页器 | P0 |
-| IG 每日同步 | `fetch-ins-daily.ts`，GitHub Actions cron | P0 |
-| ins→twitter 映射 | `mapping.ts` 维护 | P1 |
+| IG 每日同步 | `bun run ig ins sync`，GitHub Actions cron 调用 `dailyUpdate.ts` | P0 |
+| ins→twitter 映射 | `users.ins_username` 列（唯一来源） | P1 |
 
 ### 3.3 规划中（Phase 4，详见 `docs/planning/roadmap.md`）
 

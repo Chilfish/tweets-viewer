@@ -1,7 +1,5 @@
 # 本地开发环境（PostgreSQL + Neon HTTP 代理）
 
-> **状态**：方案已定，代码实现中（2026-11-18）。`ig dev db` / `ig dev proxy` 在实现完成前不可用。
-
 本地跑抓取与入库不需要线上 Neon：本机 Postgres 加一层 `/sql` 代理，就能让 `@neondatabase/serverless` 继续用 HTTP 驱动，代码与线上完全同路。`LOCAL=1` 是总开关。
 
 ## 为什么需要代理

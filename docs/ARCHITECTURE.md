@@ -143,10 +143,10 @@ tweets-viewer/
 │  Instagram SDK     │     │  apps/scripts      │───→ 本地 JSON 缓存文件
 │ (gallery-dl-ig)    │     │  (dailyUpdate.ts   │
 └────────┬───────────┘     │   insertToDB.ts)   │
-         │ IGPost[]        └────────┬───────────┘
-         │                          │ EnrichedTweet[]
-         │     mapping.ts           │
-         │  (ins→twitter)           │
+         │ IGPost[]                  │
+         │                           │ EnrichedTweet[]
+         │   users.ins_username      │
+         │   (ins→twitter 映射)      │
          │         │                │
          ▼         ▼                ▼
          ┌──────────────────────────────────┐

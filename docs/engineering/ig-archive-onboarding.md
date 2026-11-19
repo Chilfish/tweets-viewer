@@ -1,7 +1,5 @@
 # 给归档新增一个 Instagram 账号
 
-> **状态**：目标流程，代码实现中（2026-11-18）。命令落地前按文末「过渡期」的旧脚本执行。
-
 一条命令：`bun run ig ins add <IG 账号> --twitter <twitter userName>`。它按顺序做抓取、下载媒体、入库、对账，失败即停。
 
 写库前那个 twitter 用户必须已经在 `users` 表里：`ins_posts.username` 存的是 **twitter userName**（FK → `users.userName`），不是 IG 用户名，缺行会直接触发外键错误。
@@ -122,28 +120,7 @@ bun run ig ins sync --account ritsu_mgmg
 | 抓到的帖子数明显偏少 | 账号是私密号，或 Cookie 失效导致只返回公开部分 | 用有效 Cookie 重跑，并核对 `posts_count` |
 | `verify` 报时间顺序错误 | 库里混入了上一版导入的旧行 | 用同一条命令重跑，upsert 会覆盖 |
 
-## 过渡期（CLI 落地前）
+## 旧脚本已移除
 
-命令实现完成前，按下面的旧脚本执行，步骤与产物和上面一致：
-
-```bash
-# 1. 导出
-cd I:/dev/gallery-dl-ins
-bun run scripts/export-user.ts https://www.instagram.com/ritsu_mgmg/
-
-# 2. 下载媒体 + 改写 CDN 链接
-bun run scripts/download-media.ts data/ritsu_mgmg.json
-
-# 3. 在 chill-s3 面板把 data/instagram/ritsu_mgmg/ 传到 instagram/ 前缀
-#    头像平铺成 instagram/ritsu_mgmg.jpg
-
-# 4. 登记映射：apps/scripts/src/mapping.ts 加一行
-#    'ritsu_mgmg': 'ritsu_yumemita',
-
-# 5. 入库
-cd I:/dev/tweets-viewer
-bun run apps/scripts/src/import-ins-data.ts ../gallery-dl-ins/data/ritsu_mgmg.cdn.json
-```
-
-旧脚本的两处已知问题在 CLI 里修掉：缺少映射时 `import-ins-data.ts` 只打日志、退出码仍为 0；上传 R2 没有脚本。
+`export-user.ts` / `download-media.ts`（gallery-dl-ins）与 `import-ins-data.ts` / `fetch-ins-daily.ts` / `mapping.ts`（本仓库）都已删除，对应能力全部收敛到 `bun run ig`。对照表见 [ig-cli.md#迁移对照](./ig-cli.md#迁移对照)。
 

@@ -100,9 +100,11 @@ bun --cwd packages/database db:migrate
 | -------------------------------------------------------------- | --------------------------------------------------------------------------------- |
 | `dailyUpdate.ts`                                               | 每日增量同步（Twitter + IG），由 GitHub Actions cron 调用；多地址时并发更新多个库 |
 | `fetch-tweet-daily.ts` / `fetchTimeline.ts` / `fetchSearch.ts` | 推文增量抓取                                                                      |
-| `fetch-ins-daily.ts`                                           | 从 users 表读取已关联 IG 的用户，抓取最新帖子入库                                 |
-| `insertToDB.ts` / `mergeData.ts` / `import-ins-data.ts`        | 本地 JSON 批量入库 / 合并                                                         |
-| `mapping.ts`                                                   | IG username → twitter username 映射表（导入 IG 前必须有映射）                     |
+| `insertToDB.ts` / `mergeData.ts`                               | 本地 JSON 批量入库 / 合并                                                         |
+| `cli.ts`（`bun run ig`）                                       | IG 归档唯一入口：`ins add/export/media/import/sync/verify/upload`、`dev db/proxy` |
+
+> IG 归档流程见 [`docs/engineering/ig-cli.md`](docs/engineering/ig-cli.md)；本地验证见 [`docs/engineering/local-database.md`](docs/engineering/local-database.md)。
+> IG→twitter 映射只认 `users.ins_username` 列，不再有常量表。
 
 > `fukuoka/` 与 `fetchSearchFukuoka.ts` 是研究脚本，**不入库**。
 

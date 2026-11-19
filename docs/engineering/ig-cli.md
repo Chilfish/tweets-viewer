@@ -1,7 +1,5 @@
 # IG 归档 CLI
 
-> **状态**：方案已定，代码实现中（2026-11-18）。下面的命令在实现完成前不可用；过渡期用 [ig-archive-onboarding.md](./ig-archive-onboarding.md) 文末的旧脚本对照表。
-
 Instagram 归档只走一个入口：`bun run ig <group> <command> [选项]`。参数解析、日志、退出码与 JSON 信封由 `apps/scripts/src/cli/` 统一提供，命令实现在 `apps/scripts/src/commands/`。
 
 抓取用已发布包 `@chilfish/gallery-dl-instagram`，只碰公开入口（`createSDK` / `ig.extract`）。上游 `gallery-dl-ins/scripts` 不再需要手工执行。
