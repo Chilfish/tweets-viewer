@@ -144,6 +144,8 @@ ins_posts: id(serial PK), post_id(UQ), username(FK→users.userName), created_at
 | `ENVIRONMENT`        | 运行环境（`development` / `production`）                                                             |
 
 参考 `example.env`，复制为根目录 `.env`。敏感凭据只走 `.env` + `env.server.ts`，绝不硬编码。
+线上 API 的 `DATABASE_URL` / `TWEET_KEYS` 走 Worker secret（`wrangler secret put`），不进构建产物；
+`bun run deploy` 固定按线上构建并扫描产物，见 `docs/engineering/local-database.md#部署与线上凭据`。
 
 ## Key Conventions
 

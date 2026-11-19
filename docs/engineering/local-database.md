@@ -65,6 +65,26 @@ macOS：`brew install postgresql`；SILO 用 `brew tap pgsty/infra && brew insta
 
 `LOCAL=1` 时 `DATABASE_URL` 不是本机地址会被强制替换成本机库，`NEON_HTTP_ENDPOINT` 同理会指向本机代理，`IG_CDN_BASE` 指向本机桶。线上（`LOCAL=0`）把 `DATABASE_URL_REMOTE` 展开为 `DATABASE_URL`，不读取本地默认值。
 
+## 部署与线上凭据
+
+`bun run deploy` 是唯一的部署入口（`bun run ig deploy`），固定按线上处理：
+
+1. 用 `DATABASE_URL_REMOTE` 覆盖库地址，置 `LOCAL=0`、清掉 `NEON_HTTP_ENDPOINT`；
+2. 清空 `apps/server/.output` 后从零构建；
+3. 产物里出现 `DATABASE_URL` / `TWEET_KEYS` / `NEON_HTTP_ENDPOINT` 就中止，出现本机地址也中止；
+4. 通过后才 `nitro deploy --prebuilt`。
+
+线上凭据**不进构建产物**，走 Worker secret：
+
+```bash
+cd apps/server
+bunx wrangler secret put DATABASE_URL    # 值取 .env 的 DATABASE_URL_REMOTE
+bunx wrangler secret put TWEET_KEYS
+bunx wrangler secret list --name tweet-api
+```
+
+直接跑 `bun --cwd apps/server deploy` 会被 `nitro.config.ts` 的守卫拦住：`LOCAL=1` + 生产构建直接抛错。
+
 ## 初始化数据库
 
 ```bash

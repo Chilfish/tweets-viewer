@@ -15,6 +15,7 @@
 | [005](005-host-node-env-leak.md) | 宿主 `NODE_ENV=production` 泄漏进 Vitest → React 加载 production 构建（`React.act` 缺失），组件测试全红；脚本内联 `NODE_ENV=` 在 Bun shell 下静默无效 | 工具反馈滞后 | 脚本 `NODE_ENV` 一律 `cross-env` 固定；改完用探针确认真实值，不能只看退出码 | 已记录 |
 | [006](006-x-403-datacenter-egress.md) | 定时抓取 18 个用户全量 403 —— 真实原因是 X 拒绝数据中心出口 IP；排查中又踩「本机 TUN/fake-ip 污染测量」得出过错误结论 | 工具反馈滞后 + 设计建模 | 外部 API 拒绝时先落错误明细再判断；跨环境链路验证必须在目标环境做；轮换策略要按错误类别分类 | 已记录 |
 | [007](007-vrt-copy-churn-stale-baselines.md) | 文案重构后 VRT 基线未重生成 → `visual` job 红；同一改动 dark 被拦、light 被放过 | 流程缺失 + 设计建模 | 像素门禁不测文案（mask + RTL 断言）；mask 目标必须尺寸稳定；门禁与基线生成环境固定 runner 版本 | 已记录 |
+| [008](008-local-env-deployed-to-worker.md) | `LOCAL=1` 的本机配置被构建期写进 Workers `vars`，线上全端点 500 | 流程缺失 + 设计建模 | 运行时配置不进构建产物；凭据走 Worker secret；deploy 固定线上模式并扫描产物 | 已记录 |
 
 ## 常见坑（写码前自查）
 
@@ -52,6 +53,8 @@
 | 规则 | 对策 |
 |---|---|
 | 宿主 `NODE_ENV` 泄漏 | 各包 `test`/`dev`/`build` 脚本一律 `cross-env NODE_ENV=...`；脚本内联 `NODE_ENV=foo cmd` 在 Bun shell 下静默无效，不要用（见 [005](005-host-node-env-leak.md)） |
+| 构建期注入运行时配置 | 配置在运行期读，别在 `nitro.config.ts` 把它写进 `wrangler.vars`；凭据走 `wrangler secret`，部署命令固定线上模式并扫描产物（见 [008](008-local-env-deployed-to-worker.md)） |
+| `process.env.X \|\| c.env.X` | Nitro 只调 `app.fetch(request)`，Hono 的 `c.env` 是 `undefined`；左侧为空时右侧必然抛错，用可选链并给出明确报错（见 [008](008-local-env-deployed-to-worker.md)） |
 | 「改了但没生效」的脚本配置 | 用探针（临时用例 `console.log(process.env.NODE_ENV, typeof React.act)`）核对真实值，不能只看退出码 |
 | 用像素基线测 UI 文案 | 文案属内容，改动频繁：用 `toMatchScreenshot` 的 `screenshotOptions.mask` 遮掉 `p`/`button`，文案交给 RTL 断言；mask 目标用固定尺寸容器（`[data-vrt-mask]`），否则遮罩框仍随文案漂移（见 [007](007-vrt-copy-churn-stale-baselines.md)） |
 | 门禁用浮动环境标签 | 视觉门禁与基线生成 workflow 固定 `runs-on: ubuntu-24.04`、`bun-version-file: package.json`；`ubuntu-latest` / `bun-version: latest` 升级会让整套基线静默失配（见 [007](007-vrt-copy-churn-stale-baselines.md)） |

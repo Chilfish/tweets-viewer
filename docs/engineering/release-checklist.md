@@ -47,7 +47,8 @@
 
 ## API（Cloudflare Workers, `tweet-api.chilfish.top`）
 
-- [ ] `bun run deploy` 部署成功，`wrangler.json` 配置（DATABASE_URL, TWEET_KEYS, RATE_LIMITER）
+- [ ] `bun run deploy` 部署成功（固定 `LOCAL=0`，产物不含凭据与本机地址）
+- [ ] Worker secrets 已就位：`wrangler secret list --name tweet-api` 含 `DATABASE_URL`、`TWEET_KEYS`
 - [ ] 核心端点冒烟：`GET /v3/tweets/get/:name`、`/v3/tweets/medias/:name`、`/v3/tweets/search?q=`、`/v3/tweets/last-years-today`、`/v3/users/all`、`/v3/ins/:name`
 - [ ] 日期范围 `start`/`end`（含 date-only 值）返回正确
 - [ ] 分页边界：末页 `meta.hasMore=false` 正确；keyset 游标续载无重复/漏项
