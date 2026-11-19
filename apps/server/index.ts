@@ -25,9 +25,12 @@ app
     maxAge: 86400,
   }))
   .use(async (c, next) => {
+    // Nitro 只调 `app.fetch(request)`，Hono 的 `c.env` 在 Workers 上是 undefined；
+    // 绑定（含 secret）在 nodejs_compat 下同时出现在 `process.env` 里。
+    const env = c.env as AppType['Bindings'] | undefined
     const db = createDb({
-      url: process.env.DATABASE_URL || c.env.DATABASE_URL,
-      endpoint: process.env.NEON_HTTP_ENDPOINT || c.env.NEON_HTTP_ENDPOINT,
+      url: process.env.DATABASE_URL || env?.DATABASE_URL || '',
+      endpoint: process.env.NEON_HTTP_ENDPOINT || env?.NEON_HTTP_ENDPOINT,
     })
     c.set('db', db)
     return next()

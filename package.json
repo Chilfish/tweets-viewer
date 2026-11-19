@@ -10,7 +10,7 @@
     "dev:client": "bun --cwd apps/web-react dev",
     "ig": "bun apps/scripts/src/cli.ts",
     "build:client": "bun --cwd apps/web-react build",
-    "deploy": "bun --cwd apps/server deploy",
+    "deploy": "bun run ig deploy",
     "lint": "eslint . --fix",
     "lint:check": "eslint . --max-warnings=0",
     "typecheck": "bun --cwd apps/web-react typecheck",

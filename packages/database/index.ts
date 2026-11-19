@@ -11,6 +11,9 @@ export type DB = ReturnType<typeof drizzle<typeof schema>>
  * 这样 `DB` 类型与查询代码在本地和线上完全一致。
  */
 export function createDb({ url, endpoint }: { url: string, endpoint?: string }): DB {
+  if (!url) {
+    throw new Error('DATABASE_URL 未配置：线上请用 `wrangler secret put DATABASE_URL` 写入')
+  }
   if (endpoint) {
     neonConfig.fetchEndpoint = endpoint
   }
