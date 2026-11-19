@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### 数据层（2026-11-19）
+
+- **Changed** Twitter 抓取运行时从内部 Fork 切到 `@chilfish/tweet@0.2.0`；归档 JSON 仍是 snake_case，DB / server / web-react 不变
+- **Added** `apps/scripts/src/lib/tweet.ts`：`TWEET_KEYS` fail-fast 校验 + SDK camelCase → 归档 snake_case 递归映射
+- **Changed** 每日抓取错误分类改用 `AuthError` / `RateLimitError`；Bun 代理走 `RettiwtPool({ proxy })` 原生 `fetch`
+- **Fixed** 新入库推文的 `retweet_count` 改取真实转推数（旧 Fork 误取 `quote_count`）；存量数据无 raw 无法回填
+- **Added** `apps/scripts` Vitest 工程与 mapper 单测，接入根 `test` 链路
+
 ### 工程规范对标（2026-09-13）
 
 - **Added** `docs/INDEX.md`（文档唯一入口）、`docs/reviews/`、`docs/requirements/README.md`、`docs/planning/backlog.md`、`SECURITY.md`、`CODE_OF_CONDUCT.md`、`docs/engineering/release-checklist.md`（原 deploy-checklist 更名）

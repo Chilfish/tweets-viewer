@@ -115,7 +115,7 @@ tweets-viewer/
 ### 3.2 `packages/rettiwt-api` — 归档类型（vendored Fork）
 
 - **来源**：[Rettiwt-API](https://github.com/Rishikant181/Rettiwt-API) (v6) 的本地 Fork
-- **当前职责**：只保留 `EnrichedTweet` / `EnrichedUser` 等**归档 JSON 契约类型**，供 `packages/database` / `apps/server` / `apps/web-react` 做 type-only 引用
+- **当前职责**：Fork 源码仍在，但运行时不再被引用；`packages/database` / `apps/server` / `apps/web-react` / `apps/scripts` 只 type-only 引用其中的 `EnrichedTweet` / `EnrichedUser` 等**归档 JSON 契约类型**
 - **运行时**：抓取、解析、连接池已切换到 [`@chilfish/tweet@0.2.0`](https://github.com/Chilfish/tweet-sdk)；字段差异由 `apps/scripts/src/lib/tweet.ts` 在写入前映射（归档仍是 snake_case）
 
 ### 3.3 `packages/shared` — 共享代码
