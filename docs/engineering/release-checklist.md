@@ -58,6 +58,7 @@
 
 - [ ] `fetch-daily.yml` cron（北京时间 00:00）最近一次运行成功
 - [ ] `DATABASE_URL` / `TWEET_KEYS` / `INSTAGRAM_COOKIES` secrets 存在且未过期
+- [ ] IG 媒体上传 secrets 存在：`R2_ACCOUNT_ID` / `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` / `R2_BUCKET`
 - [ ] 新增用户/推文已入库（`/v3/users/all` 可查到）
 
 ## 发布纪律

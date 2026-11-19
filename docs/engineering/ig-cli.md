@@ -67,7 +67,7 @@ LOCAL=1 bun run ig ins merge-remote
 | `ins export <账号> [--out <path>]` | 抓取资料与帖子，写 `data/<账号>.json` |
 | `ins media <账号> \| --from <json>` | 下载媒体，写 `data/instagram/<账号>/` 与 `data/<账号>.cdn.json` |
 | `ins import <file.json> [--twitter <name>]` | 写 `users.ins_username` / `users.ins_json_data` / `ins_posts` |
-| `ins sync [--since <ISO>] [--account <账号>]` | 每日增量：按库里已关联且 `daily_fetch = true` 的账号抓取 |
+| `ins sync [--since <ISO>] [--account <账号>]` | 每日增量：抓取、下载并上传媒体、入库（`daily_fetch = true`） |
 | `ins refresh [--missing] [--no-download]` | 全量拉齐所有已关联账号；本地默认先同步线上 `users` 表 |
 | `ins merge-remote [--account <账号>]` | 把线上 `users` 与 `ins_posts` 合并到本地，同 `post_id` 保留本地 |
 | `ins verify <twitterName>` | 对账：资料、条数、时间顺序、媒体可达 |

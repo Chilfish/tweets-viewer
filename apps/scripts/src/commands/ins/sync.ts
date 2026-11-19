@@ -8,6 +8,8 @@ interface SyncData {
   accounts: number
   imported: number
   posts: number
+  media: { downloaded: number, skipped: number, failed: number }
+  upload: { uploaded: number, skipped: number, failed: number }
   failures: { account: string, error: string }[]
 }
 
@@ -15,7 +17,8 @@ export const syncSpec: CommandSpec<SyncData> = {
   id: 'ins.sync',
   description: '每日增量：抓取已关联且 daily_fetch 开启的账号',
   details: '账号来源是 `users.ins_username`，不再是单独的映射表。\n'
-    + '默认同步最近 2 天、下载并改写媒体；`--no-media` 只写数据（媒体链接会随签名过期）。',
+    + '默认同步最近 2 天、下载并上传媒体；`--no-media` 只写数据（媒体链接会随签名过期），'
+    + '`--no-upload` 只下载不上传。',
   examples: [
     'bun run ig ins sync',
     'bun run ig ins sync --since 2026-11-16T00:00:00Z',
@@ -25,6 +28,7 @@ export const syncSpec: CommandSpec<SyncData> = {
     new Option('--since <iso>', '起始时间，默认 2 天前'),
     new Option('--account <ins>', '只同步某个 IG 账号'),
     new Option('--no-media', '不下载媒体'),
+    new Option('--no-upload', '只下载媒体，不上传'),
   ],
   async run(ctx) {
     const { db } = getDb()
@@ -45,6 +49,8 @@ export const syncSpec: CommandSpec<SyncData> = {
           accounts: 0,
           imported: 0,
           posts: 0,
+          media: { downloaded: 0, skipped: 0, failed: 0 },
+          upload: { uploaded: 0, skipped: 0, failed: 0 },
           failures: [],
         },
       }
@@ -54,6 +60,7 @@ export const syncSpec: CommandSpec<SyncData> = {
       since,
       account,
       media: ctx.options.media !== false,
+      upload: ctx.options.upload !== false,
       log: ctx.log,
     })
 

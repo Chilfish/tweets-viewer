@@ -80,6 +80,8 @@ async function updateTarget(databaseUrl: string, label: string): Promise<DailyRe
         accounts: result.accounts,
         imported: result.imported,
         posts: result.posts,
+        media: result.media,
+        upload: result.upload,
         failedAccounts: insFailedUsers.length,
       })
     }
