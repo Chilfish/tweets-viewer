@@ -22,7 +22,8 @@ Tweets Viewer 用来读离线的推文归档。数据存在 PostgreSQL 里，前
 
 ```bash
 # 开发
-bun dev              # 同时启动 server + client
+bun dev              # 本地模式下先准备 Postgres/代理/SILO，再起 server + client
+bun dev:setup        # 只准备本地服务（LOCAL=1 时）
 bun dev:server       # 仅 API (http://localhost:3000)
 bun dev:client       # 仅前端 (http://localhost:9080)
 
@@ -122,7 +123,7 @@ ins_posts: id(serial PK), post_id(UQ), username(FK→users.userName), created_at
 | 文件                                                           | 用途                                                                                            |
 | -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
 | `dailyUpdate.ts`                                               | 每日增量同步（Twitter + IG），GitHub Actions cron 调用；`DATABASE_URL` 多地址时对每个库并发更新 |
-| `cli.ts`（`bun run ig`）                                       | IG 归档唯一入口：`ins add/export/media/import/sync/verify/upload`、`dev db/proxy`               |
+| `cli.ts`（`bun run ig`）                                       | IG 归档唯一入口：`ins add/export/media/import/sync/verify/upload`、`dev db/proxy/storage`       |
 | `fetch-tweet-daily.ts` / `fetchTimeline.ts` / `fetchSearch.ts` | 推文增量抓取（`fetch-tweet-daily` 另刷新用户资料：粉丝/bio/推文数 → `users.jsonData`）          |
 | `insertToDB.ts` / `mergeData.ts`                               | 本地 JSON 批量入库 / 合并                                                                       |
 | `fukuoka/` + `fetchSearchFukuoka.ts`                           | 研究脚本，**不入库**                                                                            |
@@ -132,9 +133,11 @@ ins_posts: id(serial PK), post_id(UQ), username(FK→users.userName), created_at
 | 变量                 | 用途                                                                                                 |
 | -------------------- | ---------------------------------------------------------------------------------------------------- |
 | `DATABASE_URL`       | Postgres 连接串；逗号分隔多地址 = 每日抓取并发更新多库（首个为主库，`env.DATABASE_URLS` 为全量列表） |
-| `LOCAL`              | `1` 时数据库与媒体地址切到本机（`ig dev db` / `ig dev proxy`）；线上不设                             |
+| `LOCAL`              | `1` 时数据库、对象存储与媒体地址全部切到本机（`ig dev db/proxy/storage`）；线上不设                  |
 | `NEON_HTTP_ENDPOINT` | 本地 Neon `/sql` 代理地址，默认 `http://127.0.0.1:4444/sql`                                          |
-| `IG_CDN_BASE`        | IG 媒体 CDN 前缀，默认 `https://s3.chilfish.top`                                                     |
+| `S3_ENDPOINT`        | 本地对象存储地址，默认 `http://127.0.0.1:9000`（线上用 `R2_*`）                                      |
+| `R2_BUCKET`          | 线上 R2 桶；本地模式下是 SILO 桶名，默认 `tweets-viewer`                                             |
+| `IG_CDN_BASE`        | 线上 IG 媒体前缀，默认 `https://s3.chilfish.top`；`LOCAL=1` 时改用本机桶地址                         |
 | `TWEET_KEYS`         | 逗号分隔的抓取 key 列表（仅抓取脚本用）                                                              |
 | `INSTAGRAM_COOKIES`  | Instagram 登录 Cookie（仅 IG 抓取用）                                                                |
 | `API_URL`            | 前端 API 基址（经 `vite.config.ts` 注入 bundle）                                                     |

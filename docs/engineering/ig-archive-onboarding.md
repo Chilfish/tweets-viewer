@@ -60,13 +60,13 @@ bun run ig ins verify ritsu_yumemita
 
 ## 3. 上传媒体
 
-入库前媒体必须已经能访问。本地验证可以先跳过这步，上线前必须完成：
+入库前媒体必须已经能访问。`ins add` 已包含这一步，下面用于单独重跑：
 
 ```bash
 bun run ig ins upload ritsu_mgmg
 ```
 
-对象 key：
+上传目标由 `LOCAL` 决定：`1` 写本机 SILO（`bun run ig dev storage`），否则写 R2。对象 key：
 
 ```
 instagram/ritsu_mgmg/<shortcode>-1.webp
@@ -74,7 +74,7 @@ instagram/ritsu_mgmg/<shortcode>-2.webp
 instagram/ritsu_mgmg.jpg                 # 头像，平铺，不在目录里
 ```
 
-没有 R2 凭据时命令会给出下一步提示，不会假装成功。也可以在 chill-s3 面板手动导入文件夹。
+没有凭据时命令直接失败并给出下一步，不会假装成功。也可以绕开脚本，在 chill-s3 面板手动导入文件夹。
 
 上传必须先于入库。顺序反了页面能打开，但每张图都是 404。
 
@@ -84,12 +84,13 @@ instagram/ritsu_mgmg.jpg                 # 头像，平铺，不在目录里
 bun run ig ins verify ritsu_yumemita
 ```
 
-四条都过才算接完：
+五条都过才算接完：
 
 - `user` 不为 `null`，`posts_count` 与导出条数接近
 - `posts.meta.total` 与导出条数一致
 - 全部 `created_at` 可解析且严格递减
 - 抽样 `display_url` 返回 200
+- 头像返回 200
 
 线上再确认一次：
 

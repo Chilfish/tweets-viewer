@@ -18,9 +18,10 @@ bun run ig ins add --help                # 单条命令的完整选项
 bun run ig ins add https://www.instagram.com/ritsu_mgmg --twitter ritsu_yumemita
 ```
 
-一条命令按顺序做四件事：抓取 → 下载媒体并改写 CDN 链接 → 入库 → 对账。中途失败立刻停下，退出码非 0，不会留下「写了一半」的状态：
+一条命令按顺序做五件事：抓取 → 下载媒体并改写链接 → 上传媒体 → 入库 → 对账。中途失败立刻停下，退出码非 0，不会留下「写了一半」的状态：
 
-- 抓取与下载在入库之前完成，失败不写库；
+- 抓取、下载与上传都在入库之前完成，失败不写库；
+- 上传目标由 `LOCAL` 决定：`1` 写本机 SILO，否则写 R2；
 - 入库按 `post_id` upsert，重复跑不会产生重复行；
 - 对账失败只报告，不回滚已写入的数据。
 
@@ -34,15 +35,18 @@ bun run ig ins add https://www.instagram.com/ritsu_mgmg --twitter ritsu_yumemita
 
 | 命令 | 作用 |
 | --- | --- |
-| `ins add <url\|账号> [--twitter <name>]` | 端到端：export → media → import → verify |
+| `ins add <url\|账号> [--twitter <name>]` | 端到端：export → media → upload → import → verify |
 | `ins export <账号> [--out <path>]` | 抓取资料与帖子，写 `data/<账号>.json` |
 | `ins media <账号> \| --from <json>` | 下载媒体，写 `data/instagram/<账号>/` 与 `data/<账号>.cdn.json` |
 | `ins import <file.json> [--twitter <name>]` | 写 `users.ins_username` / `users.ins_json_data` / `ins_posts` |
 | `ins sync [--since <ISO>] [--account <账号>]` | 每日增量：按库里已关联且 `daily_fetch = true` 的账号抓取 |
 | `ins verify <twitterName>` | 对账：资料、条数、时间顺序、媒体可达 |
-| `ins upload <账号> [--bucket <name>]` | 上传 R2；没配凭据时给出下一步，不假装成功 |
+| `ins upload <账号> [--bucket <name>]` | 上传媒体；`LOCAL=1` 写本机 SILO，否则写 R2 |
 | `dev db` | 起本机 Postgres、建库、跑迁移、把本地段写进 `.env` |
-| `dev proxy` | 前台启动 Neon `/sql` 兼容代理（见 [local-database.md](./local-database.md)） |
+| `dev proxy` | 前台启动 Neon `/sql` 兼容代理 |
+| `dev storage` | 启动本机 SILO 并准备桶（匿名只读） |
+
+本地服务与 `LOCAL=1` 的完整说明见 [local-database.md](./local-database.md)。
 
 ## 全局选项
 
@@ -107,6 +111,8 @@ data/
 
 头像与帖子媒体是两个位置：帖子在 `instagram/<账号>/`，头像平铺在 `instagram/<账号>.jpg`。
 
+`.cdn.json` 里的前缀由环境决定：线上是 `IG_CDN_BASE`（默认 `https://s3.chilfish.top`），`LOCAL=1` 时是本机桶 `http://127.0.0.1:9000/tweets-viewer`。本地导入的记录切回线上后要重新导入一次。
+
 ## 代码位置
 
 ```text
@@ -115,8 +121,8 @@ apps/scripts/src/
 ├─ cli/                   # runtime / logger / envelope / exit
 ├─ commands/
 │  ├─ ins/                # add · export · media · import · sync · verify · upload
-│  └─ dev/                # db · proxy
-└─ lib/                   # instagram · media · db · dev-services · local-config
+│  └─ dev/                # db · proxy · storage
+└─ lib/                   # instagram · media · db · dev-services · dev-storage · local-config
 ```
 
 ## 迁移对照

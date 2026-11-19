@@ -96,12 +96,12 @@ bun --cwd packages/database db:migrate
 > `DATABASE_URL` 支持逗号分隔多地址（`url1,url2`，地址内若含逗号需写成 `%2C`）：`dailyUpdate.ts` 会对每个库**并发**跑一轮完整更新，
 > 任一库失败都会让进程以非 0 退出（cron 会标记失败），但不影响其他库；首个地址为主库，API / `drizzle-kit` / 单库脚本只用它。
 
-| 脚本                                                           | 用途                                                                              |
-| -------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| `dailyUpdate.ts`                                               | 每日增量同步（Twitter + IG），由 GitHub Actions cron 调用；多地址时并发更新多个库 |
-| `fetch-tweet-daily.ts` / `fetchTimeline.ts` / `fetchSearch.ts` | 推文增量抓取                                                                      |
-| `insertToDB.ts` / `mergeData.ts`                               | 本地 JSON 批量入库 / 合并                                                         |
-| `cli.ts`（`bun run ig`）                                       | IG 归档唯一入口：`ins add/export/media/import/sync/verify/upload`、`dev db/proxy` |
+| 脚本                                                           | 用途                                                                                      |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `dailyUpdate.ts`                                               | 每日增量同步（Twitter + IG），由 GitHub Actions cron 调用；多地址时并发更新多个库         |
+| `fetch-tweet-daily.ts` / `fetchTimeline.ts` / `fetchSearch.ts` | 推文增量抓取                                                                              |
+| `insertToDB.ts` / `mergeData.ts`                               | 本地 JSON 批量入库 / 合并                                                                 |
+| `cli.ts`（`bun run ig`）                                       | IG 归档唯一入口：`ins add/export/media/import/sync/verify/upload`、`dev db/proxy/storage` |
 
 > IG 归档流程见 [`docs/engineering/ig-cli.md`](docs/engineering/ig-cli.md)；本地验证见 [`docs/engineering/local-database.md`](docs/engineering/local-database.md)。
 > IG→twitter 映射只认 `users.ins_username` 列，不再有常量表。
