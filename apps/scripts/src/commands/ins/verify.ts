@@ -1,7 +1,7 @@
-import type { CommandSpec } from '../../cli/runtime'
+import type { CommandSpec } from '@chilfish/devkit/cli'
 import type { VerifyCheck } from '../../lib/pipeline'
+import { UsageError } from '@chilfish/devkit/cli'
 import { Option } from 'commander'
-import { UsageError } from '../../cli/exit'
 import { getDb } from '../../lib/db'
 import { runVerify } from '../../lib/pipeline'
 

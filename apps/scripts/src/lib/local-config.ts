@@ -1,24 +1,21 @@
+import { ConfigError } from '@chilfish/devkit/cli'
+import { isLocalMode } from '@chilfish/devkit/shared'
 import {
   applyLocalDefaults,
   isLocalDatabaseUrl,
-  isLocalMode,
-  LOCAL_DATABASE_URL,
-  LOCAL_PROXY_ENDPOINT,
   parseDatabaseUrls,
 } from '@tweets-viewer/shared'
-import { ConfigError } from '../cli/exit'
+import { devkit } from '../../dev.config'
 
-export { isLocalDatabaseUrl, isLocalMode }
+export { isLocalMode }
 
-export const DEFAULT_LOCAL_DATABASE_URL = LOCAL_DATABASE_URL
-export const DEFAULT_LOCAL_PROXY_ENDPOINT = LOCAL_PROXY_ENDPOINT
 export const DEFAULT_CDN_BASE = 'https://s3.chilfish.top'
 
-/** 本地对象存储（SILO / MinIO）默认值，与 yumemita-stream-dashboard 保持一致。 */
+/** 本地对象存储（SILO / MinIO）默认值，与 devkit 保持一致。 */
 export const DEFAULT_LOCAL_S3_ENDPOINT = 'http://127.0.0.1:9000'
 export const DEFAULT_LOCAL_S3_ACCESS_KEY = 'silo-admin'
 export const DEFAULT_LOCAL_S3_SECRET_KEY = 'silo-admin'
-export const DEFAULT_LOCAL_BUCKET = 'tweets-viewer'
+export const DEFAULT_LOCAL_BUCKET = devkit.storage.bucket ?? 'tweets-viewer'
 
 /** `LOCAL=1` 时把数据库变量切到本机；线上原样返回。 */
 function normalizeEnv(env: NodeJS.ProcessEnv): Record<string, string | undefined> {
@@ -60,7 +57,7 @@ export function resolveNeonEndpoint(
     return configured
   }
   if (isLocalDatabaseUrl(databaseUrl)) {
-    return DEFAULT_LOCAL_PROXY_ENDPOINT
+    return devkit.database.proxyEndpoint
   }
   return undefined
 }
@@ -139,29 +136,4 @@ export function resolveCdnBase(env: NodeJS.ProcessEnv = process.env): string {
     return localStoragePublicBase(env)
   }
   return (env.IG_CDN_BASE?.trim() || DEFAULT_CDN_BASE).replace(/\/+$/, '')
-}
-
-/** 一行环境说明：模式 + 数据库主机/库名（+ 本地对象存储）。不打印账号密码。 */
-export function describeEnvironment(env: NodeJS.ProcessEnv = process.env): string {
-  const effective = normalizeEnv(env)
-  const mode = isLocalMode(env)
-    ? '本地模式（LOCAL=1）'
-    : '线上模式'
-  const url = parseDatabaseUrls(effective.DATABASE_URL)[0]
-  const storage = isLocalMode(env)
-    ? ` · 对象存储 ${localStoragePublicBase(env)}`
-    : ''
-  if (!url) {
-    return `${mode} · 数据库未配置${storage}`
-  }
-
-  try {
-    const parsed = new URL(url)
-    return `${mode} · 数据库 ${parsed.hostname}${parsed.port
-      ? `:${parsed.port}`
-      : ''}${parsed.pathname}${storage}`
-  }
-  catch {
-    return `${mode} · 数据库地址无法解析${storage}`
-  }
 }

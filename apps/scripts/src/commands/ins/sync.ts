@@ -1,6 +1,6 @@
-import type { CommandSpec } from '../../cli/runtime'
+import type { CommandSpec } from '@chilfish/devkit/cli'
+import { UsageError } from '@chilfish/devkit/cli'
 import { Option } from 'commander'
-import { UsageError } from '../../cli/exit'
 import { getDb } from '../../lib/db'
 import { syncInsAccounts } from '../../lib/ins-sync'
 

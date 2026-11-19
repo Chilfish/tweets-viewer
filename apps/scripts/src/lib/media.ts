@@ -1,5 +1,5 @@
+import type { Logger } from '@chilfish/devkit/cli'
 import type { IGPost, IGUserInfo } from '@tweets-viewer/shared'
-import type { Logger } from '../cli/logger'
 import { existsSync } from 'node:fs'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'

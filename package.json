@@ -5,8 +5,7 @@
   "private": true,
   "packageManager": "bun@1.4.5",
   "scripts": {
-    "dev": "bun apps/scripts/dev-setup.ts && concurrently \"bun run dev:server\" \"bun run dev:client\"",
-    "dev:setup": "bun apps/scripts/dev-setup.ts",
+    "dev": "bun run ig dev server",
     "dev:server": "bun --cwd apps/server dev",
     "dev:client": "bun --cwd apps/web-react dev",
     "ig": "bun apps/scripts/src/cli.ts",
@@ -29,9 +28,9 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^10.0.0",
+    "@chilfish/devkit": "0.1.2",
     "@types/bun": "^1.4.4",
     "@types/node": "^26.6.6",
-    "concurrently": "^10.0.7",
     "cross-env": "^10.1.0",
     "dotenv": "^18.0.10",
     "eslint": "^10.15.0",

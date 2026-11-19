@@ -1,5 +1,5 @@
+import type { Logger } from '@chilfish/devkit/cli'
 import type { DB } from '@tweets-viewer/database'
-import type { Logger } from '../cli/logger'
 import type { IgSession } from './instagram'
 import { getDailyFetchInsUsers } from '@tweets-viewer/database'
 import { runExport, runImport, runMedia } from './pipeline'

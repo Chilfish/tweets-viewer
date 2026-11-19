@@ -1,8 +1,8 @@
-import type { Logger } from '../cli/logger'
+import type { Logger } from '@chilfish/devkit/cli'
 import { existsSync } from 'node:fs'
 import { readdir, readFile } from 'node:fs/promises'
 import path from 'node:path'
-import { ConfigError } from '../cli/exit'
+import { ConfigError } from '@chilfish/devkit/cli'
 import { isLocalMode, resolveStorage } from './local-config'
 import { avatarPath, mediaDir } from './media'
 

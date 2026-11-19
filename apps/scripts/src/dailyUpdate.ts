@@ -24,9 +24,9 @@
  */
 
 import type { TweetDailyResult } from './fetch-tweet-daily'
+import { createLogger } from '@chilfish/devkit/cli'
 import { createDb } from '@tweets-viewer/database'
 import { parseDatabaseUrls } from '@tweets-viewer/shared'
-import { createLogger } from './cli/logger'
 // ═══ Twitter Daily Update ═══
 import { fetchTweetDaily } from './fetch-tweet-daily'
 // ═══ Instagram Daily Update ═══

@@ -1,6 +1,6 @@
-import type { CommandSpec } from '../../cli/runtime'
+import type { CommandSpec } from '@chilfish/devkit/cli'
+import { ConfigError } from '@chilfish/devkit/cli'
 import { Option } from 'commander'
-import { ConfigError } from '../../cli/exit'
 import { hasStorageCredentials, uploadAccountMedia } from '../../lib/upload'
 
 interface UploadData {

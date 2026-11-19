@@ -1,7 +1,6 @@
-import type { CliGroup, CommandSpec } from '../cli/runtime'
-import { devGroup } from './dev'
+import type { CommandGroup, CommandSpec } from '@chilfish/devkit/cli'
 import { insGroup } from './ins'
 
-export const groups: CliGroup[] = [insGroup, devGroup]
+export const groups: CommandGroup[] = [insGroup]
 
 export const rootCommands: CommandSpec[] = []

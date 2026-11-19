@@ -1,6 +1,6 @@
+import type { Logger } from '@chilfish/devkit/cli'
 import type { DB } from '@tweets-viewer/database'
 import type { IGPost } from '@tweets-viewer/shared'
-import type { Logger } from '../cli/logger'
 import type { IgSession } from './instagram'
 import type { ExportFile } from './media'
 import { getInsPosts, getInsUserByName } from '@tweets-viewer/database'

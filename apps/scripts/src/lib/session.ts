@@ -1,5 +1,5 @@
 import type { IgSession } from './instagram'
-import { ConfigError, UsageError } from '../cli/exit'
+import { ConfigError, UsageError } from '@chilfish/devkit/cli'
 import { createSession } from './instagram'
 
 /** 读取 Cookie 并建立抓取会话。 */

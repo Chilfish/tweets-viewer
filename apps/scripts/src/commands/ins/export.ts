@@ -1,4 +1,4 @@
-import type { CommandSpec } from '../../cli/runtime'
+import type { CommandSpec } from '@chilfish/devkit/cli'
 import { Option } from 'commander'
 import { runExport } from '../../lib/pipeline'
 import { normalizeAccount, openSession } from '../../lib/session'

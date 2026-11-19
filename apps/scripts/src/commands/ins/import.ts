@@ -1,7 +1,7 @@
-import type { CommandSpec } from '../../cli/runtime'
+import type { CommandSpec } from '@chilfish/devkit/cli'
 import { existsSync } from 'node:fs'
+import { UsageError } from '@chilfish/devkit/cli'
 import { Option } from 'commander'
-import { UsageError } from '../../cli/exit'
 import { getDb } from '../../lib/db'
 import { loadExport, runImport } from '../../lib/pipeline'
 

@@ -1,4 +1,4 @@
-import type { CommandSpec } from '../../cli/runtime'
+import type { CommandSpec } from '@chilfish/devkit/cli'
 import type { VerifyCheck } from '../../lib/pipeline'
 import { Option } from 'commander'
 import { getDb } from '../../lib/db'
@@ -47,7 +47,7 @@ export const addSpec: CommandSpec<AddData> = {
           : '（按 users.ins_username 反查）'}\n`
           + `  1. 抓取帖子与资料 → data/${insUsername}.json\n`
           + `  2. 下载媒体 → data/instagram/${insUsername}/\n`
-          + `  3. 上传媒体 → ${isLocalMode()
+          + `  3. 上传媒体 → ${isLocalMode(process.env)
             ? '本机 SILO'
             : 'R2'}\n`
             + `  4. 入库 → users + ins_posts\n`
