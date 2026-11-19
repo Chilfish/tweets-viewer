@@ -38,7 +38,7 @@
 
 ## 数据模型
 
-`packages/rettiwt-api/types/enriched/poll.ts`，挂在 `EnrichedTweet.poll`：
+`packages/tweet-types/poll.ts`，挂在 `EnrichedTweet.poll`：
 
 ```ts
 export interface PollChoice {
@@ -65,7 +65,7 @@ export interface TweetPoll {
 
 ## 解析规则
 
-`packages/rettiwt-api/parsers/poll.ts#mapPollCard()`（纯函数）：
+`@chilfish/tweet` 的 `src/lib/parse/poll.ts#mapPollCard()`（纯函数）：
 
 1. 归一化 `cardData.legacy || cardData`，`binding_values` 同时兼容 GraphQL 数组与 syndication 对象；
 2. 判定以 `choice1_label` 为锚点，不依赖 `card.name`；
@@ -98,7 +98,7 @@ export interface TweetPoll {
 
 ## 测试
 
-`packages/rettiwt-api/__tests__/poll-card.test.ts`：
+`@chilfish/tweet` 的 `tests/parse/poll.test.ts`：
 
 - 文字选项：票数、百分比、最终状态；
 - 带图选项：原图优先、主色、US 日期格式；

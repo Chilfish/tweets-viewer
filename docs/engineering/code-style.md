@@ -17,7 +17,7 @@
 | React 组件 | PascalCase | `DateRangeFilter`, `TweetCard` |
 | React Hooks | camelCase + `use` 前缀 | `useTweetStore`, `useSearchParams` |
 | 文件命名 | kebab-case | `date-range-filter.tsx`, `tweet-skeleton.tsx` |
-| 包名 | kebab-case | `@tweets-viewer/rettiwt-api` |
+| 包名 | kebab-case | `@tweets-viewer/tweet-types` |
 
 ### 文件组织
 
@@ -119,7 +119,7 @@ try { /* ... */ } catch (error: unknown) {
 
 - `bun run lint` = `eslint . --fix`
 - `bun run lint:check` = `eslint . --max-warnings=0`（CI / pre-push 用）
-- `packages/rettiwt-api/**`（vendored Fork）与 `.commandcode/**`（工具产物）豁免 lint
+- `.commandcode/**`（工具产物）豁免 lint；`.agents/**` 由 Agent 工具维护
 
 ## Lefthook 钩子
 

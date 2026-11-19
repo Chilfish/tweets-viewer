@@ -15,8 +15,7 @@
 ## 未决
 
 - [ ] [fix] 恢复 Instagram 每日抓取：刷新已过期的 `INSTAGRAM_COOKIES`（2026-06-21 起，13 个账号全部 `User not found`）后取消 `dailyUpdate.ts` 里的注释；顺带修 `fetch-ins-daily.ts:270` 吞掉用户级错误、不设退出码（job 假绿）的问题（前置：拿到新的 IG cookie；关联：`docs/development-log/2026-09-14.md`；风险：低）
-- [ ] [refactor] 补齐 `apps/server` / `packages/database` 的 `typecheck`，把根 `bun run typecheck` 扩到全仓（前置：先隔离 vendored `packages/rettiwt-api` 的历史类型错误；关联：`docs/INDEX.md` §四、CI `typecheck` job；风险：低）
-- [ ] [refactor] 收敛 `packages/rettiwt-api`：运行时已切到 `@chilfish/tweet`，包内 axios / CLI / services 不再被引用；删除运行时代码与依赖，或把归档类型迁到更合适的包（前置：确认 DB / server / web-react 全部 type-only；关联：`ARCHITECTURE.md` §3.2；风险：中）
+- [ ] [refactor] 补齐 `apps/server` / `apps/scripts` 的 `typecheck`，把根 `bun run typecheck` 扩到全仓（前置：scripts 剩 3 处历史错误、server 集成测试 1 处；`packages/database` 已可干净通过；关联：`docs/INDEX.md` §四、CI `typecheck` job；风险：低）
 - [ ] [test] 视觉回归（VRT）覆盖扩面：MediaCard / InstagramPostCard / TweetSkeleton / DateDivider × 双主题（前置：CI linux 基线生成流程；关联：`planning/visual-regression-testing.md`；风险：中）
 - [ ] [feat] 执行 Space 卡片历史数据回填：脚本已就绪（`apps/scripts/src/backfillSpace.ts`，只写 `jsonData`、默认 dry-run，`--write` 落库），但本机 Bun 连不上 Neon（TLS 校验失败，PowerShell 可连）故尚未实跑；需在能连 Neon 的环境先 dry-run 确认规模再 `--write`（前置：可访问 Neon 的网络 / 限流预算；关联：`docs/development-log/2026-09-25.md`；风险：低）
 
@@ -32,6 +31,7 @@
 | 日期 | 内容 | 去向 |
 | --- | --- | --- |
 | 2026-11-19 | Twitter 抓取运行时切换到 `@chilfish/tweet@0.2.0`：脚本边界映射回归档 snake_case，错误分类 / Bun 代理 / cursor 适配 | 见 `../development-log/2026-11-19.md` |
+| 2026-11-19 | 下线 `packages/rettiwt-api`，归档类型收敛到 `packages/tweet-types`；真实抓取 19 条验证通过 | 见 `../development-log/2026-11-19.md` |
 | 2026-09-25 | 同步 anonTweet 的 rettiwt-api 数据层（JetFuel + Space 请求）+ 端到端 X Space 卡片（五态行动区、正文去重、抓取时挂载 `space`） | 见 `../development-log/2026-09-25.md` |
 | 2026-09-17 | API 加固（issue #8 / #9）：字段级参数校验 + 非法游标 400 + medias 日期范围 total 收敛 + 媒体 partial index | 见 `../development-log/2026-09-17.md` |
 | 2026-09-14 | 定时抓取全量 403 修复：出口改走 mihomo 代理 + `RettiwtPool` 错误分类硬化（401/403/429 轮换、类型化错误、明细日志） | 见 `../development-log/2026-09-14.md`、`../postmortem/006-x-403-datacenter-egress.md` |

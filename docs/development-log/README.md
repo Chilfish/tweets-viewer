@@ -6,7 +6,7 @@
 
 | 日期 | 主题 |
 |---|---|
-| [2026-11-19](2026-11-19.md) | 升级 `@chilfish/gallery-dl-instagram` 0.2.7（用户 feed 改走 doc_id GraphQL）；Twitter 抓取运行时切换到 `@chilfish/tweet@0.2.0`，在脚本边界映射回归档 snake_case，DB / server / web-react 不动 |
+| [2026-11-19](2026-11-19.md) | 升级 `@chilfish/gallery-dl-instagram` 0.2.7；Twitter 抓取运行时切到 `@chilfish/tweet@0.2.0` 并做边界映射；下线 `packages/rettiwt-api`，归档类型收敛到 `packages/tweet-types`，本地真实抓取 19 条验证通过 |
 | [2026-11-18](2026-11-18.md) | 新增 IG 归档账号的标准流程（`engineering/ig-archive-onboarding.md`）；方案：把 gallery-dl-ins 的脚本搬进本仓库，改成 `bun run ig` 统一 CLI（`engineering/ig-cli.md`），并参考 ymmemita 搭本地 Postgres + Neon `/sql` 代理做验证（`engineering/local-database.md`） |
 | [2026-11-04](2026-11-04.md) | 日期范围筛选与排序统一到事件时间（issue #19）：`start` / `end` 改按排序键的 snowflake 闭区间过滤，年统计同口径；清理 `rettiwt-api` 未使用的 `happy-dom` 依赖，关闭 3 条 Dependabot 告警 |
 | [2026-10-31](2026-10-31.md) | VRT 门禁降噪：文案用 `screenshotOptions.mask` 排除、改由 RTL 断言；重试按钮行用 `[data-vrt-mask]` 固定遮罩；CI 与基线 workflow 固定 `ubuntu-24.04` / bun 版本（postmortem 007） |

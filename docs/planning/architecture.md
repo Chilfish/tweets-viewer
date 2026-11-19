@@ -90,6 +90,14 @@
 - **后果**: 首屏 = 静态壳 + 骨架屏，内容客户端渲染；URL 驱动状态保证可分享/可书签；
   Specification §6 更新渲染模型表述
 
+## ADR-011: 外置 Twitter 运行时，归档类型独立成包
+
+- **日期**: 2026-11-19
+- **决策**: 删除 vendored `packages/rettiwt-api`；抓取/解析/连接池使用 npm 包 `@chilfish/tweet@0.2.0`，归档 JSON 契约抽到 `packages/tweet-types`（纯类型）
+- **背景**: 内部 Fork 与同源上游字段契约已分叉；维护两份请求/解析实现成本高，且上游已补齐计数、`parent_id`、卡片清洗、Bun 代理等 parity
+- **理由**: 运行时由上游维护；本仓库只持有自己的归档契约。字段差异集中在一个映射函数（`apps/scripts/src/lib/tweet.ts`），DB / server / web-react 不感知上游命名
+- **后果**: 归档仍是 snake_case；新增抓取能力先看 `@chilfish/tweet` 是否已提供；`packages/tweet-types` 无运行时代码，可被所有包 type-only 引用
+
 ## 技术栈总览
 
 | 层 | 技术 |

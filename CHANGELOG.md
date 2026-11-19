@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 - **Changed** 每日抓取错误分类改用 `AuthError` / `RateLimitError`；Bun 代理走 `RettiwtPool({ proxy })` 原生 `fetch`
 - **Fixed** 新入库推文的 `retweet_count` 改取真实转推数（旧 Fork 误取 `quote_count`）；存量数据无 raw 无法回填
 - **Added** `apps/scripts` Vitest 工程与 mapper 单测，接入根 `test` 链路
+- **Removed** `packages/rettiwt-api`（vendored Fork）；归档类型收敛到新包 `packages/tweet-types`（纯类型）
+- **Changed** 所有包改为从 `@tweets-viewer/tweet-types` type-only 引用；`ITweetFilter` 从 `@chilfish/tweet` 导入
+- **Changed** `apps/scripts/src/common.ts` 的 `RettiwtPool` 支持 `TWEET_PROXY`
 
 ### 工程规范对标（2026-09-13）
 

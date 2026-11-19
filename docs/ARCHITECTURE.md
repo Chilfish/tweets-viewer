@@ -10,7 +10,7 @@ tweets-viewer/
 │   └── scripts/     # 离线归档脚本 (抓取→合并→入库)
 ├── packages/
 │   ├── database/    # 数据库 Schema + 查询/写入模块 (Drizzle ORM)
-│   ├── rettiwt-api/ # 归档类型（Twitter 客户端 Fork；运行时已外置到 @chilfish/tweet）
+│   ├── tweet-types/ # Twitter 归档 JSON 契约（type-only）
 │   └── shared/      # 共享常量、类型、工具
 ├── docs/            # 项目文档
 ├── wrangler.json    # Cloudflare Workers 部署配置
@@ -112,11 +112,12 @@ tweets-viewer/
   - `user.ts`：`createUser` (upsert), `getAllUsers`, `getUserByName`
   - `ins.ts`：`upsertInsUserInfo` (更新 users 表的 IG 信息), `getInsUserByName`, `getInsUserByInsName`, `createInsPosts`, `getInsPosts`
 
-### 3.2 `packages/rettiwt-api` — 归档类型（vendored Fork）
+### 3.2 `packages/tweet-types` — 归档 JSON 契约
 
-- **来源**：[Rettiwt-API](https://github.com/Rishikant181/Rettiwt-API) (v6) 的本地 Fork
-- **当前职责**：Fork 源码仍在，但运行时不再被引用；`packages/database` / `apps/server` / `apps/web-react` / `apps/scripts` 只 type-only 引用其中的 `EnrichedTweet` / `EnrichedUser` 等**归档 JSON 契约类型**
-- **运行时**：抓取、解析、连接池已切换到 [`@chilfish/tweet@0.2.0`](https://github.com/Chilfish/tweet-sdk)；字段差异由 `apps/scripts/src/lib/tweet.ts` 在写入前映射（归档仍是 snake_case）
+- **职责**：只放 `EnrichedTweet` / `EnrichedUser` / `MediaDetails` / `SpaceDetails` 等归档 JSON 类型，无运行时代码、无依赖
+- **来源**：从旧 vendored Rettiwt Fork 中抽取，字段保持归档 snake_case 契约
+- **消费方**：`packages/database` / `apps/server` / `apps/web-react` / `apps/scripts` 全部 type-only 引用
+- **运行时**：抓取、解析、连接池使用 [`@chilfish/tweet@0.2.0`](https://github.com/Chilfish/tweet-sdk)；字段差异由 `apps/scripts/src/lib/tweet.ts` 在写入前映射
 
 ### 3.3 `packages/shared` — 共享代码
 

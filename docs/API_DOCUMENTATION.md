@@ -60,7 +60,7 @@ interface PaginatedResponse<T> {
 ### EnrichedTweet
 
 推文详情对象，包含推文内容、媒体信息、统计数据等。
-(类型定义引用自 `@tweets-viewer/rettiwt-api`)
+(类型定义引用自 `@tweets-viewer/tweet-types`)
 
 可选字段（缺省即不渲染 / 不返回）：
 
@@ -74,7 +74,7 @@ interface PaginatedResponse<T> {
 ### EnrichedUser
 
 用户详情对象，包含用户资料、关注数、粉丝数等。
-(类型定义引用自 `@tweets-viewer/rettiwt-api`)
+(类型定义引用自 `@tweets-viewer/tweet-types`)
 
 ---
 

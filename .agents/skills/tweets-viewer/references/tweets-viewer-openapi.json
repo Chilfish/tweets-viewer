@@ -42,12 +42,12 @@
       "EnrichedTweet": {
         "type": "object",
         "additionalProperties": true,
-        "description": "推文详情（EnrichedTweet）。完整字段见 packages/rettiwt-api/types/enriched。"
+        "description": "推文详情（EnrichedTweet）。完整字段见 packages/tweet-types/index.ts。"
       },
       "EnrichedUser": {
         "type": "object",
         "additionalProperties": true,
-        "description": "用户详情（EnrichedUser）。完整字段见 packages/rettiwt-api/types/enriched。"
+        "description": "用户详情（EnrichedUser）。完整字段见 packages/tweet-types/index.ts。"
       },
       "PaginatedTweets": {
         "type": "object",

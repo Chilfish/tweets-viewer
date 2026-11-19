@@ -66,7 +66,7 @@
 
 ## 数据模型
 
-`packages/rettiwt-api/types/enriched/card.ts`：
+`packages/tweet-types/card.ts`：
 
 ```ts
 export interface CardCarouselImage {
@@ -92,7 +92,7 @@ export interface LinkPreviewCard {
 
 ## 解析规则
 
-`helper/parseTweet.ts#parseUnifiedCard()`：
+`@chilfish/tweet` 的 `src/lib/parse/tweet.ts#parseUnifiedCard()`：
 
 1. `type.startsWith('image_carousel')` → `image_carousel`；
    `video_` → `video_card`；`image_` 或多图 → `image_card`；否则 `default`。
@@ -133,7 +133,7 @@ export interface LinkPreviewCard {
 
 ## 测试
 
-`packages/rettiwt-api/__tests__/card-media.test.ts`：
+`@chilfish/tweet` 的 `tests/parse/card.test.ts`：
 
 - 多图：顺序与 `media_list` 一致、`imageUrl === images[0].url`、`ctaLabel`、`layout`；
 - 单图：`layout = image_card`、原图宽高；

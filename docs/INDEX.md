@@ -55,7 +55,7 @@ docs/
 | **接数据 / 写空加载错误** | `ui-design/feedback.md` + `ui-design/patterns.md` | `FeedStatus`、Empty、Alert、浮层与文案 |
 | **写文案 / 文档** | `engineering/writing-style.md` + `requirements/glossary.md` | 具体、统一、可读的写法 |
 | **改推文卡片 / 富媒体解析** | `features/tweet/README.md` + 对应卡片文档 | 轮播 / 投票 / Trending 的数据形状、解析与渲染 |
-| **改抓取请求 / transaction ID** | `features/tweet/transaction-id.md` + `@chilfish/tweet` | 外壳 cookie、候选页面、feature flags；本仓库 `packages/rettiwt-api` 仅保留归档类型 |
+| **改抓取请求 / transaction ID** | `features/tweet/transaction-id.md` + `@chilfish/tweet` | 外壳 cookie、候选页面、feature flags；本仓库 `packages/tweet-types` 仅保留归档类型 |
 | **改数据抓取 / 入库脚本** | `ARCHITECTURE.md` + `apps/scripts` | 数据流、mapping、Fukuoka 为研究脚本不入库 |
 | **新增 Instagram 归档账号** | `engineering/ig-archive-onboarding.md` + `engineering/ig-cli.md` | 一条 `bun run ig ins add` 跑完抓取、下载、入库、对账 |
 | **本地跑抓取 / 入库** | `engineering/local-database.md` | 本机 Postgres + Neon `/sql` 代理 + SILO 对象存储，`LOCAL=1` 总开关 |
@@ -93,13 +93,13 @@ docs/
 | --- | --- |
 | `bun run lint:check` | ESLint（`--max-warnings=0`，不改文件） |
 | `bun run typecheck` | react-router typegen + tsc（web-react） |
-| `bun run test` | 全包 Vitest（rettiwt-api + shared + database + server + web-react） |
+| `bun run test` | 全包 Vitest（shared + database + server + scripts + web-react） |
 | `bun run test:visual` | VRT 视觉回归（本地 win32 基线对 CI 无效，见 `planning/visual-regression-testing.md`） |
 | `bun run build:client` | 前端生产构建 |
 
 `lefthook` pre-push = `lint:check + typecheck + test + build:client`，**禁止 `--no-verify`**。详见 `engineering/git-workflow.md`。
 
-> 已知缺口：`apps/server` / `packages/database` 尚无 `typecheck` 脚本（`packages/rettiwt-api` 为 vendored Fork，历史类型错误未清），当前 `typecheck` 只覆盖 web-react（与 CI 一致）。
+> 已知缺口：`apps/server` / `apps/scripts` 尚未接入根 `typecheck`。`packages/database` 已可干净通过；`apps/scripts` 剩 3 处历史错误，`apps/server` 集成测试 1 处。当前 `typecheck` 只覆盖 web-react（与 CI 一致）。
 
 ---
 

@@ -3,8 +3,8 @@
 > 更新时间：2026-11-19
 > 关联：上游 `@chilfish/tweet` 的 `src/lib/transaction.ts` 与 `tests/transaction.test.ts`
 >
-> 运行时已迁到 `@chilfish/tweet@0.2.0`；本仓库 `packages/rettiwt-api` 只保留归档类型，
-> 下文代码路径为历史参考（同名实现已在上游包内）。
+> 运行时已迁到 `@chilfish/tweet@0.2.0`；本仓库旧 Fork 已删除，只保留
+> `packages/tweet-types` 归档类型。下文代码路径为历史参考（同名实现已在上游包内）。
 
 ## 结论
 
