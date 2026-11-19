@@ -138,7 +138,9 @@ export async function collectUserPosts(
   const { sdk } = session
   sdk.config.set('extractor.instagram.user.include', options.include ?? 'posts,reels')
   if (options.maxPosts) {
-    sdk.config.set('extractor.instagram.user.max-posts', options.maxPosts)
+    // 子提取器读的是 `extractor.instagram.{posts,reels}.max-posts`；
+    // 写在 `instagram` 这一层由 interpolate 向上查找，一次覆盖所有子类。
+    sdk.config.set('extractor.instagram.max-posts', options.maxPosts)
   }
 
   const posts = new Map<string, IGPost>()
