@@ -50,6 +50,15 @@ LOCAL=1 bun run ig ins refresh --no-download --missing --delay 30 --retry 3
 `--missing` 比较本地 `ins_posts` 数与资料 `posts_count`；`--delay` 是账号间隔秒数，
 `--retry` 是单账号失败重试次数，退避从 `--retry-delay`（默认 30）开始线性增长。
 
+IG 限流时先把线上归档合并到本地（`post_id` 冲突保留本地行）：
+
+```bash
+LOCAL=1 bun run ig ins merge-remote
+```
+
+合并会读取线上整张 `users` 与 `ins_posts`；本地已有的帖子跳过，不覆盖本地媒体地址与字段。
+新帖子的媒体链接是线上已有的地址，不保证覆盖到资料里的最新帖。
+
 ## 命令表
 
 | 命令 | 作用 |
@@ -60,6 +69,7 @@ LOCAL=1 bun run ig ins refresh --no-download --missing --delay 30 --retry 3
 | `ins import <file.json> [--twitter <name>]` | 写 `users.ins_username` / `users.ins_json_data` / `ins_posts` |
 | `ins sync [--since <ISO>] [--account <账号>]` | 每日增量：按库里已关联且 `daily_fetch = true` 的账号抓取 |
 | `ins refresh [--missing] [--no-download]` | 全量拉齐所有已关联账号；本地默认先同步线上 `users` 表 |
+| `ins merge-remote [--account <账号>]` | 把线上 `users` 与 `ins_posts` 合并到本地，同 `post_id` 保留本地 |
 | `ins verify <twitterName>` | 对账：资料、条数、时间顺序、媒体可达 |
 | `ins upload <账号> [--bucket <name>]` | 上传媒体；`LOCAL=1` 写本机 SILO，否则写 R2 |
 | `dev server` | 起本地服务（Postgres / 建库 / 迁移 / 代理 / SILO）后同时启动 server 与 client |

@@ -76,6 +76,40 @@ export async function createInsPosts({ db, posts, username }: {
   return { rowCount: insertedCount }
 }
 
+/** 读取整行 IG 帖子，用于库间合并（`id` 不参与同步）。 */
+export async function getInsPostRows(db: DB): Promise<SelectInsPost[]> {
+  return db.select().from(insPostsTable)
+}
+
+/** 合并远端帖子：`post_id` 冲突时保留本地行，只补本地没有的。 */
+export async function mergeInsPostRows({
+  db,
+  rows,
+}: {
+  db: DB
+  rows: SelectInsPost[]
+}): Promise<{ inserted: number, skipped: number }> {
+  if (rows.length === 0) {
+    return { inserted: 0, skipped: 0 }
+  }
+
+  let inserted = 0
+  for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+    const chunk = rows.slice(i, i + BATCH_SIZE)
+    const result = await db
+      .insert(insPostsTable)
+      .values(chunk.map(({ id: _id, ...row }) => row))
+      .onConflictDoNothing({ target: insPostsTable.postId })
+      .returning({ postId: insPostsTable.postId })
+    inserted += result.length
+  }
+
+  return {
+    inserted,
+    skipped: rows.length - inserted,
+  }
+}
+
 /** 每个用户的本地 IG 帖子数，用于断点续跑。 */
 export async function getInsPostCounts(db: DB): Promise<Map<string, number>> {
   const rows = await db

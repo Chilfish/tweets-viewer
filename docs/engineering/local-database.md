@@ -202,6 +202,9 @@ LOCAL=1 bun run ig ins refresh --no-download
 `ins refresh` 会先从 `DATABASE_URL_REMOTE` 同步整张 `users` 表，再对全部 `ins_username` 账号全量抓取帖子；
 `--no-download` 表示只同步数据、媒体链接指向线上 CDN。限流中断后加 `--missing` 续跑。
 
+IG 限流时用 `LOCAL=1 bun run ig ins merge-remote` 先把线上 `ins_posts` 合并到本地：
+同一个 `post_id` 保留本地行，只补本地没有的帖子。
+
 本机已经有别的项目占了 4444 时，把 `.env` 的 `NEON_HTTP_ENDPOINT` 改成 `http://127.0.0.1:4445/sql`，`bun run dev` 会把代理起在 4445。
 
 ## 切回线上
