@@ -203,13 +203,16 @@ curl -s "http://127.0.0.1:3000/v3/ins/yuno_yumemita" | jq '.user.fullname, .post
 LOCAL=0 bun run ig ins verify yuno_yumemita   # 单次覆盖
 ```
 
-或把 `.env` 的 `LOCAL` 改成 `0`。线上模式把 `DATABASE_URL_REMOTE` 展开为 `DATABASE_URL`，并读取 `R2_*`，不再回落到本机默认值。显式设置的 `DATABASE_URL` 优先于文件。
+或把 `.env` 的 `LOCAL` 改成 `0`。线上模式把 `DATABASE_URL_REMOTE` 展开为 `DATABASE_URL`，并读取 `R2_*`；`.env` 里由本地模式写下的 `NEON_HTTP_ENDPOINT` / `IG_CDN_BASE` 会被忽略——前者只对本机库生效，后者只有非本机地址才会被采用。显式设置的 `DATABASE_URL` 优先于文件。
 
-本地导入过的记录里存的是本机媒体地址，切回线上后需要重新导入一次 `.cdn.json`，让链接回到 `s3.chilfish.top`：
+本地导入过的记录里存的是本机媒体地址，切回线上后先重写再重导一次 `.cdn.json`，让链接回到 `s3.chilfish.top`：
 
 ```bash
+LOCAL=0 bun run ig ins media yunoch1
 LOCAL=0 bun run ig ins import data/yunoch1.cdn.json --twitter yuno_yumemita
 ```
+
+线上媒体先上传（无 `R2_*` 凭据时可用 `wrangler r2 object put static/instagram/<账号>/<文件>`；`s3.chilfish.top` 绑的是 `static` 桶），再入库。
 
 ## 停止
 
