@@ -1,6 +1,6 @@
 # IG 归档 CLI
 
-Instagram 归档只走一个入口：`bun run ig <group> <command> [选项]`。参数解析、日志、退出码与 JSON 信封由 `apps/scripts/src/cli/` 统一提供，命令实现在 `apps/scripts/src/commands/`。
+Instagram 归档只走一个入口：`bun run ig <group> <command> [选项]`。参数解析、日志、退出码、JSON 信封与 `dev` 命令组由 [`@chilfish/devkit`](https://github.com/Chilfish/devkit) 统一提供，配置在 `apps/scripts/dev.config.ts`，业务命令实现在 `apps/scripts/src/commands/`。
 
 抓取用已发布包 `@chilfish/gallery-dl-instagram`（`^0.2.7`，用户 feed 走 doc_id GraphQL）。根提取器与 `/info/` 提取器按 SDK 的方式直接实例化，父子提取器共享 `csrfToken` / `wwwClaim` / `lsdToken`，子类不再各自拉首页换 token。上游 `gallery-dl-ins/scripts` 不再需要手工执行。
 
@@ -42,6 +42,7 @@ bun run ig ins add https://www.instagram.com/ritsu_mgmg --twitter ritsu_yumemita
 | `ins sync [--since <ISO>] [--account <账号>]` | 每日增量：按库里已关联且 `daily_fetch = true` 的账号抓取 |
 | `ins verify <twitterName>` | 对账：资料、条数、时间顺序、媒体可达 |
 | `ins upload <账号> [--bucket <name>]` | 上传媒体；`LOCAL=1` 写本机 SILO，否则写 R2 |
+| `dev server` | 起本地服务（Postgres / 建库 / 迁移 / 代理 / SILO）后同时启动 server 与 client |
 | `dev db` | 起本机 Postgres、建库、跑迁移、把本地段写进 `.env` |
 | `dev proxy` | 前台启动 Neon `/sql` 兼容代理 |
 | `dev storage` | 启动本机 SILO 并准备桶（匿名只读） |
@@ -92,9 +93,10 @@ bun run ig ins add https://www.instagram.com/ritsu_mgmg --twitter ritsu_yumemita
 
 ## 日志与环境
 
-- 每条命令开工前打印一行目标环境：`本地模式（LOCAL=1） · 数据库 localhost:5432/tweets_dev`。
+- 每条命令开工前由 devkit 打印一行目标环境：`local mode (LOCAL=1) · database localhost:5432/tweets_dev · local storage http://127.0.0.1:9000/tweets-viewer`。
 - 人读日志写 stderr，stdout 只留给数据输出与信封。
 - `--json` 不改变可读性：CI 日志仍然是人读的，机器契约只在显式传 `--json` 时生效。
+- devkit 0.1.2 的 `--help` 标题与错误提示是英文；`describe` 的退出码与全局选项文案由 `apps/scripts/src/cli.ts` 的 `labels` 保留中文。
 
 ## 输入输出
 
@@ -116,14 +118,16 @@ data/
 ## 代码位置
 
 ```text
-apps/scripts/src/
-├─ cli.ts                 # 唯一入口
-├─ cli/                   # runtime / logger / envelope / exit
-├─ commands/
-│  ├─ ins/                # add · export · media · import · sync · verify · upload
-│  └─ dev/                # db · proxy · storage
-└─ lib/                   # instagram · media · db · dev-services · dev-storage · local-config
+apps/scripts/
+├─ dev.config.ts          # devkit 配置（env / database / storage / dev servers）
+└─ src/
+   ├─ cli.ts              # 唯一入口（buildCli + createDevCommands）
+   ├─ commands/
+   │  └─ ins/             # add · export · media · import · sync · verify · upload
+   └─ lib/                # instagram · media · db · local-config · errors
 ```
+
+CLI runtime、`dev` 命令组与本地服务编排都在 `@chilfish/devkit` 内；项目侧只保留业务命令与上面列出的适配层。
 
 ## 迁移对照
 

@@ -17,15 +17,16 @@
 
 对象存储没有这个问题：SILO 直接说 S3 HTTP API，`aws4fetch` 与浏览器都能直连。
 
-代码位置：
+本地编排由 [`@chilfish/devkit`](https://github.com/Chilfish/devkit) 提供：Postgres 定位与启停、建库、迁移、`/sql` 代理、SILO、`dev server` 多进程。原理与完整参数见 devkit 的 [local-dev](https://github.com/Chilfish/devkit/blob/main/docs/guide/local-dev.md) 与 [config](https://github.com/Chilfish/devkit/blob/main/docs/reference/config.md)。
 
-- `apps/scripts/src/lib/local-config.ts` — `LOCAL=1` 判定、本地默认地址与桶、环境横幅
-- `apps/scripts/src/lib/dev-services.ts` — 定位 `pg_ctl`、启停 Postgres、建库、跑迁移
-- `apps/scripts/src/lib/dev-storage.ts` — 定位 SILO、启动、建桶、匿名读策略
-- `apps/scripts/src/commands/dev/db.ts` — `bun run ig dev db`
-- `apps/scripts/src/commands/dev/proxy.ts` — `bun run ig dev proxy`
-- `apps/scripts/src/commands/dev/storage.ts` — `bun run ig dev storage`
+项目侧只保留：
+
+- `apps/scripts/dev.config.ts` — devkit 配置（本机库、代理端点、迁移目录、SILO 桶、两个 dev server）
+- `apps/scripts/src/lib/local-config.ts` — 多库地址取首个、远端 R2 解析、媒体前缀
+- `apps/scripts/src/lib/errors.ts` — 错误 `cause` 展开（devkit 0.1.2 尚未内置）
 - `packages/database/index.ts` — `createDb({ url, endpoint })`，`endpoint` 存在时设置 `neonConfig.fetchEndpoint`
+
+`dev` 命令组（`dev server` / `dev db` / `dev proxy` / `dev storage`）由 `createDevCommands(devkit)` 生成，本项目只覆盖中文 describe 文案。
 
 ## 一次性安装
 
@@ -38,12 +39,7 @@ scoop install silo
 
 macOS：`brew install postgresql`；SILO 用 `brew tap pgsty/infra && brew install pgsty/infra/silo`。Linux 用系统包管理器装 Postgres，SILO 下载对应二进制放进 `PATH`。
 
-`ig dev db` 会自动定位 Postgres：
-
-- `pg_ctl`：`PG_CTL` → `PATH` → `scoop prefix postgresql` → `%SCOOP%\apps\postgresql\current\bin` → `C:\Program Files\PostgreSQL\*\bin`
-- 数据目录：`PGDATA` → `%SCOOP%\persist\postgresql\data` → 安装目录下的 `data`
-
-`ig dev storage` 查找 SILO：`SILO_BIN` → `PATH` → Scoop 的 `apps\silo\current\silo.exe`，再回退到 `minio`（命令一致）。
+`ig dev db` 与 `ig dev storage` 的可执行文件查找顺序（`PG_CTL` / `PGDATA` / Scoop / 标准安装目录，`SILO_BIN` / `PATH` / Scoop / MinIO 回退）由 devkit 维护，见 [local-dev](https://github.com/Chilfish/devkit/blob/main/docs/guide/local-dev.md#postgres-discovery)。本项目只需保证 Postgres 与 SILO 在 `PATH` 中，或用 `PG_CTL` / `PGDATA` / `SILO_BIN` 显式指定。
 
 ## 环境变量
 
@@ -62,11 +58,12 @@ macOS：`brew install postgresql`；SILO 用 `brew tap pgsty/infra && brew insta
 | `SILO_DATA` | `cache/silo-data` | SILO 数据目录 |
 | `TWEET_KEYS` | — | Twitter 抓取用，`env.server.ts` 必填 |
 | `INSTAGRAM_COOKIES` | — | IG 抓取用，至少含 `sessionid` + `csrftoken` |
-| `IG_CDN_BASE` | `https://s3.chilfish.top` | 线上媒体前缀；`LOCAL=1` 时忽略，改用本机桶地址 |
+| `IG_CDN_BASE` | `https://s3.chilfish.top` | 线上媒体前缀；`LOCAL=1` 时由 devkit 写成 `http://127.0.0.1:9000/tweets-viewer` |
+| `DATABASE_URL_REMOTE` | — | 线上库连接串；`LOCAL=0` 时由 devkit 展开为 `DATABASE_URL` |
 
-`bun run ig dev db` 会 upsert `LOCAL` / `DATABASE_URL` / `NEON_HTTP_ENDPOINT` 三行，`TWEET_KEYS` 等既有行保持不动；覆盖前把原远程地址另存为 `DATABASE_URL_REMOTE`。
+`bun run ig dev db` 由 devkit 的 `ensureEnvFile` 对齐 `.env`：upsert `LOCAL` / `DATABASE_URL` / `NEON_HTTP_ENDPOINT` / `IG_CDN_BASE`，注释与 `TWEET_KEYS` 等既有行保持不动。devkit 0.1.2 不再自动把原 `DATABASE_URL` 另存为 `DATABASE_URL_REMOTE`，远程连接串需要自己维护。
 
-`LOCAL=1` 时 `DATABASE_URL` 不是本机地址会被强制替换成本机库，`NEON_HTTP_ENDPOINT` 同理会指向本机代理。线上（`LOCAL=0`）不读取这两个默认值。
+`LOCAL=1` 时 `DATABASE_URL` 不是本机地址会被强制替换成本机库，`NEON_HTTP_ENDPOINT` 同理会指向本机代理，`IG_CDN_BASE` 指向本机桶。线上（`LOCAL=0`）把 `DATABASE_URL_REMOTE` 展开为 `DATABASE_URL`，不读取本地默认值。
 
 ## 初始化数据库
 
@@ -90,7 +87,7 @@ bun run ig dev db --url postgres://postgres@localhost:5433/tweets_dev
 
 ## 本地对象存储（SILO）
 
-SILO 是 MinIO 的维护分支，S3 API 与 `MINIO_*` 变量契约不变。启动后自动建桶并设为匿名只读，浏览器才能直接取图。
+SILO 是 MinIO 的维护分支，S3 API 与 `MINIO_*` 变量契约不变。启动、建桶与匿名只读策略由 devkit 的 `ensureSiloRunning` 负责（见 [local-dev](https://github.com/Chilfish/devkit/blob/main/docs/guide/local-dev.md#storage-silo)）；本节只列本项目参数。
 
 ```bash
 bun run ig dev storage
@@ -121,19 +118,20 @@ http://127.0.0.1:9000/tweets-viewer/instagram/<账号>.<ext>
 bun run dev
 ```
 
-`LOCAL=1` 时它会先跑 `apps/scripts/dev-setup.ts`：启动 Postgres → 建库 → 跑迁移 → 后台拉起 `/sql` 代理与 SILO，然后才启动 server 与 client。三个本地服务都是独立后台进程，dev 退出后继续运行，下次 `bun run dev` 直接复用。
+`bun run dev` 等价于 `bun run ig dev server`。devkit 会先跑 `ensureDevServices`：启动 Postgres → 建库 → 跑迁移 → 对齐 `.env` → 后台拉起 `/sql` 代理与 SILO，然后才启动 `dev.servers` 里的 server 与 client。Postgres、代理与 SILO 是独立后台进程，`Ctrl-C` 只结束两个前台 server，本地服务继续运行，下次 `bun run dev` 直接复用。
 
 只做前置、不起服务器：
 
 ```bash
-bun run dev:setup
+bun run ig dev db          # 初始化数据库与 .env
+bun run ig dev server --dry-run   # 只看会启动什么
 ```
 
 对象存储缺失不阻塞读库：页面能打开，只是上传与图片会失败，命令会打印原因。
 
 线上模式（`LOCAL` 未设置）会跳过全部本地服务，直接启动 server 与 client。
 
-代理端口取 `NEON_HTTP_ENDPOINT` 里的端口（其次 `TWEETS_DB_PROXY_PORT`，最后 4444）。端口被另一个库的代理占用时直接报错，不会静默连错库。
+`dev server` 的代理端口取 `apps/scripts/dev.config.ts` 的 `database.proxyEndpoint`；单独用 `dev proxy` 时可用 `--port` 覆盖。`TWEETS_DB_PROXY_PORT` 已不再被读取（迁移期弃用），改端口时同步改 `dev.config.ts` 与 `.env` 的 `NEON_HTTP_ENDPOINT`。端口被另一个库的代理占用时直接报错，不会静默连错库。
 
 ## 单独启动代理
 
@@ -153,7 +151,7 @@ curl http://127.0.0.1:4444/health
 端口被占用时换一个，并同步 `.env` 的 `NEON_HTTP_ENDPOINT`：
 
 ```bash
-TWEETS_DB_PROXY_PORT=4445 bun run ig dev proxy
+bun run ig dev proxy --port 4445
 ```
 
 ## 验证本地链路
@@ -185,12 +183,12 @@ curl -s "http://127.0.0.1:3000/v3/ins/yuno_yumemita" | jq '.user.fullname, .post
 LOCAL=0 bun run ig ins verify yuno_yumemita   # 单次覆盖
 ```
 
-或把 `.env` 的 `LOCAL` 改成 `0`。线上模式只读 `DATABASE_URL` 与 `R2_*`，不再回落到本机默认值。
+或把 `.env` 的 `LOCAL` 改成 `0`。线上模式把 `DATABASE_URL_REMOTE` 展开为 `DATABASE_URL`，并读取 `R2_*`，不再回落到本机默认值。显式设置的 `DATABASE_URL` 优先于文件。
 
-本地导入过的记录里存的是本机媒体地址，切回线上后需要重新导入一次 `.cdn.json`，让链接回到 `s3.chilfish.top`。`DATABASE_URL_REMOTE` 保存了覆盖前的连接串：
+本地导入过的记录里存的是本机媒体地址，切回线上后需要重新导入一次 `.cdn.json`，让链接回到 `s3.chilfish.top`：
 
 ```bash
-DATABASE_URL="$DATABASE_URL_REMOTE" LOCAL=0 bun run ig ins import data/yunoch1.cdn.json --twitter yuno_yumemita
+LOCAL=0 bun run ig ins import data/yunoch1.cdn.json --twitter yuno_yumemita
 ```
 
 ## 停止
@@ -217,7 +215,7 @@ pg_ctl stop -D "$env:PGDATA"
 | `数据目录不可用` | 数据目录未初始化：`initdb -D <PGDATA>`；或 `PGDATA` 指错 |
 | 连接被拒绝 / `ECONNREFUSED` | 代理没起：`bun run ig dev proxy`；确认 `.env` 的 `NEON_HTTP_ENDPOINT` 与代理端口一致 |
 | 查询报 `relation "users" does not exist` | 迁移没跑：`bun run ig dev db` |
-| 端口已被占用 | `TWEETS_DB_PROXY_PORT=4445 bun run ig dev proxy`，同时改 `.env` |
+| 端口已被占用 | `bun run ig dev proxy --port 4445`，同时改 `dev.config.ts` 的 `database.proxyEndpoint` 与 `.env` 的 `NEON_HTTP_ENDPOINT` |
 | `LOCAL=1` 但仍连线上 | 进程环境覆盖了文件：`LOCAL=1 bun run …` 显式传一次 |
 | 页面数据是旧的 | 本地库有数据但前端有 5 分钟客户端缓存，刷新标签页 |
 | `未找到 silo 可执行文件` | 装 SILO 并加入 `PATH`，或设 `SILO_BIN`；读库不受影响 |

@@ -22,8 +22,8 @@ Tweets Viewer 用来读离线的推文归档。数据存在 PostgreSQL 里，前
 
 ```bash
 # 开发
-bun dev              # 本地模式下先准备 Postgres/代理/SILO，再起 server + client
-bun dev:setup        # 只准备本地服务（LOCAL=1 时）
+bun dev              # devkit：先准备 Postgres/代理/SILO，再起 server + client
+bun run ig dev db    # 只准备本地数据库与 .env（LOCAL=1 时）
 bun dev:server       # 仅 API (http://localhost:3000)
 bun dev:client       # 仅前端 (http://localhost:9080)
 
