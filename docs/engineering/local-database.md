@@ -193,7 +193,14 @@ bun run dev:server                                      # wrangler dev，3000
 curl -s "http://127.0.0.1:3000/v3/ins/yuno_yumemita" | jq '.user.fullname, .posts.meta.total'
 ```
 
-判断读的是哪个库，看 `/v3/users/all` 的条数：本地库只会有你导入过的那几个用户。
+判断读的是哪个库，看 `/v3/users/all` 的条数：本地库初始只有少数用户。要拉齐线上账号名单与 IG 帖子：
+
+```bash
+LOCAL=1 bun run ig ins refresh --no-download
+```
+
+`ins refresh` 会先从 `DATABASE_URL_REMOTE` 同步整张 `users` 表，再对全部 `ins_username` 账号全量抓取帖子；
+`--no-download` 表示只同步数据、媒体链接指向线上 CDN。限流中断后加 `--missing` 续跑。
 
 本机已经有别的项目占了 4444 时，把 `.env` 的 `NEON_HTTP_ENDPOINT` 改成 `http://127.0.0.1:4445/sql`，`bun run dev` 会把代理起在 4445。
 

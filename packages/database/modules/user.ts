@@ -1,7 +1,7 @@
 import type { EnrichedUser } from '@tweets-viewer/tweet-types'
 import type { DB } from '../'
 import type { SelectUser } from '../schema'
-import { and, eq, isNotNull } from 'drizzle-orm'
+import { and, eq, isNotNull, sql } from 'drizzle-orm'
 import { usersTable } from '../schema'
 
 export async function updateUser({ db, user }: { db: DB, user: EnrichedUser }) {
@@ -50,6 +50,51 @@ export async function getDailyFetchInsUsers(db: DB): Promise<{ userName: string,
     .where(and(eq(usersTable.dailyFetch, true), isNotNull(usersTable.insUsername)))
 
   return rows.map(row => ({ userName: row.userName, insUsername: row.insUsername! }))
+}
+
+/** 读取整行用户记录，用于库间同步（`id` 不参与同步）。 */
+export async function getUserRows(db: DB): Promise<SelectUser[]> {
+  return db.select().from(usersTable)
+}
+
+/** 按 `userName` upsert 用户记录，`id` 保留本地值。 */
+export async function upsertUserRows({ db, rows }: { db: DB, rows: SelectUser[] }): Promise<void> {
+  if (rows.length === 0) {
+    return
+  }
+  await db
+    .insert(usersTable)
+    .values(rows.map(({ id: _id, ...row }) => row))
+    .onConflictDoUpdate({
+      target: usersTable.userName,
+      set: {
+        restId: sql`excluded."restId"`,
+        jsonData: sql`excluded."jsonData"`,
+        dailyFetch: sql`excluded.daily_fetch`,
+        insUsername: sql`excluded.ins_username`,
+        insJsonData: sql`excluded.ins_json_data`,
+      },
+    })
+}
+
+/** 所有已关联 IG 的账号，不要求开启 `daily_fetch` */
+export async function getLinkedInsUsers(
+  db: DB,
+): Promise<{ userName: string, insUsername: string, postsCount: number }[]> {
+  const rows = await db
+    .select({
+      userName: usersTable.userName,
+      insUsername: usersTable.insUsername,
+      insJsonData: usersTable.insJsonData,
+    })
+    .from(usersTable)
+    .where(isNotNull(usersTable.insUsername))
+
+  return rows.map(row => ({
+    userName: row.userName,
+    insUsername: row.insUsername!,
+    postsCount: row.insJsonData?.posts_count ?? 0,
+  }))
 }
 
 /** 按 IG 用户名找对应的 users 行（IG → twitter 映射的唯一来源） */

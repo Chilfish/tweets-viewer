@@ -31,6 +31,25 @@ bun run ig ins add https://www.instagram.com/ritsu_mgmg --twitter ritsu_yumemita
 bun run ig ins add https://www.instagram.com/ritsu_mgmg --twitter ritsu_yumemita --dry-run
 ```
 
+## 本地全量拉齐
+
+```bash
+LOCAL=1 bun run ig ins refresh --no-download
+```
+
+`ins refresh` 对 `users.ins_username` 里的全部账号做全量抓取（不看 `daily_fetch`、不带 since）。
+`LOCAL=1` 时默认先从 `DATABASE_URL_REMOTE` 同步整张 `users` 表，保证账号名单与线上一致；
+`--no-sync-users` 跳过。只同步帖子数据时加 `--no-download`：不下载媒体，链接改写为线上 CDN。
+
+被限流打断后用断点续跑，只处理没拉齐的账号：
+
+```bash
+LOCAL=1 bun run ig ins refresh --no-download --missing --delay 30 --retry 3
+```
+
+`--missing` 比较本地 `ins_posts` 数与资料 `posts_count`；`--delay` 是账号间隔秒数，
+`--retry` 是单账号失败重试次数，退避从 `--retry-delay`（默认 30）开始线性增长。
+
 ## 命令表
 
 | 命令 | 作用 |
@@ -40,6 +59,7 @@ bun run ig ins add https://www.instagram.com/ritsu_mgmg --twitter ritsu_yumemita
 | `ins media <账号> \| --from <json>` | 下载媒体，写 `data/instagram/<账号>/` 与 `data/<账号>.cdn.json` |
 | `ins import <file.json> [--twitter <name>]` | 写 `users.ins_username` / `users.ins_json_data` / `ins_posts` |
 | `ins sync [--since <ISO>] [--account <账号>]` | 每日增量：按库里已关联且 `daily_fetch = true` 的账号抓取 |
+| `ins refresh [--missing] [--no-download]` | 全量拉齐所有已关联账号；本地默认先同步线上 `users` 表 |
 | `ins verify <twitterName>` | 对账：资料、条数、时间顺序、媒体可达 |
 | `ins upload <账号> [--bucket <name>]` | 上传媒体；`LOCAL=1` 写本机 SILO，否则写 R2 |
 | `dev server` | 起本地服务（Postgres / 建库 / 迁移 / 代理 / SILO）后同时启动 server 与 client |

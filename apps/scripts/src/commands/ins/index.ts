@@ -3,6 +3,7 @@ import { addSpec } from './add'
 import { exportSpec } from './export'
 import { importSpec } from './import'
 import { mediaSpec } from './media'
+import { refreshSpec } from './refresh'
 import { syncSpec } from './sync'
 import { uploadSpec } from './upload'
 import { verifySpec } from './verify'
@@ -16,6 +17,7 @@ export const insGroup: CommandGroup = {
     mediaSpec,
     importSpec,
     syncSpec,
+    refreshSpec,
     verifySpec,
     uploadSpec,
   ],

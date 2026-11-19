@@ -65,10 +65,12 @@ export interface MediaOutcome {
 export async function runMedia(
   insUsername: string,
   exported: ExportFile,
-  options: { concurrency?: number, log?: Logger } = {},
+  options: { concurrency?: number, log?: Logger, download?: boolean, cdnBase?: string } = {},
 ): Promise<MediaOutcome> {
-  const result = await downloadExportMedia(insUsername, exported, options)
-  const cdn = rewriteToCdn(insUsername, exported, resolveCdnBase())
+  const result = options.download === false
+    ? { downloaded: 0, skipped: 0, failed: [] }
+    : await downloadExportMedia(insUsername, exported, options)
+  const cdn = rewriteToCdn(insUsername, exported, options.cdnBase ?? resolveCdnBase())
   const cdnFile = await writeCdnFile(insUsername, cdn)
   options.log?.info(`已写入 ${cdnFile}`)
 

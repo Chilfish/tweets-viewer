@@ -26,6 +26,7 @@ export function createDb({ url, endpoint }: { url: string, endpoint?: string }):
 export * from './modules/ins'
 export * from './modules/tweet'
 export * from './modules/user'
+export type { SelectUser } from './schema'
 export {
   schema,
 }

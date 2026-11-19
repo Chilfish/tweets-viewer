@@ -4,6 +4,8 @@ import {
   resolveCdnBase,
   resolveDatabaseUrl,
   resolveNeonEndpoint,
+  resolveOnlineCdnBase,
+  resolveRemoteDatabaseUrl,
 } from '../local-config'
 
 describe('resolveNeonEndpoint', () => {
@@ -69,5 +71,31 @@ describe('resolveDatabaseUrl', () => {
     expect(resolveDatabaseUrl({
       DATABASE_URL: 'postgres://u:p@a.neon.tech/db, postgres://u:p@b.neon.tech/db',
     })).toBe('postgres://u:p@a.neon.tech/db')
+  })
+})
+
+describe('resolveOnlineCdnBase', () => {
+  it('local=1 时仍返回线上 CDN', () => {
+    expect(resolveOnlineCdnBase({
+      LOCAL: '1',
+      IG_CDN_BASE: 'http://127.0.0.1:9000/tweets-viewer',
+    })).toBe(DEFAULT_CDN_BASE)
+  })
+
+  it('非本机前缀原样使用', () => {
+    expect(resolveOnlineCdnBase({ IG_CDN_BASE: 'https://cdn.example.com/' }))
+      .toBe('https://cdn.example.com')
+  })
+})
+
+describe('resolveRemoteDatabaseUrl', () => {
+  it('读取 DATABASE_URL_REMOTE', () => {
+    expect(resolveRemoteDatabaseUrl({
+      DATABASE_URL_REMOTE: 'postgres://u:p@remote.neon.tech/neondb',
+    })).toBe('postgres://u:p@remote.neon.tech/neondb')
+  })
+
+  it('缺失时返回 undefined', () => {
+    expect(resolveRemoteDatabaseUrl({})).toBeUndefined()
   })
 })

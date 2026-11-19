@@ -41,6 +41,11 @@ export function resolveDatabaseUrl(env: NodeJS.ProcessEnv = process.env): string
   })
 }
 
+/** 线上库地址，用于本地初始化时从远端拉取用户表。 */
+export function resolveRemoteDatabaseUrl(env: NodeJS.ProcessEnv = process.env): string | undefined {
+  return env.DATABASE_URL_REMOTE?.trim() || undefined
+}
+
 /**
  * neon 驱动的 HTTP 地址。
  *
@@ -129,6 +134,15 @@ export function resolveStorage(env: NodeJS.ProcessEnv = process.env): StorageCon
     bucket,
     publicBase: (env.IG_CDN_BASE?.trim() || DEFAULT_CDN_BASE).replace(/\/+$/, ''),
   }
+}
+
+/** 线上媒体前缀：忽略本机桶地址，只用于「只同步数据、媒体链回线上」。 */
+export function resolveOnlineCdnBase(env: NodeJS.ProcessEnv = process.env): string {
+  const configured = env.IG_CDN_BASE?.trim()
+  if (configured && !isLocalDatabaseUrl(configured)) {
+    return configured.replace(/\/+$/, '')
+  }
+  return DEFAULT_CDN_BASE
 }
 
 /** 媒体地址前缀：本地模式指向本机桶，线上用 `IG_CDN_BASE`。 */

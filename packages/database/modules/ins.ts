@@ -76,6 +76,22 @@ export async function createInsPosts({ db, posts, username }: {
   return { rowCount: insertedCount }
 }
 
+/** 每个用户的本地 IG 帖子数，用于断点续跑。 */
+export async function getInsPostCounts(db: DB): Promise<Map<string, number>> {
+  const rows = await db
+    .select({
+      username: insPostsTable.userId,
+      total: count(),
+    })
+    .from(insPostsTable)
+    .groupBy(insPostsTable.userId)
+
+  return new Map(rows.map(row => [
+    row.username,
+    Number(row.total),
+  ]))
+}
+
 /**
  * Get IG user info by twitter username.
  * Returns IGUserInfo from users.ins_json_data.
