@@ -3,14 +3,14 @@
   "type": "module",
   "version": "0.0.0",
   "private": true,
-  "packageManager": "bun@1.4.4",
+  "packageManager": "bun@1.4.5",
   "scripts": {
     "run:search": "bun src/fetchSearch.ts",
     "test": "cross-env NODE_ENV=test vitest run"
   },
   "dependencies": {
     "@chilfish/gallery-dl-instagram": "^0.2.7",
-    "@chilfish/tweet": "^0.2.0",
+    "@chilfish/tweet": "^0.2.1",
     "@neondatabase/serverless": "^1.2.1",
     "aws4fetch": "^1.0.20",
     "commander": "^15.1.0",

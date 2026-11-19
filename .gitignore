@@ -69,3 +69,4 @@ coverage/
 # Local harness memory state
 .mnemon/
 .commandcode/settings.json
+data/
