@@ -98,14 +98,14 @@ bun run build:client # 前端生产构建
 
 ### CI
 
-`.github/workflows/ci.yml`：`lint` / `typecheck`（web-react）/ `build` / `test`（四包）/ `visual`（VRT）五个 job。
-`visual` 环境必须与 `update-screenshots.yml` 严格同构（runner / playwright / CJK 字体）。
+`.github/workflows/ci.yml`：`lint` / `typecheck`（web-react）/ `build` / `test`（四包）四个 job。
+VRT 不进 CI：像素基线受字体栈与 runner 镜像影响，维护成本高于收益；需要时本地 `bun run test:visual`（见 `planning/visual-regression-testing.md`）。
 
 ## 代码审查
 
 ### PR 流程
 
-1. 创建 PR → 自动运行 CI（Lint + Typecheck + Build + Test + Visual）
+1. 创建 PR → 自动运行 CI（Lint + Typecheck + Build + Test）
 2. 至少 1 人 Approve（AI 辅助先进行自动化 Code Review）
 3. 所有 CI 检查通过
 4. Create a Merge Commit 到 `main`
@@ -151,7 +151,7 @@ gh pr merge 1 --merge --delete-branch   # Create a Merge Commit
 
 ### PR 合并判断标准
 
-- CI 全部通过（Lint + Typecheck + Build + Test + Visual）
+- CI 全部通过（Lint + Typecheck + Build + Test）
 - AI Code Review 通过，无未解决的 Review 评论
 - Commit message 符合 Conventional Commits
 

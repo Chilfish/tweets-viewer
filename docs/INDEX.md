@@ -62,7 +62,7 @@ docs/
 | **部署 / 环境配置** | `engineering/release-checklist.md` + `example.env` | Vercel / Workers、环境变量、性能预算 |
 | **写码前防复现** | `postmortem/README.md`（+ `TEMPLATE.md`） | 常见坑自查；新 Bug 模式写复盘记录 |
 | **每次 commit / PR** | `engineering/git-workflow.md` | 分支模型、Conventional Commits、检查 |
-| **测试 / 视觉回归** | `planning/visual-regression-testing.md` + `engineering/code-style.md#测试规范` | Vitest projects 拆分、VRT 基线管理 |
+| **测试 / 视觉回归** | `planning/visual-regression-testing.md` + `engineering/code-style.md#测试规范` | Vitest projects 拆分、VRT 本地基线（不进 CI） |
 | **了解历史决策 / 审查** | `reviews/` + `development-log/` + `archive/` | 评审记录、按天开发日志、已完成阶段存档 |
 
 ### 按文档类型速查
@@ -94,7 +94,7 @@ docs/
 | `bun run lint:check` | ESLint（`--max-warnings=0`，不改文件） |
 | `bun run typecheck` | react-router typegen + tsc（web-react） |
 | `bun run test` | 全包 Vitest（shared + database + server + scripts + web-react） |
-| `bun run test:visual` | VRT 视觉回归（本地 win32 基线对 CI 无效，见 `planning/visual-regression-testing.md`） |
+| `bun run test:visual` | VRT 视觉回归（仅本地可选检查，基线不进仓库，见 `planning/visual-regression-testing.md`） |
 | `bun run build:client` | 前端生产构建 |
 
 `lefthook` pre-push = `lint:check + typecheck + test + build:client`，**禁止 `--no-verify`**。详见 `engineering/git-workflow.md`。
@@ -114,7 +114,7 @@ bun run lint             # ESLint --fix
 bun run lint:check       # ESLint --max-warnings=0
 bun run typecheck        # 类型检查
 bun run test             # 全包测试
-bun run test:visual      # 视觉回归
+bun run test:visual      # 视觉回归（本地可选）
 ```
 
 ---

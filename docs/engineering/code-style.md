@@ -105,7 +105,7 @@ try { /* ... */ } catch (error: unknown) {
 - **web-react 三 project**（`vitest.config.ts`）：
   - `unit` — 常规单元 + 组件测试（jsdom）
   - `stories` — Storybook portable stories（addon-vitest）
-  - `vrt` — 视觉回归（真实 Chromium + `toMatchScreenshot`，`*.vrt.test.tsx`）
+  - `vrt` — 视觉回归（真实 Chromium + `toMatchScreenshot`，`*.vrt.test.tsx`；本地可选，不进 CI）
   - **纪律**：会接管 `test.include` 的插件（`storybookTest()`）只进自己的 project，否则静默吞测试；
     新增用例后核对 `Test Files` 数量（见 [postmortem 002](../postmortem/002-vitest-component-test-infra.md)）
 - **断言存在性（机器强制）**：eslint `test/expect-expect` / `test/no-conditional-expect` / `test/no-standalone-expect`

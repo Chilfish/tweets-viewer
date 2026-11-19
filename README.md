@@ -138,7 +138,7 @@ bun run lint             # ESLint --fix
 bun run lint:check       # ESLint --max-warnings=0
 bun run typecheck        # 类型检查
 bun run test             # 全包测试
-bun run test:visual      # 视觉回归
+bun run test:visual      # 视觉回归（本地可选，基线不进仓库）
 ```
 
 ## 文档

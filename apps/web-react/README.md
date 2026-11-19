@@ -20,7 +20,7 @@ bun run dev:client
 ```bash
 bun dev
 bun run test         # Vitest unit + stories
-bun run test:visual  # Vitest vrt（视觉回归）
+bun run test:visual  # Vitest vrt（视觉回归，本地可选）
 bun run typecheck
 bun run build
 ```

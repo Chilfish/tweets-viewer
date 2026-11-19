@@ -57,7 +57,7 @@
 | `process.env.X \|\| c.env.X` | Nitro 只调 `app.fetch(request)`，Hono 的 `c.env` 是 `undefined`；左侧为空时右侧必然抛错，用可选链并给出明确报错（见 [008](008-local-env-deployed-to-worker.md)） |
 | 「改了但没生效」的脚本配置 | 用探针（临时用例 `console.log(process.env.NODE_ENV, typeof React.act)`）核对真实值，不能只看退出码 |
 | 用像素基线测 UI 文案 | 文案属内容，改动频繁：用 `toMatchScreenshot` 的 `screenshotOptions.mask` 遮掉 `p`/`button`，文案交给 RTL 断言；mask 目标用固定尺寸容器（`[data-vrt-mask]`），否则遮罩框仍随文案漂移（见 [007](007-vrt-copy-churn-stale-baselines.md)） |
-| 门禁用浮动环境标签 | 视觉门禁与基线生成 workflow 固定 `runs-on: ubuntu-24.04`、`bun-version-file: package.json`；`ubuntu-latest` / `bun-version: latest` 升级会让整套基线静默失配（见 [007](007-vrt-copy-churn-stale-baselines.md)） |
+| 门禁用浮动环境标签 | 若重建视觉门禁：门禁与基线生成 workflow 必须固定 `runs-on: ubuntu-XX.YY`、`bun-version-file: package.json`；`ubuntu-latest` / `bun-version: latest` 升级会让整套基线静默失配（历史见 [007](007-vrt-copy-churn-stale-baselines.md)）。当前 VRT 只本地跑，不进 CI |
 | 本地有 TUN/系统代理时验证代理链路 | 出口 IP 与 DNS 都会被外层接管（fake-ip 会解析成 `198.18.x.x`）、出站被二次跳转 → 逐节点结论全部不可信；跨环境链路问题放到目标环境（runner）验证，或先证明进程实际解析/连接的目标（见 [006](006-x-403-datacenter-egress.md)） |
 | 测试假绿 | 断言必须能在「改坏行为」时变红；`test/expect-expect` 等 lint 规则 + 核对 Test Files 数量双重兜底 |
 

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### 工程（2026-11-19）
+
+- **Removed** CI 的 `visual` job（VRT 像素门禁）与 `.github/workflows/update-screenshots.yml` 基线生成 workflow；VRT 收缩为本地可选检查 `bun run test:visual`
+- **Changed** 视觉回归基线不再入库：`.gitignore` 忽略 `**/__screenshots__/`，删除已提交的 24 张 linux 基线
+
 ### 数据层（2026-11-19）
 
 - **Changed** Twitter 抓取运行时从内部 Fork 切到 `@chilfish/tweet@0.2.0`；归档 JSON 仍是 snake_case，DB / server / web-react 不变

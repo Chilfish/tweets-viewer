@@ -106,6 +106,8 @@
 
 ## 视觉回归测试地基（2026-09-04，方案见 `visual-regression-testing.md`）
 
+> 2026-11-19 变更：V4~V6 的 CI 门禁与基线 workflow 已下线，VRT 收缩为本地可选检查（见方案 §零）。下表保留当时的落地记录。
+
 ### 目标
 
 组件级视觉回归自动化：核心组件 × 双主题截图基线进 CI 门禁，零外部服务（Vitest browser mode `toMatchScreenshot`，非 Chromatic）。
@@ -113,11 +115,11 @@
 | 任务 | 说明 | 状态 |
 |---|---|---|
 | V1 | 方案文档（选型依据/架构/基线管理/CI 接入）+ 本登记 | ✅ |
-| V2 | vitest `vrt` project（chromium headless）+ devDeps + 脚本 + win32 基线 gitignore | ✅ |
+| V2 | vitest `vrt` project（chromium headless）+ devDeps + 脚本 + 本地基线 gitignore | ✅ |
 | V3 | 核心组件 vrt 用例：FeedStatus 四态 / MyTweet 三形态 / ProfileHeader（× light/dark，共 18 基线） | ✅ |
-| V4 | CI `visual` job（playwright + fonts-noto-cjk） | ✅ |
-| V5 | `update-screenshots` workflow（PR label `update-screenshots` 触发，CI-only 基线生成） | ✅ |
-| V6 | PR 打 label 播种 linux 基线 → CI 全绿 → 合并 | ✅ |
+| V4 | CI `visual` job（playwright + fonts-noto-cjk） | ✅ 已下线 |
+| V5 | `update-screenshots` workflow（PR label `update-screenshots` 触发，CI-only 基线生成） | ✅ 已下线 |
+| V6 | PR 打 label 播种 linux 基线 → CI 全绿 → 合并 | ✅ 已下线 |
 
 ## Phase 6 — 测试纵深 × 数据洞察 × 阅读新体验（当前，见 `roadmap-phase6.md`）
 

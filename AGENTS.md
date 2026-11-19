@@ -36,7 +36,7 @@ bun run lint         # ESLint --fix
 bun run lint:check   # ESLint --max-warnings=0（提交前检查用，不改文件）
 bun run typecheck    # react-router typegen + tsc（web-react）
 bun run test         # 全包 Vitest（shared + database + server + scripts + web-react）
-bun run test:visual  # VRT 视觉回归（本地 win32 基线不进检查，见下）
+bun run test:visual  # VRT 视觉回归（仅本地可选检查，不进 CI，见下）
 
 # 单包测试（调试时）
 bun --cwd packages/shared test
@@ -174,7 +174,7 @@ ins_posts: id(serial PK), post_id(UQ), username(FK→users.userName), created_at
 
 6. **只读性**：系统不提供任何写入功能（发推/点赞/关注），数据全部来自离线归档。
 
-7. **文案与文档**：新文案先查 `docs/requirements/glossary.md` 的统一叫法，再按 `docs/engineering/writing-style.md` 自查；文案变更同步 Specification、测试和 VRT。
+7. **文案与文档**：新文案先查 `docs/requirements/glossary.md` 的统一叫法，再按 `docs/engineering/writing-style.md` 自查；文案变更同步 Specification 与测试。
 
 ## Current State
 

@@ -92,7 +92,7 @@
 
 1. 先改 `docs/Specification.md` 里的行为或定位描述。
 2. 再改界面字符串（`apps/web-react/app`）。
-3. 同步更新测试断言和 VRT Linux 基线（`update-screenshots.yml`）。
+3. 同步更新测试断言；改了布局或配色再本地跑 `bun run test:visual --update` 重建基线（基线不进仓库）。
 4. 在 `docs/requirements/glossary.md` 补上新的统一叫法。
 5. 新文档按本规范写，历史记录保持原样。
 
@@ -105,7 +105,7 @@
 - [ ] 句子长度有变化
 - [ ] 形容词后面跟着事实
 - [ ] 文档里有作者自己的判断或取舍
-- [ ] 文案变更同步了规格、测试和 VRT
+- [ ] 文案变更同步了规格与测试
 
 ## 7. 参考
 
