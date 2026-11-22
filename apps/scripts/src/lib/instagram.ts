@@ -29,8 +29,8 @@ export interface IgSession {
 }
 
 /** 抓取会话：只依赖 SDK 的公开导出面。 */
-export async function createSession(cookies: string): Promise<IgSession> {
-  const sdk = await createSDK({ cookies })
+export async function createSession(cookies: string, proxy?: string | null): Promise<IgSession> {
+  const sdk = await createSDK({ cookies, proxy })
   const csrfToken = extractCsrfToken(cookies)
   return {
     sdk,

@@ -27,7 +27,7 @@
       "name": "@tweets-viewer/scripts",
       "version": "0.0.0",
       "dependencies": {
-        "@chilfish/gallery-dl-instagram": "^0.2.7",
+        "@chilfish/gallery-dl-instagram": "^0.3.0",
         "@chilfish/tweet": "^0.2.1",
         "@neondatabase/serverless": "^1.2.1",
         "aws4fetch": "^1.0.20",
@@ -229,7 +229,7 @@
 
     "@chilfish/devkit": ["@chilfish/devkit@0.1.2", "", { "dependencies": { "aws4fetch": "^1.0.20", "commander": "^15.1.0" }, "peerDependencies": { "drizzle-orm": ">=0.30.0", "pg": ">=8.11.0" }, "optionalPeers": ["drizzle-orm", "pg"] }, "sha512-ASKN/ONVUgpq/JvvuzRUlDUQCRLtvRQsIlu8cSgHW9T/SDqHo7fFsG6VrzlVsnHV0ehHWXQXfwMwtqFuHEHggA=="],
 
-    "@chilfish/gallery-dl-instagram": ["@chilfish/gallery-dl-instagram@0.2.7", "", { "bin": { "dl-ins": "dist/dl-ins.mjs" } }, "sha512-x1FUxoyspD3gceh/ysmC6pl4uZST1Y7F0LmUwX4jcPUCpZ4ZQTqrvqbr7FftCxaj7WdMjJBdcSR0HQ8jW8c9eQ=="],
+    "@chilfish/gallery-dl-instagram": ["@chilfish/gallery-dl-instagram@0.3.0", "", { "peerDependencies": { "undici": ">=6" }, "optionalPeers": ["undici"], "bin": { "dl-ins": "dist/dl-ins.mjs" } }, "sha512-gCWiBwFzjLdOVu6/9sAu5t3nTvbTEsDRAyWYGVEzzsAolw035yC9vQu162PtlusikuYeVmGpSdxoKCsq1pyIIQ=="],
 
     "@chilfish/tweet": ["@chilfish/tweet@0.2.1", "", { "dependencies": { "linkedom": "^0.18.15", "x-client-transaction-id": "^0.3.3" }, "peerDependencies": { "undici": "^8.12.4" }, "optionalPeers": ["undici"], "bin": { "tweet-cli": "dist/cli-bin.js" } }, "sha512-NYTMITZqMrzJA1gF8oGNiAMFLGr7x45fLXp2JMIk8U7a3bOghInqq3r6dwGkmfYU1d6Cs5aJK5lnD6LpDLkkEQ=="],
 

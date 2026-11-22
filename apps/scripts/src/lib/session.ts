@@ -2,6 +2,16 @@ import type { IgSession } from './instagram'
 import { ConfigError, UsageError } from '@chilfish/devkit/cli'
 import { createSession } from './instagram'
 
+/**
+ * IG 抓取出口代理。
+ *
+ * IG 把数据中心出口判成未登录（`not-logged-in`），远端运行时必须走代理；
+ * 未单独配置 `IG_PROXY` 时复用 `TWEET_PROXY`，两者共用同一条 mihomo 出口。
+ */
+export function readIgProxy(): string | undefined {
+  return process.env.IG_PROXY?.trim() || process.env.TWEET_PROXY?.trim() || undefined
+}
+
 /** 读取 Cookie 并建立抓取会话。 */
 export async function openSession(): Promise<IgSession> {
   const cookies = process.env.INSTAGRAM_COOKIES?.trim()
@@ -12,7 +22,7 @@ export async function openSession(): Promise<IgSession> {
       context: { name: 'INSTAGRAM_COOKIES' },
     })
   }
-  return createSession(cookies)
+  return createSession(cookies, readIgProxy())
 }
 
 /** 接受完整链接、`@账号` 或裸账号，统一成 IG 用户名。 */
