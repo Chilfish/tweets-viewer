@@ -74,6 +74,8 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           TWEET_KEYS: ${{ secrets.TWEET_KEYS }}
           INSTAGRAM_COOKIES: ${{ secrets.INSTAGRAM_COOKIES }}
+          # IG 与 X 一样拒绝 runner 出口 IP：直连会把数据中心的请求判成未登录。
+          IG_PROXY: ${{ env.TWEET_PROXY }}
           # 每日 IG 同步会把新帖媒体传到 R2；缺任一项会让 IG 步骤显红。
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}

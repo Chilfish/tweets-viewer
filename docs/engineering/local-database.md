@@ -58,6 +58,7 @@ macOS：`brew install postgresql`；SILO 用 `brew tap pgsty/infra && brew insta
 | `SILO_DATA` | `cache/silo-data` | SILO 数据目录 |
 | `TWEET_KEYS` | — | Twitter 抓取用，`env.server.ts` 必填 |
 | `INSTAGRAM_COOKIES` | — | IG 抓取用，至少含 `sessionid` + `csrftoken` |
+| `IG_PROXY` | 回退 `TWEET_PROXY` | IG 抓取走 HTTP(S) 代理；数据中心出口会被 IG 拒成「未登录」，CI 必须设置 |
 | `IG_CDN_BASE` | `https://s3.chilfish.top` | 线上媒体前缀；`LOCAL=1` 时由 devkit 写成 `http://127.0.0.1:9000/tweets-viewer` |
 | `DATABASE_URL_REMOTE` | — | 线上库连接串；`LOCAL=0` 时由 devkit 展开为 `DATABASE_URL` |
 

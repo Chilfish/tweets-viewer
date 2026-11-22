@@ -58,6 +58,7 @@ bun install
 DATABASE_URL="postgresql://..."   # 连接串；逗号分隔多地址 = 每日抓取并发更新多个归档库（首个为主库）
 TWEET_KEYS=""                     # 逗号分隔的抓取 key 列表（仅抓取脚本用）
 INSTAGRAM_COOKIES=""              # Instagram 登录 Cookie（仅 IG 抓取用）
+IG_PROXY=""                       # IG 抓取代理；不设时回退 TWEET_PROXY（数据中心出口会被 IG 拒绝）
 API_URL="https://tweet-api.chilfish.top"  # 前端 API 基址（经 vite 注入 bundle）
 ENVIRONMENT="development"         # development / production
 ```
