@@ -4,11 +4,18 @@ on:
   schedule:
     - cron: '0 16 * * *'
   workflow_dispatch:
+    inputs:
+      ins:
+        description: 同时同步 Instagram（数据中心出口会被 IG 限流，缺省关闭）
+        type: boolean
+        default: false
 
 env:
   # X 会拒绝 GitHub runner 的出口 IP（403），所有抓取统一经 mihomo 转出去。
   MIHOMO_VERSION: v1.19.30
   TWEET_PROXY: http://127.0.0.1:7890
+  # 定时运行拿不到 inputs，`inputs.ins` 为空 → IG 关闭；手动触发可勾选打开。
+  DAILY_INS: ${{ inputs.ins && '1' || '' }}
 
 jobs:
   update-data:
@@ -73,10 +80,12 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           TWEET_KEYS: ${{ secrets.TWEET_KEYS }}
+          # 用户级并发数；缺省 `TWEET_KEYS 数量 × 2`。调大前先确认 Key 的 15 分钟配额。
+          SYNC_CONCURRENCY: ${{ vars.SYNC_CONCURRENCY }}
           INSTAGRAM_COOKIES: ${{ secrets.INSTAGRAM_COOKIES }}
           # IG 与 X 一样拒绝 runner 出口 IP：直连会把数据中心的请求判成未登录。
           IG_PROXY: ${{ env.TWEET_PROXY }}
-          # 每日 IG 同步会把新帖媒体传到 R2；缺任一项会让 IG 步骤显红。
+          # IG 步骤才会把新帖媒体传到 R2；定时运行默认不跑 IG。
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
@@ -98,7 +107,7 @@ jobs:
             --body "The scheduled daily update workflow failed on $(date -u +%Y-%m-%dT%H:%M:%SZ).
 
             - Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-            - Check: mihomo / MIHOMO_SUB_URL 是否可用、IG Cookie 是否过期、TWEET_KEYS 速率限制、DATABASE_URL 连接" \
+            - Check: mihomo / MIHOMO_SUB_URL 是否可用、TWEET_KEYS 速率限制、DATABASE_URL 连接；带 `ins` 勾选运行时另查 IG Cookie 与出口" \
             --repo ${{ github.repository }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

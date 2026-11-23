@@ -6,6 +6,7 @@
 
 | 日期 | 主题 |
 |---|---|
+| [2026-11-23](2026-11-23.md) | 定时任务不再每日跑 IG（改为 `DAILY_INS` / Actions `ins` 复选框手动开启）；推文抓取改为用户级有界并发 + 进程级闸门，`SYNC_CONCURRENCY` 缺省 Key 数 × 2 |
 | [2026-11-22](2026-11-22.md) | IG 每日同步接上代理（issue #20–#22）：根因是 IG 拒绝数据中心出口，Cookie 并未过期；升级 `@chilfish/gallery-dl-instagram@0.3.0` 用 `createSDK({ proxy })`，新增 `IG_PROXY` 并回退 `TWEET_PROXY` |
 | [2026-11-19](2026-11-19.md) | 升级 `@chilfish/gallery-dl-instagram` 0.2.7；Twitter 抓取运行时切到 `@chilfish/tweet@0.2.0` 并做边界映射；下线 `packages/rettiwt-api`，归档类型收敛到 `packages/tweet-types`；VRT 退出 CI 门禁（删 `visual` job + `update-screenshots` workflow，基线不入库，只留本地 `test:visual`） |
 | [2026-11-18](2026-11-18.md) | 新增 IG 归档账号的标准流程（`engineering/ig-archive-onboarding.md`）；方案：把 gallery-dl-ins 的脚本搬进本仓库，改成 `bun run ig` 统一 CLI（`engineering/ig-cli.md`），并参考 ymmemita 搭本地 Postgres + Neon `/sql` 代理做验证（`engineering/local-database.md`） |

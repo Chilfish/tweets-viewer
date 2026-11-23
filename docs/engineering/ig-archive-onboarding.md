@@ -108,7 +108,8 @@ bun run ig ins sync --since 2026-11-16T00:00:00Z
 bun run ig ins sync --account ritsu_mgmg
 ```
 
-`dailyUpdate.ts` 的 cron 走同一个实现。账号是否被每日抓取由 `users.daily_fetch` 决定，不再有第二份名单。
+`bun run ig ins sync` 是 IG 增量的唯一入口：定时任务默认不跑 IG（数据中心出口会被限流），
+需要时在 Actions 里手动触发 `Daily Data Update` 并勾选 `ins`。账号是否被同步由 `users.daily_fetch` 决定，不再有第二份名单。
 
 ## 踩过的坑
 
