@@ -1,12 +1,38 @@
-import type { EnrichedTweet } from '@tweets-viewer/tweet-types'
+import type { EnrichedTweet, EnrichedUser } from '@tweets-viewer/tweet-types'
 import { setTimeout as sleep } from 'node:timers/promises'
 import { attachSpaceDetails, AuthError, RateLimitError, RettiwtPool, TweetEnrichmentService, TwitterAPIClient } from '@chilfish/tweet'
 import { createDb, createTweets, createUser, getDailyFetchUsers } from '@tweets-viewer/database'
+import { createConcurrencyGate, forEachConcurrent } from './lib/concurrency'
 import { resolveDatabaseUrl, resolveNeonEndpoint } from './lib/local-config'
 import { readTweetKeys, toArchivedTweets } from './lib/tweet'
 
 const KEYS = readTweetKeys()
 const PROXY = process.env.TWEET_PROXY?.trim() || undefined
+
+/**
+ * 用户之间的并发数，默认 `Key 数 × 2`。
+ *
+ * 抓取是「等代理往返」的延迟密集型任务，单用户内部又要串行翻页，串行跑几乎只用
+ * 一个 Key。X 的速率限制按 Key / 15 分钟窗口计，少量超额由 `RettiwtPool` 的
+ * 429 冷却轮换兜住；`SYNC_CONCURRENCY` 可显式覆盖（本地冒烟常设 1）。
+ */
+function resolveConcurrency(keysCount: number): number {
+  const raw = Number(process.env.SYNC_CONCURRENCY)
+  if (Number.isInteger(raw) && raw > 0)
+    return raw
+  return Math.max(2, keysCount * 2)
+}
+
+const CONCURRENCY = resolveConcurrency(KEYS.length)
+
+/**
+ * 进程级请求闸门：多库并发更新时共用同一个 Key 池，
+ * 没有闸门就会叠成 `库数 × 并发数`，把速率配额一次打满。
+ */
+const requestGate = createConcurrencyGate(CONCURRENCY)
+
+/** Key 级中止是全局的（所有库共用同一批 Key），命中后所有库都停止派发新用户 */
+let globalAbortReason: string | undefined
 const SYNC_SINCE = process.env.SYNC_SINCE
   ? new Date(process.env.SYNC_SINCE)
   : new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
@@ -158,24 +184,27 @@ export async function fetchTweetDaily(options: FetchTweetDailyOptions = {}): Pro
   const writeFailedUsers: string[] = []
   let fetchedUsers = 0
 
-  /** 所有提前返回都走这里，保证结果结构完整（中止原因可选） */
-  const report = (aborted?: string): TweetDailyResult => ({
+  /** 汇总结果：Key 级中止是全局的，任一库命中都记在这里 */
+  const report = (): TweetDailyResult => ({
     label: dbLabel,
-    ok: !aborted && failedUsers.length === 0 && writeFailedUsers.length === 0,
+    ok: !globalAbortReason && failedUsers.length === 0 && writeFailedUsers.length === 0,
     fetchedUsers,
     failedUsers,
     writeFailedUsers,
-    aborted,
+    aborted: globalAbortReason,
   })
 
-  for (const user of users) {
+  /** 单个用户：刷新资料 → 抓时间线（带重试）→ 入库。异常都在内部消费成结果 */
+  async function updateUser(user: EnrichedUser): Promise<void> {
+    const username = user.fullName ?? user.userName ?? user.id
+
     // ── Phase 0: refresh user profile ──
     // 粉丝数 / bio / 推文总数等每天都在变，不能只留在入库时的那份快照里。
     // 用 restId 定位（改名不影响），整份 EnrichedUser upsert 回 users.jsonData；
     // upsert 只覆盖 restId + jsonData，daily_fetch / ins_* 三列不受影响。
     // 失败不阻断推文抓取——资料是附带产出，推文才是主数据。
     try {
-      const freshUser = await apiClient.fetchUserDetailsRaw(user.id)
+      const freshUser = await requestGate(() => apiClient.fetchUserDetailsRaw(user.id))
 
       if (freshUser) {
         await createUser({ db, user: freshUser })
@@ -212,13 +241,14 @@ export async function fetchTweetDaily(options: FetchTweetDailyOptions = {}): Pro
       })
 
       if (abortReason) {
+        globalAbortReason ??= abortReason
         console.error({
           db: dbLabel,
           action: 'refresh-user-abort',
           reason: abortReason,
           message: formatError(error),
         })
-        return report(abortReason)
+        return
       }
     }
 
@@ -236,7 +266,7 @@ export async function fetchTweetDaily(options: FetchTweetDailyOptions = {}): Pro
         let nowCursor: string | undefined
         let pages = 0
         do {
-          const { tweets, cursor } = await fetchTimeline(user.id, nowCursor)
+          const { tweets, cursor } = await requestGate(() => fetchTimeline(user.id, nowCursor))
           if (!tweets.length)
             break
 
@@ -284,13 +314,14 @@ export async function fetchTweetDaily(options: FetchTweetDailyOptions = {}): Pro
         const abortReason = getAbortReason(error)
 
         if (abortReason) {
+          globalAbortReason ??= abortReason
           console.error({
             db: dbLabel,
             action: 'fetch-timeline-abort',
             reason: abortReason,
             message: formatError(error),
           })
-          return report(abortReason)
+          return
         }
 
         if (attempt < MAX_RETRIES)
@@ -299,22 +330,22 @@ export async function fetchTweetDaily(options: FetchTweetDailyOptions = {}): Pro
     }
 
     if (!fetchOk) {
-      failedUsers.push(user.fullName ?? user.userName ?? user.id)
-      console.error(`[${dbLabel}] Failed to fetch @${user.fullName} after ${MAX_RETRIES} attempts (last error: ${formatError(lastError)}). Skipping.`)
-      continue
+      failedUsers.push(username)
+      console.error(`[${dbLabel}] Failed to fetch @${username} after ${MAX_RETRIES} attempts (last error: ${formatError(lastError)}). Skipping.`)
+      return
     }
 
     if (allTweets.length === 0)
-      continue
-    // ── Phase 2: upsert to DB (no retry — data is deterministic) ──
+      return
 
+    // ── Phase 2: upsert to DB (no retry — data is deterministic) ──
     try {
       const result = await createTweets({ db, tweets: allTweets, user })
-      console.log(`  [${dbLabel}] @${user.fullName}: ${result.rowCount} rows affected / ${allTweets.length} total`)
+      console.log(`  [${dbLabel}] @${username}: ${result.rowCount} rows affected / ${allTweets.length} total`)
     }
 
     catch (error: unknown) {
-      writeFailedUsers.push(user.fullName ?? user.userName ?? user.id)
+      writeFailedUsers.push(username)
       console.error({
         db: dbLabel,
         userId: user.id,
@@ -325,6 +356,12 @@ export async function fetchTweetDaily(options: FetchTweetDailyOptions = {}): Pro
       })
     }
   }
+
+  // 用户之间并发执行，每个用户内部仍是「资料 → 翻页 → 入库」的串行流程；
+  // Key 级中止只停止派发新用户，正在跑的用户会把当前请求做完。
+  await forEachConcurrent(users, CONCURRENCY, updateUser, {
+    shouldStop: () => globalAbortReason !== undefined,
+  })
 
   // 抓取失败与入库失败都要如实汇报，交给入口决定退出码：
   // 多库并发时其中一个库写失败，job 也必须显红，否则那个库会静默过期。
