@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### 工程（2026-11-24）
+
+- **Changed** `.agents/skills/tweets-viewer` 入口从 PowerShell 换成单文件 TypeScript（`bun` 运行，参数校验前置），删除 `scripts/tweets-viewer.ps1`
+- **Changed** Skill 文档按 Agent Skills 规范重写：命令表、参数规则、分页与排错；数据形状拆到 `references/data-shapes.md`
+- **Fixed** Skill 文档与当前 API 对齐：`medias` 日期范围必须成对、IG 固定每页 15 条且无游标、「那年今日」按北京时间判定、未归档用户的 404/200 语义
+- **Added** `docs/INDEX.md` 的 Agent 工具入口
+
 ### 工程（2026-11-19）
 
 - **Removed** CI 的 `visual` job（VRT 像素门禁）与 `.github/workflows/update-screenshots.yml` 基线生成 workflow；VRT 收缩为本地可选检查 `bun run test:visual`

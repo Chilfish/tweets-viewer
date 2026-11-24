@@ -165,3 +165,10 @@ UI 设计      docs/ui-design/（README · visual · patterns · feedback · int
 | [../CONTRIBUTING.md](../CONTRIBUTING.md) | 贡献指南 |
 | [../SECURITY.md](../SECURITY.md) | 安全政策与漏洞报告渠道 |
 | [../CODE_OF_CONDUCT.md](../CODE_OF_CONDUCT.md) | 行为准则（Contributor Covenant 2.1） |
+
+## 八、Agent 工具
+
+| 文件 | 说明 |
+| --- | --- |
+| [../.agents/skills/tweets-viewer/SKILL.md](../.agents/skills/tweets-viewer/SKILL.md) | 归档 API 的 Agent Skill：命令速查、参数规则、分页协议与故障排查；入口 `scripts/tweets-viewer.ts` |
+| [../.agents/skills/tweets-viewer/references/data-shapes.md](../.agents/skills/tweets-viewer/references/data-shapes.md) | 接口返回的数据形状与空结果语义 |

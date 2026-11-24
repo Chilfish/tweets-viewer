@@ -6,6 +6,7 @@
 
 | 日期 | 主题 |
 |---|---|
+| [2026-11-24](2026-11-24.md) | 归档 API 的 Agent Skill 重构：入口从 PowerShell 换成单文件 TypeScript（11 个命令、前置参数校验）；`SKILL.md` 按规范重写，数据形状拆到 `references/`，并对照当前路由修正文档 |
 | [2026-11-23](2026-11-23.md) | 定时任务不再每日跑 IG（改为 `DAILY_INS` / Actions `ins` 复选框手动开启）；推文抓取改为用户级有界并发 + 进程级闸门，`SYNC_CONCURRENCY` 缺省 Key 数 × 2 |
 | [2026-11-22](2026-11-22.md) | IG 每日同步接上代理（issue #20–#22）：根因是 IG 拒绝数据中心出口，Cookie 并未过期；升级 `@chilfish/gallery-dl-instagram@0.3.0` 用 `createSDK({ proxy })`，新增 `IG_PROXY` 并回退 `TWEET_PROXY` |
 | [2026-11-19](2026-11-19.md) | 升级 `@chilfish/gallery-dl-instagram` 0.2.7；Twitter 抓取运行时切到 `@chilfish/tweet@0.2.0` 并做边界映射；下线 `packages/rettiwt-api`，归档类型收敛到 `packages/tweet-types`；VRT 退出 CI 门禁（删 `visual` job + `update-screenshots` workflow，基线不入库，只留本地 `test:visual`） |
