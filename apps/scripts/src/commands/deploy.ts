@@ -3,15 +3,27 @@ import { spawnSync } from 'node:child_process'
 import { existsSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
 import { CliError } from '@chilfish/devkit/cli'
-import { applyOnlineEnv, readOnlineTarget } from '@chilfish/devkit/env'
+import { isLocalDatabaseUrl } from '@tweets-viewer/shared'
 import { Option } from 'commander'
 import { devkit } from '../../dev.config'
 import { findForbiddenVars, findLocalAddresses } from '../lib/deploy-scan'
 import { projectRoot } from '../lib/env'
+import { PROD_ENV_FILE, readProdEnv } from '../lib/env-files'
 
 const SERVER_ROOT = join(projectRoot, 'apps', 'server')
 const OUTPUT_ROOT = join(SERVER_ROOT, '.output')
 const WRANGLER_CONFIG = join(OUTPUT_ROOT, 'server', 'wrangler.json')
+
+/** 本地模式下 devkit 写进 `process.env` 的本机变量，部署时必须清掉。 */
+const LOCAL_ONLY_KEYS = [
+  'NEON_HTTP_ENDPOINT',
+  'S3_ENDPOINT',
+  'MINIO_ENDPOINT',
+  'MINIO_ROOT_USER',
+  'MINIO_ROOT_PASSWORD',
+  'SILO_BIN',
+  'SILO_DATA',
+]
 
 interface DeployData {
   databaseHost: string
@@ -25,6 +37,25 @@ export interface DeployOptions {
   /** 全局 `--dry-run`：只报告步骤，不构建、不部署。 */
   dryRun?: boolean
   log?: { info: (message: string) => void, warn: (message: string) => void }
+}
+
+/**
+ * 把 `<file>.prod` 的值写进当前进程，并切到线上模式。
+ *
+ * devkit 0.2.0 不再提供 `applyOnlineEnv`；这里按同样的语义做三件事：
+ * 展开 `.env.prod` 的键、置 `LOCAL=0`、删掉只属于本机的服务变量。
+ */
+function applyProdEnv(): void {
+  for (const [key, value] of Object.entries(readProdEnv())) {
+    if (key === devkit.env.localFlag) {
+      continue
+    }
+    process.env[key] = value
+  }
+  process.env[devkit.env.localFlag] = '0'
+  for (const key of LOCAL_ONLY_KEYS) {
+    delete process.env[key]
+  }
 }
 
 function runStep(args: string[], label: string): void {
@@ -50,26 +81,40 @@ function runStep(args: string[], label: string): void {
 }
 
 /**
- * 部署固定按线上处理：`.env` 里的 `LOCAL=1` 不会带进构建。
+ * 部署固定按线上处理：本机 `.env.dev` 里的 `LOCAL=1` 不会带进构建。
  *
- * 1. `readOnlineTarget` 只信文件里的 `DATABASE_URL_REMOTE`，本机地址直接拒绝；
- * 2. `applyOnlineEnv` 展开 `*_REMOTE`、置 `LOCAL=0`、清掉本机代理地址；
+ * 1. 只从 `.env.prod` 取线上库地址，本机地址直接拒绝；
+ * 2. 把 `.env.prod` 的值写回 `process.env`、置 `LOCAL=0`、清掉本机代理/存储变量；
  * 3. 从零构建，扫描产物：凭据残留或本机地址 → 中止，不部署。
  */
 export async function runDeploy(options: DeployOptions = {}): Promise<DeployData> {
   const log = options.log ?? console
 
-  const target = readOnlineTarget({ config: devkit, cwd: projectRoot })
-  applyOnlineEnv({ config: devkit, remote: target.remote })
-  process.env.DATABASE_URL = target.databaseUrl
-  const databaseHost = new URL(target.databaseUrl).host
+  const databaseUrl = readProdEnv().DATABASE_URL?.trim()
+  if (!databaseUrl) {
+    throw new CliError(`${PROD_ENV_FILE} 里缺少 DATABASE_URL`, {
+      code: 'MISSING_ENV',
+      hint: `在 ${PROD_ENV_FILE} 里写线上连接串，本机地址会被拒绝`,
+      context: { name: 'DATABASE_URL', file: PROD_ENV_FILE },
+    })
+  }
+  if (isLocalDatabaseUrl(databaseUrl)) {
+    throw new CliError(`${PROD_ENV_FILE} 的 DATABASE_URL 指向本机（${databaseUrl}），拒绝部署`, {
+      code: 'NON_LOCAL_DATABASE',
+      hint: '线上连接串写进 .env.prod；本机地址只属于 .env.dev',
+      context: { name: 'DATABASE_URL', file: PROD_ENV_FILE },
+    })
+  }
 
+  const databaseHost = new URL(databaseUrl).host
   log.info(`部署固定按线上处理（LOCAL=0）→ ${databaseHost}`)
 
   if (options.dryRun) {
     log.info(`dry-run：将清空 apps/server/.output 并构建${options.noDeploy ? '（--no-deploy：不部署）' : ''}`)
     return { databaseHost, built: false, deployed: false }
   }
+
+  applyProdEnv()
 
   // 上次构建残留的 vars 会被 nitro 合并进新产物，必须从零开始。
   rmSync(OUTPUT_ROOT, { recursive: true, force: true })
@@ -101,7 +146,7 @@ export async function runDeploy(options: DeployOptions = {}): Promise<DeployData
     }
     throw new CliError('构建产物里有本机地址，已中止部署', {
       code: 'LOCAL_ADDRESSES_IN_BUILD',
-      hint: '检查 .env 的 LOCAL / DATABASE_URL / NEON_HTTP_ENDPOINT 后重跑 bun run deploy',
+      hint: '检查 .env.dev 的 LOCAL / DATABASE_URL / NEON_HTTP_ENDPOINT 后重跑 bun run deploy',
       context: {
         hits: hits.slice(0, 10),
         total: hits.length,
@@ -128,8 +173,8 @@ export const deploySpec: CommandSpec<DeployData> = {
   id: 'deploy',
   description: '构建并部署 API 到 Cloudflare Workers（固定线上环境）',
   details: '固定按线上处理，不受 `LOCAL` 开关影响。\n'
-    + '\n'
-    + '1. 强制 `LOCAL=0`，线上库取 `.env` 的 `DATABASE_URL_REMOTE`（本机地址直接拒绝）；\n'
+    + `\n`
+    + `1. 强制 \`LOCAL=0\`，线上库取 \`${PROD_ENV_FILE}\` 的 \`DATABASE_URL\`（本机地址直接拒绝）；\n`
     + '2. 清空 `apps/server/.output` 后从零构建（残留的 vars 会被合并进新产物）；\n'
     + '3. 产物里出现 `DATABASE_URL` / `TWEET_KEYS` 等凭据就中止——线上凭据走 Worker secret；\n'
     + '4. 产物里出现本机库 / 代理 / 对象存储地址就中止；\n'

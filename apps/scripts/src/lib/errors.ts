@@ -1,7 +1,7 @@
 import type { CommandGroup, CommandSpec } from '@chilfish/devkit/cli'
 import { CliError, EXIT_CODES } from '@chilfish/devkit/cli'
 
-/** devkit 0.1.2 只输出 `error.message`，这里保留旧的 `cause` 展开。 */
+/** devkit 0.2.0 只输出 `error.message`，这里保留旧的 `cause` 展开。 */
 function describeError(error: Error): string {
   const cause = (error as { cause?: unknown }).cause
   return cause instanceof Error

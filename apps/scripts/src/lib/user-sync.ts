@@ -15,10 +15,10 @@ export async function fetchRemoteUserRows(
 ): Promise<SelectUser[]> {
   const remoteUrl = options.remoteUrl ?? resolveRemoteDatabaseUrl()
   if (!remoteUrl) {
-    throw new ConfigError('缺少 DATABASE_URL_REMOTE，无法同步线上用户表', {
+    throw new ConfigError('缺少线上库地址，无法同步线上用户表', {
       code: 'MISSING_ENV',
-      hint: '在 .env 里配置 DATABASE_URL_REMOTE，或加 --no-sync-users 只用本地账号',
-      context: { name: 'DATABASE_URL_REMOTE' },
+      hint: '在 .env.prod 里配置 DATABASE_URL，或加 --no-sync-users 只用本地账号',
+      context: { name: 'DATABASE_URL', file: '.env.prod' },
     })
   }
 

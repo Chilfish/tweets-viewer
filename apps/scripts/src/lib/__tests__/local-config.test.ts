@@ -30,7 +30,7 @@ describe('resolveNeonEndpoint', () => {
 
   it('本机库始终回落到本机代理', () => {
     expect(resolveNeonEndpoint('postgres://postgres@localhost:5432/tweets_dev', {}))
-      .toBe('http://127.0.0.1:4444/sql')
+      .toBe('http://127.0.0.1:4445/sql')
   })
 })
 
@@ -89,13 +89,35 @@ describe('resolveOnlineCdnBase', () => {
 })
 
 describe('resolveRemoteDatabaseUrl', () => {
-  it('读取 DATABASE_URL_REMOTE', () => {
-    expect(resolveRemoteDatabaseUrl({
-      DATABASE_URL_REMOTE: 'postgres://u:p@remote.neon.tech/neondb',
-    })).toBe('postgres://u:p@remote.neon.tech/neondb')
+  it('优先读取 .env.prod 的 DATABASE_URL', () => {
+    expect(resolveRemoteDatabaseUrl(
+      {},
+      { DATABASE_URL: 'postgres://u:p@remote.neon.tech/neondb' },
+    )).toBe('postgres://u:p@remote.neon.tech/neondb')
   })
 
-  it('缺失时返回 undefined', () => {
-    expect(resolveRemoteDatabaseUrl({})).toBeUndefined()
+  it('.env.prod 指向本机时忽略', () => {
+    expect(resolveRemoteDatabaseUrl(
+      { DATABASE_URL: 'postgres://u:p@remote.neon.tech/neondb' },
+      { DATABASE_URL: 'postgres://postgres@localhost:5432/tweets_dev' },
+    )).toBe('postgres://u:p@remote.neon.tech/neondb')
+  })
+
+  it('回落到进程环境里的非本机地址', () => {
+    expect(resolveRemoteDatabaseUrl(
+      { DATABASE_URL: 'postgres://u:p@remote.neon.tech/neondb' },
+      {},
+    )).toBe('postgres://u:p@remote.neon.tech/neondb')
+  })
+
+  it('进程环境是本机地址时返回 undefined', () => {
+    expect(resolveRemoteDatabaseUrl(
+      { DATABASE_URL: 'postgres://postgres@localhost:5432/tweets_dev' },
+      {},
+    )).toBeUndefined()
+  })
+
+  it('两处都缺失时返回 undefined', () => {
+    expect(resolveRemoteDatabaseUrl({}, {})).toBeUndefined()
   })
 })

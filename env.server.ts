@@ -1,15 +1,14 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { applyLocalDefaults, parseDatabaseUrls } from '@tweets-viewer/shared'
-import { config } from 'dotenv'
 import { z } from 'zod'
+import { loadLayeredEnv } from './env.layer'
 
 const rootPath = path.dirname(fileURLToPath(import.meta.url))
 
-config({
-  path: path.join(rootPath, '.env'),
-  quiet: true,
-})
+// 与 devkit 同一套分层：`.env` 打底，本地标志开启时叠加 `.env.dev`，
+// 否则叠加 `.env.prod`；进程环境始终优先。
+loadLayeredEnv({ root: rootPath })
 
 /** `LOCAL=1` 时把数据库相关变量补成本机默认值；线上原样返回。 */
 const effectiveEnv = applyLocalDefaults(process.env as Record<string, string | undefined>)

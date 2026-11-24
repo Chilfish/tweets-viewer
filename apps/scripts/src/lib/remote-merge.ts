@@ -37,10 +37,10 @@ export async function mergeRemoteArchive(
 ): Promise<RemoteMergeOutcome> {
   const remoteUrl = options.remoteUrl ?? resolveRemoteDatabaseUrl()
   if (!remoteUrl) {
-    throw new ConfigError('缺少 DATABASE_URL_REMOTE，无法读取线上归档', {
+    throw new ConfigError('缺少线上库地址，无法读取线上归档', {
       code: 'MISSING_ENV',
-      hint: '在 .env 里配置 DATABASE_URL_REMOTE',
-      context: { name: 'DATABASE_URL_REMOTE' },
+      hint: '在 .env.prod 里配置 DATABASE_URL',
+      context: { name: 'DATABASE_URL', file: '.env.prod' },
     })
   }
 

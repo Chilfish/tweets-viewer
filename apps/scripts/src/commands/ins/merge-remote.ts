@@ -15,7 +15,7 @@ interface MergeRemoteData {
 export const mergeRemoteSpec: CommandSpec<MergeRemoteData> = {
   id: 'ins.merge-remote',
   description: '把线上 users 与 ins_posts 合并到本地（post_id 冲突保留本地）',
-  details: '只用于 `LOCAL=1`：先读 `DATABASE_URL_REMOTE` 的整张 `users` 与 `ins_posts`，\n'
+  details: '只用于 `LOCAL=1`：先读 `.env.prod` 线上库的整张 `users` 与 `ins_posts`，\n'
     + '再 upsert 到本机库。同一条帖子本地已存在时跳过，不覆盖本地行。\n'
     + '适合 IG 抓取被限流时先把线上归档补到本地。',
   examples: [

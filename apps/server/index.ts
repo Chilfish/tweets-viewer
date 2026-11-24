@@ -11,7 +11,6 @@ import insApp from './routes/ins'
 import tweetsApp from './routes/tweets'
 import usersApp from './routes/users'
 import { jsonResponse, registerOpenAPI } from './utils/openapi'
-import 'dotenv'
 
 const isDev = process.env.NODE_ENV === 'development'
 

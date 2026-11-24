@@ -26,7 +26,9 @@ dist-ssr
 
 *.tsbuildinfo
 auto-*.d.ts
+# 环境文件分层：.env 是基础文件，.env.dev / .env.prod 是模式文件，全部不入库
 .env
+.env.*
 wrangler.toml
 
 .vercel

@@ -23,7 +23,7 @@ export const refreshSpec: CommandSpec<RefreshData> = {
   id: 'ins.refresh',
   description: '全量拉齐所有已关联 IG 账号：抓取 → 媒体 → 上传 → 入库 → 对账',
   details: '账号来源是 `users.ins_username`，不要求 `daily_fetch`；不带 since，抓取全部帖子。\n'
-    + 'LOCAL=1 时默认先从 `DATABASE_URL_REMOTE` 同步 `users` 表，保证账号名单与线上一致；'
+    + 'LOCAL=1 时默认先从 `.env.prod` 的线上库同步 `users` 表，保证账号名单与线上一致；'
     + '`--no-sync-users` 可跳过。\n'
     + '单个账号失败会记入 `failures` 并继续，最后退出码为 1。默认下载并上传媒体；'
     + '`--no-download` 只同步数据并把链接改写成线上 CDN，`--no-media` 连媒体字段都不改写。',

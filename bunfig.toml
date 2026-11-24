@@ -1,2 +1,9 @@
+# Bun 默认会自动加载 .env 并写进 process.env；那样 devkit 的分层
+# （`.env` → `.env.dev` / `.env.prod`）就覆盖不上基础文件的值。
+# 关掉自动加载，统一由 devkit 的 `loadEnvFile()` 分层读取：
+# CLI 入口在 `buildCli` 里调用，独立脚本通过 `apps/scripts/src/lib/load-env.ts`。
 [install]
 linker = "hoisted"
+
+[env]
+file = false

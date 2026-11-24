@@ -6,6 +6,7 @@ import {
   parseDatabaseUrls,
 } from '@tweets-viewer/shared'
 import { devkit } from '../../dev.config'
+import { readProdEnv } from './env-files'
 
 export { isLocalMode }
 
@@ -41,9 +42,25 @@ export function resolveDatabaseUrl(env: NodeJS.ProcessEnv = process.env): string
   })
 }
 
-/** 线上库地址，用于本地初始化时从远端拉取用户表。 */
-export function resolveRemoteDatabaseUrl(env: NodeJS.ProcessEnv = process.env): string | undefined {
-  return env.DATABASE_URL_REMOTE?.trim() || undefined
+/**
+ * 线上库地址，用于本地初始化时从远端拉取用户表。
+ *
+ * 先认 `.env.prod` 文件——本地模式下 devkit 已把 `process.env.DATABASE_URL`
+ * 改成本机库，拿它当线上目标会读到本地数据；只有进程环境里显式给了非本机
+ * 地址（CI / 部署）时才回落到进程环境。
+ */
+export function resolveRemoteDatabaseUrl(
+  env: NodeJS.ProcessEnv = process.env,
+  prodEnv: Record<string, string> = readProdEnv(),
+): string | undefined {
+  const fromFile = prodEnv.DATABASE_URL?.trim()
+  if (fromFile && !isLocalDatabaseUrl(fromFile)) {
+    return fromFile
+  }
+  const fromProcess = env.DATABASE_URL?.trim()
+  return fromProcess && !isLocalDatabaseUrl(fromProcess)
+    ? fromProcess
+    : undefined
 }
 
 /**
