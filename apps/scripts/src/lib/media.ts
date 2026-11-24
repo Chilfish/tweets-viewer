@@ -3,6 +3,7 @@ import type { IGPost, IGUserInfo } from '@tweets-viewer/shared'
 import { existsSync } from 'node:fs'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
+import { runBoundedStage } from './concurrency'
 import { dataDir } from './env'
 
 /** 导出文件里的 user 形状：与 `import` 读取的字段一致。 */
@@ -162,19 +163,21 @@ export async function downloadExportMedia(
   }
 
   const result: DownloadResult = { downloaded: 0, skipped: 0, failed: [] }
-  let index = 0
   let completed = 0
 
-  async function worker(): Promise<void> {
-    while (index < tasks.length) {
-      const task = tasks[index++]!
+  const outcome = await runBoundedStage<DownloadTask>({
+    name: 'download-media',
+    items: tasks,
+    key: task => task.file,
+    concurrency,
+    run: async (task, { signal }) => {
       if (existsSync(task.file)) {
         result.skipped++
         completed++
-        continue
+        return
       }
       try {
-        await downloadOne(task)
+        await downloadOne(task, signal)
         result.downloaded++
         completed++
         if (completed % 25 === 0) {
@@ -182,6 +185,7 @@ export async function downloadExportMedia(
         }
       }
       catch (error) {
+        // 单条失败要留在结果里，不能当成「没有媒体」静默通过。
         result.failed.push({
           label: task.label,
           error: error instanceof Error
@@ -192,22 +196,28 @@ export async function downloadExportMedia(
           error: String(error),
         })
       }
-    }
+    },
+  })
+
+  if (outcome.status === 'cancelled') {
+    log?.warn('下载已取消，未完成的文件会在下次运行时重试')
   }
 
-  await Promise.all(Array.from({
-    length: Math.max(1, Math.min(concurrency, tasks.length)),
-  }, worker))
   return result
 }
 
-async function downloadOne(task: DownloadTask): Promise<void> {
+async function downloadOne(task: DownloadTask, signal?: AbortSignal): Promise<void> {
   let lastError: unknown
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
       const response = await fetch(task.url, {
         headers: { 'User-Agent': 'Mozilla/5.0 (compatible; tweets-viewer/ig-cli)' },
-        signal: AbortSignal.timeout(120_000),
+        signal: signal
+          ? AbortSignal.any([
+              signal,
+              AbortSignal.timeout(120_000),
+            ])
+          : AbortSignal.timeout(120_000),
       })
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`)
@@ -218,6 +228,9 @@ async function downloadOne(task: DownloadTask): Promise<void> {
     }
     catch (error) {
       lastError = error
+      if (signal?.aborted) {
+        throw error
+      }
       if (attempt < 3) {
         await new Promise(resolve => setTimeout(resolve, 1000 * attempt))
       }

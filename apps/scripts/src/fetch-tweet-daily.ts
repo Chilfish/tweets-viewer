@@ -1,29 +1,17 @@
 import type { EnrichedTweet, EnrichedUser } from '@tweets-viewer/tweet-types'
+
 import { setTimeout as sleep } from 'node:timers/promises'
 import { attachSpaceDetails, AuthError, RateLimitError, RettiwtPool, TweetEnrichmentService, TwitterAPIClient } from '@chilfish/tweet'
 import { createDb, createTweets, createUser, getDailyFetchUsers } from '@tweets-viewer/database'
-import { createConcurrencyGate, forEachConcurrent } from './lib/concurrency'
+import { createConcurrencyGate, resolveSyncConcurrency, runBoundedStage } from './lib/concurrency'
 import { resolveDatabaseUrl, resolveNeonEndpoint } from './lib/local-config'
 import { readTweetKeys, toArchivedTweets } from './lib/tweet'
+import './lib/load-env'
 
 const KEYS = readTweetKeys()
 const PROXY = process.env.TWEET_PROXY?.trim() || undefined
 
-/**
- * 用户之间的并发数，默认 `Key 数 × 2`。
- *
- * 抓取是「等代理往返」的延迟密集型任务，单用户内部又要串行翻页，串行跑几乎只用
- * 一个 Key。X 的速率限制按 Key / 15 分钟窗口计，少量超额由 `RettiwtPool` 的
- * 429 冷却轮换兜住；`SYNC_CONCURRENCY` 可显式覆盖（本地冒烟常设 1）。
- */
-function resolveConcurrency(keysCount: number): number {
-  const raw = Number(process.env.SYNC_CONCURRENCY)
-  if (Number.isInteger(raw) && raw > 0)
-    return raw
-  return Math.max(2, keysCount * 2)
-}
-
-const CONCURRENCY = resolveConcurrency(KEYS.length)
+const CONCURRENCY = resolveSyncConcurrency(KEYS.length)
 
 /**
  * 进程级请求闸门：多库并发更新时共用同一个 Key 池，
@@ -138,6 +126,12 @@ export interface FetchTweetDailyOptions {
   label?: string
   /** 每个用户最多翻几页；缺省取 `SYNC_MAX_PAGES`，再不设就不限制。 */
   maxPages?: number
+  /**
+   * 本库的用户级并发数；缺省用进程总预算 `SYNC_CONCURRENCY`。
+   *
+   * 多库并行时由入口按库数均分，避免总在飞请求变成 `库数 × 预算`。
+   */
+  concurrency?: number
 }
 
 export interface TweetDailyResult {
@@ -159,6 +153,7 @@ export async function fetchTweetDaily(options: FetchTweetDailyOptions = {}): Pro
   const DATABASE_URL = options.databaseUrl ?? resolveDatabaseUrl()
   const dbLabel = options.label ?? 'database'
   const maxPages = options.maxPages ?? MAX_PAGES
+  const concurrency = options.concurrency ?? CONCURRENCY
 
   const db = createDb({
     url: DATABASE_URL,
@@ -359,8 +354,15 @@ export async function fetchTweetDaily(options: FetchTweetDailyOptions = {}): Pro
 
   // 用户之间并发执行，每个用户内部仍是「资料 → 翻页 → 入库」的串行流程；
   // Key 级中止只停止派发新用户，正在跑的用户会把当前请求做完。
-  await forEachConcurrent(users, CONCURRENCY, updateUser, {
+  await runBoundedStage<EnrichedUser>({
+    name: `fetch-users-${dbLabel}`,
+    items: users,
+    key: user => String(user.id),
+    concurrency,
     shouldStop: () => globalAbortReason !== undefined,
+    // 异常已在 updateUser 内部收成结果，这里不会再抛；
+    // 用户级失败由 failedUsers / writeFailedUsers 汇总。
+    run: user => updateUser(user),
   })
 
   // 抓取失败与入库失败都要如实汇报，交给入口决定退出码：

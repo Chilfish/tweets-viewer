@@ -28,15 +28,17 @@
  */
 
 import type { TweetDailyResult } from './fetch-tweet-daily'
+
 import { createLogger } from '@chilfish/devkit/cli'
 import { createDb } from '@tweets-viewer/database'
 import { parseDatabaseUrls } from '@tweets-viewer/shared'
 // ═══ Twitter Daily Update ═══
 import { fetchTweetDaily } from './fetch-tweet-daily'
 // ═══ Instagram Daily Update ═══
+import { resolveSyncConcurrency, shareConcurrency } from './lib/concurrency'
 import { syncInsAccounts } from './lib/ins-sync'
 import { resolveNeonEndpoint } from './lib/local-config'
-import 'dotenv'
+import './lib/load-env'
 
 export interface DailyResult extends TweetDailyResult {
   /** 抓取失败的 IG 账号（IG 步骤被跳过时为空） */
@@ -45,6 +47,13 @@ export interface DailyResult extends TweetDailyResult {
 
 /** 目标库地址（`DATABASE_URL` 逗号分隔，已去重）；空 = 配置错误，直接失败 */
 const DATABASE_URLS = parseDatabaseUrls(process.env.DATABASE_URL)
+
+/** Key 池大小决定默认并发预算（`SYNC_CONCURRENCY` 可覆盖）。 */
+const KEYS_COUNT = (process.env.TWEET_KEYS ?? '')
+  .split(',')
+  .map(key => key.trim())
+  .filter(Boolean)
+  .length
 
 /**
  * IG 每日步骤开关：缺省关闭。
@@ -70,10 +79,14 @@ function databaseLabel(url: string, index: number): string {
 }
 
 /** 对单个归档库跑一轮完整更新：Twitter，然后 IG（`DAILY_INS=1` 时）。 */
-async function updateTarget(databaseUrl: string, label: string): Promise<DailyResult> {
+async function updateTarget(
+  databaseUrl: string,
+  label: string,
+  concurrency: number,
+): Promise<DailyResult> {
   console.log(`\n───── [${label}] daily update start ─────`)
 
-  const tweetResult = await fetchTweetDaily({ databaseUrl, label })
+  const tweetResult = await fetchTweetDaily({ databaseUrl, label, concurrency })
 
   const insFailedUsers: string[] = []
   if (DAILY_INS) {
@@ -141,11 +154,15 @@ async function main(): Promise<void> {
     label: databaseLabel(url, index),
   }))
 
+  // 多库并行且共用同一个 Key 池：把用户级预算按库数均分，总在飞请求才不翻倍。
+  const budget = shareConcurrency(resolveSyncConcurrency(KEYS_COUNT), targets.length)
+
   console.log(`=== Daily Update Start (${targets.length} target(s): ${targets.map(t => t.label).join(', ')}) ===`)
+  console.log(`--- concurrency: ${budget} user(s)/target, ${targets.length * budget} in flight ---`)
 
   // 各库之间没有依赖关系，并发执行；单个库失败不影响其他库
   const settled = await Promise.allSettled(
-    targets.map(target => updateTarget(target.url, target.label)),
+    targets.map(target => updateTarget(target.url, target.label, budget)),
   )
 
   const failed: string[] = []

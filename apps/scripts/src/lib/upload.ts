@@ -3,6 +3,7 @@ import { existsSync } from 'node:fs'
 import { readdir, readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { ConfigError } from '@chilfish/devkit/cli'
+import { runBoundedStage } from './concurrency'
 import { isLocalMode, resolveStorage } from './local-config'
 import { avatarPath, mediaDir } from './media'
 
@@ -91,20 +92,22 @@ export async function uploadAccountMedia(
     skipped: 0,
     failed: [],
   }
-  let index = 0
   let completed = 0
   const concurrency = options.concurrency ?? 8
 
-  async function worker(): Promise<void> {
-    while (index < tasks.length) {
-      const task = tasks[index++]!
+  const outcome = await runBoundedStage<UploadTask>({
+    name: 'upload-media',
+    items: tasks,
+    key: task => task.key,
+    concurrency,
+    run: async (task) => {
       const url = `${storage.endpoint}/${storage.bucket}/${encodeURI(task.key)}`
       try {
         const head = await client.fetch(url, { method: 'HEAD' })
         if (head.ok) {
           result.skipped++
           completed++
-          continue
+          return
         }
 
         const body = await readFile(task.file)
@@ -139,12 +142,12 @@ export async function uploadAccountMedia(
           error: String(error),
         })
       }
-    }
-  }
+    },
+  })
 
-  await Promise.all(Array.from({
-    length: Math.max(1, Math.min(concurrency, tasks.length)),
-  }, worker))
+  if (outcome.status === 'cancelled') {
+    options.log?.warn('上传已取消，未完成的对象会在下次运行时补传')
+  }
 
   options.log?.info(`上传目标：${storage.endpoint}/${storage.bucket}`)
   return result
