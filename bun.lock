@@ -11,7 +11,7 @@
       },
       "devDependencies": {
         "@antfu/eslint-config": "^10.0.0",
-        "@chilfish/devkit": "0.1.2",
+        "@chilfish/devkit": "0.2.0",
         "@types/bun": "^1.4.4",
         "@types/node": "^26.6.6",
         "cross-env": "^10.1.0",
@@ -227,7 +227,7 @@
 
     "@cacheable/utils": ["@cacheable/utils@2.5.0", "", { "dependencies": { "hashery": "^1.5.1", "keyv": "^5.6.0" } }, "sha512-buipgOVDkkPXNR5+xBpDw7Zk2n1EvU7qBJCNUcL7rhQ//kfpOXPAvQ511Os0vpLYJ1pZnvudNytkQt2hst3wqA=="],
 
-    "@chilfish/devkit": ["@chilfish/devkit@0.1.2", "", { "dependencies": { "aws4fetch": "^1.0.20", "commander": "^15.1.0" }, "peerDependencies": { "drizzle-orm": ">=0.30.0", "pg": ">=8.11.0" }, "optionalPeers": ["drizzle-orm", "pg"] }, "sha512-ASKN/ONVUgpq/JvvuzRUlDUQCRLtvRQsIlu8cSgHW9T/SDqHo7fFsG6VrzlVsnHV0ehHWXQXfwMwtqFuHEHggA=="],
+    "@chilfish/devkit": ["@chilfish/devkit@0.2.0", "", { "dependencies": { "aws4fetch": "^1.0.20", "commander": "^15.1.0" }, "peerDependencies": { "drizzle-orm": ">=0.30.0", "pg": ">=8.11.0" }, "optionalPeers": ["drizzle-orm", "pg"] }, "sha512-WbxHgZsdgZn+slOe3CeIPLBaMMDgQxl17mWixwQmK7Kc8RvNk6SNWPCaML8JMwlnSyTX9ZNM3siFl38G/7+l6g=="],
 
     "@chilfish/gallery-dl-instagram": ["@chilfish/gallery-dl-instagram@0.3.0", "", { "peerDependencies": { "undici": ">=6" }, "optionalPeers": ["undici"], "bin": { "dl-ins": "dist/dl-ins.mjs" } }, "sha512-gCWiBwFzjLdOVu6/9sAu5t3nTvbTEsDRAyWYGVEzzsAolw035yC9vQu162PtlusikuYeVmGpSdxoKCsq1pyIIQ=="],
 

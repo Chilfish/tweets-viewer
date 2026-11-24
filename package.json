@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^10.0.0",
-    "@chilfish/devkit": "0.1.2",
+    "@chilfish/devkit": "0.2.0",
     "@types/bun": "^1.4.4",
     "@types/node": "^26.6.6",
     "cross-env": "^10.1.0",
