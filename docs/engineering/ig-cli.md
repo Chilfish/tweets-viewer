@@ -38,7 +38,7 @@ LOCAL=1 bun run ig ins refresh --no-download
 ```
 
 `ins refresh` 对 `users.ins_username` 里的全部账号做全量抓取（不看 `daily_fetch`、不带 since）。
-`LOCAL=1` 时默认先从 `DATABASE_URL_REMOTE` 同步整张 `users` 表，保证账号名单与线上一致；
+`LOCAL=1` 时默认先从 `.env.prod` 的线上库同步整张 `users` 表，保证账号名单与线上一致；
 `--no-sync-users` 跳过。只同步帖子数据时加 `--no-download`：不下载媒体，链接改写为线上 CDN。
 
 被限流打断后用断点续跑，只处理没拉齐的账号：
@@ -73,7 +73,7 @@ LOCAL=1 bun run ig ins merge-remote
 | `ins verify <twitterName>` | 对账：资料、条数、时间顺序、媒体可达 |
 | `ins upload <账号> [--bucket <name>]` | 上传媒体；`LOCAL=1` 写本机 SILO，否则写 R2 |
 | `dev server` | 起本地服务（Postgres / 建库 / 迁移 / 代理 / SILO）后同时启动 server 与 client |
-| `dev db` | 起本机 Postgres、建库、跑迁移、把本地段写进 `.env` |
+| `dev db` | 起本机 Postgres、建库、跑迁移、把本地段写进 `.env.dev` |
 | `dev proxy` | 前台启动 Neon `/sql` 兼容代理 |
 | `dev storage` | 启动本机 SILO 并准备桶（匿名只读） |
 
@@ -126,7 +126,7 @@ LOCAL=1 bun run ig ins merge-remote
 - 每条命令开工前由 devkit 打印一行目标环境：`local mode (LOCAL=1) · database localhost:5432/tweets_dev · local storage http://127.0.0.1:9000/tweets-viewer`。
 - 人读日志写 stderr，stdout 只留给数据输出与信封。
 - `--json` 不改变可读性：CI 日志仍然是人读的，机器契约只在显式传 `--json` 时生效。
-- devkit 0.1.2 的 `--help` 标题与错误提示是英文；`describe` 的退出码与全局选项文案由 `apps/scripts/src/cli.ts` 的 `labels` 保留中文。
+- devkit 0.2.0 的 `--help` 标题与错误提示是英文；`describe` 的退出码与全局选项文案由 `apps/scripts/src/cli.ts` 的 `labels` 保留中文。
 
 ## 输入输出
 
@@ -148,13 +148,14 @@ data/
 ## 代码位置
 
 ```text
+env.layer.ts               # 环境文件分层（.env → .env.dev / .env.prod）
 apps/scripts/
 ├─ dev.config.ts          # devkit 配置（env / database / storage / dev servers）
 └─ src/
    ├─ cli.ts              # 唯一入口（buildCli + createDevCommands）
    ├─ commands/
    │  └─ ins/             # add · export · media · import · sync · verify · upload
-   └─ lib/                # instagram · media · db · local-config · errors
+   └─ lib/                # instagram · media · db · local-config · concurrency · env-files · load-env · errors
 ```
 
 CLI runtime、`dev` 命令组与本地服务编排都在 `@chilfish/devkit` 内；项目侧只保留业务命令与上面列出的适配层。

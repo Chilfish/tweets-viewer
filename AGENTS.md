@@ -130,11 +130,13 @@ ins_posts: id(serial PK), post_id(UQ), username(FK→users.userName), created_at
 
 ### 环境变量（`env.server.ts` 单源 Zod 校验）
 
+环境文件分三层，全部不入库：`.env`（共用）→ `.env.dev`（`LOCAL=1` 时叠加）或 `.env.prod`（线上，`bun run deploy` 只读它）。后面的文件覆盖前面的，进程环境始终优先。
+
 | 变量                 | 用途                                                                                                 |
 | -------------------- | ---------------------------------------------------------------------------------------------------- |
 | `DATABASE_URL`       | Postgres 连接串；逗号分隔多地址 = 每日抓取并发更新多库（首个为主库，`env.DATABASE_URLS` 为全量列表） |
 | `LOCAL`              | `1` 时数据库、对象存储与媒体地址全部切到本机（`ig dev db/proxy/storage`）；线上不设                  |
-| `NEON_HTTP_ENDPOINT` | 本地 Neon `/sql` 代理地址，默认 `http://127.0.0.1:4444/sql`                                          |
+| `NEON_HTTP_ENDPOINT` | 本地 Neon `/sql` 代理地址，默认 `http://127.0.0.1:4445/sql`                                          |
 | `S3_ENDPOINT`        | 本地对象存储地址，默认 `http://127.0.0.1:9000`（线上用 `R2_*`）                                      |
 | `R2_BUCKET`          | 线上 R2 桶；本地模式下是 SILO 桶名，默认 `tweets-viewer`                                             |
 | `IG_CDN_BASE`        | 线上 IG 媒体前缀，默认 `https://s3.chilfish.top`；`LOCAL=1` 时改用本机桶地址                         |
@@ -143,7 +145,7 @@ ins_posts: id(serial PK), post_id(UQ), username(FK→users.userName), created_at
 | `API_URL`            | 前端 API 基址（经 `vite.config.ts` 注入 bundle）                                                     |
 | `ENVIRONMENT`        | 运行环境（`development` / `production`）                                                             |
 
-参考 `example.env`，复制为根目录 `.env`。敏感凭据只走 `.env` + `env.server.ts`，绝不硬编码。
+参考 `example.env`：共用配置写 `.env`，本机地址写 `.env.dev`，线上地址写 `.env.prod`。敏感凭据只走环境文件 + `env.server.ts`，绝不硬编码。
 线上 API 的 `DATABASE_URL` / `TWEET_KEYS` 走 Worker secret（`wrangler secret put`），不进构建产物；
 `bun run deploy` 固定按线上构建并扫描产物，见 `docs/engineering/local-database.md#部署与线上凭据`。
 

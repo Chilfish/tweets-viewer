@@ -197,10 +197,10 @@ tweets-viewer/
 
 | 变量           | 用途                              | 位置                                    |
 | -------------- | --------------------------------- | --------------------------------------- |
-| `DATABASE_URL` | Postgres 连接串；逗号分隔多地址 = 定时抓取并发更新多库（首个为主库，`env.DATABASE_URLS` 为全量列表） | `.env`, `wrangler.toml`, GitHub Secrets |
-| `TWEET_KEYS`   | Twitter API Key 列表（逗号分隔）  | `.env`, `wrangler.toml`, GitHub Secrets |
+| `DATABASE_URL` | Postgres 连接串；逗号分隔多地址 = 定时抓取并发更新多库（首个为主库，`env.DATABASE_URLS` 为全量列表） | 环境文件（`.env.dev` / `.env.prod`）, GitHub Secrets |
+| `TWEET_KEYS`   | Twitter API Key 列表（逗号分隔）  | `.env`, GitHub Secrets |
 | `INSTAGRAM_COOKIES` | Instagram 登录 Cookie       | `.env`, GitHub Secrets                  |
-| `R2_*`         | IG 媒体上传（R2 凭据与桶名）       | `.env`, GitHub Secrets                  |
+| `R2_*`         | IG 媒体上传（R2 凭据与桶名）       | 环境文件, GitHub Secrets                |
 | `ENVIRONMENT`  | 运行环境 (development/production) | `env.server.ts` (Zod 验证)              |
 | `API_URL`      | 前端 API 基址（不含 `/v3`），由 `vite.config.ts` 注入客户端 bundle | `.env` / 平台环境变量，`env.server.ts` (Zod 验证) |
 

@@ -1,6 +1,6 @@
 # Backlog（任务清单）
 
-**项目**: Tweets Viewer | **最后更新**: 2026-11-19
+**项目**: Tweets Viewer | **最后更新**: 2026-11-24
 
 > 本清单**只保留当前关注的未决任务**，不累积已完成条目。规划下一阶段时从这里选任务；条目完成后移入归档。
 > 已完成里程碑见 [action-plan.md](action-plan.md)（历史记录）与 [../archive/](../archive/README.md)。
@@ -15,7 +15,7 @@
 ## 未决
 
 - [ ] [fix] Instagram 抓取：Cookie 有效，失败根因是 IG 把数据中心出口判成未登录 / 限流（`code 1675004`）。**已停止每日自动同步**（`DAILY_INS` 缺省关闭，Actions 手动触发可勾 `ins`），日常增量走 `bun run ig ins sync`。若将来要恢复自动同步，需要给 IG 单独挑一个能过风控的出口（家宽 / 住宅类节点）（关联：`docs/development-log/2026-11-22.md`、`2026-11-23.md`；风险：中）
-- [ ] [feat] 推文抓取并发调优：已改成用户级有界并发（`SYNC_CONCURRENCY`，缺省 Key 数 × 2）+ 进程级闸门，等下一轮 cron 实测耗时。若仍偏慢，再看翻页请求能否在单用户内并发（现在同一用户必须串行拿 cursor）（关联：`docs/development-log/2026-11-23.md`；风险：低）
+- [ ] [feat] 推文抓取并发调优：已改成用户级有界并发（`SYNC_CONCURRENCY`，缺省 Key 数 × 2）+ 进程级闸门，并收敛到 `@chilfish/devkit/pipeline`；多库时预算按库数均分。等下一轮 cron 实测耗时。若仍偏慢，再看翻页请求能否在单用户内并发（现在同一用户必须串行拿 cursor）（关联：`docs/development-log/2026-11-23.md`、`2026-11-24.md`；风险：低）
 - [ ] [refactor] 补齐 `apps/server` / `apps/scripts` 的 `typecheck`，把根 `bun run typecheck` 扩到全仓（前置：scripts 剩 3 处历史错误、server 集成测试 1 处；`packages/database` 已可干净通过；关联：`docs/INDEX.md` §四、CI `typecheck` job；风险：低）
 - [ ] [test] 视觉回归（VRT）覆盖扩面：MediaCard / InstagramPostCard / TweetSkeleton / DateDivider × 双主题（前置：无，基线只在本地生成；关联：`planning/visual-regression-testing.md`；风险：低）
 - [ ] [feat] 执行 Space 卡片历史数据回填：脚本已就绪（`apps/scripts/src/backfillSpace.ts`，只写 `jsonData`、默认 dry-run，`--write` 落库），但本机 Bun 连不上 Neon（TLS 校验失败，PowerShell 可连）故尚未实跑；需在能连 Neon 的环境先 dry-run 确认规模再 `--write`（前置：可访问 Neon 的网络 / 限流预算；关联：`docs/development-log/2026-09-25.md`；风险：低）

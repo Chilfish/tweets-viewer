@@ -24,7 +24,7 @@ select "userName", daily_fetch, ins_username from users where "userName" = 'rits
 
 `ins_username` / `ins_json_data` 为空就是还没接进来；`daily_fetch = true` 才会进每日增量。
 
-`.env` 需要 `INSTAGRAM_COOKIES`（至少含 `sessionid` + `csrftoken`）和 `DATABASE_URL`。Cookie 过期时抓取会报 401 或 `User not found`。
+环境文件里需要 `INSTAGRAM_COOKIES`（至少含 `sessionid` + `csrftoken`）和 `DATABASE_URL`。Cookie 过期时抓取会报 401 或 `User not found`。
 
 ## 1. 先看会做什么
 

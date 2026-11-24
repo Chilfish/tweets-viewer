@@ -43,13 +43,21 @@ macOS：`brew install postgresql`；SILO 用 `brew tap pgsty/infra && brew insta
 
 ## 环境变量
 
-只用一个文件：项目根目录 `.env`（已在 `.gitignore`）。**这不是 wrangler 的 `.dev.vars`**，脚本与 `env.server.ts` 都读它。
+环境文件分成三个，都在项目根目录且不入库（**不是 wrangler 的 `.dev.vars`**）。脚本、CLI 与 `env.server.ts` 都按同一顺序读取：
+
+| 文件 | 何时叠加 | 放什么 |
+| --- | --- | --- |
+| `.env` | 总是先读 | 共用配置：`TWEET_KEYS`、`INSTAGRAM_COOKIES`、`IG_PROXY`、`LOCAL` |
+| `.env.dev` | `LOCAL=1` | 本机库、Neon 代理、本机对象存储与媒体地址 |
+| `.env.prod` | `LOCAL` 未开启 | 线上 `DATABASE_URL` 与 `IG_CDN_BASE`；`bun run deploy` 只读它 |
+
+后面的文件覆盖前面的，缺失的模式文件跳过，进程环境始终优先。`LOCAL` 本身只看进程环境与 `.env`，模式文件不参与判定。
 
 | 变量 | 默认 | 说明 |
 | --- | --- | --- |
 | `LOCAL` | 未设置 | `1` / `true` / `yes` 开启本地模式 |
-| `DATABASE_URL` | — | 本机时是 `postgres://postgres@localhost:5432/tweets_dev`；多库时逗号分隔 |
-| `NEON_HTTP_ENDPOINT` | — | 本地是 `http://127.0.0.1:4444/sql`；设置后 neon 驱动改打这个地址 |
+| `DATABASE_URL` | — | 本机时是 `postgres://postgres@localhost:5432/tweets_dev`；线上多库时逗号分隔 |
+| `NEON_HTTP_ENDPOINT` | — | 本地是 `http://127.0.0.1:4445/sql`；设置后 neon 驱动改打这个地址 |
 | `S3_ENDPOINT` | `http://127.0.0.1:9000` | 本地对象存储地址 |
 | `S3_ACCESS_KEY_ID` | `silo-admin` | 本地凭据；优先于 `MINIO_ROOT_USER` |
 | `S3_SECRET_ACCESS_KEY` | `silo-admin` | 本地凭据；优先于 `MINIO_ROOT_PASSWORD` |
@@ -59,18 +67,15 @@ macOS：`brew install postgresql`；SILO 用 `brew tap pgsty/infra && brew insta
 | `TWEET_KEYS` | — | Twitter 抓取用，`env.server.ts` 必填 |
 | `INSTAGRAM_COOKIES` | — | IG 抓取用，至少含 `sessionid` + `csrftoken` |
 | `IG_PROXY` | 回退 `TWEET_PROXY` | IG 抓取走 HTTP(S) 代理；数据中心出口会被 IG 拒成「未登录」，CI 必须设置 |
-| `IG_CDN_BASE` | `https://s3.chilfish.top` | 线上媒体前缀；`LOCAL=1` 时由 devkit 写成 `http://127.0.0.1:9000/tweets-viewer` |
-| `DATABASE_URL_REMOTE` | — | 线上库连接串；`LOCAL=0` 时由 devkit 展开为 `DATABASE_URL` |
+| `IG_CDN_BASE` | `https://s3.chilfish.top` | 媒体前缀；`LOCAL=1` 时由 devkit 写成 `http://127.0.0.1:9000/tweets-viewer` |
 
-`bun run ig dev db` 由 devkit 的 `ensureEnvFile` 对齐 `.env`：upsert `LOCAL` / `DATABASE_URL` / `NEON_HTTP_ENDPOINT` / `IG_CDN_BASE`，注释与 `TWEET_KEYS` 等既有行保持不动。devkit 0.1.2 不再自动把原 `DATABASE_URL` 另存为 `DATABASE_URL_REMOTE`，远程连接串需要自己维护。
-
-`LOCAL=1` 时 `DATABASE_URL` 不是本机地址会被强制替换成本机库，`NEON_HTTP_ENDPOINT` 同理会指向本机代理，`IG_CDN_BASE` 指向本机桶。线上（`LOCAL=0`）把 `DATABASE_URL_REMOTE` 展开为 `DATABASE_URL`，不读取本地默认值。
+`bun run ig dev db` 由 devkit 的 `ensureEnvFile` 对齐 `.env.dev`（没有 `.env.dev` 时才写 `.env`）：upsert `LOCAL` / `DATABASE_URL` / `NEON_HTTP_ENDPOINT` / `IG_CDN_BASE`，注释与 `TWEET_KEYS` 等既有行保持不动。线上库地址自己写进 `.env.prod`，devkit 不会改写它。
 
 ## 部署与线上凭据
 
 `bun run deploy` 是唯一的部署入口（`bun run ig deploy`），固定按线上处理：
 
-1. 用 `DATABASE_URL_REMOTE` 覆盖库地址，置 `LOCAL=0`、清掉 `NEON_HTTP_ENDPOINT`；
+1. 只从 `.env.prod` 取 `DATABASE_URL`，本机地址直接拒绝；置 `LOCAL=0`、清掉本机代理/存储变量；
 2. 清空 `apps/server/.output` 后从零构建；
 3. 产物里出现 `DATABASE_URL` / `TWEET_KEYS` / `NEON_HTTP_ENDPOINT` 就中止，出现本机地址也中止；
 4. 通过后才 `nitro deploy --prebuilt`。
@@ -79,7 +84,7 @@ macOS：`brew install postgresql`；SILO 用 `brew tap pgsty/infra && brew insta
 
 ```bash
 cd apps/server
-bunx wrangler secret put DATABASE_URL    # 值取 .env 的 DATABASE_URL_REMOTE
+bunx wrangler secret put DATABASE_URL    # 值取 .env.prod 的 DATABASE_URL
 bunx wrangler secret put TWEET_KEYS
 bunx wrangler secret list --name tweet-api
 ```
@@ -92,7 +97,7 @@ bunx wrangler secret list --name tweet-api
 bun run ig dev db
 ```
 
-依次做四件事：启动 Postgres（已在运行则跳过）→ 建 `tweets_dev` → 应用 `packages/database/migrations/` → 写 `.env`。
+依次做四件事：启动 Postgres（已在运行则跳过）→ 建 `tweets_dev` → 应用 `packages/database/migrations/` → 写 `.env.dev`。
 
 只做诊断、不改文件：
 
@@ -139,7 +144,7 @@ http://127.0.0.1:9000/tweets-viewer/instagram/<账号>.<ext>
 bun run dev
 ```
 
-`bun run dev` 等价于 `bun run ig dev server`。devkit 会先跑 `ensureDevServices`：启动 Postgres → 建库 → 跑迁移 → 对齐 `.env` → 后台拉起 `/sql` 代理与 SILO，然后才启动 `dev.servers` 里的 server 与 client。Postgres、代理与 SILO 是独立后台进程，`Ctrl-C` 只结束两个前台 server，本地服务继续运行，下次 `bun run dev` 直接复用。
+`bun run dev` 等价于 `bun run ig dev server`。devkit 会先跑 `ensureDevServices`：启动 Postgres → 建库 → 跑迁移 → 对齐 `.env.dev` → 后台拉起 `/sql` 代理与 SILO，然后才启动 `dev.servers` 里的 server 与 client。Postgres、代理与 SILO 是独立后台进程，`Ctrl-C` 只结束两个前台 server，本地服务继续运行，下次 `bun run dev` 直接复用。
 
 只做前置、不起服务器：
 
@@ -152,7 +157,7 @@ bun run ig dev server --dry-run   # 只看会启动什么
 
 线上模式（`LOCAL` 未设置）会跳过全部本地服务，直接启动 server 与 client。
 
-`dev server` 的代理端口取 `apps/scripts/dev.config.ts` 的 `database.proxyEndpoint`；单独用 `dev proxy` 时可用 `--port` 覆盖。`TWEETS_DB_PROXY_PORT` 已不再被读取（迁移期弃用），改端口时同步改 `dev.config.ts` 与 `.env` 的 `NEON_HTTP_ENDPOINT`。端口被另一个库的代理占用时直接报错，不会静默连错库。
+`dev server` 的代理端口取 `apps/scripts/dev.config.ts` 的 `database.proxyEndpoint`；单独用 `dev proxy` 时可用 `--port` 覆盖。`TWEETS_DB_PROXY_PORT` 已不再被读取（迁移期弃用），改端口时同步改 `dev.config.ts` 与 `.env.dev` 的 `NEON_HTTP_ENDPOINT`。端口被另一个库的代理占用时直接报错，不会静默连错库。
 
 ## 单独启动代理
 
@@ -163,16 +168,16 @@ bun run ig dev proxy
 前台运行，`Ctrl-C` 结束。它只接受本机数据库地址，避免把线上库暴露到 localhost。
 
 ```bash
-curl http://127.0.0.1:4444/health
+curl http://127.0.0.1:4445/health
 # {"ok":true,"pid":925604,"host":"localhost:5432","database":"tweets_dev","queries":0}
 ```
 
 跑过一次抓取或访问过页面后 `queries` 会增加，说明查询确实落在本地库。
 
-端口被占用时换一个，并同步 `.env` 的 `NEON_HTTP_ENDPOINT`：
+端口被占用时换一个，并同步 `.env.dev` 的 `NEON_HTTP_ENDPOINT`：
 
 ```bash
-bun run ig dev proxy --port 4445
+bun run ig dev proxy --port 4446
 ```
 
 ## 验证本地链路
@@ -200,13 +205,13 @@ curl -s "http://127.0.0.1:3000/v3/ins/yuno_yumemita" | jq '.user.fullname, .post
 LOCAL=1 bun run ig ins refresh --no-download
 ```
 
-`ins refresh` 会先从 `DATABASE_URL_REMOTE` 同步整张 `users` 表，再对全部 `ins_username` 账号全量抓取帖子；
+`ins refresh` 会先从 `.env.prod` 的线上库同步整张 `users` 表，再对全部 `ins_username` 账号全量抓取帖子；
 `--no-download` 表示只同步数据、媒体链接指向线上 CDN。限流中断后加 `--missing` 续跑。
 
 IG 限流时用 `LOCAL=1 bun run ig ins merge-remote` 先把线上 `ins_posts` 合并到本地：
 同一个 `post_id` 保留本地行，只补本地没有的帖子。
 
-本机已经有别的项目占了 4444 时，把 `.env` 的 `NEON_HTTP_ENDPOINT` 改成 `http://127.0.0.1:4445/sql`，`bun run dev` 会把代理起在 4445。
+本机已经有别的项目占了 4445 时，把 `.env.dev` 的 `NEON_HTTP_ENDPOINT` 改成其他端口，`bun run dev` 会把代理起在该端口。
 
 ## 切回线上
 
@@ -214,7 +219,7 @@ IG 限流时用 `LOCAL=1 bun run ig ins merge-remote` 先把线上 `ins_posts` �
 LOCAL=0 bun run ig ins verify yuno_yumemita   # 单次覆盖
 ```
 
-或把 `.env` 的 `LOCAL` 改成 `0`。线上模式把 `DATABASE_URL_REMOTE` 展开为 `DATABASE_URL`，并读取 `R2_*`；`.env` 里由本地模式写下的 `NEON_HTTP_ENDPOINT` / `IG_CDN_BASE` 会被忽略——前者只对本机库生效，后者只有非本机地址才会被采用。显式设置的 `DATABASE_URL` 优先于文件。
+或把 `.env` 的 `LOCAL` 改成 `0`。线上模式从 `.env.prod` 读 `DATABASE_URL` 与 `IG_CDN_BASE`，并读取 `R2_*`；`.env.dev` 写下的 `NEON_HTTP_ENDPOINT` / `IG_CDN_BASE` 不会被叠加——前者只对本机库生效，后者只有非本机地址才会被采用。进程环境显式设置的值优先于文件。
 
 本地导入过的记录里存的是本机媒体地址，切回线上后先重写再重导一次 `.cdn.json`，让链接回到 `s3.chilfish.top`：
 
@@ -231,7 +236,7 @@ Postgres、代理与 SILO 都不随命令退出而停止（`dev proxy` 是前台
 
 ```powershell
 # 代理：先看 pid
-curl http://127.0.0.1:4444/health
+curl http://127.0.0.1:4445/health
 Stop-Process -Id <pid>
 
 # SILO：默认监听 9000
@@ -247,9 +252,9 @@ pg_ctl stop -D "$env:PGDATA"
 | --- | --- |
 | `未找到 pg_ctl` | 设置 `PG_CTL` 指向可执行文件、`PGDATA` 指向数据目录，或按上面的顺序安装 PostgreSQL |
 | `数据目录不可用` | 数据目录未初始化：`initdb -D <PGDATA>`；或 `PGDATA` 指错 |
-| 连接被拒绝 / `ECONNREFUSED` | 代理没起：`bun run ig dev proxy`；确认 `.env` 的 `NEON_HTTP_ENDPOINT` 与代理端口一致 |
+| 连接被拒绝 / `ECONNREFUSED` | 代理没起：`bun run ig dev proxy`；确认 `.env.dev` 的 `NEON_HTTP_ENDPOINT` 与代理端口一致 |
 | 查询报 `relation "users" does not exist` | 迁移没跑：`bun run ig dev db` |
-| 端口已被占用 | `bun run ig dev proxy --port 4445`，同时改 `dev.config.ts` 的 `database.proxyEndpoint` 与 `.env` 的 `NEON_HTTP_ENDPOINT` |
+| 端口已被占用 | `bun run ig dev proxy --port 4446`，同时改 `dev.config.ts` 的 `database.proxyEndpoint` 与 `.env.dev` 的 `NEON_HTTP_ENDPOINT` |
 | `LOCAL=1` 但仍连线上 | 进程环境覆盖了文件：`LOCAL=1 bun run …` 显式传一次 |
 | 页面数据是旧的 | 本地库有数据但前端有 5 分钟客户端缓存，刷新标签页 |
 | `未找到 silo 可执行文件` | 装 SILO 并加入 `PATH`，或设 `SILO_BIN`；读库不受影响 |
