@@ -25,6 +25,8 @@ export const LOCAL_MARKERS = [
   'postgresql://postgres@localhost',
   '127.0.0.1:4444',
   'localhost:4444',
+  '127.0.0.1:4445',
+  'localhost:4445',
   '127.0.0.1:9000',
   'localhost:9000',
   '5432/tweets_dev',

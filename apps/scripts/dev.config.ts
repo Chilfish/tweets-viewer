@@ -7,13 +7,14 @@ export const devkit = defineDevkit({
     helpHint: 'bun run ig',
   },
   env: {
+    // 基础文件 + 模式文件：LOCAL=1 叠加 .env.dev，否则叠加 .env.prod。
     file: '.env',
     localFlag: 'LOCAL',
-    onlineSuffix: '_REMOTE',
   },
   database: {
     localUrl: 'postgres://postgres@localhost:5432/tweets_dev',
-    proxyEndpoint: 'http://127.0.0.1:4444/sql',
+    // 4444 常被同机的其他 devkit 项目占用；本项目固定 4445，避免代理连错库。
+    proxyEndpoint: 'http://127.0.0.1:4445/sql',
     migrations: 'packages/database/migrations',
   },
   storage: {

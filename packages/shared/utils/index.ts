@@ -71,7 +71,8 @@ export function parseDatabaseUrls(raw: string | null | undefined): string[] {
 
 /** 本地开发模式总开关：`LOCAL=1` / `true` / `yes`。 */
 export const LOCAL_DATABASE_URL = 'postgres://postgres@localhost:5432/tweets_dev'
-export const LOCAL_PROXY_ENDPOINT = 'http://127.0.0.1:4444/sql'
+// 4444 会被同机的其他 devkit 项目占用，本项目固定 4445。
+export const LOCAL_PROXY_ENDPOINT = 'http://127.0.0.1:4445/sql'
 
 export function isLocalMode(env: Record<string, string | undefined> = process.env): boolean {
   const value = (env.LOCAL ?? '').trim().toLowerCase()
